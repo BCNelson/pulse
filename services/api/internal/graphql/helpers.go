@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/bcnelson/pulse/services/api/internal/auth"
+	graphqlModel "github.com/bcnelson/pulse/services/api/internal/graphql/model"
 )
 
 // errPermissionDenied is the typed error every mutation returns when the
@@ -100,4 +101,22 @@ type cursor struct {
 func encodeCursor(c cursor) string {
 	bs, _ := json.Marshal(c)
 	return base64.RawURLEncoding.EncodeToString(bs)
+}
+
+// boolOrTrue returns *p when set; nil defaults to true. Used for GraphQL
+// optional boolean inputs whose semantic default is "true".
+func boolOrTrue(p *bool) bool {
+	if p == nil {
+		return true
+	}
+	return *p
+}
+
+// emptyPostConnection is the zero-value PostConnection callers return for
+// "no rows" or anonymous viewers. Keeps the schema's non-null promise.
+func emptyPostConnection() *graphqlModel.PostConnection {
+	return &graphqlModel.PostConnection{
+		Edges:    []*graphqlModel.PostEdge{},
+		PageInfo: &graphqlModel.PageInfo{},
+	}
 }

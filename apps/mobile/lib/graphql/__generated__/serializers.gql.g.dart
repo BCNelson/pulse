@@ -8,6 +8,7 @@ part of 'serializers.gql.dart';
 
 Serializers _$serializers = (Serializers().toBuilder()
       ..add(FetchPolicy.serializer)
+      ..add(GCreateChatRoomInput.serializer)
       ..add(GCreateCommentInput.serializer)
       ..add(GCreatePostInput.serializer)
       ..add(GCreateTagInput.serializer)
@@ -24,6 +25,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GPrincipalKind.serializer)
       ..add(GPrincipalStatus.serializer)
       ..add(GSearchKind.serializer)
+      ..add(GSendMessageInput.serializer)
       ..add(GSubscribeTagInput.serializer)
       ..add(GSubscriptionUrgency.serializer)
       ..add(GTagRootKind.serializer)
@@ -31,6 +33,12 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(GPostTagInput)]),
           () => ListBuilder<GPostTagInput>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())

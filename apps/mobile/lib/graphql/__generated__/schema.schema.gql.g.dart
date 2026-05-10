@@ -221,6 +221,10 @@ Serializer<GEditPostInput> _$gEditPostInputSerializer =
     _$GEditPostInputSerializer();
 Serializer<GCreateCommentInput> _$gCreateCommentInputSerializer =
     _$GCreateCommentInputSerializer();
+Serializer<GCreateChatRoomInput> _$gCreateChatRoomInputSerializer =
+    _$GCreateChatRoomInputSerializer();
+Serializer<GSendMessageInput> _$gSendMessageInputSerializer =
+    _$GSendMessageInputSerializer();
 
 class _$GTagRootKindSerializer implements PrimitiveSerializer<GTagRootKind> {
   @override
@@ -833,6 +837,131 @@ class _$GCreateCommentInputSerializer
         case 'body':
           result.body = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreateChatRoomInputSerializer
+    implements StructuredSerializer<GCreateChatRoomInput> {
+  @override
+  final Iterable<Type> types = const [
+    GCreateChatRoomInput,
+    _$GCreateChatRoomInput
+  ];
+  @override
+  final String wireName = 'GCreateChatRoomInput';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCreateChatRoomInput object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[];
+    Object? value;
+    value = object.tagIds;
+    if (value != null) {
+      result
+        ..add('tagIds')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(String)])));
+    }
+    value = object.participantIds;
+    if (value != null) {
+      result
+        ..add('participantIds')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(String)])));
+    }
+    return result;
+  }
+
+  @override
+  GCreateChatRoomInput deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreateChatRoomInputBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'tagIds':
+          result.tagIds.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(String)]))!
+              as BuiltList<Object?>);
+          break;
+        case 'participantIds':
+          result.participantIds.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(String)]))!
+              as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GSendMessageInputSerializer
+    implements StructuredSerializer<GSendMessageInput> {
+  @override
+  final Iterable<Type> types = const [GSendMessageInput, _$GSendMessageInput];
+  @override
+  final String wireName = 'GSendMessageInput';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, GSendMessageInput object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'roomId',
+      serializers.serialize(object.roomId,
+          specifiedType: const FullType(String)),
+      'body',
+      serializers.serialize(object.body, specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.replyTo;
+    if (value != null) {
+      result
+        ..add('replyTo')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    return result;
+  }
+
+  @override
+  GSendMessageInput deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSendMessageInputBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'roomId':
+          result.roomId = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'body':
+          result.body = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'replyTo':
+          result.replyTo = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
           break;
       }
     }
@@ -1862,6 +1991,225 @@ class GCreateCommentInputBuilder
           parentId: parentId,
           body: BuiltValueNullFieldError.checkNotNull(
               body, r'GCreateCommentInput', 'body'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreateChatRoomInput extends GCreateChatRoomInput {
+  @override
+  final BuiltList<String>? tagIds;
+  @override
+  final BuiltList<String>? participantIds;
+
+  factory _$GCreateChatRoomInput(
+          [void Function(GCreateChatRoomInputBuilder)? updates]) =>
+      (GCreateChatRoomInputBuilder()..update(updates))._build();
+
+  _$GCreateChatRoomInput._({this.tagIds, this.participantIds}) : super._();
+  @override
+  GCreateChatRoomInput rebuild(
+          void Function(GCreateChatRoomInputBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreateChatRoomInputBuilder toBuilder() =>
+      GCreateChatRoomInputBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreateChatRoomInput &&
+        tagIds == other.tagIds &&
+        participantIds == other.participantIds;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, tagIds.hashCode);
+    _$hash = $jc(_$hash, participantIds.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GCreateChatRoomInput')
+          ..add('tagIds', tagIds)
+          ..add('participantIds', participantIds))
+        .toString();
+  }
+}
+
+class GCreateChatRoomInputBuilder
+    implements Builder<GCreateChatRoomInput, GCreateChatRoomInputBuilder> {
+  _$GCreateChatRoomInput? _$v;
+
+  ListBuilder<String>? _tagIds;
+  ListBuilder<String> get tagIds => _$this._tagIds ??= ListBuilder<String>();
+  set tagIds(ListBuilder<String>? tagIds) => _$this._tagIds = tagIds;
+
+  ListBuilder<String>? _participantIds;
+  ListBuilder<String> get participantIds =>
+      _$this._participantIds ??= ListBuilder<String>();
+  set participantIds(ListBuilder<String>? participantIds) =>
+      _$this._participantIds = participantIds;
+
+  GCreateChatRoomInputBuilder();
+
+  GCreateChatRoomInputBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _tagIds = $v.tagIds?.toBuilder();
+      _participantIds = $v.participantIds?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreateChatRoomInput other) {
+    _$v = other as _$GCreateChatRoomInput;
+  }
+
+  @override
+  void update(void Function(GCreateChatRoomInputBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreateChatRoomInput build() => _build();
+
+  _$GCreateChatRoomInput _build() {
+    _$GCreateChatRoomInput _$result;
+    try {
+      _$result = _$v ??
+          _$GCreateChatRoomInput._(
+            tagIds: _tagIds?.build(),
+            participantIds: _participantIds?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'tagIds';
+        _tagIds?.build();
+        _$failedField = 'participantIds';
+        _participantIds?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GCreateChatRoomInput', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSendMessageInput extends GSendMessageInput {
+  @override
+  final String roomId;
+  @override
+  final String body;
+  @override
+  final String? replyTo;
+
+  factory _$GSendMessageInput(
+          [void Function(GSendMessageInputBuilder)? updates]) =>
+      (GSendMessageInputBuilder()..update(updates))._build();
+
+  _$GSendMessageInput._(
+      {required this.roomId, required this.body, this.replyTo})
+      : super._();
+  @override
+  GSendMessageInput rebuild(void Function(GSendMessageInputBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSendMessageInputBuilder toBuilder() =>
+      GSendMessageInputBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSendMessageInput &&
+        roomId == other.roomId &&
+        body == other.body &&
+        replyTo == other.replyTo;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, roomId.hashCode);
+    _$hash = $jc(_$hash, body.hashCode);
+    _$hash = $jc(_$hash, replyTo.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GSendMessageInput')
+          ..add('roomId', roomId)
+          ..add('body', body)
+          ..add('replyTo', replyTo))
+        .toString();
+  }
+}
+
+class GSendMessageInputBuilder
+    implements Builder<GSendMessageInput, GSendMessageInputBuilder> {
+  _$GSendMessageInput? _$v;
+
+  String? _roomId;
+  String? get roomId => _$this._roomId;
+  set roomId(String? roomId) => _$this._roomId = roomId;
+
+  String? _body;
+  String? get body => _$this._body;
+  set body(String? body) => _$this._body = body;
+
+  String? _replyTo;
+  String? get replyTo => _$this._replyTo;
+  set replyTo(String? replyTo) => _$this._replyTo = replyTo;
+
+  GSendMessageInputBuilder();
+
+  GSendMessageInputBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _roomId = $v.roomId;
+      _body = $v.body;
+      _replyTo = $v.replyTo;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSendMessageInput other) {
+    _$v = other as _$GSendMessageInput;
+  }
+
+  @override
+  void update(void Function(GSendMessageInputBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSendMessageInput build() => _build();
+
+  _$GSendMessageInput _build() {
+    final _$result = _$v ??
+        _$GSendMessageInput._(
+          roomId: BuiltValueNullFieldError.checkNotNull(
+              roomId, r'GSendMessageInput', 'roomId'),
+          body: BuiltValueNullFieldError.checkNotNull(
+              body, r'GSendMessageInput', 'body'),
+          replyTo: replyTo,
         );
     replace(_$result);
     return _$result;

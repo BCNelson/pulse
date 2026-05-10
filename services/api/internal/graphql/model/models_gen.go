@@ -42,6 +42,24 @@ func (this Bot) GetStatus() PrincipalStatus { return this.Status }
 func (this Bot) GetDisplayName() string     { return this.DisplayName }
 func (this Bot) GetHomeTag() *Tag           { return this.HomeTag }
 
+type ChatRoom struct {
+	ID           string                 `json:"id"`
+	GlobalURI    string                 `json:"globalUri"`
+	IsDm         bool                   `json:"isDM"`
+	Tags         []*Tag                 `json:"tags"`
+	Participants []*ChatRoomParticipant `json:"participants"`
+	Messages     *MessageConnection     `json:"messages"`
+	CreatedAt    time.Time              `json:"createdAt"`
+	ArchivedAt   *time.Time             `json:"archivedAt,omitempty"`
+}
+
+type ChatRoomParticipant struct {
+	Principal Principal  `json:"principal"`
+	Role      string     `json:"role"`
+	JoinedAt  time.Time  `json:"joinedAt"`
+	LeftAt    *time.Time `json:"leftAt,omitempty"`
+}
+
 type Comment struct {
 	ID        string             `json:"id"`
 	PostID    string             `json:"postId"`
@@ -66,6 +84,11 @@ type CommentConnection struct {
 type CommentEdge struct {
 	Node   *Comment `json:"node"`
 	Cursor string   `json:"cursor"`
+}
+
+type CreateChatRoomInput struct {
+	TagIds         []string `json:"tagIds,omitempty"`
+	ParticipantIds []string `json:"participantIds,omitempty"`
 }
 
 type CreateCommentInput struct {
@@ -105,6 +128,29 @@ type LoginPayload struct {
 	Token     string    `json:"token"`
 	ExpiresAt time.Time `json:"expiresAt"`
 	Viewer    *User     `json:"viewer"`
+}
+
+type Message struct {
+	ID             string     `json:"id"`
+	GlobalURI      string     `json:"globalUri"`
+	ChatRoom       *ChatRoom  `json:"chatRoom"`
+	Author         Principal  `json:"author"`
+	Body           string     `json:"body"`
+	ReplyTo        *Message   `json:"replyTo,omitempty"`
+	CreatedAt      time.Time  `json:"createdAt"`
+	EditedAt       *time.Time `json:"editedAt,omitempty"`
+	DeletedAt      *time.Time `json:"deletedAt,omitempty"`
+	PromotedToPost *Post      `json:"promotedToPost,omitempty"`
+}
+
+type MessageConnection struct {
+	Edges    []*MessageEdge `json:"edges"`
+	PageInfo *PageInfo      `json:"pageInfo"`
+}
+
+type MessageEdge struct {
+	Node   *Message `json:"node"`
+	Cursor string   `json:"cursor"`
 }
 
 type Mutation struct {
@@ -189,11 +235,20 @@ type SearchEdge struct {
 	Score  float64      `json:"score"`
 }
 
+type SendMessageInput struct {
+	RoomID  string  `json:"roomId"`
+	Body    string  `json:"body"`
+	ReplyTo *string `json:"replyTo,omitempty"`
+}
+
 type SubscribeTagInput struct {
 	TagID        string               `json:"tagId"`
 	Cascade      *bool                `json:"cascade,omitempty"`
 	Urgency      *SubscriptionUrgency `json:"urgency,omitempty"`
 	ReasonFilter []string             `json:"reasonFilter,omitempty"`
+}
+
+type Subscription struct {
 }
 
 type Tag struct {
@@ -225,6 +280,11 @@ type TagPermissions struct {
 type TagSearchHit struct {
 	Tag        *Tag    `json:"tag"`
 	Similarity float64 `json:"similarity"`
+}
+
+type TagStructureEvent struct {
+	TagID string `json:"tagId"`
+	Kind  string `json:"kind"`
 }
 
 type TagSubscription struct {

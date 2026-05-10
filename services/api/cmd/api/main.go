@@ -22,12 +22,14 @@ import (
 
 	pulseaudit "github.com/bcnelson/pulse/services/api/internal/audit"
 	pulseauth "github.com/bcnelson/pulse/services/api/internal/auth"
+	pulsechat "github.com/bcnelson/pulse/services/api/internal/chat"
 	pulsecomment "github.com/bcnelson/pulse/services/api/internal/comment"
 	pulsedb "github.com/bcnelson/pulse/services/api/internal/db"
 	pulsegraphql "github.com/bcnelson/pulse/services/api/internal/graphql"
 	pulsejob "github.com/bcnelson/pulse/services/api/internal/job"
 	pulseperm "github.com/bcnelson/pulse/services/api/internal/perm"
 	pulsepost "github.com/bcnelson/pulse/services/api/internal/post"
+	pulserealtime "github.com/bcnelson/pulse/services/api/internal/realtime"
 	pulsesearch "github.com/bcnelson/pulse/services/api/internal/search"
 	pulsetag "github.com/bcnelson/pulse/services/api/internal/tag"
 )
@@ -93,15 +95,24 @@ func run(ctx context.Context, mode string, cfg appConfig, logger *slog.Logger, p
 
 func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool *pgxpool.Pool) error {
 	authSvc := &pulseauth.Service{DB: pool}
+	postSvc := &pulsepost.Service{DB: pool}
+
+	dispatcher, err := pulserealtime.New(ctx, cfg.databaseURL, logger.With("component", "realtime"))
+	if err != nil {
+		return fmt.Errorf("realtime: %w", err)
+	}
+
 	resolver := &pulsegraphql.Resolver{
 		DB:       pool,
 		Auth:     authSvc,
 		Perm:     &pulseperm.Service{DB: pool},
 		Tags:     &pulsetag.Service{DB: pool},
 		Audit:    &pulseaudit.Service{DB: pool},
-		Posts:    &pulsepost.Service{DB: pool},
+		Posts:    postSvc,
 		Comments: &pulsecomment.Service{DB: pool},
 		Search:   &pulsesearch.Service{DB: pool},
+		Chat:     &pulsechat.Service{DB: pool, Posts: postSvc},
+		Realtime: dispatcher,
 	}
 
 	srv := handler.New(pulsegraphql.NewExecutableSchema(pulsegraphql.Config{
@@ -110,6 +121,10 @@ func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool 
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
+	// Subscriptions over WebSocket (graphql-transport-ws).
+	srv.AddTransport(transport.Websocket{
+		KeepAlivePingInterval: 30 * time.Second,
+	})
 	srv.Use(extension.Introspection{})
 
 	// Per-request perm cache wraps every GraphQL operation; auth middleware

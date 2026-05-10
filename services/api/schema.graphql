@@ -3,7 +3,9 @@ Pulse GraphQL schema.
 
 M1: identity, tags, permissions.
 M2: posts, comments, reactions, search.
-M3+ : real-time, chat, tasks land in subsequent milestones.
+M3: chat (rooms, messages, DM detection, promotion to post) + real-time
+    subscriptions (messageAdded, postChanged, tagStructureChanged).
+M4+ : tasks, notifications inbox land in subsequent milestones.
 """
 
 scalar Time
@@ -236,6 +238,7 @@ type Query {
 
   tag(id: ID!): Tag
   post(id: ID!): Post
+  chatRoom(id: ID!): ChatRoom
 
   search(query: String!, kinds: [SearchKind!], first: Int): SearchConnection!
   searchTags(query: String!, first: Int): [TagSearchHit!]!
@@ -296,6 +299,67 @@ type LoginPayload {
   viewer: User!
 }
 
+# ----- chat (M3) -----
+
+type ChatRoomParticipant {
+  principal: Principal!
+  role: String!
+  joinedAt: Time!
+  leftAt: Time
+}
+
+type ChatRoom {
+  id: ID!
+  globalUri: String!
+  isDM: Boolean!
+  tags: [Tag!]!
+  participants: [ChatRoomParticipant!]!
+  messages(first: Int): MessageConnection!
+  createdAt: Time!
+  archivedAt: Time
+}
+
+type Message {
+  id: ID!
+  globalUri: String!
+  chatRoom: ChatRoom!
+  author: Principal!
+  body: String!
+  replyTo: Message
+  createdAt: Time!
+  editedAt: Time
+  deletedAt: Time
+  promotedToPost: Post
+}
+
+type MessageEdge {
+  node: Message!
+  cursor: String!
+}
+
+type MessageConnection {
+  edges: [MessageEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TagStructureEvent {
+  tagId: ID!
+  kind: String!
+}
+
+input CreateChatRoomInput {
+  tagIds: [ID!]
+  participantIds: [ID!]
+}
+
+input SendMessageInput {
+  roomId: ID!
+  body: String!
+  replyTo: ID
+}
+
+# ----- mutations -----
+
 type Mutation {
   login(email: String!, password: String!): LoginPayload!
   logout: Boolean!
@@ -322,4 +386,36 @@ type Mutation {
   deleteComment(commentId: ID!): Boolean!
   reactToComment(commentId: ID!, emoji: String!): Comment!
   unreactToComment(commentId: ID!, emoji: String!): Comment!
+
+  createChatRoom(input: CreateChatRoomInput!): ChatRoom!
+  addParticipant(roomId: ID!, principalId: ID!, role: String): ChatRoom!
+  removeParticipant(roomId: ID!, principalId: ID!): ChatRoom!
+  addRoomTag(roomId: ID!, tagId: ID!): ChatRoom!
+  removeRoomTag(roomId: ID!, tagId: ID!): ChatRoom!
+  sendMessage(input: SendMessageInput!): Message!
+  editMessage(messageId: ID!, body: String!): Message!
+  deleteMessage(messageId: ID!): Boolean!
+  promoteMessage(messageId: ID!): Post!
+}
+
+# ----- subscriptions (M3) -----
+
+type Subscription {
+  """
+  Fires whenever a new message lands in the named room. Auth is rechecked
+  on every event — a viewer who loses access to the room mid-session
+  stops receiving messages even before reconnecting.
+  """
+  messageAdded(roomId: ID!): Message!
+
+  """
+  Fires whenever a post visible to the viewer (under the named tag)
+  changes. M3 emits on create only; M4 extends to update / delete.
+  """
+  postChanged(tagId: ID!): Post!
+
+  """
+  Fires when a tag is moved, renamed, or archived.
+  """
+  tagStructureChanged(tagId: ID!): TagStructureEvent!
 }

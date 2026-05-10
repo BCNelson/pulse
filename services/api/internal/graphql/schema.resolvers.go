@@ -14,14 +14,29 @@ import (
 
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
+	"github.com/bcnelson/pulse/services/api/internal/chat"
 	"github.com/bcnelson/pulse/services/api/internal/comment"
 	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
 	"github.com/bcnelson/pulse/services/api/internal/post"
+	"github.com/bcnelson/pulse/services/api/internal/realtime"
 	"github.com/bcnelson/pulse/services/api/internal/search"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
 	"github.com/google/uuid"
 )
+
+// Messages is the resolver for the messages field.
+func (r *chatRoomResolver) Messages(ctx context.Context, obj *model.ChatRoom, first *int) (*model.MessageConnection, error) {
+	rid, err := uuid.Parse(obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid room id: %w", err)
+	}
+	limit := 100
+	if first != nil && *first > 0 && *first <= 500 {
+		limit = *first
+	}
+	return r.loadMessageConnection(ctx, rid, limit)
+}
 
 // Login is the resolver for the login field.
 func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*model.LoginPayload, error) {
@@ -163,8 +178,10 @@ func (r *mutationResolver) MoveTag(ctx context.Context, tagID string, newParentI
 	}); err != nil {
 		return nil, err
 	}
-	if _, err := r.DB.Exec(ctx, `SELECT pg_notify('tag.' || $1::text || '.structure', $2)`,
-		src, fmt.Sprintf(`{"kind":"moved","tag_id":"%s","new_parent_id":"%s"}`, src, dst)); err != nil {
+	notifyPayload := json.RawMessage(fmt.Sprintf(
+		`{"kind":"moved","tag_id":"%s","new_parent_id":"%s"}`, src, dst))
+	notifySQL, notifyArgs := realtime.NotifySQL("tag."+src.String()+".structure", notifyPayload)
+	if _, err := r.DB.Exec(ctx, notifySQL, notifyArgs...); err != nil {
 		return nil, err
 	}
 	return r.loadTag(ctx, src)
@@ -743,6 +760,300 @@ func (r *mutationResolver) UnreactToComment(ctx context.Context, commentID strin
 	return r.loadComment(ctx, id)
 }
 
+// CreateChatRoom is the resolver for the createChatRoom field.
+func (r *mutationResolver) CreateChatRoom(ctx context.Context, input model.CreateChatRoomInput) (*model.ChatRoom, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tagIDs := make([]uuid.UUID, 0, len(input.TagIds))
+	for _, s := range input.TagIds {
+		tid, err := uuid.Parse(s)
+		if err != nil {
+			return nil, fmt.Errorf("invalid tagId: %w", err)
+		}
+		// Creating a chat room under a tag requires contribute on the tag.
+		can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionContribute, tid)
+		if err != nil {
+			return nil, err
+		}
+		if !can {
+			return nil, errPermissionDenied
+		}
+		tagIDs = append(tagIDs, tid)
+	}
+	parts := []chat.ParticipantInput{{PrincipalID: identity.EffectiveID, Role: "admin"}}
+	for _, s := range input.ParticipantIds {
+		pid, err := uuid.Parse(s)
+		if err != nil {
+			return nil, fmt.Errorf("invalid participantId: %w", err)
+		}
+		if pid == identity.EffectiveID {
+			continue // creator already added as admin
+		}
+		parts = append(parts, chat.ParticipantInput{PrincipalID: pid, Role: "member"})
+	}
+	id, err := r.Chat.CreateRoom(ctx, chat.CreateRoomInput{
+		Tags:         tagIDs,
+		Participants: parts,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "chatroom.create", TargetType: "chat_room", TargetID: id,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadChatRoom(ctx, id)
+}
+
+// AddParticipant is the resolver for the addParticipant field.
+func (r *mutationResolver) AddParticipant(ctx context.Context, roomID string, principalID string, role *string) (*model.ChatRoom, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rid, err := uuid.Parse(roomID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid roomId: %w", err)
+	}
+	pid, err := uuid.Parse(principalID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid principalId: %w", err)
+	}
+	// Modifying participants requires either being a participant already
+	// (members can invite) or moderator-on-tag.
+	can, err := r.Perm.CanInRoom(ctx, identity.EffectiveID, rid)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	roleStr := ""
+	if role != nil {
+		roleStr = *role
+	}
+	if err := r.Chat.AddParticipant(ctx, rid, pid, roleStr); err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "chatroom.add_participant", TargetType: "chat_room", TargetID: rid,
+		Diff: json.RawMessage(fmt.Sprintf(`{"principal_id":"%s","role":%q}`, pid, roleStr)),
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadChatRoom(ctx, rid)
+}
+
+// RemoveParticipant is the resolver for the removeParticipant field.
+func (r *mutationResolver) RemoveParticipant(ctx context.Context, roomID string, principalID string) (*model.ChatRoom, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rid, err := uuid.Parse(roomID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid roomId: %w", err)
+	}
+	pid, err := uuid.Parse(principalID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid principalId: %w", err)
+	}
+	// Self-leave is always allowed; otherwise need room access.
+	if pid != identity.EffectiveID {
+		can, err := r.Perm.CanInRoom(ctx, identity.EffectiveID, rid)
+		if err != nil {
+			return nil, err
+		}
+		if !can {
+			return nil, errPermissionDenied
+		}
+	}
+	if err := r.Chat.RemoveParticipant(ctx, rid, pid); err != nil {
+		return nil, err
+	}
+	return r.loadChatRoom(ctx, rid)
+}
+
+// AddRoomTag is the resolver for the addRoomTag field.
+func (r *mutationResolver) AddRoomTag(ctx context.Context, roomID string, tagID string) (*model.ChatRoom, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rid, err := uuid.Parse(roomID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid roomId: %w", err)
+	}
+	tid, err := uuid.Parse(tagID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tagId: %w", err)
+	}
+	can, err := r.Perm.CanInRoom(ctx, identity.EffectiveID, rid)
+	if err != nil {
+		return nil, err
+	}
+	canTag, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionContribute, tid)
+	if err != nil {
+		return nil, err
+	}
+	if !can || !canTag {
+		return nil, errPermissionDenied
+	}
+	if err := r.Chat.AddTag(ctx, rid, tid); err != nil {
+		return nil, err
+	}
+	return r.loadChatRoom(ctx, rid)
+}
+
+// RemoveRoomTag is the resolver for the removeRoomTag field.
+func (r *mutationResolver) RemoveRoomTag(ctx context.Context, roomID string, tagID string) (*model.ChatRoom, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rid, err := uuid.Parse(roomID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid roomId: %w", err)
+	}
+	tid, err := uuid.Parse(tagID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tagId: %w", err)
+	}
+	can, err := r.Perm.CanInRoom(ctx, identity.EffectiveID, rid)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if err := r.Chat.RemoveTag(ctx, rid, tid); err != nil {
+		return nil, err
+	}
+	return r.loadChatRoom(ctx, rid)
+}
+
+// SendMessage is the resolver for the sendMessage field.
+func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMessageInput) (*model.Message, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rid, err := uuid.Parse(input.RoomID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid roomId: %w", err)
+	}
+	can, err := r.Perm.CanInRoom(ctx, identity.EffectiveID, rid)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	var replyTo *uuid.UUID
+	if input.ReplyTo != nil {
+		rt, err := uuid.Parse(*input.ReplyTo)
+		if err != nil {
+			return nil, fmt.Errorf("invalid replyTo: %w", err)
+		}
+		replyTo = &rt
+	}
+	id, err := r.Chat.SendMessage(ctx, chat.SendInput{
+		RoomID: rid, AuthorID: identity.EffectiveID, Body: input.Body, ReplyTo: replyTo,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return r.loadMessage(ctx, id)
+}
+
+// EditMessage is the resolver for the editMessage field.
+func (r *mutationResolver) EditMessage(ctx context.Context, messageID string, body string) (*model.Message, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	mid, err := uuid.Parse(messageID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid messageId: %w", err)
+	}
+	msg, err := r.Chat.GetMessage(ctx, mid)
+	if err != nil {
+		return nil, err
+	}
+	if msg.AuthorID != identity.EffectiveID {
+		// Non-author edits aren't supported in M3 — chat is more
+		// transient than posts. M5 may add admin overrides.
+		return nil, errPermissionDenied
+	}
+	if err := r.Chat.EditMessage(ctx, mid, identity.EffectiveID, body); err != nil {
+		if errors.Is(err, chat.ErrAlreadyEdited) {
+			return r.loadMessage(ctx, mid)
+		}
+		return nil, err
+	}
+	return r.loadMessage(ctx, mid)
+}
+
+// DeleteMessage is the resolver for the deleteMessage field.
+func (r *mutationResolver) DeleteMessage(ctx context.Context, messageID string) (bool, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return false, err
+	}
+	mid, err := uuid.Parse(messageID)
+	if err != nil {
+		return false, fmt.Errorf("invalid messageId: %w", err)
+	}
+	msg, err := r.Chat.GetMessage(ctx, mid)
+	if err != nil {
+		return false, err
+	}
+	if msg.AuthorID != identity.EffectiveID {
+		return false, errPermissionDenied
+	}
+	if err := r.Chat.DeleteMessage(ctx, mid); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// PromoteMessage is the resolver for the promoteMessage field.
+func (r *mutationResolver) PromoteMessage(ctx context.Context, messageID string) (*model.Post, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	mid, err := uuid.Parse(messageID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid messageId: %w", err)
+	}
+	msg, err := r.Chat.GetMessage(ctx, mid)
+	if err != nil {
+		return nil, err
+	}
+	can, err := r.Perm.CanInRoom(ctx, identity.EffectiveID, msg.ChatRoomID)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	postID, err := r.Chat.PromoteMessage(ctx, mid, identity.EffectiveID)
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "message.promote", TargetType: "message", TargetID: mid,
+		Diff: json.RawMessage(fmt.Sprintf(`{"post_id":"%s"}`, postID)),
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadPost(ctx, postID)
+}
+
 // Comments is the resolver for the comments field.
 func (r *postResolver) Comments(ctx context.Context, obj *model.Post, first *int, after *string) (*model.CommentConnection, error) {
 	postID, err := uuid.Parse(obj.ID)
@@ -802,6 +1113,15 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 		return nil, fmt.Errorf("invalid id: %w", err)
 	}
 	return r.loadPost(ctx, postID)
+}
+
+// ChatRoom is the resolver for the chatRoom field.
+func (r *queryResolver) ChatRoom(ctx context.Context, id string) (*model.ChatRoom, error) {
+	rid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid id: %w", err)
+	}
+	return r.loadChatRoom(ctx, rid)
 }
 
 // Search is the resolver for the search field.
@@ -897,6 +1217,181 @@ func (r *queryResolver) SearchTags(ctx context.Context, query string, first *int
 	return out, nil
 }
 
+// MessageAdded is the resolver for the messageAdded field.
+func (r *subscriptionResolver) MessageAdded(ctx context.Context, roomID string) (<-chan *model.Message, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	rid, err := uuid.Parse(roomID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid roomId: %w", err)
+	}
+	can, err := r.Perm.CanInRoom(ctx, identity.EffectiveID, rid)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	out := make(chan *model.Message, 4)
+	sub := r.Realtime.Subscribe("chat.room." + rid.String())
+	go func() {
+		defer close(out)
+		defer sub.Close()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case ev, ok := <-sub.Ch:
+				if !ok {
+					return
+				}
+				var p struct {
+					MessageID string `json:"message_id"`
+				}
+				if err := json.Unmarshal(ev.Payload, &p); err != nil || p.MessageID == "" {
+					continue
+				}
+				mid, err := uuid.Parse(p.MessageID)
+				if err != nil {
+					continue
+				}
+				// Per architecture: recheck visibility on every event so a
+				// viewer who lost access mid-session stops receiving.
+				stillCan, err := r.Perm.CanInRoom(ctx, identity.EffectiveID, rid)
+				if err != nil || !stillCan {
+					continue
+				}
+				msg, err := r.loadMessage(ctx, mid)
+				if err != nil || msg == nil {
+					continue
+				}
+				select {
+				case out <- msg:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}()
+	return out, nil
+}
+
+// PostChanged is the resolver for the postChanged field.
+func (r *subscriptionResolver) PostChanged(ctx context.Context, tagID string) (<-chan *model.Post, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tid, err := uuid.Parse(tagID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tagId: %w", err)
+	}
+	can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionView, tid)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	out := make(chan *model.Post, 4)
+	sub := r.Realtime.Subscribe("posts.tag." + tid.String())
+	go func() {
+		defer close(out)
+		defer sub.Close()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case ev, ok := <-sub.Ch:
+				if !ok {
+					return
+				}
+				var p struct {
+					PostID string `json:"post_id"`
+				}
+				if err := json.Unmarshal(ev.Payload, &p); err != nil || p.PostID == "" {
+					continue
+				}
+				pid, err := uuid.Parse(p.PostID)
+				if err != nil {
+					continue
+				}
+				stillCan, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionView, pid)
+				if err != nil || !stillCan {
+					continue
+				}
+				post, err := r.loadPost(ctx, pid)
+				if err != nil || post == nil {
+					continue
+				}
+				select {
+				case out <- post:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}()
+	return out, nil
+}
+
+// TagStructureChanged is the resolver for the tagStructureChanged field.
+func (r *subscriptionResolver) TagStructureChanged(ctx context.Context, tagID string) (<-chan *model.TagStructureEvent, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tid, err := uuid.Parse(tagID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tagId: %w", err)
+	}
+	can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionView, tid)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	out := make(chan *model.TagStructureEvent, 4)
+	sub := r.Realtime.Subscribe("tag." + tid.String() + ".structure")
+	go func() {
+		defer close(out)
+		defer sub.Close()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case ev, ok := <-sub.Ch:
+				if !ok {
+					return
+				}
+				var p struct {
+					Kind  string `json:"kind"`
+					TagID string `json:"tag_id"`
+				}
+				if err := json.Unmarshal(ev.Payload, &p); err != nil {
+					continue
+				}
+				if p.TagID == "" {
+					p.TagID = tid.String()
+				}
+				stillCan, _ := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionView, tid)
+				if !stillCan {
+					continue
+				}
+				select {
+				case out <- &model.TagStructureEvent{TagID: p.TagID, Kind: p.Kind}:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}()
+	return out, nil
+}
+
 // Posts is the resolver for the posts field.
 func (r *tagResolver) Posts(ctx context.Context, obj *model.Tag, first *int, after *string, sort *model.PostSort) (*model.PostConnection, error) {
 	identity := auth.FromContext(ctx)
@@ -950,16 +1445,8 @@ func (r *tagResolver) Posts(ctx context.Context, obj *model.Tag, first *int, aft
 	return &model.PostConnection{Edges: edges, PageInfo: pi}, nil
 }
 
-func emptyPostConnection() *model.PostConnection {
-	return &model.PostConnection{Edges: []*model.PostEdge{}, PageInfo: &model.PageInfo{}}
-}
-
-func boolOrTrue(p *bool) bool {
-	if p == nil {
-		return true
-	}
-	return *p
-}
+// ChatRoom returns ChatRoomResolver implementation.
+func (r *Resolver) ChatRoom() ChatRoomResolver { return &chatRoomResolver{r} }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
@@ -970,10 +1457,15 @@ func (r *Resolver) Post() PostResolver { return &postResolver{r} }
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// Subscription returns SubscriptionResolver implementation.
+func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionResolver{r} }
+
 // Tag returns TagResolver implementation.
 func (r *Resolver) Tag() TagResolver { return &tagResolver{r} }
 
+type chatRoomResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type postResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+type subscriptionResolver struct{ *Resolver }
 type tagResolver struct{ *Resolver }

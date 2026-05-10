@@ -43,3 +43,7 @@ models:
     fields:
       comments:
         resolver: true
+  ChatRoom:
+    fields:
+      messages:
+        resolver: true

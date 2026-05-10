@@ -5,9 +5,11 @@ import (
 
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
+	"github.com/bcnelson/pulse/services/api/internal/chat"
 	"github.com/bcnelson/pulse/services/api/internal/comment"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
 	"github.com/bcnelson/pulse/services/api/internal/post"
+	"github.com/bcnelson/pulse/services/api/internal/realtime"
 	"github.com/bcnelson/pulse/services/api/internal/search"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
 )
@@ -25,4 +27,6 @@ type Resolver struct {
 	Posts    *post.Service
 	Comments *comment.Service
 	Search   *search.Service
+	Chat     *chat.Service
+	Realtime *realtime.Dispatcher
 }

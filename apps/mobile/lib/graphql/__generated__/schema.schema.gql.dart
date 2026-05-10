@@ -345,6 +345,57 @@ abstract class GCreateCommentInput
       );
 }
 
+abstract class GCreateChatRoomInput
+    implements Built<GCreateChatRoomInput, GCreateChatRoomInputBuilder> {
+  GCreateChatRoomInput._();
+
+  factory GCreateChatRoomInput(
+          [void Function(GCreateChatRoomInputBuilder b) updates]) =
+      _$GCreateChatRoomInput;
+
+  BuiltList<String>? get tagIds;
+  BuiltList<String>? get participantIds;
+  static Serializer<GCreateChatRoomInput> get serializer =>
+      _$gCreateChatRoomInputSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GCreateChatRoomInput.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreateChatRoomInput? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GCreateChatRoomInput.serializer,
+        json,
+      );
+}
+
+abstract class GSendMessageInput
+    implements Built<GSendMessageInput, GSendMessageInputBuilder> {
+  GSendMessageInput._();
+
+  factory GSendMessageInput(
+          [void Function(GSendMessageInputBuilder b) updates]) =
+      _$GSendMessageInput;
+
+  String get roomId;
+  String get body;
+  String? get replyTo;
+  static Serializer<GSendMessageInput> get serializer =>
+      _$gSendMessageInputSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GSendMessageInput.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSendMessageInput? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GSendMessageInput.serializer,
+        json,
+      );
+}
+
 const Map<String, Set<String>> possibleTypesMap = {
   'Principal': {
     'User',

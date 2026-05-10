@@ -9,6 +9,7 @@ import 'package:gql_code_builder_serializers/gql_code_builder_serializers.dart'
     show OperationSerializer;
 import 'package:pulse/graphql/__generated__/schema.schema.gql.dart'
     show
+        GCreateChatRoomInput,
         GCreateCommentInput,
         GCreatePostInput,
         GCreateTagInput,
@@ -22,6 +23,7 @@ import 'package:pulse/graphql/__generated__/schema.schema.gql.dart'
         GPrincipalKind,
         GPrincipalStatus,
         GSearchKind,
+        GSendMessageInput,
         GSubscribeTagInput,
         GSubscriptionUrgency,
         GTagRootKind,
@@ -39,6 +41,7 @@ final SerializersBuilder _serializersBuilder = _$serializers.toBuilder()
   ..add(OperationSerializer())
   ..addPlugin(StandardJsonPlugin());
 @SerializersFor([
+  GCreateChatRoomInput,
   GCreateCommentInput,
   GCreatePostInput,
   GCreateTagInput,
@@ -55,6 +58,7 @@ final SerializersBuilder _serializersBuilder = _$serializers.toBuilder()
   GPrincipalKind,
   GPrincipalStatus,
   GSearchKind,
+  GSendMessageInput,
   GSubscribeTagInput,
   GSubscriptionUrgency,
   GTagRootKind,
