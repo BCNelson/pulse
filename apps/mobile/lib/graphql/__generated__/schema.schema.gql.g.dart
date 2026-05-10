@@ -132,6 +132,68 @@ final BuiltSet<GPrincipalStatus> _$gPrincipalStatusValues =
   _$gPrincipalStatusTOMBSTONED,
 ]);
 
+const GDecisionStatus _$gDecisionStatusDECISION =
+    const GDecisionStatus._('DECISION');
+const GDecisionStatus _$gDecisionStatusANSWER =
+    const GDecisionStatus._('ANSWER');
+
+GDecisionStatus _$gDecisionStatusValueOf(String name) {
+  switch (name) {
+    case 'DECISION':
+      return _$gDecisionStatusDECISION;
+    case 'ANSWER':
+      return _$gDecisionStatusANSWER;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<GDecisionStatus> _$gDecisionStatusValues =
+    BuiltSet<GDecisionStatus>(const <GDecisionStatus>[
+  _$gDecisionStatusDECISION,
+  _$gDecisionStatusANSWER,
+]);
+
+const GSearchKind _$gSearchKindPOST = const GSearchKind._('POST');
+const GSearchKind _$gSearchKindCOMMENT = const GSearchKind._('COMMENT');
+
+GSearchKind _$gSearchKindValueOf(String name) {
+  switch (name) {
+    case 'POST':
+      return _$gSearchKindPOST;
+    case 'COMMENT':
+      return _$gSearchKindCOMMENT;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<GSearchKind> _$gSearchKindValues =
+    BuiltSet<GSearchKind>(const <GSearchKind>[
+  _$gSearchKindPOST,
+  _$gSearchKindCOMMENT,
+]);
+
+const GPostSort _$gPostSortRECENT = const GPostSort._('RECENT');
+const GPostSort _$gPostSortACTIVE = const GPostSort._('ACTIVE');
+
+GPostSort _$gPostSortValueOf(String name) {
+  switch (name) {
+    case 'RECENT':
+      return _$gPostSortRECENT;
+    case 'ACTIVE':
+      return _$gPostSortACTIVE;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<GPostSort> _$gPostSortValues =
+    BuiltSet<GPostSort>(const <GPostSort>[
+  _$gPostSortRECENT,
+  _$gPostSortACTIVE,
+]);
+
 Serializer<GTagRootKind> _$gTagRootKindSerializer = _$GTagRootKindSerializer();
 Serializer<GPermissionBundle> _$gPermissionBundleSerializer =
     _$GPermissionBundleSerializer();
@@ -141,12 +203,24 @@ Serializer<GPrincipalKind> _$gPrincipalKindSerializer =
     _$GPrincipalKindSerializer();
 Serializer<GPrincipalStatus> _$gPrincipalStatusSerializer =
     _$GPrincipalStatusSerializer();
+Serializer<GDecisionStatus> _$gDecisionStatusSerializer =
+    _$GDecisionStatusSerializer();
+Serializer<GSearchKind> _$gSearchKindSerializer = _$GSearchKindSerializer();
+Serializer<GPostSort> _$gPostSortSerializer = _$GPostSortSerializer();
 Serializer<GCreateTagInput> _$gCreateTagInputSerializer =
     _$GCreateTagInputSerializer();
 Serializer<GGrantTagInput> _$gGrantTagInputSerializer =
     _$GGrantTagInputSerializer();
 Serializer<GSubscribeTagInput> _$gSubscribeTagInputSerializer =
     _$GSubscribeTagInputSerializer();
+Serializer<GPostTagInput> _$gPostTagInputSerializer =
+    _$GPostTagInputSerializer();
+Serializer<GCreatePostInput> _$gCreatePostInputSerializer =
+    _$GCreatePostInputSerializer();
+Serializer<GEditPostInput> _$gEditPostInputSerializer =
+    _$GEditPostInputSerializer();
+Serializer<GCreateCommentInput> _$gCreateCommentInputSerializer =
+    _$GCreateCommentInputSerializer();
 
 class _$GTagRootKindSerializer implements PrimitiveSerializer<GTagRootKind> {
   @override
@@ -235,6 +309,58 @@ class _$GPrincipalStatusSerializer
   GPrincipalStatus deserialize(Serializers serializers, Object serialized,
           {FullType specifiedType = FullType.unspecified}) =>
       GPrincipalStatus.valueOf(serialized as String);
+}
+
+class _$GDecisionStatusSerializer
+    implements PrimitiveSerializer<GDecisionStatus> {
+  @override
+  final Iterable<Type> types = const <Type>[GDecisionStatus];
+  @override
+  final String wireName = 'GDecisionStatus';
+
+  @override
+  Object serialize(Serializers serializers, GDecisionStatus object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      object.name;
+
+  @override
+  GDecisionStatus deserialize(Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      GDecisionStatus.valueOf(serialized as String);
+}
+
+class _$GSearchKindSerializer implements PrimitiveSerializer<GSearchKind> {
+  @override
+  final Iterable<Type> types = const <Type>[GSearchKind];
+  @override
+  final String wireName = 'GSearchKind';
+
+  @override
+  Object serialize(Serializers serializers, GSearchKind object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      object.name;
+
+  @override
+  GSearchKind deserialize(Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      GSearchKind.valueOf(serialized as String);
+}
+
+class _$GPostSortSerializer implements PrimitiveSerializer<GPostSort> {
+  @override
+  final Iterable<Type> types = const <Type>[GPostSort];
+  @override
+  final String wireName = 'GPostSort';
+
+  @override
+  Object serialize(Serializers serializers, GPostSort object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      object.name;
+
+  @override
+  GPostSort deserialize(Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      GPostSort.valueOf(serialized as String);
 }
 
 class _$GCreateTagInputSerializer
@@ -457,6 +583,256 @@ class _$GSubscribeTagInputSerializer
                   specifiedType: const FullType(
                       BuiltList, const [const FullType(String)]))!
               as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostTagInputSerializer implements StructuredSerializer<GPostTagInput> {
+  @override
+  final Iterable<Type> types = const [GPostTagInput, _$GPostTagInput];
+  @override
+  final String wireName = 'GPostTagInput';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, GPostTagInput object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'tagId',
+      serializers.serialize(object.tagId,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.viewRole;
+    if (value != null) {
+      result
+        ..add('viewRole')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.interactRole;
+    if (value != null) {
+      result
+        ..add('interactRole')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.moderateRole;
+    if (value != null) {
+      result
+        ..add('moderateRole')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    return result;
+  }
+
+  @override
+  GPostTagInput deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostTagInputBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'tagId':
+          result.tagId = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'viewRole':
+          result.viewRole = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool?;
+          break;
+        case 'interactRole':
+          result.interactRole = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool?;
+          break;
+        case 'moderateRole':
+          result.moderateRole = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool?;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreatePostInputSerializer
+    implements StructuredSerializer<GCreatePostInput> {
+  @override
+  final Iterable<Type> types = const [GCreatePostInput, _$GCreatePostInput];
+  @override
+  final String wireName = 'GCreatePostInput';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, GCreatePostInput object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'title',
+      serializers.serialize(object.title,
+          specifiedType: const FullType(String)),
+      'body',
+      serializers.serialize(object.body, specifiedType: const FullType(String)),
+      'tags',
+      serializers.serialize(object.tags,
+          specifiedType:
+              const FullType(BuiltList, const [const FullType(GPostTagInput)])),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCreatePostInput deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreatePostInputBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'title':
+          result.title = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'body':
+          result.body = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'tags':
+          result.tags.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(GPostTagInput)]))!
+              as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GEditPostInputSerializer
+    implements StructuredSerializer<GEditPostInput> {
+  @override
+  final Iterable<Type> types = const [GEditPostInput, _$GEditPostInput];
+  @override
+  final String wireName = 'GEditPostInput';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, GEditPostInput object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'postId',
+      serializers.serialize(object.postId,
+          specifiedType: const FullType(String)),
+      'title',
+      serializers.serialize(object.title,
+          specifiedType: const FullType(String)),
+      'body',
+      serializers.serialize(object.body, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GEditPostInput deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GEditPostInputBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'postId':
+          result.postId = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'title':
+          result.title = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'body':
+          result.body = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreateCommentInputSerializer
+    implements StructuredSerializer<GCreateCommentInput> {
+  @override
+  final Iterable<Type> types = const [
+    GCreateCommentInput,
+    _$GCreateCommentInput
+  ];
+  @override
+  final String wireName = 'GCreateCommentInput';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCreateCommentInput object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'postId',
+      serializers.serialize(object.postId,
+          specifiedType: const FullType(String)),
+      'body',
+      serializers.serialize(object.body, specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.parentId;
+    if (value != null) {
+      result
+        ..add('parentId')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    return result;
+  }
+
+  @override
+  GCreateCommentInput deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreateCommentInputBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'postId':
+          result.postId = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'parentId':
+          result.parentId = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'body':
+          result.body = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
       }
     }
@@ -1030,6 +1406,463 @@ class GSubscribeTagInputBuilder
       }
       rethrow;
     }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostTagInput extends GPostTagInput {
+  @override
+  final String tagId;
+  @override
+  final bool? viewRole;
+  @override
+  final bool? interactRole;
+  @override
+  final bool? moderateRole;
+
+  factory _$GPostTagInput([void Function(GPostTagInputBuilder)? updates]) =>
+      (GPostTagInputBuilder()..update(updates))._build();
+
+  _$GPostTagInput._(
+      {required this.tagId,
+      this.viewRole,
+      this.interactRole,
+      this.moderateRole})
+      : super._();
+  @override
+  GPostTagInput rebuild(void Function(GPostTagInputBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostTagInputBuilder toBuilder() => GPostTagInputBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostTagInput &&
+        tagId == other.tagId &&
+        viewRole == other.viewRole &&
+        interactRole == other.interactRole &&
+        moderateRole == other.moderateRole;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, tagId.hashCode);
+    _$hash = $jc(_$hash, viewRole.hashCode);
+    _$hash = $jc(_$hash, interactRole.hashCode);
+    _$hash = $jc(_$hash, moderateRole.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostTagInput')
+          ..add('tagId', tagId)
+          ..add('viewRole', viewRole)
+          ..add('interactRole', interactRole)
+          ..add('moderateRole', moderateRole))
+        .toString();
+  }
+}
+
+class GPostTagInputBuilder
+    implements Builder<GPostTagInput, GPostTagInputBuilder> {
+  _$GPostTagInput? _$v;
+
+  String? _tagId;
+  String? get tagId => _$this._tagId;
+  set tagId(String? tagId) => _$this._tagId = tagId;
+
+  bool? _viewRole;
+  bool? get viewRole => _$this._viewRole;
+  set viewRole(bool? viewRole) => _$this._viewRole = viewRole;
+
+  bool? _interactRole;
+  bool? get interactRole => _$this._interactRole;
+  set interactRole(bool? interactRole) => _$this._interactRole = interactRole;
+
+  bool? _moderateRole;
+  bool? get moderateRole => _$this._moderateRole;
+  set moderateRole(bool? moderateRole) => _$this._moderateRole = moderateRole;
+
+  GPostTagInputBuilder();
+
+  GPostTagInputBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _tagId = $v.tagId;
+      _viewRole = $v.viewRole;
+      _interactRole = $v.interactRole;
+      _moderateRole = $v.moderateRole;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostTagInput other) {
+    _$v = other as _$GPostTagInput;
+  }
+
+  @override
+  void update(void Function(GPostTagInputBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostTagInput build() => _build();
+
+  _$GPostTagInput _build() {
+    final _$result = _$v ??
+        _$GPostTagInput._(
+          tagId: BuiltValueNullFieldError.checkNotNull(
+              tagId, r'GPostTagInput', 'tagId'),
+          viewRole: viewRole,
+          interactRole: interactRole,
+          moderateRole: moderateRole,
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreatePostInput extends GCreatePostInput {
+  @override
+  final String title;
+  @override
+  final String body;
+  @override
+  final BuiltList<GPostTagInput> tags;
+
+  factory _$GCreatePostInput(
+          [void Function(GCreatePostInputBuilder)? updates]) =>
+      (GCreatePostInputBuilder()..update(updates))._build();
+
+  _$GCreatePostInput._(
+      {required this.title, required this.body, required this.tags})
+      : super._();
+  @override
+  GCreatePostInput rebuild(void Function(GCreatePostInputBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreatePostInputBuilder toBuilder() =>
+      GCreatePostInputBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreatePostInput &&
+        title == other.title &&
+        body == other.body &&
+        tags == other.tags;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, title.hashCode);
+    _$hash = $jc(_$hash, body.hashCode);
+    _$hash = $jc(_$hash, tags.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GCreatePostInput')
+          ..add('title', title)
+          ..add('body', body)
+          ..add('tags', tags))
+        .toString();
+  }
+}
+
+class GCreatePostInputBuilder
+    implements Builder<GCreatePostInput, GCreatePostInputBuilder> {
+  _$GCreatePostInput? _$v;
+
+  String? _title;
+  String? get title => _$this._title;
+  set title(String? title) => _$this._title = title;
+
+  String? _body;
+  String? get body => _$this._body;
+  set body(String? body) => _$this._body = body;
+
+  ListBuilder<GPostTagInput>? _tags;
+  ListBuilder<GPostTagInput> get tags =>
+      _$this._tags ??= ListBuilder<GPostTagInput>();
+  set tags(ListBuilder<GPostTagInput>? tags) => _$this._tags = tags;
+
+  GCreatePostInputBuilder();
+
+  GCreatePostInputBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _title = $v.title;
+      _body = $v.body;
+      _tags = $v.tags.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreatePostInput other) {
+    _$v = other as _$GCreatePostInput;
+  }
+
+  @override
+  void update(void Function(GCreatePostInputBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreatePostInput build() => _build();
+
+  _$GCreatePostInput _build() {
+    _$GCreatePostInput _$result;
+    try {
+      _$result = _$v ??
+          _$GCreatePostInput._(
+            title: BuiltValueNullFieldError.checkNotNull(
+                title, r'GCreatePostInput', 'title'),
+            body: BuiltValueNullFieldError.checkNotNull(
+                body, r'GCreatePostInput', 'body'),
+            tags: tags.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'tags';
+        tags.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GCreatePostInput', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GEditPostInput extends GEditPostInput {
+  @override
+  final String postId;
+  @override
+  final String title;
+  @override
+  final String body;
+
+  factory _$GEditPostInput([void Function(GEditPostInputBuilder)? updates]) =>
+      (GEditPostInputBuilder()..update(updates))._build();
+
+  _$GEditPostInput._(
+      {required this.postId, required this.title, required this.body})
+      : super._();
+  @override
+  GEditPostInput rebuild(void Function(GEditPostInputBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GEditPostInputBuilder toBuilder() => GEditPostInputBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GEditPostInput &&
+        postId == other.postId &&
+        title == other.title &&
+        body == other.body;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, postId.hashCode);
+    _$hash = $jc(_$hash, title.hashCode);
+    _$hash = $jc(_$hash, body.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GEditPostInput')
+          ..add('postId', postId)
+          ..add('title', title)
+          ..add('body', body))
+        .toString();
+  }
+}
+
+class GEditPostInputBuilder
+    implements Builder<GEditPostInput, GEditPostInputBuilder> {
+  _$GEditPostInput? _$v;
+
+  String? _postId;
+  String? get postId => _$this._postId;
+  set postId(String? postId) => _$this._postId = postId;
+
+  String? _title;
+  String? get title => _$this._title;
+  set title(String? title) => _$this._title = title;
+
+  String? _body;
+  String? get body => _$this._body;
+  set body(String? body) => _$this._body = body;
+
+  GEditPostInputBuilder();
+
+  GEditPostInputBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _postId = $v.postId;
+      _title = $v.title;
+      _body = $v.body;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GEditPostInput other) {
+    _$v = other as _$GEditPostInput;
+  }
+
+  @override
+  void update(void Function(GEditPostInputBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GEditPostInput build() => _build();
+
+  _$GEditPostInput _build() {
+    final _$result = _$v ??
+        _$GEditPostInput._(
+          postId: BuiltValueNullFieldError.checkNotNull(
+              postId, r'GEditPostInput', 'postId'),
+          title: BuiltValueNullFieldError.checkNotNull(
+              title, r'GEditPostInput', 'title'),
+          body: BuiltValueNullFieldError.checkNotNull(
+              body, r'GEditPostInput', 'body'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreateCommentInput extends GCreateCommentInput {
+  @override
+  final String postId;
+  @override
+  final String? parentId;
+  @override
+  final String body;
+
+  factory _$GCreateCommentInput(
+          [void Function(GCreateCommentInputBuilder)? updates]) =>
+      (GCreateCommentInputBuilder()..update(updates))._build();
+
+  _$GCreateCommentInput._(
+      {required this.postId, this.parentId, required this.body})
+      : super._();
+  @override
+  GCreateCommentInput rebuild(
+          void Function(GCreateCommentInputBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreateCommentInputBuilder toBuilder() =>
+      GCreateCommentInputBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreateCommentInput &&
+        postId == other.postId &&
+        parentId == other.parentId &&
+        body == other.body;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, postId.hashCode);
+    _$hash = $jc(_$hash, parentId.hashCode);
+    _$hash = $jc(_$hash, body.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GCreateCommentInput')
+          ..add('postId', postId)
+          ..add('parentId', parentId)
+          ..add('body', body))
+        .toString();
+  }
+}
+
+class GCreateCommentInputBuilder
+    implements Builder<GCreateCommentInput, GCreateCommentInputBuilder> {
+  _$GCreateCommentInput? _$v;
+
+  String? _postId;
+  String? get postId => _$this._postId;
+  set postId(String? postId) => _$this._postId = postId;
+
+  String? _parentId;
+  String? get parentId => _$this._parentId;
+  set parentId(String? parentId) => _$this._parentId = parentId;
+
+  String? _body;
+  String? get body => _$this._body;
+  set body(String? body) => _$this._body = body;
+
+  GCreateCommentInputBuilder();
+
+  GCreateCommentInputBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _postId = $v.postId;
+      _parentId = $v.parentId;
+      _body = $v.body;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreateCommentInput other) {
+    _$v = other as _$GCreateCommentInput;
+  }
+
+  @override
+  void update(void Function(GCreateCommentInputBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreateCommentInput build() => _build();
+
+  _$GCreateCommentInput _build() {
+    final _$result = _$v ??
+        _$GCreateCommentInput._(
+          postId: BuiltValueNullFieldError.checkNotNull(
+              postId, r'GCreateCommentInput', 'postId'),
+          parentId: parentId,
+          body: BuiltValueNullFieldError.checkNotNull(
+              body, r'GCreateCommentInput', 'body'),
+        );
     replace(_$result);
     return _$result;
   }

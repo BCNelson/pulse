@@ -1,16 +1,22 @@
 """
-Pulse GraphQL schema (M1).
+Pulse GraphQL schema.
 
-Surfaces the identity + tag + permission spine. Posts/comments/chat/tasks
-land in M2+. Real-time GraphQL subscriptions land in M3.
-
-Errors: M1 surfaces typed failures (PermissionDenied, NotFound, Conflict)
-through standard GraphQL errors. M2 may switch hot mutations to result-
-envelope unions if the typed-error pattern proves insufficient.
+M1: identity, tags, permissions.
+M2: posts, comments, reactions, search.
+M3+ : real-time, chat, tasks land in subsequent milestones.
 """
 
 scalar Time
 scalar JSON
+
+# ----- shared -----
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
 
 # ----- enums -----
 
@@ -43,7 +49,22 @@ enum PrincipalStatus {
   TOMBSTONED
 }
 
-# ----- types -----
+enum DecisionStatus {
+  DECISION
+  ANSWER
+}
+
+enum SearchKind {
+  POST
+  COMMENT
+}
+
+enum PostSort {
+  RECENT
+  ACTIVE
+}
+
+# ----- principals -----
 
 interface Principal {
   id: ID!
@@ -74,10 +95,8 @@ type Bot implements Principal {
   ownerPrincipal: Principal
 }
 
-"""
-Per-viewer permission summary on a tag. Computed alongside the tag fetch
-so clients don't make a separate round trip.
-"""
+# ----- tags -----
+
 type TagPermissions {
   bundle: PermissionBundle
   extras: [String!]!
@@ -107,6 +126,104 @@ type Tag {
   createdAt: Time!
   myPermissions: TagPermissions!
   mySubscription: TagSubscription
+  posts(first: Int, after: String, sort: PostSort): PostConnection!
+}
+
+# ----- posts -----
+
+type PostTag {
+  tag: Tag!
+  viewRole: Boolean!
+  interactRole: Boolean!
+  moderateRole: Boolean!
+}
+
+type PostPermissions {
+  bundle: PermissionBundle
+  canView: Boolean!
+  canContribute: Boolean!
+  canModerate: Boolean!
+}
+
+type ReactionSummary {
+  emoji: String!
+  count: Int!
+  byViewer: Boolean!
+}
+
+type Post {
+  id: ID!
+  globalUri: String!
+  title: String!
+  body: String!
+  author: Principal!
+  tags: [PostTag!]!
+  mentions: [Principal!]!
+  comments(first: Int, after: String): CommentConnection!
+  reactions: [ReactionSummary!]!
+  decisionStatus: DecisionStatus
+  denyFlag: Boolean!
+  myPermissions: PostPermissions!
+  createdAt: Time!
+  editedAt: Time
+  deletedAt: Time
+  lastReadAt: Time
+}
+
+type PostEdge {
+  node: Post!
+  cursor: String!
+}
+
+type PostConnection {
+  edges: [PostEdge!]!
+  pageInfo: PageInfo!
+}
+
+# ----- comments -----
+
+type Comment {
+  id: ID!
+  postId: ID!
+  parentId: ID
+  depth: Int!
+  author: Principal!
+  body: String!
+  mentions: [Principal!]!
+  reactions: [ReactionSummary!]!
+  createdAt: Time!
+  editedAt: Time
+  deletedAt: Time
+}
+
+type CommentEdge {
+  node: Comment!
+  cursor: String!
+}
+
+type CommentConnection {
+  edges: [CommentEdge!]!
+  pageInfo: PageInfo!
+}
+
+# ----- search -----
+
+union SearchResult = Post | Comment
+
+type SearchEdge {
+  node: SearchResult!
+  cursor: String!
+  score: Float!
+}
+
+type SearchConnection {
+  edges: [SearchEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TagSearchHit {
+  tag: Tag!
+  similarity: Float!
 }
 
 # ----- queries -----
@@ -115,16 +232,13 @@ type Query {
   health: String!
   serverTime: Time!
 
-  """
-  The signed-in viewer. Returns null when the request is anonymous.
-  """
   viewer: User
 
-  """
-  Look up a tag by id. Returns null when the tag is not visible to the viewer
-  (we conflate not-found with not-visible to avoid leaking existence).
-  """
   tag(id: ID!): Tag
+  post(id: ID!): Post
+
+  search(query: String!, kinds: [SearchKind!], first: Int): SearchConnection!
+  searchTags(query: String!, first: Int): [TagSearchHit!]!
 }
 
 # ----- mutations -----
@@ -151,6 +265,31 @@ input SubscribeTagInput {
   reasonFilter: [String!]
 }
 
+input PostTagInput {
+  tagId: ID!
+  viewRole: Boolean
+  interactRole: Boolean
+  moderateRole: Boolean
+}
+
+input CreatePostInput {
+  title: String!
+  body: String!
+  tags: [PostTagInput!]!
+}
+
+input EditPostInput {
+  postId: ID!
+  title: String!
+  body: String!
+}
+
+input CreateCommentInput {
+  postId: ID!
+  parentId: ID
+  body: String!
+}
+
 type LoginPayload {
   token: String!
   expiresAt: Time!
@@ -164,10 +303,23 @@ type Mutation {
   createTag(input: CreateTagInput!): Tag!
   moveTag(tagId: ID!, newParentId: ID!, reason: String): Tag!
   archiveTag(tagId: ID!): Tag!
-
   grantTag(input: GrantTagInput!): Tag!
   revokeTagGrant(tagId: ID!, principalId: ID!): Tag!
-
   subscribeTag(input: SubscribeTagInput!): TagSubscription!
   unsubscribeTag(tagId: ID!): Boolean!
+
+  createPost(input: CreatePostInput!): Post!
+  editPost(input: EditPostInput!): Post!
+  deletePost(postId: ID!): Boolean!
+  setDecisionStatus(postId: ID!, status: DecisionStatus): Post!
+  setDenyFlag(postId: ID!, deny: Boolean!): Post!
+  reactToPost(postId: ID!, emoji: String!): Post!
+  unreactToPost(postId: ID!, emoji: String!): Post!
+  markPostRead(postId: ID!): Post!
+
+  createComment(input: CreateCommentInput!): Comment!
+  editComment(commentId: ID!, body: String!): Comment!
+  deleteComment(commentId: ID!): Boolean!
+  reactToComment(commentId: ID!, emoji: String!): Comment!
+  unreactToComment(commentId: ID!, emoji: String!): Comment!
 }

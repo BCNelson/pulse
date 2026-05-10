@@ -121,6 +121,49 @@ class GPrincipalStatus extends EnumClass {
       _$gPrincipalStatusValueOf(name);
 }
 
+class GDecisionStatus extends EnumClass {
+  const GDecisionStatus._(String name) : super(name);
+
+  static const GDecisionStatus DECISION = _$gDecisionStatusDECISION;
+
+  static const GDecisionStatus ANSWER = _$gDecisionStatusANSWER;
+
+  static Serializer<GDecisionStatus> get serializer =>
+      _$gDecisionStatusSerializer;
+
+  static BuiltSet<GDecisionStatus> get values => _$gDecisionStatusValues;
+
+  static GDecisionStatus valueOf(String name) => _$gDecisionStatusValueOf(name);
+}
+
+class GSearchKind extends EnumClass {
+  const GSearchKind._(String name) : super(name);
+
+  static const GSearchKind POST = _$gSearchKindPOST;
+
+  static const GSearchKind COMMENT = _$gSearchKindCOMMENT;
+
+  static Serializer<GSearchKind> get serializer => _$gSearchKindSerializer;
+
+  static BuiltSet<GSearchKind> get values => _$gSearchKindValues;
+
+  static GSearchKind valueOf(String name) => _$gSearchKindValueOf(name);
+}
+
+class GPostSort extends EnumClass {
+  const GPostSort._(String name) : super(name);
+
+  static const GPostSort RECENT = _$gPostSortRECENT;
+
+  static const GPostSort ACTIVE = _$gPostSortACTIVE;
+
+  static Serializer<GPostSort> get serializer => _$gPostSortSerializer;
+
+  static BuiltSet<GPostSort> get values => _$gPostSortValues;
+
+  static GPostSort valueOf(String name) => _$gPostSortValueOf(name);
+}
+
 abstract class GCreateTagInput
     implements Built<GCreateTagInput, GCreateTagInputBuilder> {
   GCreateTagInput._();
@@ -201,9 +244,114 @@ abstract class GSubscribeTagInput
       );
 }
 
+abstract class GPostTagInput
+    implements Built<GPostTagInput, GPostTagInputBuilder> {
+  GPostTagInput._();
+
+  factory GPostTagInput([void Function(GPostTagInputBuilder b) updates]) =
+      _$GPostTagInput;
+
+  String get tagId;
+  bool? get viewRole;
+  bool? get interactRole;
+  bool? get moderateRole;
+  static Serializer<GPostTagInput> get serializer => _$gPostTagInputSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GPostTagInput.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostTagInput? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GPostTagInput.serializer,
+        json,
+      );
+}
+
+abstract class GCreatePostInput
+    implements Built<GCreatePostInput, GCreatePostInputBuilder> {
+  GCreatePostInput._();
+
+  factory GCreatePostInput([void Function(GCreatePostInputBuilder b) updates]) =
+      _$GCreatePostInput;
+
+  String get title;
+  String get body;
+  BuiltList<GPostTagInput> get tags;
+  static Serializer<GCreatePostInput> get serializer =>
+      _$gCreatePostInputSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GCreatePostInput.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreatePostInput? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GCreatePostInput.serializer,
+        json,
+      );
+}
+
+abstract class GEditPostInput
+    implements Built<GEditPostInput, GEditPostInputBuilder> {
+  GEditPostInput._();
+
+  factory GEditPostInput([void Function(GEditPostInputBuilder b) updates]) =
+      _$GEditPostInput;
+
+  String get postId;
+  String get title;
+  String get body;
+  static Serializer<GEditPostInput> get serializer =>
+      _$gEditPostInputSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GEditPostInput.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GEditPostInput? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GEditPostInput.serializer,
+        json,
+      );
+}
+
+abstract class GCreateCommentInput
+    implements Built<GCreateCommentInput, GCreateCommentInputBuilder> {
+  GCreateCommentInput._();
+
+  factory GCreateCommentInput(
+          [void Function(GCreateCommentInputBuilder b) updates]) =
+      _$GCreateCommentInput;
+
+  String get postId;
+  String? get parentId;
+  String get body;
+  static Serializer<GCreateCommentInput> get serializer =>
+      _$gCreateCommentInputSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GCreateCommentInput.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreateCommentInput? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GCreateCommentInput.serializer,
+        json,
+      );
+}
+
 const Map<String, Set<String>> possibleTypesMap = {
   'Principal': {
     'User',
     'Bot',
-  }
+  },
+  'SearchResult': {
+    'Post',
+    'Comment',
+  },
 };

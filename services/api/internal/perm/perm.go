@@ -204,11 +204,20 @@ type cacheEntry struct {
 }
 
 type cache struct {
-	tag map[[2]uuid.UUID]cacheEntry
+	tag      map[[2]uuid.UUID]cacheEntry
+	postTags map[postTagsKey][]uuid.UUID
+}
+
+type postTagsKey struct {
+	postID uuid.UUID
+	action Action
 }
 
 func newCache() *cache {
-	return &cache{tag: make(map[[2]uuid.UUID]cacheEntry)}
+	return &cache{
+		tag:      make(map[[2]uuid.UUID]cacheEntry),
+		postTags: make(map[postTagsKey][]uuid.UUID),
+	}
 }
 
 func (c *cache) lookup(principal, tag uuid.UUID) (cacheEntry, bool) {
@@ -218,6 +227,15 @@ func (c *cache) lookup(principal, tag uuid.UUID) (cacheEntry, bool) {
 
 func (c *cache) store(principal, tag uuid.UUID, bundle Bundle, extras []string) {
 	c.tag[[2]uuid.UUID{principal, tag}] = cacheEntry{bundle: bundle, extras: extras}
+}
+
+func (c *cache) lookupPostTags(postID uuid.UUID, action Action) ([]uuid.UUID, bool) {
+	v, ok := c.postTags[postTagsKey{postID, action}]
+	return v, ok
+}
+
+func (c *cache) storePostTags(postID uuid.UUID, action Action, tags []uuid.UUID) {
+	c.postTags[postTagsKey{postID, action}] = tags
 }
 
 func cacheFromContext(ctx context.Context) (*cache, bool) {

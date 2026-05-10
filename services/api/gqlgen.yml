@@ -33,3 +33,13 @@ models:
   Time:
     model:
       - github.com/99designs/gqlgen/graphql.Time
+  # Heavy fields that take args or want lazy resolution become field
+  # resolvers — skip the model struct's eager-loaded copy.
+  Tag:
+    fields:
+      posts:
+        resolver: true
+  Post:
+    fields:
+      comments:
+        resolver: true

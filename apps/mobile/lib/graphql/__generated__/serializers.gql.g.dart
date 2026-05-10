@@ -8,19 +8,29 @@ part of 'serializers.gql.dart';
 
 Serializers _$serializers = (Serializers().toBuilder()
       ..add(FetchPolicy.serializer)
+      ..add(GCreateCommentInput.serializer)
+      ..add(GCreatePostInput.serializer)
       ..add(GCreateTagInput.serializer)
+      ..add(GDecisionStatus.serializer)
+      ..add(GEditPostInput.serializer)
       ..add(GGrantTagInput.serializer)
       ..add(GHealthData.serializer)
       ..add(GHealthReq.serializer)
       ..add(GHealthVars.serializer)
       ..add(GJSON.serializer)
       ..add(GPermissionBundle.serializer)
+      ..add(GPostSort.serializer)
+      ..add(GPostTagInput.serializer)
       ..add(GPrincipalKind.serializer)
       ..add(GPrincipalStatus.serializer)
+      ..add(GSearchKind.serializer)
       ..add(GSubscribeTagInput.serializer)
       ..add(GSubscriptionUrgency.serializer)
       ..add(GTagRootKind.serializer)
       ..add(GTime.serializer)
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(GPostTagInput)]),
+          () => ListBuilder<GPostTagInput>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())

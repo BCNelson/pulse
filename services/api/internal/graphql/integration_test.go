@@ -131,7 +131,7 @@ func buildServer(pool *pgxpool.Pool, authSvc *auth.Service) http.Handler {
 		DB:    pool,
 		Auth:  authSvc,
 		Perm:  &perm.Service{DB: pool},
-		Tag:   &tag.Service{DB: pool},
+		Tags:  &tag.Service{DB: pool},
 		Audit: &audit.Service{DB: pool},
 	}
 	srv := handler.New(pulsegraphql.NewExecutableSchema(pulsegraphql.Config{Resolvers: resolver}))

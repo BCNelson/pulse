@@ -22,10 +22,13 @@ import (
 
 	pulseaudit "github.com/bcnelson/pulse/services/api/internal/audit"
 	pulseauth "github.com/bcnelson/pulse/services/api/internal/auth"
+	pulsecomment "github.com/bcnelson/pulse/services/api/internal/comment"
 	pulsedb "github.com/bcnelson/pulse/services/api/internal/db"
 	pulsegraphql "github.com/bcnelson/pulse/services/api/internal/graphql"
 	pulsejob "github.com/bcnelson/pulse/services/api/internal/job"
 	pulseperm "github.com/bcnelson/pulse/services/api/internal/perm"
+	pulsepost "github.com/bcnelson/pulse/services/api/internal/post"
+	pulsesearch "github.com/bcnelson/pulse/services/api/internal/search"
 	pulsetag "github.com/bcnelson/pulse/services/api/internal/tag"
 )
 
@@ -91,11 +94,14 @@ func run(ctx context.Context, mode string, cfg appConfig, logger *slog.Logger, p
 func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool *pgxpool.Pool) error {
 	authSvc := &pulseauth.Service{DB: pool}
 	resolver := &pulsegraphql.Resolver{
-		DB:    pool,
-		Auth:  authSvc,
-		Perm:  &pulseperm.Service{DB: pool},
-		Tag:   &pulsetag.Service{DB: pool},
-		Audit: &pulseaudit.Service{DB: pool},
+		DB:       pool,
+		Auth:     authSvc,
+		Perm:     &pulseperm.Service{DB: pool},
+		Tags:     &pulsetag.Service{DB: pool},
+		Audit:    &pulseaudit.Service{DB: pool},
+		Posts:    &pulsepost.Service{DB: pool},
+		Comments: &pulsecomment.Service{DB: pool},
+		Search:   &pulsesearch.Service{DB: pool},
 	}
 
 	srv := handler.New(pulsegraphql.NewExecutableSchema(pulsegraphql.Config{

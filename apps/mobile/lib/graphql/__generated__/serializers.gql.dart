@@ -9,12 +9,19 @@ import 'package:gql_code_builder_serializers/gql_code_builder_serializers.dart'
     show OperationSerializer;
 import 'package:pulse/graphql/__generated__/schema.schema.gql.dart'
     show
+        GCreateCommentInput,
+        GCreatePostInput,
         GCreateTagInput,
+        GDecisionStatus,
+        GEditPostInput,
         GGrantTagInput,
         GJSON,
         GPermissionBundle,
+        GPostSort,
+        GPostTagInput,
         GPrincipalKind,
         GPrincipalStatus,
+        GSearchKind,
         GSubscribeTagInput,
         GSubscriptionUrgency,
         GTagRootKind,
@@ -32,15 +39,22 @@ final SerializersBuilder _serializersBuilder = _$serializers.toBuilder()
   ..add(OperationSerializer())
   ..addPlugin(StandardJsonPlugin());
 @SerializersFor([
+  GCreateCommentInput,
+  GCreatePostInput,
   GCreateTagInput,
+  GDecisionStatus,
+  GEditPostInput,
   GGrantTagInput,
   GHealthData,
   GHealthReq,
   GHealthVars,
   GJSON,
   GPermissionBundle,
+  GPostSort,
+  GPostTagInput,
   GPrincipalKind,
   GPrincipalStatus,
+  GSearchKind,
   GSubscribeTagInput,
   GSubscriptionUrgency,
   GTagRootKind,

@@ -20,6 +20,10 @@ type Principal interface {
 	GetHomeTag() *Tag
 }
 
+type SearchResult interface {
+	IsSearchResult()
+}
+
 type Bot struct {
 	ID             string          `json:"id"`
 	GlobalURI      string          `json:"globalUri"`
@@ -38,11 +42,55 @@ func (this Bot) GetStatus() PrincipalStatus { return this.Status }
 func (this Bot) GetDisplayName() string     { return this.DisplayName }
 func (this Bot) GetHomeTag() *Tag           { return this.HomeTag }
 
+type Comment struct {
+	ID        string             `json:"id"`
+	PostID    string             `json:"postId"`
+	ParentID  *string            `json:"parentId,omitempty"`
+	Depth     int                `json:"depth"`
+	Author    Principal          `json:"author"`
+	Body      string             `json:"body"`
+	Mentions  []Principal        `json:"mentions"`
+	Reactions []*ReactionSummary `json:"reactions"`
+	CreatedAt time.Time          `json:"createdAt"`
+	EditedAt  *time.Time         `json:"editedAt,omitempty"`
+	DeletedAt *time.Time         `json:"deletedAt,omitempty"`
+}
+
+func (Comment) IsSearchResult() {}
+
+type CommentConnection struct {
+	Edges    []*CommentEdge `json:"edges"`
+	PageInfo *PageInfo      `json:"pageInfo"`
+}
+
+type CommentEdge struct {
+	Node   *Comment `json:"node"`
+	Cursor string   `json:"cursor"`
+}
+
+type CreateCommentInput struct {
+	PostID   string  `json:"postId"`
+	ParentID *string `json:"parentId,omitempty"`
+	Body     string  `json:"body"`
+}
+
+type CreatePostInput struct {
+	Title string          `json:"title"`
+	Body  string          `json:"body"`
+	Tags  []*PostTagInput `json:"tags"`
+}
+
 type CreateTagInput struct {
 	ParentID    string  `json:"parentId"`
 	Slug        string  `json:"slug"`
 	DisplayName string  `json:"displayName"`
 	Defaults    *string `json:"defaults,omitempty"`
+}
+
+type EditPostInput struct {
+	PostID string `json:"postId"`
+	Title  string `json:"title"`
+	Body   string `json:"body"`
 }
 
 type GrantTagInput struct {
@@ -62,7 +110,83 @@ type LoginPayload struct {
 type Mutation struct {
 }
 
+type PageInfo struct {
+	HasNextPage     bool    `json:"hasNextPage"`
+	HasPreviousPage bool    `json:"hasPreviousPage"`
+	StartCursor     *string `json:"startCursor,omitempty"`
+	EndCursor       *string `json:"endCursor,omitempty"`
+}
+
+type Post struct {
+	ID             string             `json:"id"`
+	GlobalURI      string             `json:"globalUri"`
+	Title          string             `json:"title"`
+	Body           string             `json:"body"`
+	Author         Principal          `json:"author"`
+	Tags           []*PostTag         `json:"tags"`
+	Mentions       []Principal        `json:"mentions"`
+	Comments       *CommentConnection `json:"comments"`
+	Reactions      []*ReactionSummary `json:"reactions"`
+	DecisionStatus *DecisionStatus    `json:"decisionStatus,omitempty"`
+	DenyFlag       bool               `json:"denyFlag"`
+	MyPermissions  *PostPermissions   `json:"myPermissions"`
+	CreatedAt      time.Time          `json:"createdAt"`
+	EditedAt       *time.Time         `json:"editedAt,omitempty"`
+	DeletedAt      *time.Time         `json:"deletedAt,omitempty"`
+	LastReadAt     *time.Time         `json:"lastReadAt,omitempty"`
+}
+
+func (Post) IsSearchResult() {}
+
+type PostConnection struct {
+	Edges    []*PostEdge `json:"edges"`
+	PageInfo *PageInfo   `json:"pageInfo"`
+}
+
+type PostEdge struct {
+	Node   *Post  `json:"node"`
+	Cursor string `json:"cursor"`
+}
+
+type PostPermissions struct {
+	Bundle        *PermissionBundle `json:"bundle,omitempty"`
+	CanView       bool              `json:"canView"`
+	CanContribute bool              `json:"canContribute"`
+	CanModerate   bool              `json:"canModerate"`
+}
+
+type PostTag struct {
+	Tag          *Tag `json:"tag"`
+	ViewRole     bool `json:"viewRole"`
+	InteractRole bool `json:"interactRole"`
+	ModerateRole bool `json:"moderateRole"`
+}
+
+type PostTagInput struct {
+	TagID        string `json:"tagId"`
+	ViewRole     *bool  `json:"viewRole,omitempty"`
+	InteractRole *bool  `json:"interactRole,omitempty"`
+	ModerateRole *bool  `json:"moderateRole,omitempty"`
+}
+
 type Query struct {
+}
+
+type ReactionSummary struct {
+	Emoji    string `json:"emoji"`
+	Count    int    `json:"count"`
+	ByViewer bool   `json:"byViewer"`
+}
+
+type SearchConnection struct {
+	Edges    []*SearchEdge `json:"edges"`
+	PageInfo *PageInfo     `json:"pageInfo"`
+}
+
+type SearchEdge struct {
+	Node   SearchResult `json:"node"`
+	Cursor string       `json:"cursor"`
+	Score  float64      `json:"score"`
 }
 
 type SubscribeTagInput struct {
@@ -86,10 +210,9 @@ type Tag struct {
 	CreatedAt      time.Time        `json:"createdAt"`
 	MyPermissions  *TagPermissions  `json:"myPermissions"`
 	MySubscription *TagSubscription `json:"mySubscription,omitempty"`
+	Posts          *PostConnection  `json:"posts"`
 }
 
-// Per-viewer permission summary on a tag. Computed alongside the tag fetch
-// so clients don't make a separate round trip.
 type TagPermissions struct {
 	Bundle        *PermissionBundle `json:"bundle,omitempty"`
 	Extras        []string          `json:"extras"`
@@ -97,6 +220,11 @@ type TagPermissions struct {
 	CanContribute bool              `json:"canContribute"`
 	CanModerate   bool              `json:"canModerate"`
 	CanOwn        bool              `json:"canOwn"`
+}
+
+type TagSearchHit struct {
+	Tag        *Tag    `json:"tag"`
+	Similarity float64 `json:"similarity"`
 }
 
 type TagSubscription struct {
@@ -122,6 +250,61 @@ func (this User) GetKind() PrincipalKind     { return this.Kind }
 func (this User) GetStatus() PrincipalStatus { return this.Status }
 func (this User) GetDisplayName() string     { return this.DisplayName }
 func (this User) GetHomeTag() *Tag           { return this.HomeTag }
+
+type DecisionStatus string
+
+const (
+	DecisionStatusDecision DecisionStatus = "DECISION"
+	DecisionStatusAnswer   DecisionStatus = "ANSWER"
+)
+
+var AllDecisionStatus = []DecisionStatus{
+	DecisionStatusDecision,
+	DecisionStatusAnswer,
+}
+
+func (e DecisionStatus) IsValid() bool {
+	switch e {
+	case DecisionStatusDecision, DecisionStatusAnswer:
+		return true
+	}
+	return false
+}
+
+func (e DecisionStatus) String() string {
+	return string(e)
+}
+
+func (e *DecisionStatus) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = DecisionStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid DecisionStatus", str)
+	}
+	return nil
+}
+
+func (e DecisionStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *DecisionStatus) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e DecisionStatus) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
 
 type PermissionBundle string
 
@@ -177,6 +360,61 @@ func (e *PermissionBundle) UnmarshalJSON(b []byte) error {
 }
 
 func (e PermissionBundle) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type PostSort string
+
+const (
+	PostSortRecent PostSort = "RECENT"
+	PostSortActive PostSort = "ACTIVE"
+)
+
+var AllPostSort = []PostSort{
+	PostSortRecent,
+	PostSortActive,
+}
+
+func (e PostSort) IsValid() bool {
+	switch e {
+	case PostSortRecent, PostSortActive:
+		return true
+	}
+	return false
+}
+
+func (e PostSort) String() string {
+	return string(e)
+}
+
+func (e *PostSort) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PostSort(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PostSort", str)
+	}
+	return nil
+}
+
+func (e PostSort) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *PostSort) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e PostSort) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil
@@ -287,6 +525,61 @@ func (e *PrincipalStatus) UnmarshalJSON(b []byte) error {
 }
 
 func (e PrincipalStatus) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type SearchKind string
+
+const (
+	SearchKindPost    SearchKind = "POST"
+	SearchKindComment SearchKind = "COMMENT"
+)
+
+var AllSearchKind = []SearchKind{
+	SearchKindPost,
+	SearchKindComment,
+}
+
+func (e SearchKind) IsValid() bool {
+	switch e {
+	case SearchKindPost, SearchKindComment:
+		return true
+	}
+	return false
+}
+
+func (e SearchKind) String() string {
+	return string(e)
+}
+
+func (e *SearchKind) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SearchKind(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SearchKind", str)
+	}
+	return nil
+}
+
+func (e SearchKind) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *SearchKind) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e SearchKind) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil

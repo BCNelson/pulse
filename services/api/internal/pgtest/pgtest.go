@@ -63,6 +63,17 @@ func truncate(t *testing.T, pool *pgxpool.Pool) {
             tag_closure,
             user_credentials,
             bot_credentials,
+            sessions,
+            principal_post_read,
+            comment_reactions,
+            post_reactions,
+            comment_edits,
+            comment_mentions,
+            comments,
+            post_edits,
+            post_mentions,
+            post_tags,
+            posts,
             tags,
             principals
         RESTART IDENTITY CASCADE

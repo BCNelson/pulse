@@ -12,13 +12,15 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
+	"github.com/bcnelson/pulse/services/api/internal/comment"
 	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
+	"github.com/bcnelson/pulse/services/api/internal/post"
+	"github.com/bcnelson/pulse/services/api/internal/search"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
+	"github.com/google/uuid"
 )
 
 // Login is the resolver for the login field.
@@ -84,7 +86,7 @@ func (r *mutationResolver) CreateTag(ctx context.Context, input model.CreateTagI
 		return nil, err
 	}
 
-	id, err := r.Tag.Create(ctx, tag.CreateInput{
+	id, err := r.Tags.Create(ctx, tag.CreateInput{
 		ParentID:    &parentID,
 		Slug:        input.Slug,
 		DisplayName: input.DisplayName,
@@ -141,7 +143,7 @@ func (r *mutationResolver) MoveTag(ctx context.Context, tagID string, newParentI
 	if err != nil {
 		return nil, err
 	}
-	if err := r.Tag.Move(ctx, src, dst); err != nil {
+	if err := r.Tags.Move(ctx, src, dst); err != nil {
 		return nil, err
 	}
 	diff, _ := json.Marshal(map[string]any{
@@ -185,7 +187,7 @@ func (r *mutationResolver) ArchiveTag(ctx context.Context, tagID string) (*model
 	if !can {
 		return nil, errPermissionDenied
 	}
-	if err := r.Tag.Archive(ctx, id); err != nil {
+	if err := r.Tags.Archive(ctx, id); err != nil {
 		return nil, err
 	}
 	if err := r.Audit.Write(ctx, audit.Event{
@@ -353,6 +355,411 @@ func (r *mutationResolver) UnsubscribeTag(ctx context.Context, tagID string) (bo
 	return true, nil
 }
 
+// CreatePost is the resolver for the createPost field.
+func (r *mutationResolver) CreatePost(ctx context.Context, input model.CreatePostInput) (*model.Post, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if len(input.Tags) == 0 {
+		return nil, fmt.Errorf("at least one tag required")
+	}
+	tagAttachments := make([]post.TagAttachment, 0, len(input.Tags))
+	for _, t := range input.Tags {
+		tagID, err := uuid.Parse(t.TagID)
+		if err != nil {
+			return nil, fmt.Errorf("invalid tagId: %w", err)
+		}
+		// Authorization: must be allowed to contribute on each attached tag.
+		can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionContribute, tagID)
+		if err != nil {
+			return nil, err
+		}
+		if !can {
+			return nil, errPermissionDenied
+		}
+		ta := post.TagAttachment{
+			TagID:        tagID,
+			ViewRole:     boolOrTrue(t.ViewRole),
+			InteractRole: boolOrTrue(t.InteractRole),
+			ModerateRole: boolOrTrue(t.ModerateRole),
+		}
+		tagAttachments = append(tagAttachments, ta)
+	}
+	mentions, err := r.resolveMentionSlugs(ctx, post.ExtractMentionSlugs(input.Body))
+	if err != nil {
+		return nil, err
+	}
+	id, err := r.Posts.Create(ctx, post.CreateInput{
+		AuthorID: identity.EffectiveID,
+		Title:    input.Title,
+		Body:     input.Body,
+		Tags:     tagAttachments,
+		Mentions: mentions,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "post.create", TargetType: "post", TargetID: id,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadPost(ctx, id)
+}
+
+// EditPost is the resolver for the editPost field.
+func (r *mutationResolver) EditPost(ctx context.Context, input model.EditPostInput) (*model.Post, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := uuid.Parse(input.PostID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid postId: %w", err)
+	}
+	can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionContribute, id)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if err := r.Posts.Edit(ctx, id, identity.EffectiveID, input.Title, input.Body); err != nil {
+		if errors.Is(err, post.ErrAlreadyEdited) {
+			return r.loadPost(ctx, id)
+		}
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "post.edit", TargetType: "post", TargetID: id,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadPost(ctx, id)
+}
+
+// DeletePost is the resolver for the deletePost field.
+func (r *mutationResolver) DeletePost(ctx context.Context, postID string) (bool, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return false, err
+	}
+	id, err := uuid.Parse(postID)
+	if err != nil {
+		return false, fmt.Errorf("invalid postId: %w", err)
+	}
+	can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionModerate, id)
+	if err != nil {
+		return false, err
+	}
+	if !can {
+		return false, errPermissionDenied
+	}
+	if err := r.Posts.Delete(ctx, id); err != nil {
+		return false, err
+	}
+	return true, r.Audit.Write(ctx, audit.Event{
+		Action: "post.delete", TargetType: "post", TargetID: id,
+	})
+}
+
+// SetDecisionStatus is the resolver for the setDecisionStatus field.
+func (r *mutationResolver) SetDecisionStatus(ctx context.Context, postID string, status *model.DecisionStatus) (*model.Post, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := uuid.Parse(postID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid postId: %w", err)
+	}
+	can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionModerate, id)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	var dbStatus *string
+	if status != nil {
+		s := mapDecisionGQLToDB(*status)
+		dbStatus = &s
+	}
+	if err := r.Posts.SetDecisionStatus(ctx, id, dbStatus); err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "post.set_decision", TargetType: "post", TargetID: id,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadPost(ctx, id)
+}
+
+// SetDenyFlag is the resolver for the setDenyFlag field.
+func (r *mutationResolver) SetDenyFlag(ctx context.Context, postID string, deny bool) (*model.Post, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := uuid.Parse(postID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid postId: %w", err)
+	}
+	can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionModerate, id)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if err := r.Posts.SetDenyFlag(ctx, id, deny); err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "post.set_deny", TargetType: "post", TargetID: id,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadPost(ctx, id)
+}
+
+// ReactToPost is the resolver for the reactToPost field.
+func (r *mutationResolver) ReactToPost(ctx context.Context, postID string, emoji string) (*model.Post, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := uuid.Parse(postID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid postId: %w", err)
+	}
+	can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionView, id)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if err := r.Posts.React(ctx, id, identity.EffectiveID, emoji); err != nil {
+		return nil, err
+	}
+	return r.loadPost(ctx, id)
+}
+
+// UnreactToPost is the resolver for the unreactToPost field.
+func (r *mutationResolver) UnreactToPost(ctx context.Context, postID string, emoji string) (*model.Post, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := uuid.Parse(postID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid postId: %w", err)
+	}
+	if err := r.Posts.Unreact(ctx, id, identity.EffectiveID, emoji); err != nil {
+		return nil, err
+	}
+	return r.loadPost(ctx, id)
+}
+
+// MarkPostRead is the resolver for the markPostRead field.
+func (r *mutationResolver) MarkPostRead(ctx context.Context, postID string) (*model.Post, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := uuid.Parse(postID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid postId: %w", err)
+	}
+	can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionView, id)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if err := r.Posts.MarkRead(ctx, id, identity.EffectiveID); err != nil {
+		return nil, err
+	}
+	return r.loadPost(ctx, id)
+}
+
+// CreateComment is the resolver for the createComment field.
+func (r *mutationResolver) CreateComment(ctx context.Context, input model.CreateCommentInput) (*model.Comment, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	postID, err := uuid.Parse(input.PostID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid postId: %w", err)
+	}
+	can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionContribute, postID)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	var parentPtr *uuid.UUID
+	if input.ParentID != nil {
+		pid, err := uuid.Parse(*input.ParentID)
+		if err != nil {
+			return nil, fmt.Errorf("invalid parentId: %w", err)
+		}
+		parentPtr = &pid
+	}
+	mentions, err := r.resolveMentionSlugs(ctx, post.ExtractMentionSlugs(input.Body))
+	if err != nil {
+		return nil, err
+	}
+	id, err := r.Comments.Create(ctx, comment.CreateInput{
+		PostID: postID, ParentID: parentPtr, AuthorID: identity.EffectiveID,
+		Body: input.Body, Mentions: mentions,
+	})
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "comment.create", TargetType: "comment", TargetID: id,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadComment(ctx, id)
+}
+
+// EditComment is the resolver for the editComment field.
+func (r *mutationResolver) EditComment(ctx context.Context, commentID string, body string) (*model.Comment, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := uuid.Parse(commentID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid commentId: %w", err)
+	}
+	c, err := r.Comments.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	if c.AuthorID != identity.EffectiveID {
+		// Non-author edits require moderator on the parent post.
+		can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionModerate, c.PostID)
+		if err != nil {
+			return nil, err
+		}
+		if !can {
+			return nil, errPermissionDenied
+		}
+	}
+	if err := r.Comments.Edit(ctx, id, identity.EffectiveID, body); err != nil {
+		if errors.Is(err, comment.ErrAlreadyEdited) {
+			return r.loadComment(ctx, id)
+		}
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "comment.edit", TargetType: "comment", TargetID: id,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadComment(ctx, id)
+}
+
+// DeleteComment is the resolver for the deleteComment field.
+func (r *mutationResolver) DeleteComment(ctx context.Context, commentID string) (bool, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return false, err
+	}
+	id, err := uuid.Parse(commentID)
+	if err != nil {
+		return false, fmt.Errorf("invalid commentId: %w", err)
+	}
+	c, err := r.Comments.Get(ctx, id)
+	if err != nil {
+		return false, err
+	}
+	if c.AuthorID != identity.EffectiveID {
+		can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionModerate, c.PostID)
+		if err != nil {
+			return false, err
+		}
+		if !can {
+			return false, errPermissionDenied
+		}
+	}
+	if err := r.Comments.Delete(ctx, id); err != nil {
+		return false, err
+	}
+	return true, r.Audit.Write(ctx, audit.Event{
+		Action: "comment.delete", TargetType: "comment", TargetID: id,
+	})
+}
+
+// ReactToComment is the resolver for the reactToComment field.
+func (r *mutationResolver) ReactToComment(ctx context.Context, commentID string, emoji string) (*model.Comment, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := uuid.Parse(commentID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid commentId: %w", err)
+	}
+	c, err := r.Comments.Get(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionView, c.PostID)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if err := r.Comments.React(ctx, id, identity.EffectiveID, emoji); err != nil {
+		return nil, err
+	}
+	return r.loadComment(ctx, id)
+}
+
+// UnreactToComment is the resolver for the unreactToComment field.
+func (r *mutationResolver) UnreactToComment(ctx context.Context, commentID string, emoji string) (*model.Comment, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := uuid.Parse(commentID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid commentId: %w", err)
+	}
+	if err := r.Comments.Unreact(ctx, id, identity.EffectiveID, emoji); err != nil {
+		return nil, err
+	}
+	return r.loadComment(ctx, id)
+}
+
+// Comments is the resolver for the comments field.
+func (r *postResolver) Comments(ctx context.Context, obj *model.Post, first *int, after *string) (*model.CommentConnection, error) {
+	postID, err := uuid.Parse(obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid post id: %w", err)
+	}
+	limit := 200
+	if first != nil && *first > 0 && *first <= 200 {
+		limit = *first
+	}
+	// after-cursor pagination is accepted as a parameter but not yet
+	// applied — comments under a post are bounded and clients fetch all
+	// in one shot today. M5 wires actual cursor pagination.
+	_ = after
+	return r.loadCommentsForPost(ctx, postID, limit)
+}
+
 // Health is the resolver for the health field.
 func (r *queryResolver) Health(ctx context.Context) (string, error) {
 	if err := r.DB.Ping(ctx); err != nil {
@@ -388,92 +795,185 @@ func (r *queryResolver) Tag(ctx context.Context, id string) (*model.Tag, error) 
 	return r.loadTag(ctx, tagID)
 }
 
+// Post is the resolver for the post field.
+func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
+	postID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid id: %w", err)
+	}
+	return r.loadPost(ctx, postID)
+}
+
+// Search is the resolver for the search field.
+func (r *queryResolver) Search(ctx context.Context, query string, kinds []model.SearchKind, first *int) (*model.SearchConnection, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	limit := 25
+	if first != nil && *first > 0 && *first <= 100 {
+		limit = *first
+	}
+	dbKinds := make([]search.Kind, 0, len(kinds))
+	for _, k := range kinds {
+		switch k {
+		case model.SearchKindPost:
+			dbKinds = append(dbKinds, search.KindPost)
+		case model.SearchKindComment:
+			dbKinds = append(dbKinds, search.KindComment)
+		}
+	}
+	hits, err := r.Resolver.Search.Search(ctx, identity.EffectiveID, query, dbKinds, limit)
+	if err != nil {
+		return nil, err
+	}
+	edges := make([]*model.SearchEdge, 0, len(hits))
+	for _, h := range hits {
+		var node model.SearchResult
+		switch h.Kind {
+		case search.KindPost:
+			p, err := r.loadPost(ctx, h.ID)
+			if err != nil {
+				return nil, err
+			}
+			if p == nil {
+				continue
+			}
+			node = p
+		case search.KindComment:
+			c, err := r.loadComment(ctx, h.ID)
+			if err != nil {
+				return nil, err
+			}
+			if c == nil {
+				continue
+			}
+			node = c
+		}
+		edges = append(edges, &model.SearchEdge{
+			Node:   node,
+			Cursor: encodeCursor(cursor{CreatedAt: h.CreatedAt, ID: h.ID}),
+			Score:  h.Score,
+		})
+	}
+	pi := &model.PageInfo{}
+	if len(edges) > 0 {
+		s := edges[0].Cursor
+		e := edges[len(edges)-1].Cursor
+		pi.StartCursor = &s
+		pi.EndCursor = &e
+	}
+	return &model.SearchConnection{Edges: edges, PageInfo: pi}, nil
+}
+
+// SearchTags is the resolver for the searchTags field.
+func (r *queryResolver) SearchTags(ctx context.Context, query string, first *int) ([]*model.TagSearchHit, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	limit := 15
+	if first != nil && *first > 0 && *first <= 50 {
+		limit = *first
+	}
+	hits, err := r.Resolver.Search.SearchTags(ctx, identity.EffectiveID, query, limit)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]*model.TagSearchHit, 0, len(hits))
+	for _, h := range hits {
+		t, err := r.loadTagShallow(ctx, h.ID)
+		if err != nil {
+			return nil, err
+		}
+		if t == nil {
+			continue
+		}
+		out = append(out, &model.TagSearchHit{
+			Tag:        t,
+			Similarity: h.Similarity,
+		})
+	}
+	return out, nil
+}
+
+// Posts is the resolver for the posts field.
+func (r *tagResolver) Posts(ctx context.Context, obj *model.Tag, first *int, after *string, sort *model.PostSort) (*model.PostConnection, error) {
+	identity := auth.FromContext(ctx)
+	if identity.IsAnonymous() {
+		return emptyPostConnection(), nil
+	}
+	tagID, err := uuid.Parse(obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tag id: %w", err)
+	}
+	limit := 25
+	if first != nil && *first > 0 && *first <= 100 {
+		limit = *first
+	}
+	// after-cursor and sort accepted but not applied yet — RECENT-by-
+	// created_at is the only ordering. Pagination cursors lift in M5.
+	_ = after
+	_ = sort
+	postRows, err := r.Resolver.Posts.ListByTag(ctx, tagID, limit)
+	if err != nil {
+		return nil, err
+	}
+	edges := make([]*model.PostEdge, 0, len(postRows))
+	for _, p := range postRows {
+		can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionView, p.ID)
+		if err != nil {
+			return nil, err
+		}
+		if !can {
+			continue
+		}
+		mp, err := r.loadPost(ctx, p.ID)
+		if err != nil {
+			return nil, err
+		}
+		if mp == nil {
+			continue
+		}
+		edges = append(edges, &model.PostEdge{
+			Node:   mp,
+			Cursor: encodeCursor(cursor{CreatedAt: p.CreatedAt, ID: p.ID}),
+		})
+	}
+	pi := &model.PageInfo{}
+	if len(edges) > 0 {
+		s := edges[0].Cursor
+		e := edges[len(edges)-1].Cursor
+		pi.StartCursor = &s
+		pi.EndCursor = &e
+	}
+	return &model.PostConnection{Edges: edges, PageInfo: pi}, nil
+}
+
+func emptyPostConnection() *model.PostConnection {
+	return &model.PostConnection{Edges: []*model.PostEdge{}, PageInfo: &model.PageInfo{}}
+}
+
+func boolOrTrue(p *bool) bool {
+	if p == nil {
+		return true
+	}
+	return *p
+}
+
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
+// Post returns PostResolver implementation.
+func (r *Resolver) Post() PostResolver { return &postResolver{r} }
 
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+// Tag returns TagResolver implementation.
+func (r *Resolver) Tag() TagResolver { return &tagResolver{r} }
+
 type mutationResolver struct{ *Resolver }
+type postResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
-
-// --- shared helpers ---
-
-var errPermissionDenied = errors.New("permission denied")
-
-func requireIdentity(ctx context.Context) (auth.Identity, error) {
-	id := auth.FromContext(ctx)
-	if id.IsAnonymous() {
-		return id, fmt.Errorf("authentication required")
-	}
-	return id, nil
-}
-
-// computePermissionDiff captures the (principal -> gained|lost) delta a
-// tag move induces. M1 implementation walks every principal with a grant
-// touching either subtree and re-evaluates effective permission before
-// and after. Cheap on small subtrees; a job-queue path for big ones lands
-// in M4.
-func (r *Resolver) computePermissionDiff(ctx context.Context, src, dst uuid.UUID) ([]map[string]string, []map[string]string, error) {
-	// Snapshot principals affected: anyone with a grant on src's subtree, plus
-	// anyone with a grant on dst's ancestors.
-	rows, err := r.DB.Query(ctx, `
-        WITH affected_principals AS (
-          SELECT DISTINCT g.principal_id
-          FROM tag_grants g
-          JOIN tag_closure c ON c.ancestor_id = g.tag_id
-          WHERE c.descendant_id IN (SELECT descendant_id FROM tag_closure WHERE ancestor_id = $1)
-             OR c.descendant_id = $2
-             OR c.ancestor_id  IN (SELECT ancestor_id FROM tag_closure WHERE descendant_id = $2)
-        )
-        SELECT principal_id FROM affected_principals
-    `, src, dst)
-	if err != nil {
-		return nil, nil, err
-	}
-	defer rows.Close()
-	var principals []uuid.UUID
-	for rows.Next() {
-		var pid uuid.UUID
-		if err := rows.Scan(&pid); err != nil {
-			return nil, nil, err
-		}
-		principals = append(principals, pid)
-	}
-	// For each principal, compute effective on every descendant of src
-	// before the move. After the move we'll re-evaluate; but Move() runs
-	// in a separate transaction so we can't cleanly do "before/after"
-	// without a savepoint. Pragmatic M1 approach: record "principals
-	// involved" as the diff payload — full before/after diff lands in M5
-	// when impersonation tooling needs the audit trail to be richer.
-	gained := []map[string]string{}
-	lost := []map[string]string{}
-	for _, pid := range principals {
-		bundle, _, err := r.Perm.EffectiveOnTag(ctx, pid, src)
-		if err != nil {
-			return nil, nil, err
-		}
-		// Without a precise before/after, mark each affected principal as
-		// "may have changed" with their current bundle. Honest signal,
-		// inexpensive to compute; M5 sharpens this.
-		entry := map[string]string{"principal_id": pid.String(), "bundle": string(bundle)}
-		gained = append(gained, entry)
-	}
-	return gained, lost, nil
-}
-
-// tokenFromContext is a placeholder for retrieving the bearer/cookie token
-// the request arrived with. Wired up properly when the middleware stores
-// the raw token alongside the resolved Identity (M5 — needed for impersonation).
-type tokenCtxKey struct{}
-
-func tokenFromContext(ctx context.Context) (string, bool) {
-	v, ok := ctx.Value(tokenCtxKey{}).(string)
-	return v, ok
-}
-
-// WithToken is exported so the auth middleware can stash the raw token
-// alongside Identity. Callers should treat the token as opaque.
-func WithToken(ctx context.Context, token string) context.Context {
-	return context.WithValue(ctx, tokenCtxKey{}, token)
-}
+type tagResolver struct{ *Resolver }

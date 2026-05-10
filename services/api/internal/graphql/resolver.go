@@ -5,18 +5,24 @@ import (
 
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
+	"github.com/bcnelson/pulse/services/api/internal/comment"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
+	"github.com/bcnelson/pulse/services/api/internal/post"
+	"github.com/bcnelson/pulse/services/api/internal/search"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
 )
 
 // Resolver carries the per-process services every GraphQL resolver leans on.
-// gqlgen passes this into each resolver invocation; field resolvers may also
-// reach into it for cross-domain calls (e.g. Tag's myPermissions field
-// dispatches to Perm).
+// gqlgen expects type-named methods (Post(), Tag(), ...) to return field
+// resolver implementations, so service fields use plural names to avoid
+// the collision.
 type Resolver struct {
-	DB    *pgxpool.Pool
-	Auth  *auth.Service
-	Perm  *perm.Service
-	Tag   *tag.Service
-	Audit *audit.Service
+	DB       *pgxpool.Pool
+	Auth     *auth.Service
+	Perm     *perm.Service
+	Tags     *tag.Service
+	Audit    *audit.Service
+	Posts    *post.Service
+	Comments *comment.Service
+	Search   *search.Service
 }
