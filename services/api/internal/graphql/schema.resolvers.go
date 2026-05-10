@@ -26,6 +26,11 @@ import (
 	"github.com/google/uuid"
 )
 
+// DownloadURL is the resolver for the downloadUrl field.
+func (r *attachmentResolver) DownloadURL(ctx context.Context, obj *model.Attachment) (string, error) {
+	return r.resolveAttachmentDownloadURL(ctx, obj.ID)
+}
+
 // Messages is the resolver for the messages field.
 func (r *chatRoomResolver) Messages(ctx context.Context, obj *model.ChatRoom, first *int) (*model.MessageConnection, error) {
 	rid, err := uuid.Parse(obj.ID)
@@ -37,6 +42,24 @@ func (r *chatRoomResolver) Messages(ctx context.Context, obj *model.ChatRoom, fi
 		limit = *first
 	}
 	return r.loadMessageConnection(ctx, rid, limit)
+}
+
+// Attachments is the resolver for the attachments field.
+func (r *commentResolver) Attachments(ctx context.Context, obj *model.Comment) ([]*model.Attachment, error) {
+	id, err := uuid.Parse(obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid id: %w", err)
+	}
+	return r.listAttachments(ctx, "comment", id)
+}
+
+// Attachments is the resolver for the attachments field.
+func (r *messageResolver) Attachments(ctx context.Context, obj *model.Message) ([]*model.Attachment, error) {
+	id, err := uuid.Parse(obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid id: %w", err)
+	}
+	return r.listAttachments(ctx, "message", id)
 }
 
 // Login is the resolver for the login field.
@@ -1210,38 +1233,6 @@ func (r *mutationResolver) EndImpersonation(ctx context.Context) (*model.Imperso
 	return r.impersonationStateForSession(ctx, sessionID)
 }
 
-// impersonationStateForSession reads the post-mutation session row and
-// builds the ImpersonationState model.
-func (r *Resolver) impersonationStateForSession(ctx context.Context, sessionID uuid.UUID) (*model.ImpersonationState, error) {
-	var actingID uuid.UUID
-	var effective *uuid.UUID
-	if err := r.DB.QueryRow(ctx,
-		`SELECT principal_id, effective_principal_id FROM sessions WHERE id = $1`,
-		sessionID).Scan(&actingID, &effective); err != nil {
-		return nil, err
-	}
-	out := &model.ImpersonationState{IsImpersonating: effective != nil}
-	if out.IsImpersonating {
-		acting, _ := r.loadPrincipalIface(ctx, actingID)
-		out.Acting = acting
-		eff, _ := r.loadPrincipalIface(ctx, *effective)
-		out.Effective = eff
-	}
-	return out, nil
-}
-
-func mapDevicePlatformGQLToDB(p model.DevicePlatform) string {
-	switch p {
-	case model.DevicePlatformIos:
-		return "ios"
-	case model.DevicePlatformAndroid:
-		return "android"
-	case model.DevicePlatformWeb:
-		return "web"
-	}
-	return ""
-}
-
 // RegisterDeviceToken is the resolver for the registerDeviceToken field.
 func (r *mutationResolver) RegisterDeviceToken(ctx context.Context, token string, platform model.DevicePlatform) (bool, error) {
 	identity, err := requireIdentity(ctx)
@@ -1270,6 +1261,21 @@ func (r *mutationResolver) UnregisterDeviceToken(ctx context.Context, token stri
 		return false, err
 	}
 	return true, nil
+}
+
+// IssueAttachmentUpload is the resolver for the issueAttachmentUpload field.
+func (r *mutationResolver) IssueAttachmentUpload(ctx context.Context, input model.IssueAttachmentUploadInput) (*model.AttachmentUploadTicket, error) {
+	return r.issueAttachmentUpload(ctx, input)
+}
+
+// ConfirmAttachmentUpload is the resolver for the confirmAttachmentUpload field.
+func (r *mutationResolver) ConfirmAttachmentUpload(ctx context.Context, attachmentID string, sha256 *string) (*model.Attachment, error) {
+	return r.confirmAttachmentUpload(ctx, attachmentID, sha256)
+}
+
+// RemoveAttachment is the resolver for the removeAttachment field.
+func (r *mutationResolver) RemoveAttachment(ctx context.Context, attachmentID string) (bool, error) {
+	return r.removeAttachment(ctx, attachmentID)
 }
 
 // CreateChatRoom is the resolver for the createChatRoom field.
@@ -1581,6 +1587,15 @@ func (r *postResolver) Comments(ctx context.Context, obj *model.Post, first *int
 	// in one shot today. M5 wires actual cursor pagination.
 	_ = after
 	return r.loadCommentsForPost(ctx, postID, limit)
+}
+
+// Attachments is the resolver for the attachments field.
+func (r *postResolver) Attachments(ctx context.Context, obj *model.Post) ([]*model.Attachment, error) {
+	id, err := uuid.Parse(obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid id: %w", err)
+	}
+	return r.listAttachments(ctx, "post", id)
 }
 
 // Health is the resolver for the health field.
@@ -2122,8 +2137,17 @@ func (r *tagResolver) Tasks(ctx context.Context, obj *model.Tag, first *int, aft
 	return r.loadTasksForTag(ctx, tagID, limit, dbStatus)
 }
 
+// Attachment returns AttachmentResolver implementation.
+func (r *Resolver) Attachment() AttachmentResolver { return &attachmentResolver{r} }
+
 // ChatRoom returns ChatRoomResolver implementation.
 func (r *Resolver) ChatRoom() ChatRoomResolver { return &chatRoomResolver{r} }
+
+// Comment returns CommentResolver implementation.
+func (r *Resolver) Comment() CommentResolver { return &commentResolver{r} }
+
+// Message returns MessageResolver implementation.
+func (r *Resolver) Message() MessageResolver { return &messageResolver{r} }
 
 // Mutation returns MutationResolver implementation.
 func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
@@ -2140,7 +2164,10 @@ func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionRes
 // Tag returns TagResolver implementation.
 func (r *Resolver) Tag() TagResolver { return &tagResolver{r} }
 
+type attachmentResolver struct{ *Resolver }
 type chatRoomResolver struct{ *Resolver }
+type commentResolver struct{ *Resolver }
+type messageResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type postResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

@@ -303,6 +303,33 @@ final BuiltSet<GDevicePlatform> _$gDevicePlatformValues =
   _$gDevicePlatformWEB,
 ]);
 
+const GAttachmentOwnerKind _$gAttachmentOwnerKindPOST =
+    const GAttachmentOwnerKind._('POST');
+const GAttachmentOwnerKind _$gAttachmentOwnerKindCOMMENT =
+    const GAttachmentOwnerKind._('COMMENT');
+const GAttachmentOwnerKind _$gAttachmentOwnerKindMESSAGE =
+    const GAttachmentOwnerKind._('MESSAGE');
+
+GAttachmentOwnerKind _$gAttachmentOwnerKindValueOf(String name) {
+  switch (name) {
+    case 'POST':
+      return _$gAttachmentOwnerKindPOST;
+    case 'COMMENT':
+      return _$gAttachmentOwnerKindCOMMENT;
+    case 'MESSAGE':
+      return _$gAttachmentOwnerKindMESSAGE;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<GAttachmentOwnerKind> _$gAttachmentOwnerKindValues =
+    BuiltSet<GAttachmentOwnerKind>(const <GAttachmentOwnerKind>[
+  _$gAttachmentOwnerKindPOST,
+  _$gAttachmentOwnerKindCOMMENT,
+  _$gAttachmentOwnerKindMESSAGE,
+]);
+
 const GPostSort _$gPostSortRECENT = const GPostSort._('RECENT');
 const GPostSort _$gPostSortACTIVE = const GPostSort._('ACTIVE');
 
@@ -342,9 +369,14 @@ Serializer<GNotificationUrgency> _$gNotificationUrgencySerializer =
     _$GNotificationUrgencySerializer();
 Serializer<GDevicePlatform> _$gDevicePlatformSerializer =
     _$GDevicePlatformSerializer();
+Serializer<GAttachmentOwnerKind> _$gAttachmentOwnerKindSerializer =
+    _$GAttachmentOwnerKindSerializer();
 Serializer<GPostSort> _$gPostSortSerializer = _$GPostSortSerializer();
 Serializer<GNotificationFilter> _$gNotificationFilterSerializer =
     _$GNotificationFilterSerializer();
+Serializer<GIssueAttachmentUploadInput>
+    _$gIssueAttachmentUploadInputSerializer =
+    _$GIssueAttachmentUploadInputSerializer();
 Serializer<GCreateTagInput> _$gCreateTagInputSerializer =
     _$GCreateTagInputSerializer();
 Serializer<GGrantTagInput> _$gGrantTagInputSerializer =
@@ -565,6 +597,24 @@ class _$GDevicePlatformSerializer
       GDevicePlatform.valueOf(serialized as String);
 }
 
+class _$GAttachmentOwnerKindSerializer
+    implements PrimitiveSerializer<GAttachmentOwnerKind> {
+  @override
+  final Iterable<Type> types = const <Type>[GAttachmentOwnerKind];
+  @override
+  final String wireName = 'GAttachmentOwnerKind';
+
+  @override
+  Object serialize(Serializers serializers, GAttachmentOwnerKind object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      object.name;
+
+  @override
+  GAttachmentOwnerKind deserialize(Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      GAttachmentOwnerKind.valueOf(serialized as String);
+}
+
 class _$GPostSortSerializer implements PrimitiveSerializer<GPostSort> {
   @override
   final Iterable<Type> types = const <Type>[GPostSort];
@@ -637,6 +687,81 @@ class _$GNotificationFilterSerializer
                   specifiedType: const FullType(
                       BuiltList, const [const FullType(GNotificationReason)]))!
               as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GIssueAttachmentUploadInputSerializer
+    implements StructuredSerializer<GIssueAttachmentUploadInput> {
+  @override
+  final Iterable<Type> types = const [
+    GIssueAttachmentUploadInput,
+    _$GIssueAttachmentUploadInput
+  ];
+  @override
+  final String wireName = 'GIssueAttachmentUploadInput';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GIssueAttachmentUploadInput object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'ownerType',
+      serializers.serialize(object.ownerType,
+          specifiedType: const FullType(GAttachmentOwnerKind)),
+      'ownerId',
+      serializers.serialize(object.ownerId,
+          specifiedType: const FullType(String)),
+      'filename',
+      serializers.serialize(object.filename,
+          specifiedType: const FullType(String)),
+      'mimeType',
+      serializers.serialize(object.mimeType,
+          specifiedType: const FullType(String)),
+      'sizeBytes',
+      serializers.serialize(object.sizeBytes,
+          specifiedType: const FullType(int)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GIssueAttachmentUploadInput deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GIssueAttachmentUploadInputBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'ownerType':
+          result.ownerType = serializers.deserialize(value,
+                  specifiedType: const FullType(GAttachmentOwnerKind))!
+              as GAttachmentOwnerKind;
+          break;
+        case 'ownerId':
+          result.ownerId = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'filename':
+          result.filename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'mimeType':
+          result.mimeType = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'sizeBytes':
+          result.sizeBytes = serializers.deserialize(value,
+              specifiedType: const FullType(int))! as int;
           break;
       }
     }
@@ -1760,6 +1885,147 @@ class GNotificationFilterBuilder
       }
       rethrow;
     }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GIssueAttachmentUploadInput extends GIssueAttachmentUploadInput {
+  @override
+  final GAttachmentOwnerKind ownerType;
+  @override
+  final String ownerId;
+  @override
+  final String filename;
+  @override
+  final String mimeType;
+  @override
+  final int sizeBytes;
+
+  factory _$GIssueAttachmentUploadInput(
+          [void Function(GIssueAttachmentUploadInputBuilder)? updates]) =>
+      (GIssueAttachmentUploadInputBuilder()..update(updates))._build();
+
+  _$GIssueAttachmentUploadInput._(
+      {required this.ownerType,
+      required this.ownerId,
+      required this.filename,
+      required this.mimeType,
+      required this.sizeBytes})
+      : super._();
+  @override
+  GIssueAttachmentUploadInput rebuild(
+          void Function(GIssueAttachmentUploadInputBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GIssueAttachmentUploadInputBuilder toBuilder() =>
+      GIssueAttachmentUploadInputBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GIssueAttachmentUploadInput &&
+        ownerType == other.ownerType &&
+        ownerId == other.ownerId &&
+        filename == other.filename &&
+        mimeType == other.mimeType &&
+        sizeBytes == other.sizeBytes;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, ownerType.hashCode);
+    _$hash = $jc(_$hash, ownerId.hashCode);
+    _$hash = $jc(_$hash, filename.hashCode);
+    _$hash = $jc(_$hash, mimeType.hashCode);
+    _$hash = $jc(_$hash, sizeBytes.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GIssueAttachmentUploadInput')
+          ..add('ownerType', ownerType)
+          ..add('ownerId', ownerId)
+          ..add('filename', filename)
+          ..add('mimeType', mimeType)
+          ..add('sizeBytes', sizeBytes))
+        .toString();
+  }
+}
+
+class GIssueAttachmentUploadInputBuilder
+    implements
+        Builder<GIssueAttachmentUploadInput,
+            GIssueAttachmentUploadInputBuilder> {
+  _$GIssueAttachmentUploadInput? _$v;
+
+  GAttachmentOwnerKind? _ownerType;
+  GAttachmentOwnerKind? get ownerType => _$this._ownerType;
+  set ownerType(GAttachmentOwnerKind? ownerType) =>
+      _$this._ownerType = ownerType;
+
+  String? _ownerId;
+  String? get ownerId => _$this._ownerId;
+  set ownerId(String? ownerId) => _$this._ownerId = ownerId;
+
+  String? _filename;
+  String? get filename => _$this._filename;
+  set filename(String? filename) => _$this._filename = filename;
+
+  String? _mimeType;
+  String? get mimeType => _$this._mimeType;
+  set mimeType(String? mimeType) => _$this._mimeType = mimeType;
+
+  int? _sizeBytes;
+  int? get sizeBytes => _$this._sizeBytes;
+  set sizeBytes(int? sizeBytes) => _$this._sizeBytes = sizeBytes;
+
+  GIssueAttachmentUploadInputBuilder();
+
+  GIssueAttachmentUploadInputBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _ownerType = $v.ownerType;
+      _ownerId = $v.ownerId;
+      _filename = $v.filename;
+      _mimeType = $v.mimeType;
+      _sizeBytes = $v.sizeBytes;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GIssueAttachmentUploadInput other) {
+    _$v = other as _$GIssueAttachmentUploadInput;
+  }
+
+  @override
+  void update(void Function(GIssueAttachmentUploadInputBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GIssueAttachmentUploadInput build() => _build();
+
+  _$GIssueAttachmentUploadInput _build() {
+    final _$result = _$v ??
+        _$GIssueAttachmentUploadInput._(
+          ownerType: BuiltValueNullFieldError.checkNotNull(
+              ownerType, r'GIssueAttachmentUploadInput', 'ownerType'),
+          ownerId: BuiltValueNullFieldError.checkNotNull(
+              ownerId, r'GIssueAttachmentUploadInput', 'ownerId'),
+          filename: BuiltValueNullFieldError.checkNotNull(
+              filename, r'GIssueAttachmentUploadInput', 'filename'),
+          mimeType: BuiltValueNullFieldError.checkNotNull(
+              mimeType, r'GIssueAttachmentUploadInput', 'mimeType'),
+          sizeBytes: BuiltValueNullFieldError.checkNotNull(
+              sizeBytes, r'GIssueAttachmentUploadInput', 'sizeBytes'),
+        );
     replace(_$result);
     return _$result;
   }

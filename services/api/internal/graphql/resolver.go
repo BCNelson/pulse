@@ -3,6 +3,7 @@ package graphql
 import (
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	"github.com/bcnelson/pulse/services/api/internal/attachment"
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/chat"
@@ -36,5 +37,6 @@ type Resolver struct {
 	Notifications *notification.Service
 	Impersonation *impersonation.Service
 	Push          *push.Service
+	Attachments   *attachment.Service
 	Realtime      *realtime.Dispatcher
 }

@@ -234,6 +234,25 @@ class GDevicePlatform extends EnumClass {
   static GDevicePlatform valueOf(String name) => _$gDevicePlatformValueOf(name);
 }
 
+class GAttachmentOwnerKind extends EnumClass {
+  const GAttachmentOwnerKind._(String name) : super(name);
+
+  static const GAttachmentOwnerKind POST = _$gAttachmentOwnerKindPOST;
+
+  static const GAttachmentOwnerKind COMMENT = _$gAttachmentOwnerKindCOMMENT;
+
+  static const GAttachmentOwnerKind MESSAGE = _$gAttachmentOwnerKindMESSAGE;
+
+  static Serializer<GAttachmentOwnerKind> get serializer =>
+      _$gAttachmentOwnerKindSerializer;
+
+  static BuiltSet<GAttachmentOwnerKind> get values =>
+      _$gAttachmentOwnerKindValues;
+
+  static GAttachmentOwnerKind valueOf(String name) =>
+      _$gAttachmentOwnerKindValueOf(name);
+}
+
 class GPostSort extends EnumClass {
   const GPostSort._(String name) : super(name);
 
@@ -269,6 +288,35 @@ abstract class GNotificationFilter
   static GNotificationFilter? fromJson(Map<String, dynamic> json) =>
       _i2.serializers.deserializeWith(
         GNotificationFilter.serializer,
+        json,
+      );
+}
+
+abstract class GIssueAttachmentUploadInput
+    implements
+        Built<GIssueAttachmentUploadInput, GIssueAttachmentUploadInputBuilder> {
+  GIssueAttachmentUploadInput._();
+
+  factory GIssueAttachmentUploadInput(
+          [void Function(GIssueAttachmentUploadInputBuilder b) updates]) =
+      _$GIssueAttachmentUploadInput;
+
+  GAttachmentOwnerKind get ownerType;
+  String get ownerId;
+  String get filename;
+  String get mimeType;
+  int get sizeBytes;
+  static Serializer<GIssueAttachmentUploadInput> get serializer =>
+      _$gIssueAttachmentUploadInputSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GIssueAttachmentUploadInput.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GIssueAttachmentUploadInput? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GIssueAttachmentUploadInput.serializer,
         json,
       );
 }

@@ -28,6 +28,32 @@ type SearchResult interface {
 	IsSearchResult()
 }
 
+// An attachment is a file uploaded to the S3-compatible bucket and
+// associated with a post, comment, or message. The API never proxies
+// bytes — clients PUT to uploadUrl on `issueAttachmentUpload` and GET
+// from `downloadUrl` on the resolved Attachment.
+type Attachment struct {
+	ID        string              `json:"id"`
+	OwnerType AttachmentOwnerKind `json:"ownerType"`
+	OwnerID   string              `json:"ownerId"`
+	Uploader  Principal           `json:"uploader"`
+	Filename  string              `json:"filename"`
+	MimeType  string              `json:"mimeType"`
+	SizeBytes int                 `json:"sizeBytes"`
+	CreatedAt time.Time           `json:"createdAt"`
+	// Presigned URL for downloading the bytes. Short-lived (~15 minutes).
+	// Resolvers re-issue per request so a stale URL never lingers.
+	DownloadURL string `json:"downloadUrl"`
+}
+
+type AttachmentUploadTicket struct {
+	AttachmentID string    `json:"attachmentId"`
+	UploadURL    string    `json:"uploadUrl"`
+	Method       string    `json:"method"`
+	ExpiresAt    time.Time `json:"expiresAt"`
+	StorageKey   string    `json:"storageKey"`
+}
+
 type Bot struct {
 	ID             string          `json:"id"`
 	GlobalURI      string          `json:"globalUri"`
@@ -65,17 +91,18 @@ type ChatRoomParticipant struct {
 }
 
 type Comment struct {
-	ID        string             `json:"id"`
-	PostID    string             `json:"postId"`
-	ParentID  *string            `json:"parentId,omitempty"`
-	Depth     int                `json:"depth"`
-	Author    Principal          `json:"author"`
-	Body      string             `json:"body"`
-	Mentions  []Principal        `json:"mentions"`
-	Reactions []*ReactionSummary `json:"reactions"`
-	CreatedAt time.Time          `json:"createdAt"`
-	EditedAt  *time.Time         `json:"editedAt,omitempty"`
-	DeletedAt *time.Time         `json:"deletedAt,omitempty"`
+	ID          string             `json:"id"`
+	PostID      string             `json:"postId"`
+	ParentID    *string            `json:"parentId,omitempty"`
+	Depth       int                `json:"depth"`
+	Author      Principal          `json:"author"`
+	Body        string             `json:"body"`
+	Mentions    []Principal        `json:"mentions"`
+	Reactions   []*ReactionSummary `json:"reactions"`
+	Attachments []*Attachment      `json:"attachments"`
+	CreatedAt   time.Time          `json:"createdAt"`
+	EditedAt    *time.Time         `json:"editedAt,omitempty"`
+	DeletedAt   *time.Time         `json:"deletedAt,omitempty"`
 }
 
 func (Comment) IsSearchResult() {}
@@ -152,6 +179,14 @@ type ImpersonationState struct {
 	Effective       Principal `json:"effective,omitempty"`
 }
 
+type IssueAttachmentUploadInput struct {
+	OwnerType AttachmentOwnerKind `json:"ownerType"`
+	OwnerID   string              `json:"ownerId"`
+	Filename  string              `json:"filename"`
+	MimeType  string              `json:"mimeType"`
+	SizeBytes int                 `json:"sizeBytes"`
+}
+
 type LoginPayload struct {
 	Token     string    `json:"token"`
 	ExpiresAt time.Time `json:"expiresAt"`
@@ -159,16 +194,17 @@ type LoginPayload struct {
 }
 
 type Message struct {
-	ID             string     `json:"id"`
-	GlobalURI      string     `json:"globalUri"`
-	ChatRoom       *ChatRoom  `json:"chatRoom"`
-	Author         Principal  `json:"author"`
-	Body           string     `json:"body"`
-	ReplyTo        *Message   `json:"replyTo,omitempty"`
-	CreatedAt      time.Time  `json:"createdAt"`
-	EditedAt       *time.Time `json:"editedAt,omitempty"`
-	DeletedAt      *time.Time `json:"deletedAt,omitempty"`
-	PromotedToPost *Post      `json:"promotedToPost,omitempty"`
+	ID             string        `json:"id"`
+	GlobalURI      string        `json:"globalUri"`
+	ChatRoom       *ChatRoom     `json:"chatRoom"`
+	Author         Principal     `json:"author"`
+	Body           string        `json:"body"`
+	ReplyTo        *Message      `json:"replyTo,omitempty"`
+	Attachments    []*Attachment `json:"attachments"`
+	CreatedAt      time.Time     `json:"createdAt"`
+	EditedAt       *time.Time    `json:"editedAt,omitempty"`
+	DeletedAt      *time.Time    `json:"deletedAt,omitempty"`
+	PromotedToPost *Post         `json:"promotedToPost,omitempty"`
 }
 
 func (Message) IsNotificationSource() {}
@@ -232,6 +268,7 @@ type Post struct {
 	Mentions       []Principal        `json:"mentions"`
 	Comments       *CommentConnection `json:"comments"`
 	Reactions      []*ReactionSummary `json:"reactions"`
+	Attachments    []*Attachment      `json:"attachments"`
 	DecisionStatus *DecisionStatus    `json:"decisionStatus,omitempty"`
 	DenyFlag       bool               `json:"denyFlag"`
 	MyPermissions  *PostPermissions   `json:"myPermissions"`
@@ -424,6 +461,63 @@ func (this User) GetKind() PrincipalKind     { return this.Kind }
 func (this User) GetStatus() PrincipalStatus { return this.Status }
 func (this User) GetDisplayName() string     { return this.DisplayName }
 func (this User) GetHomeTag() *Tag           { return this.HomeTag }
+
+type AttachmentOwnerKind string
+
+const (
+	AttachmentOwnerKindPost    AttachmentOwnerKind = "POST"
+	AttachmentOwnerKindComment AttachmentOwnerKind = "COMMENT"
+	AttachmentOwnerKindMessage AttachmentOwnerKind = "MESSAGE"
+)
+
+var AllAttachmentOwnerKind = []AttachmentOwnerKind{
+	AttachmentOwnerKindPost,
+	AttachmentOwnerKindComment,
+	AttachmentOwnerKindMessage,
+}
+
+func (e AttachmentOwnerKind) IsValid() bool {
+	switch e {
+	case AttachmentOwnerKindPost, AttachmentOwnerKindComment, AttachmentOwnerKindMessage:
+		return true
+	}
+	return false
+}
+
+func (e AttachmentOwnerKind) String() string {
+	return string(e)
+}
+
+func (e *AttachmentOwnerKind) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = AttachmentOwnerKind(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid AttachmentOwnerKind", str)
+	}
+	return nil
+}
+
+func (e AttachmentOwnerKind) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *AttachmentOwnerKind) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e AttachmentOwnerKind) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
 
 type DecisionStatus string
 

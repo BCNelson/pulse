@@ -29,7 +29,10 @@ func NewExecutableSchema(cfg Config) graphql.ExecutableSchema {
 type Config = graphql.Config[ResolverRoot, DirectiveRoot, ComplexityRoot]
 
 type ResolverRoot interface {
+	Attachment() AttachmentResolver
 	ChatRoom() ChatRoomResolver
+	Comment() CommentResolver
+	Message() MessageResolver
 	Mutation() MutationResolver
 	Post() PostResolver
 	Query() QueryResolver
@@ -41,6 +44,26 @@ type DirectiveRoot struct {
 }
 
 type ComplexityRoot struct {
+	Attachment struct {
+		CreatedAt   func(childComplexity int) int
+		DownloadURL func(childComplexity int) int
+		Filename    func(childComplexity int) int
+		ID          func(childComplexity int) int
+		MimeType    func(childComplexity int) int
+		OwnerID     func(childComplexity int) int
+		OwnerType   func(childComplexity int) int
+		SizeBytes   func(childComplexity int) int
+		Uploader    func(childComplexity int) int
+	}
+
+	AttachmentUploadTicket struct {
+		AttachmentID func(childComplexity int) int
+		ExpiresAt    func(childComplexity int) int
+		Method       func(childComplexity int) int
+		StorageKey   func(childComplexity int) int
+		UploadURL    func(childComplexity int) int
+	}
+
 	Bot struct {
 		DisplayName    func(childComplexity int) int
 		GlobalURI      func(childComplexity int) int
@@ -70,17 +93,18 @@ type ComplexityRoot struct {
 	}
 
 	Comment struct {
-		Author    func(childComplexity int) int
-		Body      func(childComplexity int) int
-		CreatedAt func(childComplexity int) int
-		DeletedAt func(childComplexity int) int
-		Depth     func(childComplexity int) int
-		EditedAt  func(childComplexity int) int
-		ID        func(childComplexity int) int
-		Mentions  func(childComplexity int) int
-		ParentID  func(childComplexity int) int
-		PostID    func(childComplexity int) int
-		Reactions func(childComplexity int) int
+		Attachments func(childComplexity int) int
+		Author      func(childComplexity int) int
+		Body        func(childComplexity int) int
+		CreatedAt   func(childComplexity int) int
+		DeletedAt   func(childComplexity int) int
+		Depth       func(childComplexity int) int
+		EditedAt    func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Mentions    func(childComplexity int) int
+		ParentID    func(childComplexity int) int
+		PostID      func(childComplexity int) int
+		Reactions   func(childComplexity int) int
 	}
 
 	CommentConnection struct {
@@ -106,6 +130,7 @@ type ComplexityRoot struct {
 	}
 
 	Message struct {
+		Attachments    func(childComplexity int) int
 		Author         func(childComplexity int) int
 		Body           func(childComplexity int) int
 		ChatRoom       func(childComplexity int) int
@@ -133,6 +158,7 @@ type ComplexityRoot struct {
 		AddRoomTag               func(childComplexity int, roomID string, tagID string) int
 		ArchiveTag               func(childComplexity int, tagID string) int
 		AssignTask               func(childComplexity int, taskID string, principalID string) int
+		ConfirmAttachmentUpload  func(childComplexity int, attachmentID string, sha256 *string) int
 		CreateChatRoom           func(childComplexity int, input model.CreateChatRoomInput) int
 		CreateComment            func(childComplexity int, input model.CreateCommentInput) int
 		CreatePost               func(childComplexity int, input model.CreatePostInput) int
@@ -149,6 +175,7 @@ type ComplexityRoot struct {
 		EndImpersonation         func(childComplexity int) int
 		GrantTag                 func(childComplexity int, input model.GrantTagInput) int
 		Impersonate              func(childComplexity int, principalID string, reason string) int
+		IssueAttachmentUpload    func(childComplexity int, input model.IssueAttachmentUploadInput) int
 		Login                    func(childComplexity int, email string, password string) int
 		Logout                   func(childComplexity int) int
 		MarkAllNotificationsRead func(childComplexity int) int
@@ -161,6 +188,7 @@ type ComplexityRoot struct {
 		ReactToComment           func(childComplexity int, commentID string, emoji string) int
 		ReactToPost              func(childComplexity int, postID string, emoji string) int
 		RegisterDeviceToken      func(childComplexity int, token string, platform model.DevicePlatform) int
+		RemoveAttachment         func(childComplexity int, attachmentID string) int
 		RemoveParticipant        func(childComplexity int, roomID string, principalID string) int
 		RemoveRoomTag            func(childComplexity int, roomID string, tagID string) int
 		RevokeTagGrant           func(childComplexity int, tagID string, principalID string) int
@@ -210,6 +238,7 @@ type ComplexityRoot struct {
 	}
 
 	Post struct {
+		Attachments    func(childComplexity int) int
 		Author         func(childComplexity int) int
 		Body           func(childComplexity int) int
 		Comments       func(childComplexity int, first *int, after *string) int
@@ -388,8 +417,17 @@ type ComplexityRoot struct {
 	}
 }
 
+type AttachmentResolver interface {
+	DownloadURL(ctx context.Context, obj *model.Attachment) (string, error)
+}
 type ChatRoomResolver interface {
 	Messages(ctx context.Context, obj *model.ChatRoom, first *int) (*model.MessageConnection, error)
+}
+type CommentResolver interface {
+	Attachments(ctx context.Context, obj *model.Comment) ([]*model.Attachment, error)
+}
+type MessageResolver interface {
+	Attachments(ctx context.Context, obj *model.Message) ([]*model.Attachment, error)
 }
 type MutationResolver interface {
 	Login(ctx context.Context, email string, password string) (*model.LoginPayload, error)
@@ -430,6 +468,9 @@ type MutationResolver interface {
 	EndImpersonation(ctx context.Context) (*model.ImpersonationState, error)
 	RegisterDeviceToken(ctx context.Context, token string, platform model.DevicePlatform) (bool, error)
 	UnregisterDeviceToken(ctx context.Context, token string) (bool, error)
+	IssueAttachmentUpload(ctx context.Context, input model.IssueAttachmentUploadInput) (*model.AttachmentUploadTicket, error)
+	ConfirmAttachmentUpload(ctx context.Context, attachmentID string, sha256 *string) (*model.Attachment, error)
+	RemoveAttachment(ctx context.Context, attachmentID string) (bool, error)
 	CreateChatRoom(ctx context.Context, input model.CreateChatRoomInput) (*model.ChatRoom, error)
 	AddParticipant(ctx context.Context, roomID string, principalID string, role *string) (*model.ChatRoom, error)
 	RemoveParticipant(ctx context.Context, roomID string, principalID string) (*model.ChatRoom, error)
@@ -442,6 +483,8 @@ type MutationResolver interface {
 }
 type PostResolver interface {
 	Comments(ctx context.Context, obj *model.Post, first *int, after *string) (*model.CommentConnection, error)
+
+	Attachments(ctx context.Context, obj *model.Post) ([]*model.Attachment, error)
 }
 type QueryResolver interface {
 	Health(ctx context.Context) (string, error)
@@ -481,6 +524,92 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	ec := newExecutionContext(nil, e, nil)
 	_ = ec
 	switch typeName + "." + field {
+
+	case "Attachment.createdAt":
+		if e.ComplexityRoot.Attachment.CreatedAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Attachment.CreatedAt(childComplexity), true
+	case "Attachment.downloadUrl":
+		if e.ComplexityRoot.Attachment.DownloadURL == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Attachment.DownloadURL(childComplexity), true
+	case "Attachment.filename":
+		if e.ComplexityRoot.Attachment.Filename == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Attachment.Filename(childComplexity), true
+	case "Attachment.id":
+		if e.ComplexityRoot.Attachment.ID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Attachment.ID(childComplexity), true
+	case "Attachment.mimeType":
+		if e.ComplexityRoot.Attachment.MimeType == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Attachment.MimeType(childComplexity), true
+	case "Attachment.ownerId":
+		if e.ComplexityRoot.Attachment.OwnerID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Attachment.OwnerID(childComplexity), true
+	case "Attachment.ownerType":
+		if e.ComplexityRoot.Attachment.OwnerType == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Attachment.OwnerType(childComplexity), true
+	case "Attachment.sizeBytes":
+		if e.ComplexityRoot.Attachment.SizeBytes == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Attachment.SizeBytes(childComplexity), true
+	case "Attachment.uploader":
+		if e.ComplexityRoot.Attachment.Uploader == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Attachment.Uploader(childComplexity), true
+
+	case "AttachmentUploadTicket.attachmentId":
+		if e.ComplexityRoot.AttachmentUploadTicket.AttachmentID == nil {
+			break
+		}
+
+		return e.ComplexityRoot.AttachmentUploadTicket.AttachmentID(childComplexity), true
+	case "AttachmentUploadTicket.expiresAt":
+		if e.ComplexityRoot.AttachmentUploadTicket.ExpiresAt == nil {
+			break
+		}
+
+		return e.ComplexityRoot.AttachmentUploadTicket.ExpiresAt(childComplexity), true
+	case "AttachmentUploadTicket.method":
+		if e.ComplexityRoot.AttachmentUploadTicket.Method == nil {
+			break
+		}
+
+		return e.ComplexityRoot.AttachmentUploadTicket.Method(childComplexity), true
+	case "AttachmentUploadTicket.storageKey":
+		if e.ComplexityRoot.AttachmentUploadTicket.StorageKey == nil {
+			break
+		}
+
+		return e.ComplexityRoot.AttachmentUploadTicket.StorageKey(childComplexity), true
+	case "AttachmentUploadTicket.uploadUrl":
+		if e.ComplexityRoot.AttachmentUploadTicket.UploadURL == nil {
+			break
+		}
+
+		return e.ComplexityRoot.AttachmentUploadTicket.UploadURL(childComplexity), true
 
 	case "Bot.displayName":
 		if e.ComplexityRoot.Bot.DisplayName == nil {
@@ -604,6 +733,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.ChatRoomParticipant.Role(childComplexity), true
 
+	case "Comment.attachments":
+		if e.ComplexityRoot.Comment.Attachments == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Comment.Attachments(childComplexity), true
 	case "Comment.author":
 		if e.ComplexityRoot.Comment.Author == nil {
 			break
@@ -735,6 +870,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.LoginPayload.Viewer(childComplexity), true
 
+	case "Message.attachments":
+		if e.ComplexityRoot.Message.Attachments == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Message.Attachments(childComplexity), true
 	case "Message.author":
 		if e.ComplexityRoot.Message.Author == nil {
 			break
@@ -866,6 +1007,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.AssignTask(childComplexity, args["taskId"].(string), args["principalId"].(string)), true
+	case "Mutation.confirmAttachmentUpload":
+		if e.ComplexityRoot.Mutation.ConfirmAttachmentUpload == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_confirmAttachmentUpload_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.ConfirmAttachmentUpload(childComplexity, args["attachmentId"].(string), args["sha256"].(*string)), true
 	case "Mutation.createChatRoom":
 		if e.ComplexityRoot.Mutation.CreateChatRoom == nil {
 			break
@@ -1037,6 +1189,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.Impersonate(childComplexity, args["principalId"].(string), args["reason"].(string)), true
+	case "Mutation.issueAttachmentUpload":
+		if e.ComplexityRoot.Mutation.IssueAttachmentUpload == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_issueAttachmentUpload_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.IssueAttachmentUpload(childComplexity, args["input"].(model.IssueAttachmentUploadInput)), true
 	case "Mutation.login":
 		if e.ComplexityRoot.Mutation.Login == nil {
 			break
@@ -1159,6 +1322,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.RegisterDeviceToken(childComplexity, args["token"].(string), args["platform"].(model.DevicePlatform)), true
+	case "Mutation.removeAttachment":
+		if e.ComplexityRoot.Mutation.RemoveAttachment == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_removeAttachment_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.RemoveAttachment(childComplexity, args["attachmentId"].(string)), true
 	case "Mutation.removeParticipant":
 		if e.ComplexityRoot.Mutation.RemoveParticipant == nil {
 			break
@@ -1443,6 +1617,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.PageInfo.StartCursor(childComplexity), true
 
+	case "Post.attachments":
+		if e.ComplexityRoot.Post.Attachments == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Post.Attachments(childComplexity), true
 	case "Post.author":
 		if e.ComplexityRoot.Post.Author == nil {
 			break
@@ -2236,6 +2416,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputEditPostInput,
 		ec.unmarshalInputEditTaskInput,
 		ec.unmarshalInputGrantTagInput,
+		ec.unmarshalInputIssueAttachmentUploadInput,
 		ec.unmarshalInputNotificationFilter,
 		ec.unmarshalInputPostTagInput,
 		ec.unmarshalInputSendMessageInput,
@@ -2427,6 +2608,12 @@ enum DevicePlatform {
   WEB
 }
 
+enum AttachmentOwnerKind {
+  POST
+  COMMENT
+  MESSAGE
+}
+
 enum PostSort {
   RECENT
   ACTIVE
@@ -2530,6 +2717,7 @@ type Post {
   mentions: [Principal!]!
   comments(first: Int, after: String): CommentConnection!
   reactions: [ReactionSummary!]!
+  attachments: [Attachment!]!
   decisionStatus: DecisionStatus
   denyFlag: Boolean!
   myPermissions: PostPermissions!
@@ -2560,6 +2748,7 @@ type Comment {
   body: String!
   mentions: [Principal!]!
   reactions: [ReactionSummary!]!
+  attachments: [Attachment!]!
   createdAt: Time!
   editedAt: Time
   deletedAt: Time
@@ -2711,6 +2900,46 @@ type ImpersonationState {
   effective: Principal
 }
 
+# ----- attachments (M6) -----
+
+"""
+An attachment is a file uploaded to the S3-compatible bucket and
+associated with a post, comment, or message. The API never proxies
+bytes — clients PUT to uploadUrl on ` + "`" + `issueAttachmentUpload` + "`" + ` and GET
+from ` + "`" + `downloadUrl` + "`" + ` on the resolved Attachment.
+"""
+type Attachment {
+  id: ID!
+  ownerType: AttachmentOwnerKind!
+  ownerId: ID!
+  uploader: Principal!
+  filename: String!
+  mimeType: String!
+  sizeBytes: Int!
+  createdAt: Time!
+  """
+  Presigned URL for downloading the bytes. Short-lived (~15 minutes).
+  Resolvers re-issue per request so a stale URL never lingers.
+  """
+  downloadUrl: String!
+}
+
+type AttachmentUploadTicket {
+  attachmentId: ID!
+  uploadUrl: String!
+  method: String!
+  expiresAt: Time!
+  storageKey: String!
+}
+
+input IssueAttachmentUploadInput {
+  ownerType: AttachmentOwnerKind!
+  ownerId: ID!
+  filename: String!
+  mimeType: String!
+  sizeBytes: Int!
+}
+
 # ----- mutations -----
 
 input CreateTagInput {
@@ -2793,6 +3022,7 @@ type Message {
   author: Principal!
   body: String!
   replyTo: Message
+  attachments: [Attachment!]!
   createdAt: Time!
   editedAt: Time
   deletedAt: Time
@@ -2909,6 +3139,25 @@ type Mutation {
   registerDeviceToken(token: String!, platform: DevicePlatform!): Boolean!
   unregisterDeviceToken(token: String!): Boolean!
 
+  """
+  Issue a presigned PUT URL for a new attachment. The client uploads
+  bytes directly to the bucket, then calls confirmAttachmentUpload to
+  flip the row to ready. Until that fires, the row is invisible to
+  readers.
+  """
+  issueAttachmentUpload(input: IssueAttachmentUploadInput!): AttachmentUploadTicket!
+  """
+  Mark an attachment as ready after the client's PUT succeeded.
+  sha256 is optional and verified out-of-band; the bucket's own
+  integrity check is the source of truth.
+  """
+  confirmAttachmentUpload(attachmentId: ID!, sha256: String): Attachment!
+  """
+  Tombstone (soft-delete) an attachment. Bytes stay in the bucket
+  until retention sweep; the attachment becomes invisible immediately.
+  """
+  removeAttachment(attachmentId: ID!): Boolean!
+
   createChatRoom(input: CreateChatRoomInput!): ChatRoom!
   addParticipant(roomId: ID!, principalId: ID!, role: String): ChatRoom!
   removeParticipant(roomId: ID!, principalId: ID!): ChatRoom!
@@ -2954,6 +3203,46 @@ var parsedSchema = gqlparser.MustLoadSchema(sources...)
 // childFields_* functions provide shared child field context lookups.
 // Each function is generated once per unique object type, deduplicating the
 // switch statements that were previously inlined in every fieldContext_* function.
+
+func (ec *executionContext) childFields_Attachment(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "id":
+		return ec.fieldContext_Attachment_id(ctx, field)
+	case "ownerType":
+		return ec.fieldContext_Attachment_ownerType(ctx, field)
+	case "ownerId":
+		return ec.fieldContext_Attachment_ownerId(ctx, field)
+	case "uploader":
+		return ec.fieldContext_Attachment_uploader(ctx, field)
+	case "filename":
+		return ec.fieldContext_Attachment_filename(ctx, field)
+	case "mimeType":
+		return ec.fieldContext_Attachment_mimeType(ctx, field)
+	case "sizeBytes":
+		return ec.fieldContext_Attachment_sizeBytes(ctx, field)
+	case "createdAt":
+		return ec.fieldContext_Attachment_createdAt(ctx, field)
+	case "downloadUrl":
+		return ec.fieldContext_Attachment_downloadUrl(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type Attachment", field.Name)
+}
+
+func (ec *executionContext) childFields_AttachmentUploadTicket(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "attachmentId":
+		return ec.fieldContext_AttachmentUploadTicket_attachmentId(ctx, field)
+	case "uploadUrl":
+		return ec.fieldContext_AttachmentUploadTicket_uploadUrl(ctx, field)
+	case "method":
+		return ec.fieldContext_AttachmentUploadTicket_method(ctx, field)
+	case "expiresAt":
+		return ec.fieldContext_AttachmentUploadTicket_expiresAt(ctx, field)
+	case "storageKey":
+		return ec.fieldContext_AttachmentUploadTicket_storageKey(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type AttachmentUploadTicket", field.Name)
+}
 
 func (ec *executionContext) childFields_ChatRoom(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 	switch field.Name {
@@ -3009,6 +3298,8 @@ func (ec *executionContext) childFields_Comment(ctx context.Context, field graph
 		return ec.fieldContext_Comment_mentions(ctx, field)
 	case "reactions":
 		return ec.fieldContext_Comment_reactions(ctx, field)
+	case "attachments":
+		return ec.fieldContext_Comment_attachments(ctx, field)
 	case "createdAt":
 		return ec.fieldContext_Comment_createdAt(ctx, field)
 	case "editedAt":
@@ -3077,6 +3368,8 @@ func (ec *executionContext) childFields_Message(ctx context.Context, field graph
 		return ec.fieldContext_Message_body(ctx, field)
 	case "replyTo":
 		return ec.fieldContext_Message_replyTo(ctx, field)
+	case "attachments":
+		return ec.fieldContext_Message_attachments(ctx, field)
 	case "createdAt":
 		return ec.fieldContext_Message_createdAt(ctx, field)
 	case "editedAt":
@@ -3191,6 +3484,8 @@ func (ec *executionContext) childFields_Post(ctx context.Context, field graphql.
 		return ec.fieldContext_Post_comments(ctx, field)
 	case "reactions":
 		return ec.fieldContext_Post_reactions(ctx, field)
+	case "attachments":
+		return ec.fieldContext_Post_attachments(ctx, field)
 	case "decisionStatus":
 		return ec.fieldContext_Post_decisionStatus(ctx, field)
 	case "denyFlag":
@@ -3701,6 +3996,28 @@ func (ec *executionContext) field_Mutation_assignTask_args(ctx context.Context, 
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_confirmAttachmentUpload_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "attachmentId",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNID2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["attachmentId"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "sha256",
+		func(ctx context.Context, v any) (*string, error) {
+			return ec.unmarshalOString2ᚖstring(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["sha256"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_createChatRoom_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -3932,6 +4249,20 @@ func (ec *executionContext) field_Mutation_impersonate_args(ctx context.Context,
 		return nil, err
 	}
 	args["reason"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_issueAttachmentUpload_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
+		func(ctx context.Context, v any) (model.IssueAttachmentUploadInput, error) {
+			return ec.unmarshalNIssueAttachmentUploadInput2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐIssueAttachmentUploadInput(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
 	return args, nil
 }
 
@@ -4168,6 +4499,20 @@ func (ec *executionContext) field_Mutation_registerDeviceToken_args(ctx context.
 		return nil, err
 	}
 	args["platform"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_removeAttachment_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "attachmentId",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNID2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["attachmentId"] = arg0
 	return args, nil
 }
 
@@ -4792,6 +5137,337 @@ func (ec *executionContext) field___Type_fields_args(ctx context.Context, rawArg
 // endregion ************************** directives.gotpl **************************
 
 // region    **************************** field.gotpl *****************************
+
+func (ec *executionContext) _Attachment_id(ctx context.Context, field graphql.CollectedField, obj *model.Attachment) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Attachment_id(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNID2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Attachment_id(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Attachment", field, false, false, errors.New("field of type ID does not have child fields"))
+}
+
+func (ec *executionContext) _Attachment_ownerType(ctx context.Context, field graphql.CollectedField, obj *model.Attachment) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Attachment_ownerType(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.OwnerType, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v model.AttachmentOwnerKind) graphql.Marshaler {
+			return ec.marshalNAttachmentOwnerKind2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachmentOwnerKind(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Attachment_ownerType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Attachment", field, false, false, errors.New("field of type AttachmentOwnerKind does not have child fields"))
+}
+
+func (ec *executionContext) _Attachment_ownerId(ctx context.Context, field graphql.CollectedField, obj *model.Attachment) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Attachment_ownerId(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.OwnerID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNID2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Attachment_ownerId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Attachment", field, false, false, errors.New("field of type ID does not have child fields"))
+}
+
+func (ec *executionContext) _Attachment_uploader(ctx context.Context, field graphql.CollectedField, obj *model.Attachment) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Attachment_uploader(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Uploader, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v model.Principal) graphql.Marshaler {
+			return ec.marshalNPrincipal2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐPrincipal(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Attachment_uploader(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Attachment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("FieldContext.Child cannot be called on type INTERFACE")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Attachment_filename(ctx context.Context, field graphql.CollectedField, obj *model.Attachment) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Attachment_filename(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Filename, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Attachment_filename(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Attachment", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Attachment_mimeType(ctx context.Context, field graphql.CollectedField, obj *model.Attachment) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Attachment_mimeType(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.MimeType, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Attachment_mimeType(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Attachment", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Attachment_sizeBytes(ctx context.Context, field graphql.CollectedField, obj *model.Attachment) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Attachment_sizeBytes(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.SizeBytes, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v int) graphql.Marshaler {
+			return ec.marshalNInt2int(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Attachment_sizeBytes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Attachment", field, false, false, errors.New("field of type Int does not have child fields"))
+}
+
+func (ec *executionContext) _Attachment_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Attachment) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Attachment_createdAt(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.CreatedAt, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v time.Time) graphql.Marshaler {
+			return ec.marshalNTime2timeᚐTime(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Attachment_createdAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Attachment", field, false, false, errors.New("field of type Time does not have child fields"))
+}
+
+func (ec *executionContext) _Attachment_downloadUrl(ctx context.Context, field graphql.CollectedField, obj *model.Attachment) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Attachment_downloadUrl(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Attachment().DownloadURL(ctx, obj)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Attachment_downloadUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Attachment", field, true, true, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _AttachmentUploadTicket_attachmentId(ctx context.Context, field graphql.CollectedField, obj *model.AttachmentUploadTicket) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_AttachmentUploadTicket_attachmentId(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.AttachmentID, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNID2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_AttachmentUploadTicket_attachmentId(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("AttachmentUploadTicket", field, false, false, errors.New("field of type ID does not have child fields"))
+}
+
+func (ec *executionContext) _AttachmentUploadTicket_uploadUrl(ctx context.Context, field graphql.CollectedField, obj *model.AttachmentUploadTicket) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_AttachmentUploadTicket_uploadUrl(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.UploadURL, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_AttachmentUploadTicket_uploadUrl(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("AttachmentUploadTicket", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _AttachmentUploadTicket_method(ctx context.Context, field graphql.CollectedField, obj *model.AttachmentUploadTicket) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_AttachmentUploadTicket_method(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Method, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_AttachmentUploadTicket_method(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("AttachmentUploadTicket", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _AttachmentUploadTicket_expiresAt(ctx context.Context, field graphql.CollectedField, obj *model.AttachmentUploadTicket) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_AttachmentUploadTicket_expiresAt(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ExpiresAt, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v time.Time) graphql.Marshaler {
+			return ec.marshalNTime2timeᚐTime(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_AttachmentUploadTicket_expiresAt(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("AttachmentUploadTicket", field, false, false, errors.New("field of type Time does not have child fields"))
+}
+
+func (ec *executionContext) _AttachmentUploadTicket_storageKey(ctx context.Context, field graphql.CollectedField, obj *model.AttachmentUploadTicket) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_AttachmentUploadTicket_storageKey(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.StorageKey, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v string) graphql.Marshaler {
+			return ec.marshalNString2string(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_AttachmentUploadTicket_storageKey(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("AttachmentUploadTicket", field, false, false, errors.New("field of type String does not have child fields"))
+}
 
 func (ec *executionContext) _Bot_id(ctx context.Context, field graphql.CollectedField, obj *model.Bot) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
@@ -5507,6 +6183,38 @@ func (ec *executionContext) fieldContext_Comment_reactions(_ context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Comment_attachments(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Comment_attachments(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Comment().Attachments(ctx, obj)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.Attachment) graphql.Marshaler {
+			return ec.marshalNAttachment2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachmentᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Comment_attachments(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Attachment(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Comment_createdAt(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -6020,6 +6728,38 @@ func (ec *executionContext) fieldContext_Message_replyTo(_ context.Context, fiel
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return ec.childFields_Message(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Message_attachments(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Message_attachments(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Message().Attachments(ctx, obj)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.Attachment) graphql.Marshaler {
+			return ec.marshalNAttachment2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachmentᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Message_attachments(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Message",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Attachment(ctx, field)
 		},
 	}
 	return fc, nil
@@ -7863,6 +8603,138 @@ func (ec *executionContext) fieldContext_Mutation_unregisterDeviceToken(ctx cont
 	return fc, nil
 }
 
+func (ec *executionContext) _Mutation_issueAttachmentUpload(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_issueAttachmentUpload(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().IssueAttachmentUpload(ctx, fc.Args["input"].(model.IssueAttachmentUploadInput))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.AttachmentUploadTicket) graphql.Marshaler {
+			return ec.marshalNAttachmentUploadTicket2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachmentUploadTicket(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_issueAttachmentUpload(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_AttachmentUploadTicket(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_issueAttachmentUpload_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_confirmAttachmentUpload(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_confirmAttachmentUpload(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().ConfirmAttachmentUpload(ctx, fc.Args["attachmentId"].(string), fc.Args["sha256"].(*string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.Attachment) graphql.Marshaler {
+			return ec.marshalNAttachment2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachment(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_confirmAttachmentUpload(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Attachment(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_confirmAttachmentUpload_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_removeAttachment(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_removeAttachment(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().RemoveAttachment(ctx, fc.Args["attachmentId"].(string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+			return ec.marshalNBoolean2bool(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_removeAttachment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_removeAttachment_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createChatRoom(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -9000,6 +9872,38 @@ func (ec *executionContext) fieldContext_Post_reactions(_ context.Context, field
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return ec.childFields_ReactionSummary(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Post_attachments(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Post_attachments(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Post().Attachments(ctx, obj)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.Attachment) graphql.Marshaler {
+			return ec.marshalNAttachment2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachmentᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Post_attachments(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Post",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Attachment(ctx, field)
 		},
 	}
 	return fc, nil
@@ -13476,6 +14380,64 @@ func (ec *executionContext) unmarshalInputGrantTagInput(ctx context.Context, obj
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputIssueAttachmentUploadInput(ctx context.Context, obj any) (model.IssueAttachmentUploadInput, error) {
+	var it model.IssueAttachmentUploadInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"ownerType", "ownerId", "filename", "mimeType", "sizeBytes"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "ownerType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerType"))
+			data, err := ec.unmarshalNAttachmentOwnerKind2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachmentOwnerKind(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OwnerType = data
+		case "ownerId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("ownerId"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.OwnerID = data
+		case "filename":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("filename"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Filename = data
+		case "mimeType":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("mimeType"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.MimeType = data
+		case "sizeBytes":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sizeBytes"))
+			data, err := ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.SizeBytes = data
+		}
+	}
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputNotificationFilter(ctx context.Context, obj any) (model.NotificationFilter, error) {
 	var it model.NotificationFilter
 	if obj == nil {
@@ -13813,6 +14775,175 @@ func (ec *executionContext) _SearchResult(ctx context.Context, sel ast.Selection
 
 // region    **************************** object.gotpl ****************************
 
+var attachmentImplementors = []string{"Attachment"}
+
+func (ec *executionContext) _Attachment(ctx context.Context, sel ast.SelectionSet, obj *model.Attachment) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, attachmentImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Attachment")
+		case "id":
+			out.Values[i] = ec._Attachment_id(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "ownerType":
+			out.Values[i] = ec._Attachment_ownerType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "ownerId":
+			out.Values[i] = ec._Attachment_ownerId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "uploader":
+			out.Values[i] = ec._Attachment_uploader(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "filename":
+			out.Values[i] = ec._Attachment_filename(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "mimeType":
+			out.Values[i] = ec._Attachment_mimeType(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "sizeBytes":
+			out.Values[i] = ec._Attachment_sizeBytes(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "createdAt":
+			out.Values[i] = ec._Attachment_createdAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "downloadUrl":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Attachment_downloadUrl(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferred), math.MaxInt32)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var attachmentUploadTicketImplementors = []string{"AttachmentUploadTicket"}
+
+func (ec *executionContext) _AttachmentUploadTicket(ctx context.Context, sel ast.SelectionSet, obj *model.AttachmentUploadTicket) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, attachmentUploadTicketImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AttachmentUploadTicket")
+		case "attachmentId":
+			out.Values[i] = ec._AttachmentUploadTicket_attachmentId(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "uploadUrl":
+			out.Values[i] = ec._AttachmentUploadTicket_uploadUrl(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "method":
+			out.Values[i] = ec._AttachmentUploadTicket_method(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "expiresAt":
+			out.Values[i] = ec._AttachmentUploadTicket_expiresAt(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "storageKey":
+			out.Values[i] = ec._AttachmentUploadTicket_storageKey(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferred), math.MaxInt32)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var botImplementors = []string{"Bot", "Principal"}
 
 func (ec *executionContext) _Bot(ctx context.Context, sel ast.SelectionSet, obj *model.Bot) graphql.Marshaler {
@@ -14043,44 +15174,80 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 		case "id":
 			out.Values[i] = ec._Comment_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "postId":
 			out.Values[i] = ec._Comment_postId(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "parentId":
 			out.Values[i] = ec._Comment_parentId(ctx, field, obj)
 		case "depth":
 			out.Values[i] = ec._Comment_depth(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "author":
 			out.Values[i] = ec._Comment_author(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "body":
 			out.Values[i] = ec._Comment_body(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "mentions":
 			out.Values[i] = ec._Comment_mentions(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "reactions":
 			out.Values[i] = ec._Comment_reactions(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "attachments":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Comment_attachments(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._Comment_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "editedAt":
 			out.Values[i] = ec._Comment_editedAt(ctx, field, obj)
@@ -14303,34 +15470,70 @@ func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, 
 		case "id":
 			out.Values[i] = ec._Message_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "globalUri":
 			out.Values[i] = ec._Message_globalUri(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "chatRoom":
 			out.Values[i] = ec._Message_chatRoom(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "author":
 			out.Values[i] = ec._Message_author(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "body":
 			out.Values[i] = ec._Message_body(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "replyTo":
 			out.Values[i] = ec._Message_replyTo(ctx, field, obj)
+		case "attachments":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Message_attachments(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "createdAt":
 			out.Values[i] = ec._Message_createdAt(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "editedAt":
 			out.Values[i] = ec._Message_editedAt(ctx, field, obj)
@@ -14734,6 +15937,27 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
 			}
+		case "issueAttachmentUpload":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_issueAttachmentUpload(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "confirmAttachmentUpload":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_confirmAttachmentUpload(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "removeAttachment":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_removeAttachment(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		case "createChatRoom":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_createChatRoom(ctx, field)
@@ -15123,6 +16347,42 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "attachments":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Post_attachments(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "decisionStatus":
 			out.Values[i] = ec._Post_decisionStatus(ctx, field, obj)
 		case "denyFlag":
@@ -16876,6 +18136,60 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
+func (ec *executionContext) marshalNAttachment2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachment(ctx context.Context, sel ast.SelectionSet, v model.Attachment) graphql.Marshaler {
+	return ec._Attachment(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAttachment2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachmentᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Attachment) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNAttachment2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachment(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNAttachment2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachment(ctx context.Context, sel ast.SelectionSet, v *model.Attachment) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Attachment(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNAttachmentOwnerKind2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachmentOwnerKind(ctx context.Context, v any) (model.AttachmentOwnerKind, error) {
+	var res model.AttachmentOwnerKind
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNAttachmentOwnerKind2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachmentOwnerKind(ctx context.Context, sel ast.SelectionSet, v model.AttachmentOwnerKind) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) marshalNAttachmentUploadTicket2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachmentUploadTicket(ctx context.Context, sel ast.SelectionSet, v model.AttachmentUploadTicket) graphql.Marshaler {
+	return ec._AttachmentUploadTicket(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNAttachmentUploadTicket2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐAttachmentUploadTicket(ctx context.Context, sel ast.SelectionSet, v *model.AttachmentUploadTicket) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AttachmentUploadTicket(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalNBoolean2bool(ctx context.Context, v any) (bool, error) {
 	res, err := graphql.UnmarshalBoolean(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -17126,6 +18440,11 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) unmarshalNIssueAttachmentUploadInput2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐIssueAttachmentUploadInput(ctx context.Context, v any) (model.IssueAttachmentUploadInput, error) {
+	res, err := ec.unmarshalInputIssueAttachmentUploadInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNJSON2string(ctx context.Context, v any) (string, error) {

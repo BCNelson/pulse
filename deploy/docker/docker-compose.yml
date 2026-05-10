@@ -1,0 +1,101 @@
+# Reference docker-compose for evaluating Pulse end-to-end. Boots
+# Postgres, MinIO (S3-compatible bucket), the API in dual mode (api +
+# worker), and includes a one-shot bootstrap container.
+#
+# Usage:
+#   docker compose up -d           # boot dependencies + api
+#   docker compose run --rm bootstrap   # create the first user
+#   open http://localhost:8080/playground
+
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: pulse
+      POSTGRES_PASSWORD: pulse
+      POSTGRES_DB: pulse
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pulse"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: pulse-dev
+      MINIO_ROOT_PASSWORD: pulse-dev-secret
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - miniodata:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # mc is a one-shot to create the bucket on first boot.
+  minio-init:
+    image: minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 pulse-dev pulse-dev-secret &&
+      mc mb -p local/pulse-attachments || true &&
+      mc anonymous set none local/pulse-attachments
+      "
+
+  api:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    image: pulse:dev
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgres://pulse:pulse@postgres:5432/pulse?sslmode=disable
+      API_ADDR: 0.0.0.0:8080
+      PULSE_MODE: both
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: pulse-attachments
+      S3_ACCESS_KEY: pulse-dev
+      S3_SECRET_KEY: pulse-dev-secret
+      S3_PATH_STYLE: "true"
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "/usr/local/bin/pulse-api", "-help"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  bootstrap:
+    image: pulse:dev
+    profiles: ["bootstrap"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    entrypoint: ["/usr/local/bin/pulse-bootstrap"]
+    environment:
+      DATABASE_URL: postgres://pulse:pulse@postgres:5432/pulse?sslmode=disable
+      PULSE_BOOTSTRAP_EMAIL: ${PULSE_BOOTSTRAP_EMAIL:-admin@example.com}
+      PULSE_BOOTSTRAP_NAME: ${PULSE_BOOTSTRAP_NAME:-Admin}
+      PULSE_BOOTSTRAP_PASSWORD: ${PULSE_BOOTSTRAP_PASSWORD:-changeme}
+      PULSE_BOOTSTRAP_ORG_SLUG: ${PULSE_BOOTSTRAP_ORG_SLUG:-org}
+      PULSE_BOOTSTRAP_ORG_NAME: ${PULSE_BOOTSTRAP_ORG_NAME:-Org}
+
+volumes:
+  pgdata:
+  miniodata:

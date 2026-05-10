@@ -45,7 +45,21 @@ models:
     fields:
       comments:
         resolver: true
+      attachments:
+        resolver: true
+  Comment:
+    fields:
+      attachments:
+        resolver: true
+  Message:
+    fields:
+      attachments:
+        resolver: true
   ChatRoom:
     fields:
       messages:
+        resolver: true
+  Attachment:
+    fields:
+      downloadUrl:
         resolver: true

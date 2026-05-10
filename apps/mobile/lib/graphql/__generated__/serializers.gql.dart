@@ -9,6 +9,7 @@ import 'package:gql_code_builder_serializers/gql_code_builder_serializers.dart'
     show OperationSerializer;
 import 'package:pulse/graphql/__generated__/schema.schema.gql.dart'
     show
+        GAttachmentOwnerKind,
         GCreateChatRoomInput,
         GCreateCommentInput,
         GCreatePostInput,
@@ -19,6 +20,7 @@ import 'package:pulse/graphql/__generated__/schema.schema.gql.dart'
         GEditPostInput,
         GEditTaskInput,
         GGrantTagInput,
+        GIssueAttachmentUploadInput,
         GJSON,
         GNotificationFilter,
         GNotificationReason,
@@ -295,6 +297,7 @@ final SerializersBuilder _serializersBuilder = _$serializers.toBuilder()
   ..add(GSearchData_search_edges_node.serializer)
   ..addPlugin(StandardJsonPlugin());
 @SerializersFor([
+  GAttachmentOwnerKind,
   GChatRoomDetailData,
   GChatRoomDetailData_chatRoom,
   GChatRoomDetailData_chatRoom_messages,
@@ -362,6 +365,7 @@ final SerializersBuilder _serializersBuilder = _$serializers.toBuilder()
   GImpersonateData_impersonate_effective,
   GImpersonateReq,
   GImpersonateVars,
+  GIssueAttachmentUploadInput,
   GJSON,
   GLoginData,
   GLoginData_login,

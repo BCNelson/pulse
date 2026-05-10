@@ -1,0 +1,35 @@
+[Unit]
+Description=Pulse API + worker
+Documentation=https://github.com/bcnelson/pulse
+After=network-online.target postgresql.service
+Wants=network-online.target
+Requires=postgresql.service
+
+[Service]
+Type=simple
+User=pulse
+Group=pulse
+ExecStart=/usr/local/bin/pulse-api -mode both
+EnvironmentFile=/etc/pulse/pulse.env
+Restart=on-failure
+RestartSec=5
+LimitNOFILE=65536
+
+# Security hardening — Pulse needs only its writable dirs.
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/pulse
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+LockPersonality=true
+MemoryDenyWriteExecute=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target

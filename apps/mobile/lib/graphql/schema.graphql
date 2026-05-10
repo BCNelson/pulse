@@ -92,6 +92,12 @@ enum DevicePlatform {
   WEB
 }
 
+enum AttachmentOwnerKind {
+  POST
+  COMMENT
+  MESSAGE
+}
+
 enum PostSort {
   RECENT
   ACTIVE
@@ -195,6 +201,7 @@ type Post {
   mentions: [Principal!]!
   comments(first: Int, after: String): CommentConnection!
   reactions: [ReactionSummary!]!
+  attachments: [Attachment!]!
   decisionStatus: DecisionStatus
   denyFlag: Boolean!
   myPermissions: PostPermissions!
@@ -225,6 +232,7 @@ type Comment {
   body: String!
   mentions: [Principal!]!
   reactions: [ReactionSummary!]!
+  attachments: [Attachment!]!
   createdAt: Time!
   editedAt: Time
   deletedAt: Time
@@ -376,6 +384,46 @@ type ImpersonationState {
   effective: Principal
 }
 
+# ----- attachments (M6) -----
+
+"""
+An attachment is a file uploaded to the S3-compatible bucket and
+associated with a post, comment, or message. The API never proxies
+bytes — clients PUT to uploadUrl on `issueAttachmentUpload` and GET
+from `downloadUrl` on the resolved Attachment.
+"""
+type Attachment {
+  id: ID!
+  ownerType: AttachmentOwnerKind!
+  ownerId: ID!
+  uploader: Principal!
+  filename: String!
+  mimeType: String!
+  sizeBytes: Int!
+  createdAt: Time!
+  """
+  Presigned URL for downloading the bytes. Short-lived (~15 minutes).
+  Resolvers re-issue per request so a stale URL never lingers.
+  """
+  downloadUrl: String!
+}
+
+type AttachmentUploadTicket {
+  attachmentId: ID!
+  uploadUrl: String!
+  method: String!
+  expiresAt: Time!
+  storageKey: String!
+}
+
+input IssueAttachmentUploadInput {
+  ownerType: AttachmentOwnerKind!
+  ownerId: ID!
+  filename: String!
+  mimeType: String!
+  sizeBytes: Int!
+}
+
 # ----- mutations -----
 
 input CreateTagInput {
@@ -458,6 +506,7 @@ type Message {
   author: Principal!
   body: String!
   replyTo: Message
+  attachments: [Attachment!]!
   createdAt: Time!
   editedAt: Time
   deletedAt: Time
@@ -573,6 +622,25 @@ type Mutation {
   """
   registerDeviceToken(token: String!, platform: DevicePlatform!): Boolean!
   unregisterDeviceToken(token: String!): Boolean!
+
+  """
+  Issue a presigned PUT URL for a new attachment. The client uploads
+  bytes directly to the bucket, then calls confirmAttachmentUpload to
+  flip the row to ready. Until that fires, the row is invisible to
+  readers.
+  """
+  issueAttachmentUpload(input: IssueAttachmentUploadInput!): AttachmentUploadTicket!
+  """
+  Mark an attachment as ready after the client's PUT succeeded.
+  sha256 is optional and verified out-of-band; the bucket's own
+  integrity check is the source of truth.
+  """
+  confirmAttachmentUpload(attachmentId: ID!, sha256: String): Attachment!
+  """
+  Tombstone (soft-delete) an attachment. Bytes stay in the bucket
+  until retention sweep; the attachment becomes invisible immediately.
+  """
+  removeAttachment(attachmentId: ID!): Boolean!
 
   createChatRoom(input: CreateChatRoomInput!): ChatRoom!
   addParticipant(roomId: ID!, principalId: ID!, role: String): ChatRoom!
