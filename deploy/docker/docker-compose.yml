@@ -55,10 +55,17 @@ services:
       "
 
   api:
-    build:
-      context: ../..
-      dockerfile: deploy/docker/Dockerfile
-    image: pulse:dev
+    # PULSE_IMAGE_TAG selects which image to run. Default is "main"
+    # (latest CI build of main branch); pin to a semver like "0.1.0"
+    # for repeatable deployments. See .github/workflows/container.yml
+    # for the tagging matrix — branch tags + sha- tags from CI, semver
+    # tags from release jobs.
+    image: ghcr.io/bcnelson/pulse:${PULSE_IMAGE_TAG:-main}
+    # build: fallback for offline / pre-release dev. Comment-only by
+    # default; uncomment to build locally and tag as the same image.
+    # build:
+    #   context: ../..
+    #   dockerfile: deploy/docker/Dockerfile
     depends_on:
       postgres:
         condition: service_healthy
@@ -82,7 +89,7 @@ services:
       retries: 3
 
   bootstrap:
-    image: pulse:dev
+    image: ghcr.io/bcnelson/pulse:${PULSE_IMAGE_TAG:-main}
     profiles: ["bootstrap"]
     depends_on:
       postgres:

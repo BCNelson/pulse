@@ -5,7 +5,11 @@ Three supported targets, all built from the same Go binary:
 ## OCI image + docker-compose (fastest demo)
 
 ```bash
+# Latest main:
 docker compose -f deploy/docker/docker-compose.yml up -d
+# Or pin a release version:
+PULSE_IMAGE_TAG=0.1.0 docker compose -f deploy/docker/docker-compose.yml up -d
+
 docker compose -f deploy/docker/docker-compose.yml run --rm bootstrap \
   -e PULSE_BOOTSTRAP_EMAIL=admin@example.com \
   -e PULSE_BOOTSTRAP_PASSWORD=changeme
@@ -15,6 +19,14 @@ open http://localhost:8080/playground
 The compose file boots Postgres 16, MinIO (S3-compatible), the API in
 `--mode=both`, and a one-shot `bootstrap` profile container. Override
 the bootstrap creds with environment variables.
+
+Images are published to `ghcr.io/bcnelson/pulse`:
+
+- `main` — latest commit on main branch (CI build)
+- `sha-<short>` — every commit; immutable
+- `0.1.0`, `0.1`, etc. — semver tags pushed when a `v0.1.0` git tag
+  lands. These are retags of the corresponding `sha-*` image, so they
+  are byte-identical to what main shipped.
 
 ## Plain binary + systemd (single-host self-host)
 

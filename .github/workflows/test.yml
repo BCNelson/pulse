@@ -1,0 +1,70 @@
+name: Test
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: pulse
+          POSTGRES_PASSWORD: pulse
+          POSTGRES_DB: pulse_test
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U pulse"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: services/api/go.mod
+          cache-dependency-path: services/api/go.sum
+
+      - name: Build
+        working-directory: services/api
+        run: go build ./...
+
+      - name: Test
+        working-directory: services/api
+        env:
+          PULSE_TEST_DB_URL: postgres://pulse:pulse@127.0.0.1:5432/pulse_test?sslmode=disable
+        run: go test -count=1 -p 1 -race ./...
+
+      - uses: golangci/golangci-lint-action@v6
+        with:
+          working-directory: services/api
+          version: v1.62
+
+  flutter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: pub get
+        working-directory: apps/mobile
+        run: flutter pub get
+
+      - name: codegen
+        working-directory: apps/mobile
+        run: flutter pub run build_runner build
+
+      - name: analyze
+        working-directory: apps/mobile
+        run: flutter analyze
