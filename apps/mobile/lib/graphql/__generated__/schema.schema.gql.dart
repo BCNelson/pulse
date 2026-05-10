@@ -143,11 +143,78 @@ class GSearchKind extends EnumClass {
 
   static const GSearchKind COMMENT = _$gSearchKindCOMMENT;
 
+  static const GSearchKind TASK = _$gSearchKindTASK;
+
+  static const GSearchKind MESSAGE = _$gSearchKindMESSAGE;
+
   static Serializer<GSearchKind> get serializer => _$gSearchKindSerializer;
 
   static BuiltSet<GSearchKind> get values => _$gSearchKindValues;
 
   static GSearchKind valueOf(String name) => _$gSearchKindValueOf(name);
+}
+
+class GTaskStatus extends EnumClass {
+  const GTaskStatus._(String name) : super(name);
+
+  static const GTaskStatus OPEN = _$gTaskStatusOPEN;
+
+  static const GTaskStatus IN_PROGRESS = _$gTaskStatusIN_PROGRESS;
+
+  static const GTaskStatus BLOCKED = _$gTaskStatusBLOCKED;
+
+  static const GTaskStatus DONE = _$gTaskStatusDONE;
+
+  static const GTaskStatus CANCELLED = _$gTaskStatusCANCELLED;
+
+  static Serializer<GTaskStatus> get serializer => _$gTaskStatusSerializer;
+
+  static BuiltSet<GTaskStatus> get values => _$gTaskStatusValues;
+
+  static GTaskStatus valueOf(String name) => _$gTaskStatusValueOf(name);
+}
+
+class GNotificationReason extends EnumClass {
+  const GNotificationReason._(String name) : super(name);
+
+  static const GNotificationReason ASSIGNMENT = _$gNotificationReasonASSIGNMENT;
+
+  static const GNotificationReason MENTION = _$gNotificationReasonMENTION;
+
+  static const GNotificationReason WATCHER = _$gNotificationReasonWATCHER;
+
+  static const GNotificationReason TAG_SUBSCRIPTION =
+      _$gNotificationReasonTAG_SUBSCRIPTION;
+
+  static const GNotificationReason DM = _$gNotificationReasonDM;
+
+  static Serializer<GNotificationReason> get serializer =>
+      _$gNotificationReasonSerializer;
+
+  static BuiltSet<GNotificationReason> get values =>
+      _$gNotificationReasonValues;
+
+  static GNotificationReason valueOf(String name) =>
+      _$gNotificationReasonValueOf(name);
+}
+
+class GNotificationUrgency extends EnumClass {
+  const GNotificationUrgency._(String name) : super(name);
+
+  static const GNotificationUrgency HIGH = _$gNotificationUrgencyHIGH;
+
+  static const GNotificationUrgency NORMAL = _$gNotificationUrgencyNORMAL;
+
+  static const GNotificationUrgency LOW = _$gNotificationUrgencyLOW;
+
+  static Serializer<GNotificationUrgency> get serializer =>
+      _$gNotificationUrgencySerializer;
+
+  static BuiltSet<GNotificationUrgency> get values =>
+      _$gNotificationUrgencyValues;
+
+  static GNotificationUrgency valueOf(String name) =>
+      _$gNotificationUrgencyValueOf(name);
 }
 
 class GPostSort extends EnumClass {
@@ -162,6 +229,31 @@ class GPostSort extends EnumClass {
   static BuiltSet<GPostSort> get values => _$gPostSortValues;
 
   static GPostSort valueOf(String name) => _$gPostSortValueOf(name);
+}
+
+abstract class GNotificationFilter
+    implements Built<GNotificationFilter, GNotificationFilterBuilder> {
+  GNotificationFilter._();
+
+  factory GNotificationFilter(
+          [void Function(GNotificationFilterBuilder b) updates]) =
+      _$GNotificationFilter;
+
+  bool? get unreadOnly;
+  BuiltList<GNotificationReason>? get reasons;
+  static Serializer<GNotificationFilter> get serializer =>
+      _$gNotificationFilterSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GNotificationFilter.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GNotificationFilter? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GNotificationFilter.serializer,
+        json,
+      );
 }
 
 abstract class GCreateTagInput
@@ -396,6 +488,85 @@ abstract class GSendMessageInput
       );
 }
 
+abstract class GTaskTagInput
+    implements Built<GTaskTagInput, GTaskTagInputBuilder> {
+  GTaskTagInput._();
+
+  factory GTaskTagInput([void Function(GTaskTagInputBuilder b) updates]) =
+      _$GTaskTagInput;
+
+  String get tagId;
+  bool? get viewRole;
+  bool? get interactRole;
+  bool? get moderateRole;
+  static Serializer<GTaskTagInput> get serializer => _$gTaskTagInputSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GTaskTagInput.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GTaskTagInput? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GTaskTagInput.serializer,
+        json,
+      );
+}
+
+abstract class GCreateTaskInput
+    implements Built<GCreateTaskInput, GCreateTaskInputBuilder> {
+  GCreateTaskInput._();
+
+  factory GCreateTaskInput([void Function(GCreateTaskInputBuilder b) updates]) =
+      _$GCreateTaskInput;
+
+  String get title;
+  String? get description;
+  GTime? get dueAt;
+  BuiltList<GTaskTagInput>? get tags;
+  BuiltList<String>? get assignees;
+  static Serializer<GCreateTaskInput> get serializer =>
+      _$gCreateTaskInputSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GCreateTaskInput.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreateTaskInput? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GCreateTaskInput.serializer,
+        json,
+      );
+}
+
+abstract class GEditTaskInput
+    implements Built<GEditTaskInput, GEditTaskInputBuilder> {
+  GEditTaskInput._();
+
+  factory GEditTaskInput([void Function(GEditTaskInputBuilder b) updates]) =
+      _$GEditTaskInput;
+
+  String get taskId;
+  String? get title;
+  String? get description;
+  GTime? get dueAt;
+  bool? get clearDueAt;
+  static Serializer<GEditTaskInput> get serializer =>
+      _$gEditTaskInputSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GEditTaskInput.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GEditTaskInput? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GEditTaskInput.serializer,
+        json,
+      );
+}
+
 const Map<String, Set<String>> possibleTypesMap = {
   'Principal': {
     'User',
@@ -404,5 +575,11 @@ const Map<String, Set<String>> possibleTypesMap = {
   'SearchResult': {
     'Post',
     'Comment',
+  },
+  'NotificationSource': {
+    'Post',
+    'Comment',
+    'Task',
+    'Message',
   },
 };

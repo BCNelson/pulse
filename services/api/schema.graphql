@@ -5,7 +5,8 @@ M1: identity, tags, permissions.
 M2: posts, comments, reactions, search.
 M3: chat (rooms, messages, DM detection, promotion to post) + real-time
     subscriptions (messageAdded, postChanged, tagStructureChanged).
-M4+ : tasks, notifications inbox land in subsequent milestones.
+M4: tasks, notifications inbox, notificationReceived subscription, worker
+    mode for fan-out + retention.
 """
 
 scalar Time
@@ -59,6 +60,30 @@ enum DecisionStatus {
 enum SearchKind {
   POST
   COMMENT
+  TASK
+  MESSAGE
+}
+
+enum TaskStatus {
+  OPEN
+  IN_PROGRESS
+  BLOCKED
+  DONE
+  CANCELLED
+}
+
+enum NotificationReason {
+  ASSIGNMENT
+  MENTION
+  WATCHER
+  TAG_SUBSCRIPTION
+  DM
+}
+
+enum NotificationUrgency {
+  HIGH
+  NORMAL
+  LOW
 }
 
 enum PostSort {
@@ -129,6 +154,7 @@ type Tag {
   myPermissions: TagPermissions!
   mySubscription: TagSubscription
   posts(first: Int, after: String, sort: PostSort): PostConnection!
+  tasks(first: Int, after: String, status: TaskStatus): TaskConnection!
 }
 
 # ----- posts -----
@@ -228,6 +254,84 @@ type TagSearchHit {
   similarity: Float!
 }
 
+# ----- tasks (M4) -----
+
+type TaskTag {
+  tag: Tag!
+  viewRole: Boolean!
+  interactRole: Boolean!
+  moderateRole: Boolean!
+}
+
+type TaskPermissions {
+  bundle: PermissionBundle
+  canView: Boolean!
+  canContribute: Boolean!
+  canModerate: Boolean!
+}
+
+type Task {
+  id: ID!
+  globalUri: String!
+  title: String!
+  description: String
+  status: TaskStatus!
+  dueAt: Time
+  tags: [TaskTag!]!
+  assignees: [Principal!]!
+  watchers: [Principal!]!
+  linkedPost: Post
+  linkedComment: Comment
+  createdBy: Principal!
+  myPermissions: TaskPermissions!
+  createdAt: Time!
+  editedAt: Time
+  deletedAt: Time
+}
+
+type TaskEdge {
+  node: Task!
+  cursor: String!
+}
+
+type TaskConnection {
+  edges: [TaskEdge!]!
+  pageInfo: PageInfo!
+}
+
+# ----- notifications (M4) -----
+
+union NotificationSource = Post | Comment | Task | Message
+
+type Notification {
+  id: ID!
+  recipient: Principal!
+  reason: NotificationReason!
+  urgency: NotificationUrgency!
+  sourceType: String!
+  sourceId: ID!
+  source: NotificationSource
+  sourceTag: Tag
+  readAt: Time
+  createdAt: Time!
+}
+
+type NotificationEdge {
+  node: Notification!
+  cursor: String!
+}
+
+type NotificationConnection {
+  edges: [NotificationEdge!]!
+  pageInfo: PageInfo!
+  unreadCount: Int!
+}
+
+input NotificationFilter {
+  unreadOnly: Boolean
+  reasons: [NotificationReason!]
+}
+
 # ----- queries -----
 
 type Query {
@@ -238,7 +342,10 @@ type Query {
 
   tag(id: ID!): Tag
   post(id: ID!): Post
+  task(id: ID!): Task
   chatRoom(id: ID!): ChatRoom
+
+  notifications(first: Int, after: String, filter: NotificationFilter): NotificationConnection!
 
   search(query: String!, kinds: [SearchKind!], first: Int): SearchConnection!
   searchTags(query: String!, first: Int): [TagSearchHit!]!
@@ -358,6 +465,29 @@ input SendMessageInput {
   replyTo: ID
 }
 
+input TaskTagInput {
+  tagId: ID!
+  viewRole: Boolean
+  interactRole: Boolean
+  moderateRole: Boolean
+}
+
+input CreateTaskInput {
+  title: String!
+  description: String
+  dueAt: Time
+  tags: [TaskTagInput!]
+  assignees: [ID!]
+}
+
+input EditTaskInput {
+  taskId: ID!
+  title: String
+  description: String
+  dueAt: Time
+  clearDueAt: Boolean
+}
+
 # ----- mutations -----
 
 type Mutation {
@@ -386,6 +516,20 @@ type Mutation {
   deleteComment(commentId: ID!): Boolean!
   reactToComment(commentId: ID!, emoji: String!): Comment!
   unreactToComment(commentId: ID!, emoji: String!): Comment!
+
+  createTask(input: CreateTaskInput!): Task!
+  editTask(input: EditTaskInput!): Task!
+  deleteTask(taskId: ID!): Boolean!
+  setTaskStatus(taskId: ID!, status: TaskStatus!): Task!
+  assignTask(taskId: ID!, principalId: ID!): Task!
+  unassignTask(taskId: ID!, principalId: ID!): Task!
+  watchTask(taskId: ID!): Task!
+  unwatchTask(taskId: ID!): Task!
+  promotePostToTask(postId: ID!, title: String!, dueAt: Time, assignees: [ID!]): Task!
+  promoteCommentToTask(commentId: ID!, title: String!, dueAt: Time, assignees: [ID!]): Task!
+
+  markNotificationRead(notificationIds: [ID!]!): Int!
+  markAllNotificationsRead: Int!
 
   createChatRoom(input: CreateChatRoomInput!): ChatRoom!
   addParticipant(roomId: ID!, principalId: ID!, role: String): ChatRoom!
@@ -418,4 +562,10 @@ type Subscription {
   Fires when a tag is moved, renamed, or archived.
   """
   tagStructureChanged(tagId: ID!): TagStructureEvent!
+
+  """
+  Fires whenever a notification is written for the viewer. Auth is checked
+  on connect — notifications are scoped to recipient_id = viewer.id.
+  """
+  notificationReceived: Notification!
 }

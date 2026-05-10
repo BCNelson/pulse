@@ -39,6 +39,8 @@ models:
     fields:
       posts:
         resolver: true
+      tasks:
+        resolver: true
   Post:
     fields:
       comments:

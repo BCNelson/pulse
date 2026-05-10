@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+type NotificationSource interface {
+	IsNotificationSource()
+}
+
 type Principal interface {
 	IsPrincipal()
 	GetID() string
@@ -76,6 +80,8 @@ type Comment struct {
 
 func (Comment) IsSearchResult() {}
 
+func (Comment) IsNotificationSource() {}
+
 type CommentConnection struct {
 	Edges    []*CommentEdge `json:"edges"`
 	PageInfo *PageInfo      `json:"pageInfo"`
@@ -110,10 +116,26 @@ type CreateTagInput struct {
 	Defaults    *string `json:"defaults,omitempty"`
 }
 
+type CreateTaskInput struct {
+	Title       string          `json:"title"`
+	Description *string         `json:"description,omitempty"`
+	DueAt       *time.Time      `json:"dueAt,omitempty"`
+	Tags        []*TaskTagInput `json:"tags,omitempty"`
+	Assignees   []string        `json:"assignees,omitempty"`
+}
+
 type EditPostInput struct {
 	PostID string `json:"postId"`
 	Title  string `json:"title"`
 	Body   string `json:"body"`
+}
+
+type EditTaskInput struct {
+	TaskID      string     `json:"taskId"`
+	Title       *string    `json:"title,omitempty"`
+	Description *string    `json:"description,omitempty"`
+	DueAt       *time.Time `json:"dueAt,omitempty"`
+	ClearDueAt  *bool      `json:"clearDueAt,omitempty"`
 }
 
 type GrantTagInput struct {
@@ -143,6 +165,8 @@ type Message struct {
 	PromotedToPost *Post      `json:"promotedToPost,omitempty"`
 }
 
+func (Message) IsNotificationSource() {}
+
 type MessageConnection struct {
 	Edges    []*MessageEdge `json:"edges"`
 	PageInfo *PageInfo      `json:"pageInfo"`
@@ -154,6 +178,35 @@ type MessageEdge struct {
 }
 
 type Mutation struct {
+}
+
+type Notification struct {
+	ID         string              `json:"id"`
+	Recipient  Principal           `json:"recipient"`
+	Reason     NotificationReason  `json:"reason"`
+	Urgency    NotificationUrgency `json:"urgency"`
+	SourceType string              `json:"sourceType"`
+	SourceID   string              `json:"sourceId"`
+	Source     NotificationSource  `json:"source,omitempty"`
+	SourceTag  *Tag                `json:"sourceTag,omitempty"`
+	ReadAt     *time.Time          `json:"readAt,omitempty"`
+	CreatedAt  time.Time           `json:"createdAt"`
+}
+
+type NotificationConnection struct {
+	Edges       []*NotificationEdge `json:"edges"`
+	PageInfo    *PageInfo           `json:"pageInfo"`
+	UnreadCount int                 `json:"unreadCount"`
+}
+
+type NotificationEdge struct {
+	Node   *Notification `json:"node"`
+	Cursor string        `json:"cursor"`
+}
+
+type NotificationFilter struct {
+	UnreadOnly *bool                `json:"unreadOnly,omitempty"`
+	Reasons    []NotificationReason `json:"reasons,omitempty"`
 }
 
 type PageInfo struct {
@@ -183,6 +236,8 @@ type Post struct {
 }
 
 func (Post) IsSearchResult() {}
+
+func (Post) IsNotificationSource() {}
 
 type PostConnection struct {
 	Edges    []*PostEdge `json:"edges"`
@@ -266,6 +321,7 @@ type Tag struct {
 	MyPermissions  *TagPermissions  `json:"myPermissions"`
 	MySubscription *TagSubscription `json:"mySubscription,omitempty"`
 	Posts          *PostConnection  `json:"posts"`
+	Tasks          *TaskConnection  `json:"tasks"`
 }
 
 type TagPermissions struct {
@@ -291,6 +347,58 @@ type TagSubscription struct {
 	Cascade      bool                `json:"cascade"`
 	Urgency      SubscriptionUrgency `json:"urgency"`
 	ReasonFilter []string            `json:"reasonFilter"`
+}
+
+type Task struct {
+	ID            string           `json:"id"`
+	GlobalURI     string           `json:"globalUri"`
+	Title         string           `json:"title"`
+	Description   *string          `json:"description,omitempty"`
+	Status        TaskStatus       `json:"status"`
+	DueAt         *time.Time       `json:"dueAt,omitempty"`
+	Tags          []*TaskTag       `json:"tags"`
+	Assignees     []Principal      `json:"assignees"`
+	Watchers      []Principal      `json:"watchers"`
+	LinkedPost    *Post            `json:"linkedPost,omitempty"`
+	LinkedComment *Comment         `json:"linkedComment,omitempty"`
+	CreatedBy     Principal        `json:"createdBy"`
+	MyPermissions *TaskPermissions `json:"myPermissions"`
+	CreatedAt     time.Time        `json:"createdAt"`
+	EditedAt      *time.Time       `json:"editedAt,omitempty"`
+	DeletedAt     *time.Time       `json:"deletedAt,omitempty"`
+}
+
+func (Task) IsNotificationSource() {}
+
+type TaskConnection struct {
+	Edges    []*TaskEdge `json:"edges"`
+	PageInfo *PageInfo   `json:"pageInfo"`
+}
+
+type TaskEdge struct {
+	Node   *Task  `json:"node"`
+	Cursor string `json:"cursor"`
+}
+
+type TaskPermissions struct {
+	Bundle        *PermissionBundle `json:"bundle,omitempty"`
+	CanView       bool              `json:"canView"`
+	CanContribute bool              `json:"canContribute"`
+	CanModerate   bool              `json:"canModerate"`
+}
+
+type TaskTag struct {
+	Tag          *Tag `json:"tag"`
+	ViewRole     bool `json:"viewRole"`
+	InteractRole bool `json:"interactRole"`
+	ModerateRole bool `json:"moderateRole"`
+}
+
+type TaskTagInput struct {
+	TagID        string `json:"tagId"`
+	ViewRole     *bool  `json:"viewRole,omitempty"`
+	InteractRole *bool  `json:"interactRole,omitempty"`
+	ModerateRole *bool  `json:"moderateRole,omitempty"`
 }
 
 type User struct {
@@ -361,6 +469,124 @@ func (e *DecisionStatus) UnmarshalJSON(b []byte) error {
 }
 
 func (e DecisionStatus) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type NotificationReason string
+
+const (
+	NotificationReasonAssignment      NotificationReason = "ASSIGNMENT"
+	NotificationReasonMention         NotificationReason = "MENTION"
+	NotificationReasonWatcher         NotificationReason = "WATCHER"
+	NotificationReasonTagSubscription NotificationReason = "TAG_SUBSCRIPTION"
+	NotificationReasonDm              NotificationReason = "DM"
+)
+
+var AllNotificationReason = []NotificationReason{
+	NotificationReasonAssignment,
+	NotificationReasonMention,
+	NotificationReasonWatcher,
+	NotificationReasonTagSubscription,
+	NotificationReasonDm,
+}
+
+func (e NotificationReason) IsValid() bool {
+	switch e {
+	case NotificationReasonAssignment, NotificationReasonMention, NotificationReasonWatcher, NotificationReasonTagSubscription, NotificationReasonDm:
+		return true
+	}
+	return false
+}
+
+func (e NotificationReason) String() string {
+	return string(e)
+}
+
+func (e *NotificationReason) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NotificationReason(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NotificationReason", str)
+	}
+	return nil
+}
+
+func (e NotificationReason) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *NotificationReason) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e NotificationReason) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type NotificationUrgency string
+
+const (
+	NotificationUrgencyHigh   NotificationUrgency = "HIGH"
+	NotificationUrgencyNormal NotificationUrgency = "NORMAL"
+	NotificationUrgencyLow    NotificationUrgency = "LOW"
+)
+
+var AllNotificationUrgency = []NotificationUrgency{
+	NotificationUrgencyHigh,
+	NotificationUrgencyNormal,
+	NotificationUrgencyLow,
+}
+
+func (e NotificationUrgency) IsValid() bool {
+	switch e {
+	case NotificationUrgencyHigh, NotificationUrgencyNormal, NotificationUrgencyLow:
+		return true
+	}
+	return false
+}
+
+func (e NotificationUrgency) String() string {
+	return string(e)
+}
+
+func (e *NotificationUrgency) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = NotificationUrgency(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid NotificationUrgency", str)
+	}
+	return nil
+}
+
+func (e NotificationUrgency) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *NotificationUrgency) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e NotificationUrgency) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil
@@ -595,16 +821,20 @@ type SearchKind string
 const (
 	SearchKindPost    SearchKind = "POST"
 	SearchKindComment SearchKind = "COMMENT"
+	SearchKindTask    SearchKind = "TASK"
+	SearchKindMessage SearchKind = "MESSAGE"
 )
 
 var AllSearchKind = []SearchKind{
 	SearchKindPost,
 	SearchKindComment,
+	SearchKindTask,
+	SearchKindMessage,
 }
 
 func (e SearchKind) IsValid() bool {
 	switch e {
-	case SearchKindPost, SearchKindComment:
+	case SearchKindPost, SearchKindComment, SearchKindTask, SearchKindMessage:
 		return true
 	}
 	return false
@@ -754,6 +984,67 @@ func (e *TagRootKind) UnmarshalJSON(b []byte) error {
 }
 
 func (e TagRootKind) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type TaskStatus string
+
+const (
+	TaskStatusOpen       TaskStatus = "OPEN"
+	TaskStatusInProgress TaskStatus = "IN_PROGRESS"
+	TaskStatusBlocked    TaskStatus = "BLOCKED"
+	TaskStatusDone       TaskStatus = "DONE"
+	TaskStatusCancelled  TaskStatus = "CANCELLED"
+)
+
+var AllTaskStatus = []TaskStatus{
+	TaskStatusOpen,
+	TaskStatusInProgress,
+	TaskStatusBlocked,
+	TaskStatusDone,
+	TaskStatusCancelled,
+}
+
+func (e TaskStatus) IsValid() bool {
+	switch e {
+	case TaskStatusOpen, TaskStatusInProgress, TaskStatusBlocked, TaskStatusDone, TaskStatusCancelled:
+		return true
+	}
+	return false
+}
+
+func (e TaskStatus) String() string {
+	return string(e)
+}
+
+func (e *TaskStatus) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TaskStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TaskStatus", str)
+	}
+	return nil
+}
+
+func (e TaskStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *TaskStatus) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e TaskStatus) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil

@@ -22,6 +22,7 @@ import (
 	"github.com/bcnelson/pulse/services/api/internal/realtime"
 	"github.com/bcnelson/pulse/services/api/internal/search"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
+	"github.com/bcnelson/pulse/services/api/internal/task"
 	"github.com/google/uuid"
 )
 
@@ -760,6 +761,421 @@ func (r *mutationResolver) UnreactToComment(ctx context.Context, commentID strin
 	return r.loadComment(ctx, id)
 }
 
+// CreateTask is the resolver for the createTask field.
+func (r *mutationResolver) CreateTask(ctx context.Context, input model.CreateTaskInput) (*model.Task, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	in := task.CreateInput{
+		CreatorID: identity.EffectiveID,
+		Title:     input.Title,
+		DueAt:     input.DueAt,
+	}
+	if input.Description != nil {
+		in.Description = *input.Description
+	}
+	for _, t := range input.Tags {
+		tid, err := uuid.Parse(t.TagID)
+		if err != nil {
+			return nil, fmt.Errorf("invalid tagId: %w", err)
+		}
+		// Creating a task under a tag requires contribute on the tag.
+		can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionContribute, tid)
+		if err != nil {
+			return nil, err
+		}
+		if !can {
+			return nil, errPermissionDenied
+		}
+		in.Tags = append(in.Tags, task.TagAttachment{
+			TagID:        tid,
+			ViewRole:     boolOrTrue(t.ViewRole),
+			InteractRole: boolOrTrue(t.InteractRole),
+			ModerateRole: boolOrTrue(t.ModerateRole),
+		})
+	}
+	for _, a := range input.Assignees {
+		pid, err := uuid.Parse(a)
+		if err != nil {
+			return nil, fmt.Errorf("invalid assignee: %w", err)
+		}
+		in.Assignees = append(in.Assignees, pid)
+	}
+	id, err := r.Tasks.Create(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "task.create", TargetType: "task", TargetID: id,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadTask(ctx, id)
+}
+
+// EditTask is the resolver for the editTask field.
+func (r *mutationResolver) EditTask(ctx context.Context, input model.EditTaskInput) (*model.Task, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tid, err := uuid.Parse(input.TaskID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid taskId: %w", err)
+	}
+	t, err := r.Tasks.Get(ctx, tid)
+	if err != nil {
+		if errors.Is(err, task.ErrNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	can, err := r.canTaskAction(ctx, identity.EffectiveID, t, perm.ActionContribute)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	clearDue := false
+	if input.ClearDueAt != nil {
+		clearDue = *input.ClearDueAt
+	}
+	if err := r.Tasks.Edit(ctx, tid, input.Title, input.Description, input.DueAt, clearDue); err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "task.edit", TargetType: "task", TargetID: tid,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadTask(ctx, tid)
+}
+
+// DeleteTask is the resolver for the deleteTask field.
+func (r *mutationResolver) DeleteTask(ctx context.Context, taskID string) (bool, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return false, err
+	}
+	tid, err := uuid.Parse(taskID)
+	if err != nil {
+		return false, fmt.Errorf("invalid taskId: %w", err)
+	}
+	t, err := r.Tasks.Get(ctx, tid)
+	if err != nil {
+		if errors.Is(err, task.ErrNotFound) {
+			return false, nil
+		}
+		return false, err
+	}
+	can, err := r.canTaskAction(ctx, identity.EffectiveID, t, perm.ActionModerate)
+	if err != nil {
+		return false, err
+	}
+	if !can {
+		return false, errPermissionDenied
+	}
+	if err := r.Tasks.Delete(ctx, tid); err != nil {
+		return false, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "task.delete", TargetType: "task", TargetID: tid,
+	}); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// SetTaskStatus is the resolver for the setTaskStatus field.
+func (r *mutationResolver) SetTaskStatus(ctx context.Context, taskID string, status model.TaskStatus) (*model.Task, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tid, err := uuid.Parse(taskID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid taskId: %w", err)
+	}
+	t, err := r.Tasks.Get(ctx, tid)
+	if err != nil {
+		if errors.Is(err, task.ErrNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	can, err := r.canTaskAction(ctx, identity.EffectiveID, t, perm.ActionContribute)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if err := r.Tasks.SetStatus(ctx, tid, mapTaskStatusGQLToDB(status)); err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "task.status", TargetType: "task", TargetID: tid,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadTask(ctx, tid)
+}
+
+// AssignTask is the resolver for the assignTask field.
+func (r *mutationResolver) AssignTask(ctx context.Context, taskID string, principalID string) (*model.Task, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tid, err := uuid.Parse(taskID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid taskId: %w", err)
+	}
+	pid, err := uuid.Parse(principalID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid principalId: %w", err)
+	}
+	t, err := r.Tasks.Get(ctx, tid)
+	if err != nil {
+		if errors.Is(err, task.ErrNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	can, err := r.canTaskAction(ctx, identity.EffectiveID, t, perm.ActionContribute)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if err := r.Tasks.Assign(ctx, tid, pid, identity.EffectiveID); err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "task.assign", TargetType: "task", TargetID: tid,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadTask(ctx, tid)
+}
+
+// UnassignTask is the resolver for the unassignTask field.
+func (r *mutationResolver) UnassignTask(ctx context.Context, taskID string, principalID string) (*model.Task, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tid, err := uuid.Parse(taskID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid taskId: %w", err)
+	}
+	pid, err := uuid.Parse(principalID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid principalId: %w", err)
+	}
+	t, err := r.Tasks.Get(ctx, tid)
+	if err != nil {
+		if errors.Is(err, task.ErrNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	can, err := r.canTaskAction(ctx, identity.EffectiveID, t, perm.ActionContribute)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if err := r.Tasks.Unassign(ctx, tid, pid); err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "task.unassign", TargetType: "task", TargetID: tid,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadTask(ctx, tid)
+}
+
+// WatchTask is the resolver for the watchTask field.
+func (r *mutationResolver) WatchTask(ctx context.Context, taskID string) (*model.Task, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tid, err := uuid.Parse(taskID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid taskId: %w", err)
+	}
+	t, err := r.Tasks.Get(ctx, tid)
+	if err != nil {
+		if errors.Is(err, task.ErrNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	can, err := r.canViewTask(ctx, identity.EffectiveID, t)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if err := r.Tasks.Watch(ctx, tid, identity.EffectiveID); err != nil {
+		return nil, err
+	}
+	return r.loadTask(ctx, tid)
+}
+
+// UnwatchTask is the resolver for the unwatchTask field.
+func (r *mutationResolver) UnwatchTask(ctx context.Context, taskID string) (*model.Task, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tid, err := uuid.Parse(taskID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid taskId: %w", err)
+	}
+	if err := r.Tasks.Unwatch(ctx, tid, identity.EffectiveID); err != nil {
+		return nil, err
+	}
+	return r.loadTask(ctx, tid)
+}
+
+// PromotePostToTask is the resolver for the promotePostToTask field.
+func (r *mutationResolver) PromotePostToTask(ctx context.Context, postID string, title string, dueAt *time.Time, assignees []string) (*model.Task, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	pid, err := uuid.Parse(postID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid postId: %w", err)
+	}
+	can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionContribute, pid)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	in := task.PromoteInput{
+		PostID:    &pid,
+		CreatorID: identity.EffectiveID,
+		Title:     title,
+		DueAt:     dueAt,
+	}
+	for _, a := range assignees {
+		aid, err := uuid.Parse(a)
+		if err != nil {
+			return nil, fmt.Errorf("invalid assignee: %w", err)
+		}
+		in.Assignees = append(in.Assignees, aid)
+	}
+	tid, err := r.Tasks.PromotePost(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "task.promote.post", TargetType: "task", TargetID: tid,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadTask(ctx, tid)
+}
+
+// PromoteCommentToTask is the resolver for the promoteCommentToTask field.
+func (r *mutationResolver) PromoteCommentToTask(ctx context.Context, commentID string, title string, dueAt *time.Time, assignees []string) (*model.Task, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	cid, err := uuid.Parse(commentID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid commentId: %w", err)
+	}
+	c, err := r.Comments.Get(ctx, cid)
+	if err != nil {
+		if errors.Is(err, comment.ErrNotFound) {
+			return nil, nil
+		}
+		return nil, err
+	}
+	can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionContribute, c.PostID)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	in := task.PromoteInput{
+		CommentID: &cid,
+		CreatorID: identity.EffectiveID,
+		Title:     title,
+		DueAt:     dueAt,
+	}
+	for _, a := range assignees {
+		aid, err := uuid.Parse(a)
+		if err != nil {
+			return nil, fmt.Errorf("invalid assignee: %w", err)
+		}
+		in.Assignees = append(in.Assignees, aid)
+	}
+	tid, err := r.Tasks.PromoteComment(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action: "task.promote.comment", TargetType: "task", TargetID: tid,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadTask(ctx, tid)
+}
+
+// MarkNotificationRead is the resolver for the markNotificationRead field.
+func (r *mutationResolver) MarkNotificationRead(ctx context.Context, notificationIds []string) (int, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return 0, err
+	}
+	ids := make([]uuid.UUID, 0, len(notificationIds))
+	for _, s := range notificationIds {
+		id, err := uuid.Parse(s)
+		if err != nil {
+			return 0, fmt.Errorf("invalid notificationId: %w", err)
+		}
+		ids = append(ids, id)
+	}
+	if err := r.Notifications.MarkRead(ctx, identity.EffectiveID, ids); err != nil {
+		return 0, err
+	}
+	return len(ids), nil
+}
+
+// MarkAllNotificationsRead is the resolver for the markAllNotificationsRead field.
+func (r *mutationResolver) MarkAllNotificationsRead(ctx context.Context) (int, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return 0, err
+	}
+	var before int
+	if err := r.DB.QueryRow(ctx,
+		`SELECT count(*) FROM notifications WHERE recipient_id = $1 AND read_at IS NULL`,
+		identity.EffectiveID).Scan(&before); err != nil {
+		return 0, err
+	}
+	if err := r.Notifications.MarkAllRead(ctx, identity.EffectiveID); err != nil {
+		return 0, err
+	}
+	return before, nil
+}
+
 // CreateChatRoom is the resolver for the createChatRoom field.
 func (r *mutationResolver) CreateChatRoom(ctx context.Context, input model.CreateChatRoomInput) (*model.ChatRoom, error) {
 	identity, err := requireIdentity(ctx)
@@ -1115,6 +1531,15 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 	return r.loadPost(ctx, postID)
 }
 
+// Task is the resolver for the task field.
+func (r *queryResolver) Task(ctx context.Context, id string) (*model.Task, error) {
+	tid, err := uuid.Parse(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid id: %w", err)
+	}
+	return r.loadTask(ctx, tid)
+}
+
 // ChatRoom is the resolver for the chatRoom field.
 func (r *queryResolver) ChatRoom(ctx context.Context, id string) (*model.ChatRoom, error) {
 	rid, err := uuid.Parse(id)
@@ -1122,6 +1547,15 @@ func (r *queryResolver) ChatRoom(ctx context.Context, id string) (*model.ChatRoo
 		return nil, fmt.Errorf("invalid id: %w", err)
 	}
 	return r.loadChatRoom(ctx, rid)
+}
+
+// Notifications is the resolver for the notifications field.
+func (r *queryResolver) Notifications(ctx context.Context, first *int, after *string, filter *model.NotificationFilter) (*model.NotificationConnection, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.loadInbox(ctx, identity.EffectiveID, first, filter)
 }
 
 // Search is the resolver for the search field.
@@ -1392,6 +1826,59 @@ func (r *subscriptionResolver) TagStructureChanged(ctx context.Context, tagID st
 	return out, nil
 }
 
+// NotificationReceived is the resolver for the notificationReceived field.
+func (r *subscriptionResolver) NotificationReceived(ctx context.Context) (<-chan *model.Notification, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	out := make(chan *model.Notification, 8)
+	sub := r.Realtime.Subscribe("notif." + identity.EffectiveID.String())
+	go func() {
+		defer close(out)
+		defer sub.Close()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case ev, ok := <-sub.Ch:
+				if !ok {
+					return
+				}
+				var p struct {
+					NotificationID string `json:"notification_id"`
+				}
+				if err := json.Unmarshal(ev.Payload, &p); err != nil || p.NotificationID == "" {
+					continue
+				}
+				nid, err := uuid.Parse(p.NotificationID)
+				if err != nil {
+					continue
+				}
+				row, err := r.Notifications.Get(ctx, nid)
+				if err != nil || row == nil {
+					continue
+				}
+				// Defense in depth: only deliver to the rightful recipient
+				// even though the topic is keyed on principal id.
+				if row.RecipientID != identity.EffectiveID {
+					continue
+				}
+				m, err := r.loadNotification(ctx, row)
+				if err != nil || m == nil {
+					continue
+				}
+				select {
+				case out <- m:
+				case <-ctx.Done():
+					return
+				}
+			}
+		}
+	}()
+	return out, nil
+}
+
 // Posts is the resolver for the posts field.
 func (r *tagResolver) Posts(ctx context.Context, obj *model.Tag, first *int, after *string, sort *model.PostSort) (*model.PostConnection, error) {
 	identity := auth.FromContext(ctx)
@@ -1443,6 +1930,25 @@ func (r *tagResolver) Posts(ctx context.Context, obj *model.Tag, first *int, aft
 		pi.EndCursor = &e
 	}
 	return &model.PostConnection{Edges: edges, PageInfo: pi}, nil
+}
+
+// Tasks is the resolver for the tasks field.
+func (r *tagResolver) Tasks(ctx context.Context, obj *model.Tag, first *int, after *string, status *model.TaskStatus) (*model.TaskConnection, error) {
+	tagID, err := uuid.Parse(obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tag id: %w", err)
+	}
+	limit := 25
+	if first != nil && *first > 0 && *first <= 100 {
+		limit = *first
+	}
+	_ = after
+	var dbStatus *string
+	if status != nil {
+		s := mapTaskStatusGQLToDB(*status)
+		dbStatus = &s
+	}
+	return r.loadTasksForTag(ctx, tagID, limit, dbStatus)
 }
 
 // ChatRoom returns ChatRoomResolver implementation.

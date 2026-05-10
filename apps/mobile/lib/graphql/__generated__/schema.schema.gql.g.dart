@@ -156,6 +156,8 @@ final BuiltSet<GDecisionStatus> _$gDecisionStatusValues =
 
 const GSearchKind _$gSearchKindPOST = const GSearchKind._('POST');
 const GSearchKind _$gSearchKindCOMMENT = const GSearchKind._('COMMENT');
+const GSearchKind _$gSearchKindTASK = const GSearchKind._('TASK');
+const GSearchKind _$gSearchKindMESSAGE = const GSearchKind._('MESSAGE');
 
 GSearchKind _$gSearchKindValueOf(String name) {
   switch (name) {
@@ -163,6 +165,10 @@ GSearchKind _$gSearchKindValueOf(String name) {
       return _$gSearchKindPOST;
     case 'COMMENT':
       return _$gSearchKindCOMMENT;
+    case 'TASK':
+      return _$gSearchKindTASK;
+    case 'MESSAGE':
+      return _$gSearchKindMESSAGE;
     default:
       throw ArgumentError(name);
   }
@@ -172,6 +178,104 @@ final BuiltSet<GSearchKind> _$gSearchKindValues =
     BuiltSet<GSearchKind>(const <GSearchKind>[
   _$gSearchKindPOST,
   _$gSearchKindCOMMENT,
+  _$gSearchKindTASK,
+  _$gSearchKindMESSAGE,
+]);
+
+const GTaskStatus _$gTaskStatusOPEN = const GTaskStatus._('OPEN');
+const GTaskStatus _$gTaskStatusIN_PROGRESS = const GTaskStatus._('IN_PROGRESS');
+const GTaskStatus _$gTaskStatusBLOCKED = const GTaskStatus._('BLOCKED');
+const GTaskStatus _$gTaskStatusDONE = const GTaskStatus._('DONE');
+const GTaskStatus _$gTaskStatusCANCELLED = const GTaskStatus._('CANCELLED');
+
+GTaskStatus _$gTaskStatusValueOf(String name) {
+  switch (name) {
+    case 'OPEN':
+      return _$gTaskStatusOPEN;
+    case 'IN_PROGRESS':
+      return _$gTaskStatusIN_PROGRESS;
+    case 'BLOCKED':
+      return _$gTaskStatusBLOCKED;
+    case 'DONE':
+      return _$gTaskStatusDONE;
+    case 'CANCELLED':
+      return _$gTaskStatusCANCELLED;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<GTaskStatus> _$gTaskStatusValues =
+    BuiltSet<GTaskStatus>(const <GTaskStatus>[
+  _$gTaskStatusOPEN,
+  _$gTaskStatusIN_PROGRESS,
+  _$gTaskStatusBLOCKED,
+  _$gTaskStatusDONE,
+  _$gTaskStatusCANCELLED,
+]);
+
+const GNotificationReason _$gNotificationReasonASSIGNMENT =
+    const GNotificationReason._('ASSIGNMENT');
+const GNotificationReason _$gNotificationReasonMENTION =
+    const GNotificationReason._('MENTION');
+const GNotificationReason _$gNotificationReasonWATCHER =
+    const GNotificationReason._('WATCHER');
+const GNotificationReason _$gNotificationReasonTAG_SUBSCRIPTION =
+    const GNotificationReason._('TAG_SUBSCRIPTION');
+const GNotificationReason _$gNotificationReasonDM =
+    const GNotificationReason._('DM');
+
+GNotificationReason _$gNotificationReasonValueOf(String name) {
+  switch (name) {
+    case 'ASSIGNMENT':
+      return _$gNotificationReasonASSIGNMENT;
+    case 'MENTION':
+      return _$gNotificationReasonMENTION;
+    case 'WATCHER':
+      return _$gNotificationReasonWATCHER;
+    case 'TAG_SUBSCRIPTION':
+      return _$gNotificationReasonTAG_SUBSCRIPTION;
+    case 'DM':
+      return _$gNotificationReasonDM;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<GNotificationReason> _$gNotificationReasonValues =
+    BuiltSet<GNotificationReason>(const <GNotificationReason>[
+  _$gNotificationReasonASSIGNMENT,
+  _$gNotificationReasonMENTION,
+  _$gNotificationReasonWATCHER,
+  _$gNotificationReasonTAG_SUBSCRIPTION,
+  _$gNotificationReasonDM,
+]);
+
+const GNotificationUrgency _$gNotificationUrgencyHIGH =
+    const GNotificationUrgency._('HIGH');
+const GNotificationUrgency _$gNotificationUrgencyNORMAL =
+    const GNotificationUrgency._('NORMAL');
+const GNotificationUrgency _$gNotificationUrgencyLOW =
+    const GNotificationUrgency._('LOW');
+
+GNotificationUrgency _$gNotificationUrgencyValueOf(String name) {
+  switch (name) {
+    case 'HIGH':
+      return _$gNotificationUrgencyHIGH;
+    case 'NORMAL':
+      return _$gNotificationUrgencyNORMAL;
+    case 'LOW':
+      return _$gNotificationUrgencyLOW;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<GNotificationUrgency> _$gNotificationUrgencyValues =
+    BuiltSet<GNotificationUrgency>(const <GNotificationUrgency>[
+  _$gNotificationUrgencyHIGH,
+  _$gNotificationUrgencyNORMAL,
+  _$gNotificationUrgencyLOW,
 ]);
 
 const GPostSort _$gPostSortRECENT = const GPostSort._('RECENT');
@@ -206,7 +310,14 @@ Serializer<GPrincipalStatus> _$gPrincipalStatusSerializer =
 Serializer<GDecisionStatus> _$gDecisionStatusSerializer =
     _$GDecisionStatusSerializer();
 Serializer<GSearchKind> _$gSearchKindSerializer = _$GSearchKindSerializer();
+Serializer<GTaskStatus> _$gTaskStatusSerializer = _$GTaskStatusSerializer();
+Serializer<GNotificationReason> _$gNotificationReasonSerializer =
+    _$GNotificationReasonSerializer();
+Serializer<GNotificationUrgency> _$gNotificationUrgencySerializer =
+    _$GNotificationUrgencySerializer();
 Serializer<GPostSort> _$gPostSortSerializer = _$GPostSortSerializer();
+Serializer<GNotificationFilter> _$gNotificationFilterSerializer =
+    _$GNotificationFilterSerializer();
 Serializer<GCreateTagInput> _$gCreateTagInputSerializer =
     _$GCreateTagInputSerializer();
 Serializer<GGrantTagInput> _$gGrantTagInputSerializer =
@@ -225,6 +336,12 @@ Serializer<GCreateChatRoomInput> _$gCreateChatRoomInputSerializer =
     _$GCreateChatRoomInputSerializer();
 Serializer<GSendMessageInput> _$gSendMessageInputSerializer =
     _$GSendMessageInputSerializer();
+Serializer<GTaskTagInput> _$gTaskTagInputSerializer =
+    _$GTaskTagInputSerializer();
+Serializer<GCreateTaskInput> _$gCreateTaskInputSerializer =
+    _$GCreateTaskInputSerializer();
+Serializer<GEditTaskInput> _$gEditTaskInputSerializer =
+    _$GEditTaskInputSerializer();
 
 class _$GTagRootKindSerializer implements PrimitiveSerializer<GTagRootKind> {
   @override
@@ -350,6 +467,59 @@ class _$GSearchKindSerializer implements PrimitiveSerializer<GSearchKind> {
       GSearchKind.valueOf(serialized as String);
 }
 
+class _$GTaskStatusSerializer implements PrimitiveSerializer<GTaskStatus> {
+  @override
+  final Iterable<Type> types = const <Type>[GTaskStatus];
+  @override
+  final String wireName = 'GTaskStatus';
+
+  @override
+  Object serialize(Serializers serializers, GTaskStatus object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      object.name;
+
+  @override
+  GTaskStatus deserialize(Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      GTaskStatus.valueOf(serialized as String);
+}
+
+class _$GNotificationReasonSerializer
+    implements PrimitiveSerializer<GNotificationReason> {
+  @override
+  final Iterable<Type> types = const <Type>[GNotificationReason];
+  @override
+  final String wireName = 'GNotificationReason';
+
+  @override
+  Object serialize(Serializers serializers, GNotificationReason object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      object.name;
+
+  @override
+  GNotificationReason deserialize(Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      GNotificationReason.valueOf(serialized as String);
+}
+
+class _$GNotificationUrgencySerializer
+    implements PrimitiveSerializer<GNotificationUrgency> {
+  @override
+  final Iterable<Type> types = const <Type>[GNotificationUrgency];
+  @override
+  final String wireName = 'GNotificationUrgency';
+
+  @override
+  Object serialize(Serializers serializers, GNotificationUrgency object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      object.name;
+
+  @override
+  GNotificationUrgency deserialize(Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      GNotificationUrgency.valueOf(serialized as String);
+}
+
 class _$GPostSortSerializer implements PrimitiveSerializer<GPostSort> {
   @override
   final Iterable<Type> types = const <Type>[GPostSort];
@@ -365,6 +535,69 @@ class _$GPostSortSerializer implements PrimitiveSerializer<GPostSort> {
   GPostSort deserialize(Serializers serializers, Object serialized,
           {FullType specifiedType = FullType.unspecified}) =>
       GPostSort.valueOf(serialized as String);
+}
+
+class _$GNotificationFilterSerializer
+    implements StructuredSerializer<GNotificationFilter> {
+  @override
+  final Iterable<Type> types = const [
+    GNotificationFilter,
+    _$GNotificationFilter
+  ];
+  @override
+  final String wireName = 'GNotificationFilter';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GNotificationFilter object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[];
+    Object? value;
+    value = object.unreadOnly;
+    if (value != null) {
+      result
+        ..add('unreadOnly')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.reasons;
+    if (value != null) {
+      result
+        ..add('reasons')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                BuiltList, const [const FullType(GNotificationReason)])));
+    }
+    return result;
+  }
+
+  @override
+  GNotificationFilter deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GNotificationFilterBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'unreadOnly':
+          result.unreadOnly = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool?;
+          break;
+        case 'reasons':
+          result.reasons.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(GNotificationReason)]))!
+              as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
 }
 
 class _$GCreateTagInputSerializer
@@ -970,6 +1203,258 @@ class _$GSendMessageInputSerializer
   }
 }
 
+class _$GTaskTagInputSerializer implements StructuredSerializer<GTaskTagInput> {
+  @override
+  final Iterable<Type> types = const [GTaskTagInput, _$GTaskTagInput];
+  @override
+  final String wireName = 'GTaskTagInput';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, GTaskTagInput object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'tagId',
+      serializers.serialize(object.tagId,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.viewRole;
+    if (value != null) {
+      result
+        ..add('viewRole')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.interactRole;
+    if (value != null) {
+      result
+        ..add('interactRole')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    value = object.moderateRole;
+    if (value != null) {
+      result
+        ..add('moderateRole')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    return result;
+  }
+
+  @override
+  GTaskTagInput deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GTaskTagInputBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'tagId':
+          result.tagId = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'viewRole':
+          result.viewRole = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool?;
+          break;
+        case 'interactRole':
+          result.interactRole = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool?;
+          break;
+        case 'moderateRole':
+          result.moderateRole = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool?;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreateTaskInputSerializer
+    implements StructuredSerializer<GCreateTaskInput> {
+  @override
+  final Iterable<Type> types = const [GCreateTaskInput, _$GCreateTaskInput];
+  @override
+  final String wireName = 'GCreateTaskInput';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, GCreateTaskInput object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'title',
+      serializers.serialize(object.title,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.description;
+    if (value != null) {
+      result
+        ..add('description')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.dueAt;
+    if (value != null) {
+      result
+        ..add('dueAt')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(GTime)));
+    }
+    value = object.tags;
+    if (value != null) {
+      result
+        ..add('tags')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                BuiltList, const [const FullType(GTaskTagInput)])));
+    }
+    value = object.assignees;
+    if (value != null) {
+      result
+        ..add('assignees')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(BuiltList, const [const FullType(String)])));
+    }
+    return result;
+  }
+
+  @override
+  GCreateTaskInput deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreateTaskInputBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'title':
+          result.title = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'description':
+          result.description = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'dueAt':
+          result.dueAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(GTime))! as GTime);
+          break;
+        case 'tags':
+          result.tags.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(GTaskTagInput)]))!
+              as BuiltList<Object?>);
+          break;
+        case 'assignees':
+          result.assignees.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(String)]))!
+              as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GEditTaskInputSerializer
+    implements StructuredSerializer<GEditTaskInput> {
+  @override
+  final Iterable<Type> types = const [GEditTaskInput, _$GEditTaskInput];
+  @override
+  final String wireName = 'GEditTaskInput';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, GEditTaskInput object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'taskId',
+      serializers.serialize(object.taskId,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.title;
+    if (value != null) {
+      result
+        ..add('title')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.description;
+    if (value != null) {
+      result
+        ..add('description')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(String)));
+    }
+    value = object.dueAt;
+    if (value != null) {
+      result
+        ..add('dueAt')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(GTime)));
+    }
+    value = object.clearDueAt;
+    if (value != null) {
+      result
+        ..add('clearDueAt')
+        ..add(
+            serializers.serialize(value, specifiedType: const FullType(bool)));
+    }
+    return result;
+  }
+
+  @override
+  GEditTaskInput deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GEditTaskInputBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'taskId':
+          result.taskId = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'title':
+          result.title = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'description':
+          result.description = serializers.deserialize(value,
+              specifiedType: const FullType(String)) as String?;
+          break;
+        case 'dueAt':
+          result.dueAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(GTime))! as GTime);
+          break;
+        case 'clearDueAt':
+          result.clearDueAt = serializers.deserialize(value,
+              specifiedType: const FullType(bool)) as bool?;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
 class _$GTime extends GTime {
   @override
   final String value;
@@ -1121,6 +1606,115 @@ class GJSONBuilder implements Builder<GJSON, GJSONBuilder> {
           value:
               BuiltValueNullFieldError.checkNotNull(value, r'GJSON', 'value'),
         );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GNotificationFilter extends GNotificationFilter {
+  @override
+  final bool? unreadOnly;
+  @override
+  final BuiltList<GNotificationReason>? reasons;
+
+  factory _$GNotificationFilter(
+          [void Function(GNotificationFilterBuilder)? updates]) =>
+      (GNotificationFilterBuilder()..update(updates))._build();
+
+  _$GNotificationFilter._({this.unreadOnly, this.reasons}) : super._();
+  @override
+  GNotificationFilter rebuild(
+          void Function(GNotificationFilterBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GNotificationFilterBuilder toBuilder() =>
+      GNotificationFilterBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GNotificationFilter &&
+        unreadOnly == other.unreadOnly &&
+        reasons == other.reasons;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, unreadOnly.hashCode);
+    _$hash = $jc(_$hash, reasons.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GNotificationFilter')
+          ..add('unreadOnly', unreadOnly)
+          ..add('reasons', reasons))
+        .toString();
+  }
+}
+
+class GNotificationFilterBuilder
+    implements Builder<GNotificationFilter, GNotificationFilterBuilder> {
+  _$GNotificationFilter? _$v;
+
+  bool? _unreadOnly;
+  bool? get unreadOnly => _$this._unreadOnly;
+  set unreadOnly(bool? unreadOnly) => _$this._unreadOnly = unreadOnly;
+
+  ListBuilder<GNotificationReason>? _reasons;
+  ListBuilder<GNotificationReason> get reasons =>
+      _$this._reasons ??= ListBuilder<GNotificationReason>();
+  set reasons(ListBuilder<GNotificationReason>? reasons) =>
+      _$this._reasons = reasons;
+
+  GNotificationFilterBuilder();
+
+  GNotificationFilterBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _unreadOnly = $v.unreadOnly;
+      _reasons = $v.reasons?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GNotificationFilter other) {
+    _$v = other as _$GNotificationFilter;
+  }
+
+  @override
+  void update(void Function(GNotificationFilterBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GNotificationFilter build() => _build();
+
+  _$GNotificationFilter _build() {
+    _$GNotificationFilter _$result;
+    try {
+      _$result = _$v ??
+          _$GNotificationFilter._(
+            unreadOnly: unreadOnly,
+            reasons: _reasons?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'reasons';
+        _reasons?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GNotificationFilter', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }
@@ -2211,6 +2805,422 @@ class GSendMessageInputBuilder
               body, r'GSendMessageInput', 'body'),
           replyTo: replyTo,
         );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GTaskTagInput extends GTaskTagInput {
+  @override
+  final String tagId;
+  @override
+  final bool? viewRole;
+  @override
+  final bool? interactRole;
+  @override
+  final bool? moderateRole;
+
+  factory _$GTaskTagInput([void Function(GTaskTagInputBuilder)? updates]) =>
+      (GTaskTagInputBuilder()..update(updates))._build();
+
+  _$GTaskTagInput._(
+      {required this.tagId,
+      this.viewRole,
+      this.interactRole,
+      this.moderateRole})
+      : super._();
+  @override
+  GTaskTagInput rebuild(void Function(GTaskTagInputBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GTaskTagInputBuilder toBuilder() => GTaskTagInputBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GTaskTagInput &&
+        tagId == other.tagId &&
+        viewRole == other.viewRole &&
+        interactRole == other.interactRole &&
+        moderateRole == other.moderateRole;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, tagId.hashCode);
+    _$hash = $jc(_$hash, viewRole.hashCode);
+    _$hash = $jc(_$hash, interactRole.hashCode);
+    _$hash = $jc(_$hash, moderateRole.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GTaskTagInput')
+          ..add('tagId', tagId)
+          ..add('viewRole', viewRole)
+          ..add('interactRole', interactRole)
+          ..add('moderateRole', moderateRole))
+        .toString();
+  }
+}
+
+class GTaskTagInputBuilder
+    implements Builder<GTaskTagInput, GTaskTagInputBuilder> {
+  _$GTaskTagInput? _$v;
+
+  String? _tagId;
+  String? get tagId => _$this._tagId;
+  set tagId(String? tagId) => _$this._tagId = tagId;
+
+  bool? _viewRole;
+  bool? get viewRole => _$this._viewRole;
+  set viewRole(bool? viewRole) => _$this._viewRole = viewRole;
+
+  bool? _interactRole;
+  bool? get interactRole => _$this._interactRole;
+  set interactRole(bool? interactRole) => _$this._interactRole = interactRole;
+
+  bool? _moderateRole;
+  bool? get moderateRole => _$this._moderateRole;
+  set moderateRole(bool? moderateRole) => _$this._moderateRole = moderateRole;
+
+  GTaskTagInputBuilder();
+
+  GTaskTagInputBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _tagId = $v.tagId;
+      _viewRole = $v.viewRole;
+      _interactRole = $v.interactRole;
+      _moderateRole = $v.moderateRole;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GTaskTagInput other) {
+    _$v = other as _$GTaskTagInput;
+  }
+
+  @override
+  void update(void Function(GTaskTagInputBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GTaskTagInput build() => _build();
+
+  _$GTaskTagInput _build() {
+    final _$result = _$v ??
+        _$GTaskTagInput._(
+          tagId: BuiltValueNullFieldError.checkNotNull(
+              tagId, r'GTaskTagInput', 'tagId'),
+          viewRole: viewRole,
+          interactRole: interactRole,
+          moderateRole: moderateRole,
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreateTaskInput extends GCreateTaskInput {
+  @override
+  final String title;
+  @override
+  final String? description;
+  @override
+  final GTime? dueAt;
+  @override
+  final BuiltList<GTaskTagInput>? tags;
+  @override
+  final BuiltList<String>? assignees;
+
+  factory _$GCreateTaskInput(
+          [void Function(GCreateTaskInputBuilder)? updates]) =>
+      (GCreateTaskInputBuilder()..update(updates))._build();
+
+  _$GCreateTaskInput._(
+      {required this.title,
+      this.description,
+      this.dueAt,
+      this.tags,
+      this.assignees})
+      : super._();
+  @override
+  GCreateTaskInput rebuild(void Function(GCreateTaskInputBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreateTaskInputBuilder toBuilder() =>
+      GCreateTaskInputBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreateTaskInput &&
+        title == other.title &&
+        description == other.description &&
+        dueAt == other.dueAt &&
+        tags == other.tags &&
+        assignees == other.assignees;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, title.hashCode);
+    _$hash = $jc(_$hash, description.hashCode);
+    _$hash = $jc(_$hash, dueAt.hashCode);
+    _$hash = $jc(_$hash, tags.hashCode);
+    _$hash = $jc(_$hash, assignees.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GCreateTaskInput')
+          ..add('title', title)
+          ..add('description', description)
+          ..add('dueAt', dueAt)
+          ..add('tags', tags)
+          ..add('assignees', assignees))
+        .toString();
+  }
+}
+
+class GCreateTaskInputBuilder
+    implements Builder<GCreateTaskInput, GCreateTaskInputBuilder> {
+  _$GCreateTaskInput? _$v;
+
+  String? _title;
+  String? get title => _$this._title;
+  set title(String? title) => _$this._title = title;
+
+  String? _description;
+  String? get description => _$this._description;
+  set description(String? description) => _$this._description = description;
+
+  GTimeBuilder? _dueAt;
+  GTimeBuilder get dueAt => _$this._dueAt ??= GTimeBuilder();
+  set dueAt(GTimeBuilder? dueAt) => _$this._dueAt = dueAt;
+
+  ListBuilder<GTaskTagInput>? _tags;
+  ListBuilder<GTaskTagInput> get tags =>
+      _$this._tags ??= ListBuilder<GTaskTagInput>();
+  set tags(ListBuilder<GTaskTagInput>? tags) => _$this._tags = tags;
+
+  ListBuilder<String>? _assignees;
+  ListBuilder<String> get assignees =>
+      _$this._assignees ??= ListBuilder<String>();
+  set assignees(ListBuilder<String>? assignees) =>
+      _$this._assignees = assignees;
+
+  GCreateTaskInputBuilder();
+
+  GCreateTaskInputBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _title = $v.title;
+      _description = $v.description;
+      _dueAt = $v.dueAt?.toBuilder();
+      _tags = $v.tags?.toBuilder();
+      _assignees = $v.assignees?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreateTaskInput other) {
+    _$v = other as _$GCreateTaskInput;
+  }
+
+  @override
+  void update(void Function(GCreateTaskInputBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreateTaskInput build() => _build();
+
+  _$GCreateTaskInput _build() {
+    _$GCreateTaskInput _$result;
+    try {
+      _$result = _$v ??
+          _$GCreateTaskInput._(
+            title: BuiltValueNullFieldError.checkNotNull(
+                title, r'GCreateTaskInput', 'title'),
+            description: description,
+            dueAt: _dueAt?.build(),
+            tags: _tags?.build(),
+            assignees: _assignees?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'dueAt';
+        _dueAt?.build();
+        _$failedField = 'tags';
+        _tags?.build();
+        _$failedField = 'assignees';
+        _assignees?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GCreateTaskInput', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GEditTaskInput extends GEditTaskInput {
+  @override
+  final String taskId;
+  @override
+  final String? title;
+  @override
+  final String? description;
+  @override
+  final GTime? dueAt;
+  @override
+  final bool? clearDueAt;
+
+  factory _$GEditTaskInput([void Function(GEditTaskInputBuilder)? updates]) =>
+      (GEditTaskInputBuilder()..update(updates))._build();
+
+  _$GEditTaskInput._(
+      {required this.taskId,
+      this.title,
+      this.description,
+      this.dueAt,
+      this.clearDueAt})
+      : super._();
+  @override
+  GEditTaskInput rebuild(void Function(GEditTaskInputBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GEditTaskInputBuilder toBuilder() => GEditTaskInputBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GEditTaskInput &&
+        taskId == other.taskId &&
+        title == other.title &&
+        description == other.description &&
+        dueAt == other.dueAt &&
+        clearDueAt == other.clearDueAt;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, taskId.hashCode);
+    _$hash = $jc(_$hash, title.hashCode);
+    _$hash = $jc(_$hash, description.hashCode);
+    _$hash = $jc(_$hash, dueAt.hashCode);
+    _$hash = $jc(_$hash, clearDueAt.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GEditTaskInput')
+          ..add('taskId', taskId)
+          ..add('title', title)
+          ..add('description', description)
+          ..add('dueAt', dueAt)
+          ..add('clearDueAt', clearDueAt))
+        .toString();
+  }
+}
+
+class GEditTaskInputBuilder
+    implements Builder<GEditTaskInput, GEditTaskInputBuilder> {
+  _$GEditTaskInput? _$v;
+
+  String? _taskId;
+  String? get taskId => _$this._taskId;
+  set taskId(String? taskId) => _$this._taskId = taskId;
+
+  String? _title;
+  String? get title => _$this._title;
+  set title(String? title) => _$this._title = title;
+
+  String? _description;
+  String? get description => _$this._description;
+  set description(String? description) => _$this._description = description;
+
+  GTimeBuilder? _dueAt;
+  GTimeBuilder get dueAt => _$this._dueAt ??= GTimeBuilder();
+  set dueAt(GTimeBuilder? dueAt) => _$this._dueAt = dueAt;
+
+  bool? _clearDueAt;
+  bool? get clearDueAt => _$this._clearDueAt;
+  set clearDueAt(bool? clearDueAt) => _$this._clearDueAt = clearDueAt;
+
+  GEditTaskInputBuilder();
+
+  GEditTaskInputBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _taskId = $v.taskId;
+      _title = $v.title;
+      _description = $v.description;
+      _dueAt = $v.dueAt?.toBuilder();
+      _clearDueAt = $v.clearDueAt;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GEditTaskInput other) {
+    _$v = other as _$GEditTaskInput;
+  }
+
+  @override
+  void update(void Function(GEditTaskInputBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GEditTaskInput build() => _build();
+
+  _$GEditTaskInput _build() {
+    _$GEditTaskInput _$result;
+    try {
+      _$result = _$v ??
+          _$GEditTaskInput._(
+            taskId: BuiltValueNullFieldError.checkNotNull(
+                taskId, r'GEditTaskInput', 'taskId'),
+            title: title,
+            description: description,
+            dueAt: _dueAt?.build(),
+            clearDueAt: clearDueAt,
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'dueAt';
+        _dueAt?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GEditTaskInput', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }
