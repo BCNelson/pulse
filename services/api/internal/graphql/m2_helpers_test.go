@@ -9,6 +9,7 @@ import (
 
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	pulsegraphql "github.com/bcnelson/pulse/services/api/internal/graphql"
+	"github.com/bcnelson/pulse/services/api/internal/graphql/loaders"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
 )
 
@@ -22,5 +23,6 @@ func buildM2Server(resolver *pulsegraphql.Resolver, authSvc *auth.Service) http.
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
 	srv.Use(extension.Introspection{})
-	return perm.WithRequestCacheMiddleware(authSvc.HTTPMiddleware(srv))
+	return loaders.Middleware(resolver.DB,
+		perm.WithRequestCacheMiddleware(authSvc.HTTPMiddleware(srv)))
 }

@@ -10,6 +10,7 @@ import (
 
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/comment"
+	"github.com/bcnelson/pulse/services/api/internal/graphql/loaders"
 	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
 	"github.com/bcnelson/pulse/services/api/internal/post"
@@ -88,18 +89,12 @@ func (r *Resolver) loadPost(ctx context.Context, id uuid.UUID) (*model.Post, err
 		}
 	}
 
-	// Reactions (aggregated).
-	tally, err := r.Posts.ReactionTally(ctx, id, identity.EffectiveID)
+	// Reactions (aggregated). Goes through the loader so a feed view
+	// that already primed the cache hits in O(1); single-post lookups
+	// fall through to a one-row query.
+	reactions, err := r.loadPostReactions(ctx, id, identity.EffectiveID)
 	if err != nil {
 		return nil, err
-	}
-	reactions := make([]*model.ReactionSummary, 0, len(tally))
-	for _, e := range tally {
-		reactions = append(reactions, &model.ReactionSummary{
-			Emoji:    e.Emoji,
-			Count:    e.Count,
-			ByViewer: e.ByViewer,
-		})
 	}
 
 	// Comments — eager load up to a default page. M2 uses a fixed cap;
@@ -301,7 +296,22 @@ func (r *Resolver) loadComment(ctx context.Context, id uuid.UUID) (*model.Commen
 // loadPrincipalIface resolves a principal id to the appropriate concrete
 // GraphQL Principal (User or Bot). Returns the model.Principal interface
 // with the underlying type.
+//
+// Goes through the per-request loader cache when available — feed-shaped
+// resolvers should call loaders.FromContext(ctx).Principals.Prime(ids)
+// before iterating so this becomes a cache hit rather than N queries.
 func (r *Resolver) loadPrincipalIface(ctx context.Context, id uuid.UUID) (model.Principal, error) {
+	if l := loaders.FromContext(ctx); l != nil {
+		row, err := l.Principals.Get(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		if row == nil {
+			return nil, nil
+		}
+		return r.shapePrincipalFromLoader(ctx, row)
+	}
+
 	var (
 		kind        string
 		status      string
@@ -323,36 +333,47 @@ func (r *Resolver) loadPrincipalIface(ctx context.Context, id uuid.UUID) (model.
 	if err != nil {
 		return nil, err
 	}
+	row := &loaders.PrincipalRow{
+		ID: id, Kind: kind, Status: status, DisplayName: displayName,
+		Email: email, HomeTagID: homeTagID, BotOwnerID: ownerID,
+	}
+	return r.shapePrincipalFromLoader(ctx, row)
+}
+
+// shapePrincipalFromLoader builds the GraphQL principal model from a
+// loader row. Shared between cached and direct paths so the field
+// derivation lives in one place.
+func (r *Resolver) shapePrincipalFromLoader(ctx context.Context, row *loaders.PrincipalRow) (model.Principal, error) {
 	var homeTag *model.Tag
-	if homeTagID != nil {
-		ht, err := r.loadTagShallow(ctx, *homeTagID)
+	if row.HomeTagID != nil {
+		ht, err := r.loadTagShallow(ctx, *row.HomeTagID)
 		if err != nil {
 			return nil, err
 		}
 		homeTag = ht
 	}
-	switch kind {
+	switch row.Kind {
 	case "user":
 		return model.User{
-			ID:          id.String(),
-			GlobalURI:   ids.URI("principals", id),
+			ID:          row.ID.String(),
+			GlobalURI:   ids.URI("principals", row.ID),
 			Kind:        model.PrincipalKindUser,
-			Status:      mapStatusDBToGQL(status),
-			DisplayName: displayName,
+			Status:      mapStatusDBToGQL(row.Status),
+			DisplayName: row.DisplayName,
 			HomeTag:     homeTag,
-			Email:       email,
+			Email:       row.Email,
 		}, nil
 	case "bot":
 		var owner model.Principal
-		if ownerID != nil {
-			owner, _ = r.loadPrincipalIface(ctx, *ownerID)
+		if row.BotOwnerID != nil {
+			owner, _ = r.loadPrincipalIface(ctx, *row.BotOwnerID)
 		}
 		return model.Bot{
-			ID:             id.String(),
-			GlobalURI:      ids.URI("principals", id),
+			ID:             row.ID.String(),
+			GlobalURI:      ids.URI("principals", row.ID),
 			Kind:           model.PrincipalKindBot,
-			Status:         mapStatusDBToGQL(status),
-			DisplayName:    displayName,
+			Status:         mapStatusDBToGQL(row.Status),
+			DisplayName:    row.DisplayName,
 			HomeTag:        homeTag,
 			OwnerPrincipal: owner,
 		}, nil
@@ -387,4 +408,69 @@ func optString(s string) *string {
 		return nil
 	}
 	return &s
+}
+
+// primePostListLoaders pre-warms the per-request loader caches for a
+// list of posts: distinct authors, distinct attached tags, reaction
+// tallies. Three round-trips total instead of N×3.
+func (r *Resolver) primePostListLoaders(ctx context.Context, posts []*post.Post, viewer uuid.UUID) {
+	l := loaders.FromContext(ctx)
+	if l == nil {
+		return
+	}
+	authorIDs := make([]uuid.UUID, 0, len(posts))
+	postIDs := make([]uuid.UUID, 0, len(posts))
+	for _, p := range posts {
+		authorIDs = append(authorIDs, p.AuthorID)
+		postIDs = append(postIDs, p.ID)
+	}
+	_ = l.Principals.Prime(ctx, authorIDs)
+	_ = l.PostReactions.Prime(ctx, postIDs, viewer)
+
+	// Tag attachments: query post_tags once and prime the tag loader
+	// with the distinct tag ids found.
+	if len(postIDs) > 0 {
+		rows, err := r.DB.Query(ctx,
+			`SELECT DISTINCT tag_id FROM post_tags WHERE post_id = ANY($1::UUID[])`, postIDs)
+		if err == nil {
+			tagIDs := []uuid.UUID{}
+			for rows.Next() {
+				var id uuid.UUID
+				if err := rows.Scan(&id); err == nil {
+					tagIDs = append(tagIDs, id)
+				}
+			}
+			rows.Close()
+			_ = l.Tags.Prime(ctx, tagIDs)
+		}
+	}
+}
+
+// loadPostReactions returns aggregated reaction tallies for a post via
+// the loader (cache hit for primed feed views, lazy load otherwise).
+func (r *Resolver) loadPostReactions(ctx context.Context, postID, viewer uuid.UUID) ([]*model.ReactionSummary, error) {
+	if l := loaders.FromContext(ctx); l != nil {
+		tally, err := l.PostReactions.Get(ctx, postID, viewer)
+		if err != nil {
+			return nil, err
+		}
+		out := make([]*model.ReactionSummary, 0, len(tally))
+		for _, t := range tally {
+			out = append(out, &model.ReactionSummary{
+				Emoji: t.Emoji, Count: t.Count, ByViewer: t.ByViewer,
+			})
+		}
+		return out, nil
+	}
+	tally, err := r.Posts.ReactionTally(ctx, postID, viewer)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]*model.ReactionSummary, 0, len(tally))
+	for _, e := range tally {
+		out = append(out, &model.ReactionSummary{
+			Emoji: e.Emoji, Count: e.Count, ByViewer: e.ByViewer,
+		})
+	}
+	return out, nil
 }

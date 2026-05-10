@@ -10,6 +10,7 @@ import (
 	"github.com/jackc/pgx/v5"
 
 	"github.com/bcnelson/pulse/services/api/internal/auth"
+	"github.com/bcnelson/pulse/services/api/internal/graphql/loaders"
 	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
@@ -91,7 +92,19 @@ func (r *Resolver) loadTag(ctx context.Context, id uuid.UUID) (*model.Tag, error
 
 // loadTagShallow returns the model with no children/parent/permissions —
 // just the structural fields. Used for hydrating the parent pointer.
+// Goes through the per-request loader cache when available.
 func (r *Resolver) loadTagShallow(ctx context.Context, id uuid.UUID) (*model.Tag, error) {
+	if l := loaders.FromContext(ctx); l != nil {
+		row, err := l.Tags.Get(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		if row == nil {
+			return nil, nil
+		}
+		return r.shallowFromLoader(row), nil
+	}
+
 	var t tagRow
 	err := r.DB.QueryRow(ctx, `
         SELECT id, parent_id, slug, display_name, root_kind, defaults, archived_at, created_at
@@ -106,6 +119,18 @@ func (r *Resolver) loadTagShallow(ctx context.Context, id uuid.UUID) (*model.Tag
 	out := r.toModelTag(t)
 	out.MyPermissions = &model.TagPermissions{Extras: []string{}}
 	return out, nil
+}
+
+// shallowFromLoader builds a Tag model from a loaders.TagRow.
+func (r *Resolver) shallowFromLoader(row *loaders.TagRow) *model.Tag {
+	t := tagRow{
+		id: row.ID, parentID: row.ParentID, slug: row.Slug,
+		displayName: row.DisplayName, rootKind: row.RootKind,
+		defaults: row.Defaults, archivedAt: row.ArchivedAt, createdAt: row.CreatedAt,
+	}
+	out := r.toModelTag(t)
+	out.MyPermissions = &model.TagPermissions{Extras: []string{}}
+	return out
 }
 
 func (r *Resolver) loadVisibleChildren(ctx context.Context, parentID, viewer uuid.UUID) ([]*model.Tag, error) {

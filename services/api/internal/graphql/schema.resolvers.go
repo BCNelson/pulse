@@ -1901,6 +1901,11 @@ func (r *tagResolver) Posts(ctx context.Context, obj *model.Tag, first *int, aft
 	if err != nil {
 		return nil, err
 	}
+	// Prime the per-request loaders so the per-post resolvers below hit
+	// cache instead of re-querying. One round-trip each for principals,
+	// tag attachments, and reaction tallies.
+	r.primePostListLoaders(ctx, postRows, identity.EffectiveID)
+
 	edges := make([]*model.PostEdge, 0, len(postRows))
 	for _, p := range postRows {
 		can, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionView, p.ID)

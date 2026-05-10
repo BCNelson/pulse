@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/bcnelson/pulse/services/api/internal/auth"
+	"github.com/bcnelson/pulse/services/api/internal/graphql/loaders"
 	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
 	"github.com/bcnelson/pulse/services/api/internal/task"
@@ -240,6 +241,59 @@ func mapTaskStatusGQLToDB(s model.TaskStatus) string {
 	return ""
 }
 
+// primeTaskListLoaders pre-warms loader caches for a task list:
+// distinct creators (and assignees/watchers as a follow-on) and the
+// task's attached tags.
+func (r *Resolver) primeTaskListLoaders(ctx context.Context, tasks []*task.Task) {
+	l := loaders.FromContext(ctx)
+	if l == nil {
+		return
+	}
+	if len(tasks) == 0 {
+		return
+	}
+	creatorIDs := make([]uuid.UUID, 0, len(tasks))
+	taskIDs := make([]uuid.UUID, 0, len(tasks))
+	for _, t := range tasks {
+		creatorIDs = append(creatorIDs, t.CreatedBy)
+		taskIDs = append(taskIDs, t.ID)
+	}
+	_ = l.Principals.Prime(ctx, creatorIDs)
+
+	// Pull distinct tag ids across all tasks and prime the tag loader.
+	rows, err := r.DB.Query(ctx,
+		`SELECT DISTINCT tag_id FROM task_tags WHERE task_id = ANY($1::UUID[])`, taskIDs)
+	if err == nil {
+		tagIDs := []uuid.UUID{}
+		for rows.Next() {
+			var id uuid.UUID
+			if err := rows.Scan(&id); err == nil {
+				tagIDs = append(tagIDs, id)
+			}
+		}
+		rows.Close()
+		_ = l.Tags.Prime(ctx, tagIDs)
+	}
+
+	// Pull assignees + watchers across all tasks and prime principals.
+	rows, err = r.DB.Query(ctx, `
+        SELECT DISTINCT principal_id FROM task_assignees WHERE task_id = ANY($1::UUID[])
+        UNION
+        SELECT DISTINCT principal_id FROM task_watchers  WHERE task_id = ANY($1::UUID[])
+    `, taskIDs)
+	if err == nil {
+		pids := []uuid.UUID{}
+		for rows.Next() {
+			var id uuid.UUID
+			if err := rows.Scan(&id); err == nil {
+				pids = append(pids, id)
+			}
+		}
+		rows.Close()
+		_ = l.Principals.Prime(ctx, pids)
+	}
+}
+
 // emptyTaskConnection mirrors emptyPostConnection.
 func emptyTaskConnection() *model.TaskConnection {
 	return &model.TaskConnection{
@@ -258,6 +312,7 @@ func (r *Resolver) loadTasksForTag(ctx context.Context, tagID uuid.UUID, limit i
 	if err != nil {
 		return nil, fmt.Errorf("list tasks: %w", err)
 	}
+	r.primeTaskListLoaders(ctx, tasks)
 	edges := make([]*model.TaskEdge, 0, len(tasks))
 	for _, t := range tasks {
 		can, err := r.canViewTask(ctx, identity.EffectiveID, t)

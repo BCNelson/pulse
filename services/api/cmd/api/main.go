@@ -26,6 +26,7 @@ import (
 	pulsecomment "github.com/bcnelson/pulse/services/api/internal/comment"
 	pulsedb "github.com/bcnelson/pulse/services/api/internal/db"
 	pulsegraphql "github.com/bcnelson/pulse/services/api/internal/graphql"
+	pulseloaders "github.com/bcnelson/pulse/services/api/internal/graphql/loaders"
 	pulsejob "github.com/bcnelson/pulse/services/api/internal/job"
 	pulsenotification "github.com/bcnelson/pulse/services/api/internal/notification"
 	pulseperm "github.com/bcnelson/pulse/services/api/internal/perm"
@@ -145,9 +146,12 @@ func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool 
 	})
 	srv.Use(extension.Introspection{})
 
-	// Per-request perm cache wraps every GraphQL operation; auth middleware
-	// resolves bearer/cookie -> Identity before the resolver runs.
-	gql := pulseperm.WithRequestCacheMiddleware(authSvc.HTTPMiddleware(srv))
+	// Per-request loader + perm cache wrap every GraphQL operation; auth
+	// middleware resolves bearer/cookie -> Identity before the resolver
+	// runs. Loader middleware sits inside the perm cache so both share
+	// the request lifetime.
+	gql := pulseloaders.Middleware(pool,
+		pulseperm.WithRequestCacheMiddleware(authSvc.HTTPMiddleware(srv)))
 
 	r := chi.NewRouter()
 	r.Use(middleware.RealIP)
