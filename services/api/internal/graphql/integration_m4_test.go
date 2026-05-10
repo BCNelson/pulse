@@ -189,7 +189,7 @@ func TestM4TaskAndNotifications(t *testing.T) {
 // TestM4NotificationSubscription drives the notificationReceived
 // subscription end-to-end through the realtime dispatcher.
 func TestM4NotificationSubscription(t *testing.T) {
-	pool := pgtest.Pool(t)
+	pool, dsn := pgtest.PoolAndDSN(t)
 	authSvc := &auth.Service{DB: pool}
 
 	alice := mustSeedUser(t, pool, authSvc, "alice@example.com", "Alice", "alice-pw-123")
@@ -202,10 +202,6 @@ func TestM4NotificationSubscription(t *testing.T) {
 	mustGrant(t, pool, rootID, alice, "owner", true)
 	mustGrant(t, pool, rootID, bob, "contributor", true)
 
-	dsn := os.Getenv("PULSE_TEST_DB_URL")
-	if dsn == "" {
-		t.Skip("PULSE_TEST_DB_URL not set")
-	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	dispatcher, err := realtime.New(ctx, dsn, slog.New(slog.NewTextHandler(os.Stderr, nil)))

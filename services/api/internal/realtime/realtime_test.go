@@ -8,17 +8,13 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bcnelson/pulse/services/api/internal/pgtest"
 	"github.com/bcnelson/pulse/services/api/internal/realtime"
 )
 
-const envURL = "PULSE_TEST_DB_URL"
-
-func newDispatcher(t *testing.T) (*realtime.Dispatcher, context.CancelFunc) {
+func newDispatcher(t *testing.T) (*realtime.Dispatcher, string, context.CancelFunc) {
 	t.Helper()
-	dsn := os.Getenv(envURL)
-	if dsn == "" {
-		t.Skipf("%s not set; skipping integration test", envURL)
-	}
+	dsn := pgtest.DSN(t)
 	ctx, cancel := context.WithCancel(context.Background())
 	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
 	d, err := realtime.New(ctx, dsn, logger)
@@ -27,11 +23,11 @@ func newDispatcher(t *testing.T) (*realtime.Dispatcher, context.CancelFunc) {
 		t.Fatalf("realtime.New: %v", err)
 	}
 	t.Cleanup(cancel)
-	return d, cancel
+	return d, dsn, cancel
 }
 
 func TestSubscribeReceivesPublish(t *testing.T) {
-	d, _ := newDispatcher(t)
+	d, _, _ := newDispatcher(t)
 
 	sub := d.Subscribe("test.topic")
 	defer sub.Close()
@@ -52,7 +48,7 @@ func TestSubscribeReceivesPublish(t *testing.T) {
 }
 
 func TestUnsubscribedTopicNotDelivered(t *testing.T) {
-	d, _ := newDispatcher(t)
+	d, _, _ := newDispatcher(t)
 
 	sub := d.Subscribe("test.topic.a")
 	defer sub.Close()
@@ -69,12 +65,7 @@ func TestUnsubscribedTopicNotDelivered(t *testing.T) {
 }
 
 func TestNotifyRoundTripThroughPostgres(t *testing.T) {
-	d, _ := newDispatcher(t)
-
-	dsn := os.Getenv(envURL)
-	if dsn == "" {
-		t.Skip()
-	}
+	d, dsn, _ := newDispatcher(t)
 
 	sub := d.Subscribe("rt.smoke")
 	defer sub.Close()

@@ -1,11 +1,13 @@
 // Package pgtest is the integration-test harness for Postgres-backed
-// services. Each test calls Pool(t) to receive a freshly migrated, freshly
-// truncated database. Tests skip themselves when PULSE_TEST_DB_URL is unset
-// so this package stays a no-op in environments without Postgres.
+// services. Each test calls Pool(t) to receive a freshly migrated, isolated
+// database. A single Postgres testcontainer is started lazily per test
+// process; pgtestdb caches the migrated schema as a template and clones a
+// fresh database for every test, dropping it on cleanup.
 package pgtest
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -13,86 +15,100 @@ import (
 	"testing"
 
 	"github.com/jackc/pgx/v5/pgxpool"
-
-	pulsedb "github.com/bcnelson/pulse/services/api/internal/db"
+	_ "github.com/jackc/pgx/v5/stdlib" // register the pgx driver for database/sql so pgtestdb can connect to the template DB
+	"github.com/peterldowns/pgtestdb"
+	"github.com/peterldowns/pgtestdb/migrators/goosemigrator"
+	"github.com/testcontainers/testcontainers-go/modules/postgres"
 )
 
-const envURL = "PULSE_TEST_DB_URL"
+const (
+	pgImage    = "postgres:16-alpine"
+	pgUser     = "pulse"
+	pgPassword = "pulse"
+	pgDatabase = "pulse"
+)
 
 var (
-	migrateOnce sync.Once
-	migrateErr  error
+	containerOnce sync.Once
+	baseConf      pgtestdb.Config
+	startErr      error
 )
 
-// Pool returns a *pgxpool.Pool against the test database. The schema is
-// migrated to head exactly once per process; data is truncated on every
-// call so tests stay independent.
+func startContainer() {
+	ctx := context.Background()
+	c, err := postgres.Run(ctx, pgImage,
+		postgres.WithDatabase(pgDatabase),
+		postgres.WithUsername(pgUser),
+		postgres.WithPassword(pgPassword),
+		postgres.BasicWaitStrategies(),
+	)
+	if err != nil {
+		startErr = fmt.Errorf("start postgres container: %w", err)
+		return
+	}
+	host, err := c.Host(ctx)
+	if err != nil {
+		startErr = fmt.Errorf("container host: %w", err)
+		return
+	}
+	port, err := c.MappedPort(ctx, "5432/tcp")
+	if err != nil {
+		startErr = fmt.Errorf("container port: %w", err)
+		return
+	}
+	baseConf = pgtestdb.Config{
+		DriverName: "pgx",
+		Host:       host,
+		Port:       port.Port(),
+		User:       pgUser,
+		Password:   pgPassword,
+		Database:   pgDatabase,
+		Options:    "sslmode=disable",
+	}
+}
+
+// Pool returns a *pgxpool.Pool against a fresh, fully-migrated database. The
+// underlying Postgres container is shared across all tests in the process;
+// each test gets its own database via pgtestdb's template-clone strategy.
+// pgtestdb registers a t.Cleanup that drops the database after the test;
+// the pool itself is closed via a separate t.Cleanup here.
 func Pool(t *testing.T) *pgxpool.Pool {
+	pool, _ := PoolAndDSN(t)
+	return pool
+}
+
+// DSN returns the connection string for a fresh, fully-migrated database.
+// Use this for tests that need a connection beyond the pgxpool — for example,
+// realtime tests that open their own LISTEN connection.
+func DSN(t *testing.T) string {
+	return newDB(t)
+}
+
+// PoolAndDSN is like Pool but also returns the underlying DSN, so callers
+// that need both a pool and an extra side connection (e.g., LISTEN/NOTIFY)
+// can target the same database.
+func PoolAndDSN(t *testing.T) (*pgxpool.Pool, string) {
 	t.Helper()
-	dsn := os.Getenv(envURL)
-	if dsn == "" {
-		t.Skipf("%s not set; skipping integration test", envURL)
-	}
-
-	migrateOnce.Do(func() {
-		migrateErr = pulsedb.Migrate(context.Background(), dsn, migrationsDir())
-	})
-	if migrateErr != nil {
-		t.Fatalf("migrate test db: %v", migrateErr)
-	}
-
-	pool, err := pulsedb.NewPool(context.Background(), dsn)
+	dsn := newDB(t)
+	pool, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {
 		t.Fatalf("open test pool: %v", err)
 	}
 	t.Cleanup(pool.Close)
-
-	truncate(t, pool)
-	return pool
+	return pool, dsn
 }
 
-// truncate wipes all writable tables. workspace_config is left intact since
-// it's a singleton bootstrap row.
-func truncate(t *testing.T, pool *pgxpool.Pool) {
+func newDB(t *testing.T) string {
 	t.Helper()
-	_, err := pool.Exec(context.Background(), `
-        TRUNCATE
-            attachments,
-            audit_events,
-            device_tokens,
-            tag_grants,
-            subscriptions,
-            tag_closure,
-            user_credentials,
-            bot_credentials,
-            sessions,
-            jobs,
-            notifications,
-            task_watchers,
-            task_assignees,
-            task_tags,
-            tasks,
-            principal_post_read,
-            messages,
-            chat_room_participants,
-            chat_room_tags,
-            chat_rooms,
-            comment_reactions,
-            post_reactions,
-            comment_edits,
-            comment_mentions,
-            comments,
-            post_edits,
-            post_mentions,
-            post_tags,
-            posts,
-            tags,
-            principals
-        RESTART IDENTITY CASCADE
-    `)
-	if err != nil {
-		t.Fatalf("truncate: %v", err)
+	containerOnce.Do(startContainer)
+	if startErr != nil {
+		t.Fatalf("%v", startErr)
 	}
+	// goosemigrator treats its dir argument as a path inside its FS, and the
+	// default FS is os.DirFS(".") which rejects absolute paths via fs.Sub.
+	// Mount our absolute path as the FS root and pass "." instead.
+	mig := goosemigrator.New(".", goosemigrator.WithFS(os.DirFS(migrationsDir())))
+	return pgtestdb.Custom(t, baseConf, mig).URL()
 }
 
 // migrationsDir returns the absolute path to db/migrations relative to this

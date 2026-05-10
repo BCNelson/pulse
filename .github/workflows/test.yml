@@ -11,19 +11,6 @@ permissions:
 jobs:
   go:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_USER: pulse
-          POSTGRES_PASSWORD: pulse
-          POSTGRES_DB: pulse_test
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd "pg_isready -U pulse"
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 10
     steps:
       - uses: actions/checkout@v5
 
@@ -38,9 +25,7 @@ jobs:
 
       - name: Test
         working-directory: services/api
-        env:
-          PULSE_TEST_DB_URL: postgres://pulse:pulse@127.0.0.1:5432/pulse_test?sslmode=disable
-        run: go test -count=1 -p 1 -race ./...
+        run: go test -count=1 -race ./...
 
       - uses: golangci/golangci-lint-action@v6
         with:

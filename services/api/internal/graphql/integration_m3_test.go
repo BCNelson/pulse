@@ -27,7 +27,7 @@ import (
 // directly). Flow: alice and bob in a DM room, alice opens the subscription,
 // bob sends a message, alice's channel fires.
 func TestM3SubscriptionDelivers(t *testing.T) {
-	pool := pgtest.Pool(t)
+	pool, dsn := pgtest.PoolAndDSN(t)
 	authSvc := &auth.Service{DB: pool}
 	postSvc := &post.Service{DB: pool}
 	chatSvc := &chat.Service{DB: pool, Posts: postSvc}
@@ -35,10 +35,6 @@ func TestM3SubscriptionDelivers(t *testing.T) {
 	alice := mustSeedUser(t, pool, authSvc, "alice@example.com", "Alice", "alice-pw")
 	bob := mustSeedUser(t, pool, authSvc, "bob@example.com", "Bob", "bob-pw")
 
-	dsn := os.Getenv("PULSE_TEST_DB_URL")
-	if dsn == "" {
-		t.Skip("PULSE_TEST_DB_URL not set")
-	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	dispatcher, err := realtime.New(ctx, dsn, slog.New(slog.NewTextHandler(os.Stderr, nil)))
@@ -98,7 +94,7 @@ func TestM3SubscriptionDelivers(t *testing.T) {
 }
 
 func TestM3SubscriptionRecheckesAuth(t *testing.T) {
-	pool := pgtest.Pool(t)
+	pool, dsn := pgtest.PoolAndDSN(t)
 	authSvc := &auth.Service{DB: pool}
 	postSvc := &post.Service{DB: pool}
 	chatSvc := &chat.Service{DB: pool, Posts: postSvc}
@@ -107,10 +103,6 @@ func TestM3SubscriptionRecheckesAuth(t *testing.T) {
 	mustSeedUser(t, pool, authSvc, "bob@example.com", "Bob", "bob-pw")
 	charlie := mustSeedUser(t, pool, authSvc, "charlie@example.com", "Charlie", "charlie-pw")
 
-	dsn := os.Getenv("PULSE_TEST_DB_URL")
-	if dsn == "" {
-		t.Skip()
-	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	dispatcher, err := realtime.New(ctx, dsn, slog.New(slog.NewTextHandler(os.Stderr, nil)))
