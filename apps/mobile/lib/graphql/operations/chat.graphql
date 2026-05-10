@@ -1,0 +1,64 @@
+fragment MessageSummary on Message {
+  id
+  body
+  createdAt
+  editedAt
+  author {
+    id
+    displayName
+  }
+  replyTo {
+    id
+    body
+  }
+}
+
+fragment ChatRoomSummary on ChatRoom {
+  id
+  isDM
+  createdAt
+  archivedAt
+  tags {
+    id
+    slug
+    displayName
+  }
+  participants {
+    principal {
+      id
+      displayName
+    }
+  }
+}
+
+query ChatRoomDetail($id: ID!) {
+  chatRoom(id: $id) {
+    ...ChatRoomSummary
+    messages(first: 200) {
+      edges {
+        cursor
+        node {
+          ...MessageSummary
+        }
+      }
+    }
+  }
+}
+
+mutation SendMessage($input: SendMessageInput!) {
+  sendMessage(input: $input) {
+    ...MessageSummary
+  }
+}
+
+mutation CreateChatRoom($input: CreateChatRoomInput!) {
+  createChatRoom(input: $input) {
+    ...ChatRoomSummary
+  }
+}
+
+subscription MessageAdded($roomId: ID!) {
+  messageAdded(roomId: $roomId) {
+    ...MessageSummary
+  }
+}

@@ -278,6 +278,31 @@ final BuiltSet<GNotificationUrgency> _$gNotificationUrgencyValues =
   _$gNotificationUrgencyLOW,
 ]);
 
+const GDevicePlatform _$gDevicePlatformIOS = const GDevicePlatform._('IOS');
+const GDevicePlatform _$gDevicePlatformANDROID =
+    const GDevicePlatform._('ANDROID');
+const GDevicePlatform _$gDevicePlatformWEB = const GDevicePlatform._('WEB');
+
+GDevicePlatform _$gDevicePlatformValueOf(String name) {
+  switch (name) {
+    case 'IOS':
+      return _$gDevicePlatformIOS;
+    case 'ANDROID':
+      return _$gDevicePlatformANDROID;
+    case 'WEB':
+      return _$gDevicePlatformWEB;
+    default:
+      throw ArgumentError(name);
+  }
+}
+
+final BuiltSet<GDevicePlatform> _$gDevicePlatformValues =
+    BuiltSet<GDevicePlatform>(const <GDevicePlatform>[
+  _$gDevicePlatformIOS,
+  _$gDevicePlatformANDROID,
+  _$gDevicePlatformWEB,
+]);
+
 const GPostSort _$gPostSortRECENT = const GPostSort._('RECENT');
 const GPostSort _$gPostSortACTIVE = const GPostSort._('ACTIVE');
 
@@ -315,6 +340,8 @@ Serializer<GNotificationReason> _$gNotificationReasonSerializer =
     _$GNotificationReasonSerializer();
 Serializer<GNotificationUrgency> _$gNotificationUrgencySerializer =
     _$GNotificationUrgencySerializer();
+Serializer<GDevicePlatform> _$gDevicePlatformSerializer =
+    _$GDevicePlatformSerializer();
 Serializer<GPostSort> _$gPostSortSerializer = _$GPostSortSerializer();
 Serializer<GNotificationFilter> _$gNotificationFilterSerializer =
     _$GNotificationFilterSerializer();
@@ -518,6 +545,24 @@ class _$GNotificationUrgencySerializer
   GNotificationUrgency deserialize(Serializers serializers, Object serialized,
           {FullType specifiedType = FullType.unspecified}) =>
       GNotificationUrgency.valueOf(serialized as String);
+}
+
+class _$GDevicePlatformSerializer
+    implements PrimitiveSerializer<GDevicePlatform> {
+  @override
+  final Iterable<Type> types = const <Type>[GDevicePlatform];
+  @override
+  final String wireName = 'GDevicePlatform';
+
+  @override
+  Object serialize(Serializers serializers, GDevicePlatform object,
+          {FullType specifiedType = FullType.unspecified}) =>
+      object.name;
+
+  @override
+  GDevicePlatform deserialize(Serializers serializers, Object serialized,
+          {FullType specifiedType = FullType.unspecified}) =>
+      GDevicePlatform.valueOf(serialized as String);
 }
 
 class _$GPostSortSerializer implements PrimitiveSerializer<GPostSort> {

@@ -1,0 +1,116 @@
+fragment PostSummary on Post {
+  id
+  title
+  body
+  createdAt
+  editedAt
+  decisionStatus
+  denyFlag
+  author {
+    id
+    displayName
+  }
+  reactions {
+    emoji
+    count
+    byViewer
+  }
+}
+
+query PostsForTag($tagId: ID!, $first: Int) {
+  tag(id: $tagId) {
+    id
+    posts(first: $first) {
+      edges {
+        cursor
+        node {
+          ...PostSummary
+        }
+      }
+    }
+  }
+}
+
+fragment CommentSummary on Comment {
+  id
+  postId
+  parentId
+  depth
+  body
+  createdAt
+  editedAt
+  author {
+    id
+    displayName
+  }
+  reactions {
+    emoji
+    count
+    byViewer
+  }
+}
+
+query PostDetail($id: ID!) {
+  post(id: $id) {
+    ...PostSummary
+    tags {
+      tag {
+        id
+        slug
+        displayName
+      }
+    }
+    comments(first: 200) {
+      edges {
+        node {
+          ...CommentSummary
+        }
+      }
+    }
+    myPermissions {
+      canView
+      canContribute
+      canModerate
+    }
+  }
+}
+
+mutation CreatePost($input: CreatePostInput!) {
+  createPost(input: $input) {
+    ...PostSummary
+  }
+}
+
+mutation CreateComment($input: CreateCommentInput!) {
+  createComment(input: $input) {
+    ...CommentSummary
+  }
+}
+
+mutation ReactToPost($postId: ID!, $emoji: String!) {
+  reactToPost(postId: $postId, emoji: $emoji) {
+    id
+    reactions {
+      emoji
+      count
+      byViewer
+    }
+  }
+}
+
+mutation UnreactToPost($postId: ID!, $emoji: String!) {
+  unreactToPost(postId: $postId, emoji: $emoji) {
+    id
+    reactions {
+      emoji
+      count
+      byViewer
+    }
+  }
+}
+
+subscription PostChanged($tagId: ID!) {
+  postChanged(tagId: $tagId) {
+    ...PostSummary
+  }
+}

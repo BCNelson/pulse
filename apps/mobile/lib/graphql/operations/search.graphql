@@ -1,0 +1,35 @@
+query Search($query: String!, $first: Int) {
+  search(query: $query, first: $first) {
+    edges {
+      cursor
+      score
+      node {
+        __typename
+        ... on Post {
+          id
+          title
+          author {
+            displayName
+          }
+        }
+        ... on Comment {
+          id
+          postId
+          body
+        }
+      }
+    }
+  }
+}
+
+query SearchTags($query: String!, $first: Int) {
+  searchTags(query: $query, first: $first) {
+    similarity
+    tag {
+      id
+      slug
+      displayName
+      path
+    }
+  }
+}

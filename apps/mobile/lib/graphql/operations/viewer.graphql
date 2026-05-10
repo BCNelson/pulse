@@ -1,0 +1,13 @@
+query Viewer {
+  viewer {
+    id
+    globalUri
+    displayName
+    email
+    homeTag {
+      id
+      slug
+      displayName
+    }
+  }
+}

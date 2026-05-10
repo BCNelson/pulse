@@ -1176,6 +1176,102 @@ func (r *mutationResolver) MarkAllNotificationsRead(ctx context.Context) (int, e
 	return before, nil
 }
 
+// Impersonate is the resolver for the impersonate field.
+func (r *mutationResolver) Impersonate(ctx context.Context, principalID string, reason string) (*model.ImpersonationState, error) {
+	if _, err := requireIdentity(ctx); err != nil {
+		return nil, err
+	}
+	sessionID, ok := auth.SessionIDFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("impersonate: no session attached")
+	}
+	target, err := uuid.Parse(principalID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid principalId: %w", err)
+	}
+	if err := r.Impersonation.Begin(ctx, sessionID, target, reason); err != nil {
+		return nil, err
+	}
+	return r.impersonationStateForSession(ctx, sessionID)
+}
+
+// EndImpersonation is the resolver for the endImpersonation field.
+func (r *mutationResolver) EndImpersonation(ctx context.Context) (*model.ImpersonationState, error) {
+	if _, err := requireIdentity(ctx); err != nil {
+		return nil, err
+	}
+	sessionID, ok := auth.SessionIDFromContext(ctx)
+	if !ok {
+		return nil, fmt.Errorf("endImpersonation: no session attached")
+	}
+	if err := r.Impersonation.End(ctx, sessionID); err != nil {
+		return nil, err
+	}
+	return r.impersonationStateForSession(ctx, sessionID)
+}
+
+// impersonationStateForSession reads the post-mutation session row and
+// builds the ImpersonationState model.
+func (r *Resolver) impersonationStateForSession(ctx context.Context, sessionID uuid.UUID) (*model.ImpersonationState, error) {
+	var actingID uuid.UUID
+	var effective *uuid.UUID
+	if err := r.DB.QueryRow(ctx,
+		`SELECT principal_id, effective_principal_id FROM sessions WHERE id = $1`,
+		sessionID).Scan(&actingID, &effective); err != nil {
+		return nil, err
+	}
+	out := &model.ImpersonationState{IsImpersonating: effective != nil}
+	if out.IsImpersonating {
+		acting, _ := r.loadPrincipalIface(ctx, actingID)
+		out.Acting = acting
+		eff, _ := r.loadPrincipalIface(ctx, *effective)
+		out.Effective = eff
+	}
+	return out, nil
+}
+
+func mapDevicePlatformGQLToDB(p model.DevicePlatform) string {
+	switch p {
+	case model.DevicePlatformIos:
+		return "ios"
+	case model.DevicePlatformAndroid:
+		return "android"
+	case model.DevicePlatformWeb:
+		return "web"
+	}
+	return ""
+}
+
+// RegisterDeviceToken is the resolver for the registerDeviceToken field.
+func (r *mutationResolver) RegisterDeviceToken(ctx context.Context, token string, platform model.DevicePlatform) (bool, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return false, err
+	}
+	if r.Push == nil {
+		return false, fmt.Errorf("push not configured")
+	}
+	if err := r.Push.Register(ctx, identity.EffectiveID, token, mapDevicePlatformGQLToDB(platform)); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+// UnregisterDeviceToken is the resolver for the unregisterDeviceToken field.
+func (r *mutationResolver) UnregisterDeviceToken(ctx context.Context, token string) (bool, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return false, err
+	}
+	if r.Push == nil {
+		return false, nil
+	}
+	if err := r.Push.Unregister(ctx, identity.EffectiveID, token); err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
 // CreateChatRoom is the resolver for the createChatRoom field.
 func (r *mutationResolver) CreateChatRoom(ctx context.Context, input model.CreateChatRoomInput) (*model.ChatRoom, error) {
 	identity, err := requireIdentity(ctx)
@@ -1547,6 +1643,76 @@ func (r *queryResolver) ChatRoom(ctx context.Context, id string) (*model.ChatRoo
 		return nil, fmt.Errorf("invalid id: %w", err)
 	}
 	return r.loadChatRoom(ctx, rid)
+}
+
+// MyTagRoots is the resolver for the myTagRoots field.
+func (r *queryResolver) MyTagRoots(ctx context.Context) ([]*model.Tag, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	// Visible roots: parent_id IS NULL AND the viewer can see the tag.
+	// We let the perm check filter rather than building the predicate
+	// into SQL — root counts are small (one or two per workspace) so
+	// the cost is negligible.
+	rows, err := r.DB.Query(ctx, `
+        SELECT id FROM tags
+        WHERE parent_id IS NULL AND archived_at IS NULL
+        ORDER BY slug
+    `)
+	if err != nil {
+		return nil, fmt.Errorf("query roots: %w", err)
+	}
+	defer rows.Close()
+	var ids []uuid.UUID
+	for rows.Next() {
+		var id uuid.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		ids = append(ids, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	out := make([]*model.Tag, 0, len(ids))
+	for _, id := range ids {
+		can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionView, id)
+		if err != nil {
+			return nil, err
+		}
+		if !can {
+			continue
+		}
+		t, err := r.loadTag(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		if t != nil {
+			out = append(out, t)
+		}
+	}
+	return out, nil
+}
+
+// ViewerImpersonationState is the resolver for the viewerImpersonationState field.
+func (r *queryResolver) ViewerImpersonationState(ctx context.Context) (*model.ImpersonationState, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	out := &model.ImpersonationState{IsImpersonating: identity.ActingID != identity.EffectiveID}
+	if out.IsImpersonating {
+		acting, err := r.loadPrincipalIface(ctx, identity.ActingID)
+		if err == nil {
+			out.Acting = acting
+		}
+		eff, err := r.loadPrincipalIface(ctx, identity.EffectiveID)
+		if err == nil {
+			out.Effective = eff
+		}
+	}
+	return out, nil
 }
 
 // Notifications is the resolver for the notifications field.

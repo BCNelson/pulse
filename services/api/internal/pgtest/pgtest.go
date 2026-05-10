@@ -58,6 +58,7 @@ func truncate(t *testing.T, pool *pgxpool.Pool) {
 	_, err := pool.Exec(context.Background(), `
         TRUNCATE
             audit_events,
+            device_tokens,
             tag_grants,
             subscriptions,
             tag_closure,

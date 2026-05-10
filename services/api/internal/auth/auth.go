@@ -118,33 +118,62 @@ func (s *Service) IssueSession(ctx context.Context, principal uuid.UUID, userAge
 // Lookup resolves a token back to its principal. Returns the typed
 // "expired"/"revoked"/"not found" errors so callers can distinguish for
 // logging without surfacing the distinction to the user.
+//
+// Deprecated: prefer LookupSession which surfaces the acting/effective
+// split; Lookup is retained for callers that only need the effective id.
 func (s *Service) Lookup(ctx context.Context, token string) (uuid.UUID, error) {
+	sess, err := s.LookupSession(ctx, token)
+	if err != nil {
+		return uuid.Nil, err
+	}
+	return sess.EffectiveID, nil
+}
+
+// SessionRecord is the resolved session pulled from a token. ActingID is
+// the user who actually holds the session (the original login). When
+// impersonation is active, EffectiveID is a different principal — the
+// one whose perms are evaluated for this request. Audit writers stamp
+// both.
+type SessionRecord struct {
+	SessionID   uuid.UUID
+	ActingID    uuid.UUID
+	EffectiveID uuid.UUID
+}
+
+// LookupSession resolves a token to the full session record including
+// the acting/effective split.
+func (s *Service) LookupSession(ctx context.Context, token string) (SessionRecord, error) {
 	if token == "" {
-		return uuid.Nil, ErrSessionNotFound
+		return SessionRecord{}, ErrSessionNotFound
 	}
 	hash := hashToken(token)
 
-	var principalID uuid.UUID
+	var sess SessionRecord
+	var effective *uuid.UUID
 	var expiresAt time.Time
 	var revokedAt *time.Time
 	err := s.DB.QueryRow(ctx, `
-        SELECT principal_id, expires_at, revoked_at
+        SELECT id, principal_id, effective_principal_id, expires_at, revoked_at
         FROM sessions
         WHERE token_hash = $1
-    `, hash).Scan(&principalID, &expiresAt, &revokedAt)
+    `, hash).Scan(&sess.SessionID, &sess.ActingID, &effective, &expiresAt, &revokedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return uuid.Nil, ErrSessionNotFound
+		return SessionRecord{}, ErrSessionNotFound
 	}
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("lookup session: %w", err)
+		return SessionRecord{}, fmt.Errorf("lookup session: %w", err)
 	}
 	if revokedAt != nil {
-		return uuid.Nil, ErrSessionRevoked
+		return SessionRecord{}, ErrSessionRevoked
 	}
 	if !expiresAt.After(time.Now()) {
-		return uuid.Nil, ErrSessionExpired
+		return SessionRecord{}, ErrSessionExpired
 	}
-	return principalID, nil
+	sess.EffectiveID = sess.ActingID
+	if effective != nil {
+		sess.EffectiveID = *effective
+	}
+	return sess, nil
 }
 
 // Logout revokes the session named by token. Idempotent: revoking an

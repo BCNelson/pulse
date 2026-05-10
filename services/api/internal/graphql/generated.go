@@ -93,6 +93,12 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	ImpersonationState struct {
+		Acting          func(childComplexity int) int
+		Effective       func(childComplexity int) int
+		IsImpersonating func(childComplexity int) int
+	}
+
 	LoginPayload struct {
 		ExpiresAt func(childComplexity int) int
 		Token     func(childComplexity int) int
@@ -140,7 +146,9 @@ type ComplexityRoot struct {
 		EditMessage              func(childComplexity int, messageID string, body string) int
 		EditPost                 func(childComplexity int, input model.EditPostInput) int
 		EditTask                 func(childComplexity int, input model.EditTaskInput) int
+		EndImpersonation         func(childComplexity int) int
 		GrantTag                 func(childComplexity int, input model.GrantTagInput) int
+		Impersonate              func(childComplexity int, principalID string, reason string) int
 		Login                    func(childComplexity int, email string, password string) int
 		Logout                   func(childComplexity int) int
 		MarkAllNotificationsRead func(childComplexity int) int
@@ -152,6 +160,7 @@ type ComplexityRoot struct {
 		PromotePostToTask        func(childComplexity int, postID string, title string, dueAt *time.Time, assignees []string) int
 		ReactToComment           func(childComplexity int, commentID string, emoji string) int
 		ReactToPost              func(childComplexity int, postID string, emoji string) int
+		RegisterDeviceToken      func(childComplexity int, token string, platform model.DevicePlatform) int
 		RemoveParticipant        func(childComplexity int, roomID string, principalID string) int
 		RemoveRoomTag            func(childComplexity int, roomID string, tagID string) int
 		RevokeTagGrant           func(childComplexity int, tagID string, principalID string) int
@@ -163,6 +172,7 @@ type ComplexityRoot struct {
 		UnassignTask             func(childComplexity int, taskID string, principalID string) int
 		UnreactToComment         func(childComplexity int, commentID string, emoji string) int
 		UnreactToPost            func(childComplexity int, postID string, emoji string) int
+		UnregisterDeviceToken    func(childComplexity int, token string) int
 		UnsubscribeTag           func(childComplexity int, tagID string) int
 		UnwatchTask              func(childComplexity int, taskID string) int
 		WatchTask                func(childComplexity int, taskID string) int
@@ -243,16 +253,18 @@ type ComplexityRoot struct {
 	}
 
 	Query struct {
-		ChatRoom      func(childComplexity int, id string) int
-		Health        func(childComplexity int) int
-		Notifications func(childComplexity int, first *int, after *string, filter *model.NotificationFilter) int
-		Post          func(childComplexity int, id string) int
-		Search        func(childComplexity int, query string, kinds []model.SearchKind, first *int) int
-		SearchTags    func(childComplexity int, query string, first *int) int
-		ServerTime    func(childComplexity int) int
-		Tag           func(childComplexity int, id string) int
-		Task          func(childComplexity int, id string) int
-		Viewer        func(childComplexity int) int
+		ChatRoom                 func(childComplexity int, id string) int
+		Health                   func(childComplexity int) int
+		MyTagRoots               func(childComplexity int) int
+		Notifications            func(childComplexity int, first *int, after *string, filter *model.NotificationFilter) int
+		Post                     func(childComplexity int, id string) int
+		Search                   func(childComplexity int, query string, kinds []model.SearchKind, first *int) int
+		SearchTags               func(childComplexity int, query string, first *int) int
+		ServerTime               func(childComplexity int) int
+		Tag                      func(childComplexity int, id string) int
+		Task                     func(childComplexity int, id string) int
+		Viewer                   func(childComplexity int) int
+		ViewerImpersonationState func(childComplexity int) int
 	}
 
 	ReactionSummary struct {
@@ -414,6 +426,10 @@ type MutationResolver interface {
 	PromoteCommentToTask(ctx context.Context, commentID string, title string, dueAt *time.Time, assignees []string) (*model.Task, error)
 	MarkNotificationRead(ctx context.Context, notificationIds []string) (int, error)
 	MarkAllNotificationsRead(ctx context.Context) (int, error)
+	Impersonate(ctx context.Context, principalID string, reason string) (*model.ImpersonationState, error)
+	EndImpersonation(ctx context.Context) (*model.ImpersonationState, error)
+	RegisterDeviceToken(ctx context.Context, token string, platform model.DevicePlatform) (bool, error)
+	UnregisterDeviceToken(ctx context.Context, token string) (bool, error)
 	CreateChatRoom(ctx context.Context, input model.CreateChatRoomInput) (*model.ChatRoom, error)
 	AddParticipant(ctx context.Context, roomID string, principalID string, role *string) (*model.ChatRoom, error)
 	RemoveParticipant(ctx context.Context, roomID string, principalID string) (*model.ChatRoom, error)
@@ -435,6 +451,8 @@ type QueryResolver interface {
 	Post(ctx context.Context, id string) (*model.Post, error)
 	Task(ctx context.Context, id string) (*model.Task, error)
 	ChatRoom(ctx context.Context, id string) (*model.ChatRoom, error)
+	MyTagRoots(ctx context.Context) ([]*model.Tag, error)
+	ViewerImpersonationState(ctx context.Context) (*model.ImpersonationState, error)
 	Notifications(ctx context.Context, first *int, after *string, filter *model.NotificationFilter) (*model.NotificationConnection, error)
 	Search(ctx context.Context, query string, kinds []model.SearchKind, first *int) (*model.SearchConnection, error)
 	SearchTags(ctx context.Context, query string, first *int) ([]*model.TagSearchHit, error)
@@ -678,6 +696,25 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.CommentEdge.Node(childComplexity), true
+
+	case "ImpersonationState.acting":
+		if e.ComplexityRoot.ImpersonationState.Acting == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ImpersonationState.Acting(childComplexity), true
+	case "ImpersonationState.effective":
+		if e.ComplexityRoot.ImpersonationState.Effective == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ImpersonationState.Effective(childComplexity), true
+	case "ImpersonationState.isImpersonating":
+		if e.ComplexityRoot.ImpersonationState.IsImpersonating == nil {
+			break
+		}
+
+		return e.ComplexityRoot.ImpersonationState.IsImpersonating(childComplexity), true
 
 	case "LoginPayload.expiresAt":
 		if e.ComplexityRoot.LoginPayload.ExpiresAt == nil {
@@ -972,6 +1009,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.EditTask(childComplexity, args["input"].(model.EditTaskInput)), true
+	case "Mutation.endImpersonation":
+		if e.ComplexityRoot.Mutation.EndImpersonation == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Mutation.EndImpersonation(childComplexity), true
 	case "Mutation.grantTag":
 		if e.ComplexityRoot.Mutation.GrantTag == nil {
 			break
@@ -983,6 +1026,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.GrantTag(childComplexity, args["input"].(model.GrantTagInput)), true
+	case "Mutation.impersonate":
+		if e.ComplexityRoot.Mutation.Impersonate == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_impersonate_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.Impersonate(childComplexity, args["principalId"].(string), args["reason"].(string)), true
 	case "Mutation.login":
 		if e.ComplexityRoot.Mutation.Login == nil {
 			break
@@ -1094,6 +1148,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.ReactToPost(childComplexity, args["postId"].(string), args["emoji"].(string)), true
+	case "Mutation.registerDeviceToken":
+		if e.ComplexityRoot.Mutation.RegisterDeviceToken == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_registerDeviceToken_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.RegisterDeviceToken(childComplexity, args["token"].(string), args["platform"].(model.DevicePlatform)), true
 	case "Mutation.removeParticipant":
 		if e.ComplexityRoot.Mutation.RemoveParticipant == nil {
 			break
@@ -1215,6 +1280,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.UnreactToPost(childComplexity, args["postId"].(string), args["emoji"].(string)), true
+	case "Mutation.unregisterDeviceToken":
+		if e.ComplexityRoot.Mutation.UnregisterDeviceToken == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_unregisterDeviceToken_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.UnregisterDeviceToken(childComplexity, args["token"].(string)), true
 	case "Mutation.unsubscribeTag":
 		if e.ComplexityRoot.Mutation.UnsubscribeTag == nil {
 			break
@@ -1563,6 +1639,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.ComplexityRoot.Query.Health(childComplexity), true
 
+	case "Query.myTagRoots":
+		if e.ComplexityRoot.Query.MyTagRoots == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Query.MyTagRoots(childComplexity), true
 	case "Query.notifications":
 		if e.ComplexityRoot.Query.Notifications == nil {
 			break
@@ -1641,6 +1723,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.Viewer(childComplexity), true
+	case "Query.viewerImpersonationState":
+		if e.ComplexityRoot.Query.ViewerImpersonationState == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Query.ViewerImpersonationState(childComplexity), true
 
 	case "ReactionSummary.byViewer":
 		if e.ComplexityRoot.ReactionSummary.ByViewer == nil {
@@ -2333,6 +2421,12 @@ enum NotificationUrgency {
   LOW
 }
 
+enum DevicePlatform {
+  IOS
+  ANDROID
+  WEB
+}
+
 enum PostSort {
   RECENT
   ACTIVE
@@ -2592,10 +2686,29 @@ type Query {
   task(id: ID!): Task
   chatRoom(id: ID!): ChatRoom
 
+  """
+  Visible tag roots (tags with no parent, where the viewer holds any
+  grant). The Flutter client uses this to seed the tag-tree pane;
+  descendants come via Tag.children.
+  """
+  myTagRoots: [Tag!]!
+
+  """
+  Whether the viewer is currently impersonating someone else, and if
+  so, who. Drives the loud "acting as" banner in the Flutter shell.
+  """
+  viewerImpersonationState: ImpersonationState!
+
   notifications(first: Int, after: String, filter: NotificationFilter): NotificationConnection!
 
   search(query: String!, kinds: [SearchKind!], first: Int): SearchConnection!
   searchTags(query: String!, first: Int): [TagSearchHit!]!
+}
+
+type ImpersonationState {
+  isImpersonating: Boolean!
+  acting: Principal
+  effective: Principal
 }
 
 # ----- mutations -----
@@ -2778,6 +2891,24 @@ type Mutation {
   markNotificationRead(notificationIds: [ID!]!): Int!
   markAllNotificationsRead: Int!
 
+  """
+  Impersonate another principal for the current session. Reason is
+  recorded in audit. Only callers with a workspace admin grant on the
+  org root may impersonate. The session token does not rotate — the
+  same bearer continues to work, but acting/effective diverge until
+  endImpersonation is called.
+  """
+  impersonate(principalId: ID!, reason: String!): ImpersonationState!
+  endImpersonation: ImpersonationState!
+
+  """
+  Register the device's push token (FCM/APNs). Idempotent on (principal,
+  token). The notification fan-out worker uses these to send push
+  alerts for high-urgency notifications.
+  """
+  registerDeviceToken(token: String!, platform: DevicePlatform!): Boolean!
+  unregisterDeviceToken(token: String!): Boolean!
+
   createChatRoom(input: CreateChatRoomInput!): ChatRoom!
   addParticipant(roomId: ID!, principalId: ID!, role: String): ChatRoom!
   removeParticipant(roomId: ID!, principalId: ID!): ChatRoom!
@@ -2906,6 +3037,18 @@ func (ec *executionContext) childFields_CommentEdge(ctx context.Context, field g
 		return ec.fieldContext_CommentEdge_cursor(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type CommentEdge", field.Name)
+}
+
+func (ec *executionContext) childFields_ImpersonationState(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "isImpersonating":
+		return ec.fieldContext_ImpersonationState_isImpersonating(ctx, field)
+	case "acting":
+		return ec.fieldContext_ImpersonationState_acting(ctx, field)
+	case "effective":
+		return ec.fieldContext_ImpersonationState_effective(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type ImpersonationState", field.Name)
 }
 
 func (ec *executionContext) childFields_LoginPayload(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
@@ -3770,6 +3913,28 @@ func (ec *executionContext) field_Mutation_grantTag_args(ctx context.Context, ra
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_impersonate_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "principalId",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNID2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["principalId"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "reason",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNString2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["reason"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_login_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -3981,6 +4146,28 @@ func (ec *executionContext) field_Mutation_reactToPost_args(ctx context.Context,
 		return nil, err
 	}
 	args["emoji"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_registerDeviceToken_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "token",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNString2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["token"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "platform",
+		func(ctx context.Context, v any) (model.DevicePlatform, error) {
+			return ec.unmarshalNDevicePlatform2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐDevicePlatform(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["platform"] = arg1
 	return args, nil
 }
 
@@ -4207,6 +4394,20 @@ func (ec *executionContext) field_Mutation_unreactToPost_args(ctx context.Contex
 		return nil, err
 	}
 	args["emoji"] = arg1
+	return args, nil
+}
+
+func (ec *executionContext) field_Mutation_unregisterDeviceToken_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "token",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNString2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["token"] = arg0
 	return args, nil
 }
 
@@ -5492,6 +5693,93 @@ func (ec *executionContext) _CommentEdge_cursor(ctx context.Context, field graph
 }
 func (ec *executionContext) fieldContext_CommentEdge_cursor(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("CommentEdge", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _ImpersonationState_isImpersonating(ctx context.Context, field graphql.CollectedField, obj *model.ImpersonationState) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_ImpersonationState_isImpersonating(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.IsImpersonating, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+			return ec.marshalNBoolean2bool(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_ImpersonationState_isImpersonating(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("ImpersonationState", field, false, false, errors.New("field of type Boolean does not have child fields"))
+}
+
+func (ec *executionContext) _ImpersonationState_acting(ctx context.Context, field graphql.CollectedField, obj *model.ImpersonationState) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_ImpersonationState_acting(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Acting, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v model.Principal) graphql.Marshaler {
+			return ec.marshalOPrincipal2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐPrincipal(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_ImpersonationState_acting(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImpersonationState",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("FieldContext.Child cannot be called on type INTERFACE")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _ImpersonationState_effective(ctx context.Context, field graphql.CollectedField, obj *model.ImpersonationState) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_ImpersonationState_effective(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Effective, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v model.Principal) graphql.Marshaler {
+			return ec.marshalOPrincipal2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐPrincipal(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_ImpersonationState_effective(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "ImpersonationState",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("FieldContext.Child cannot be called on type INTERFACE")
+		},
+	}
+	return fc, nil
 }
 
 func (ec *executionContext) _LoginPayload_token(ctx context.Context, field graphql.CollectedField, obj *model.LoginPayload) (ret graphql.Marshaler) {
@@ -7411,6 +7699,170 @@ func (ec *executionContext) fieldContext_Mutation_markAllNotificationsRead(_ con
 	return graphql.NewScalarFieldContext("Mutation", field, true, true, errors.New("field of type Int does not have child fields"))
 }
 
+func (ec *executionContext) _Mutation_impersonate(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_impersonate(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().Impersonate(ctx, fc.Args["principalId"].(string), fc.Args["reason"].(string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.ImpersonationState) graphql.Marshaler {
+			return ec.marshalNImpersonationState2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐImpersonationState(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_impersonate(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_ImpersonationState(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_impersonate_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_endImpersonation(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_endImpersonation(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Mutation().EndImpersonation(ctx)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.ImpersonationState) graphql.Marshaler {
+			return ec.marshalNImpersonationState2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐImpersonationState(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_endImpersonation(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_ImpersonationState(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_registerDeviceToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_registerDeviceToken(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().RegisterDeviceToken(ctx, fc.Args["token"].(string), fc.Args["platform"].(model.DevicePlatform))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+			return ec.marshalNBoolean2bool(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_registerDeviceToken(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_registerDeviceToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_unregisterDeviceToken(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_unregisterDeviceToken(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().UnregisterDeviceToken(ctx, fc.Args["token"].(string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+			return ec.marshalNBoolean2bool(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_unregisterDeviceToken(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_unregisterDeviceToken_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Mutation_createChatRoom(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -9285,6 +9737,70 @@ func (ec *executionContext) fieldContext_Query_chatRoom(ctx context.Context, fie
 	if fc.Args, err = ec.field_Query_chatRoom_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_myTagRoots(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_myTagRoots(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Query().MyTagRoots(ctx)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.Tag) graphql.Marshaler {
+			return ec.marshalNTag2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐTagᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_myTagRoots(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Tag(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_viewerImpersonationState(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_viewerImpersonationState(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Query().ViewerImpersonationState(ctx)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.ImpersonationState) graphql.Marshaler {
+			return ec.marshalNImpersonationState2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐImpersonationState(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_viewerImpersonationState(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_ImpersonationState(ctx, field)
+		},
 	}
 	return fc, nil
 }
@@ -13681,6 +14197,49 @@ func (ec *executionContext) _CommentEdge(ctx context.Context, sel ast.SelectionS
 	return out
 }
 
+var impersonationStateImplementors = []string{"ImpersonationState"}
+
+func (ec *executionContext) _ImpersonationState(ctx context.Context, sel ast.SelectionSet, obj *model.ImpersonationState) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, impersonationStateImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("ImpersonationState")
+		case "isImpersonating":
+			out.Values[i] = ec._ImpersonationState_isImpersonating(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "acting":
+			out.Values[i] = ec._ImpersonationState_acting(ctx, field, obj)
+		case "effective":
+			out.Values[i] = ec._ImpersonationState_effective(ctx, field, obj)
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferred), math.MaxInt32)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
 var loginPayloadImplementors = []string{"LoginPayload"}
 
 func (ec *executionContext) _LoginPayload(ctx context.Context, sel ast.SelectionSet, obj *model.LoginPayload) graphql.Marshaler {
@@ -14143,6 +14702,34 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "markAllNotificationsRead":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_markAllNotificationsRead(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "impersonate":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_impersonate(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "endImpersonation":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_endImpersonation(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "registerDeviceToken":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_registerDeviceToken(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "unregisterDeviceToken":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_unregisterDeviceToken(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -14924,6 +15511,50 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_chatRoom(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "myTagRoots":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_myTagRoots(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "viewerImpersonationState":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_viewerImpersonationState(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
 				return res
 			}
 
@@ -16380,6 +17011,16 @@ func (ec *executionContext) unmarshalNCreateTaskInput2githubᚗcomᚋbcnelsonᚋ
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNDevicePlatform2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐDevicePlatform(ctx context.Context, v any) (model.DevicePlatform, error) {
+	var res model.DevicePlatform
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNDevicePlatform2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐDevicePlatform(ctx context.Context, sel ast.SelectionSet, v model.DevicePlatform) graphql.Marshaler {
+	return v
+}
+
 func (ec *executionContext) unmarshalNEditPostInput2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐEditPostInput(ctx context.Context, v any) (model.EditPostInput, error) {
 	res, err := ec.unmarshalInputEditPostInput(ctx, v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -16455,6 +17096,20 @@ func (ec *executionContext) marshalNID2ᚕstringᚄ(ctx context.Context, sel ast
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalNImpersonationState2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐImpersonationState(ctx context.Context, sel ast.SelectionSet, v model.ImpersonationState) graphql.Marshaler {
+	return ec._ImpersonationState(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNImpersonationState2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐImpersonationState(ctx context.Context, sel ast.SelectionSet, v *model.ImpersonationState) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._ImpersonationState(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNInt2int(ctx context.Context, v any) (int, error) {

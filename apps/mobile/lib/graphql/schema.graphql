@@ -86,6 +86,12 @@ enum NotificationUrgency {
   LOW
 }
 
+enum DevicePlatform {
+  IOS
+  ANDROID
+  WEB
+}
+
 enum PostSort {
   RECENT
   ACTIVE
@@ -345,10 +351,29 @@ type Query {
   task(id: ID!): Task
   chatRoom(id: ID!): ChatRoom
 
+  """
+  Visible tag roots (tags with no parent, where the viewer holds any
+  grant). The Flutter client uses this to seed the tag-tree pane;
+  descendants come via Tag.children.
+  """
+  myTagRoots: [Tag!]!
+
+  """
+  Whether the viewer is currently impersonating someone else, and if
+  so, who. Drives the loud "acting as" banner in the Flutter shell.
+  """
+  viewerImpersonationState: ImpersonationState!
+
   notifications(first: Int, after: String, filter: NotificationFilter): NotificationConnection!
 
   search(query: String!, kinds: [SearchKind!], first: Int): SearchConnection!
   searchTags(query: String!, first: Int): [TagSearchHit!]!
+}
+
+type ImpersonationState {
+  isImpersonating: Boolean!
+  acting: Principal
+  effective: Principal
 }
 
 # ----- mutations -----
@@ -530,6 +555,24 @@ type Mutation {
 
   markNotificationRead(notificationIds: [ID!]!): Int!
   markAllNotificationsRead: Int!
+
+  """
+  Impersonate another principal for the current session. Reason is
+  recorded in audit. Only callers with a workspace admin grant on the
+  org root may impersonate. The session token does not rotate — the
+  same bearer continues to work, but acting/effective diverge until
+  endImpersonation is called.
+  """
+  impersonate(principalId: ID!, reason: String!): ImpersonationState!
+  endImpersonation: ImpersonationState!
+
+  """
+  Register the device's push token (FCM/APNs). Idempotent on (principal,
+  token). The notification fan-out worker uses these to send push
+  alerts for high-urgency notifications.
+  """
+  registerDeviceToken(token: String!, platform: DevicePlatform!): Boolean!
+  unregisterDeviceToken(token: String!): Boolean!
 
   createChatRoom(input: CreateChatRoomInput!): ChatRoom!
   addParticipant(roomId: ID!, principalId: ID!, role: String): ChatRoom!

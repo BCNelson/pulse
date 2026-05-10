@@ -27,10 +27,12 @@ import (
 	pulsedb "github.com/bcnelson/pulse/services/api/internal/db"
 	pulsegraphql "github.com/bcnelson/pulse/services/api/internal/graphql"
 	pulseloaders "github.com/bcnelson/pulse/services/api/internal/graphql/loaders"
+	pulseimpersonation "github.com/bcnelson/pulse/services/api/internal/impersonation"
 	pulsejob "github.com/bcnelson/pulse/services/api/internal/job"
 	pulsenotification "github.com/bcnelson/pulse/services/api/internal/notification"
 	pulseperm "github.com/bcnelson/pulse/services/api/internal/perm"
 	pulsepost "github.com/bcnelson/pulse/services/api/internal/post"
+	pulsepush "github.com/bcnelson/pulse/services/api/internal/push"
 	pulserealtime "github.com/bcnelson/pulse/services/api/internal/realtime"
 	pulsesearch "github.com/bcnelson/pulse/services/api/internal/search"
 	pulsetag "github.com/bcnelson/pulse/services/api/internal/tag"
@@ -84,13 +86,18 @@ func run(ctx context.Context, mode string, cfg appConfig, logger *slog.Logger, p
 	// agree on kinds. Even in --mode=api the registry exists so future
 	// in-process jobs (e.g. inline tests) can register, though only worker
 	// mode polls.
-	notifSvc := &pulsenotification.Service{DB: pool}
+	pushSvc := &pulsepush.Service{
+		DB:       pool,
+		Provider: &pulsepush.LogProvider{Logger: logger.With("component", "push")},
+		Logger:   logger.With("component", "push"),
+	}
+	notifSvc := &pulsenotification.Service{DB: pool, Push: pushSvc}
 	registry := pulsejob.NewRegistry()
 	registry.Register("notification.fanout", notifSvc.Handler)
 
 	if runAPI {
 		go func() {
-			errs <- runAPIServer(ctx, cfg, logger.With("component", "api"), pool, notifSvc)
+			errs <- runAPIServer(ctx, cfg, logger.With("component", "api"), pool, notifSvc, pushSvc)
 		}()
 	}
 	if runWorker {
@@ -110,9 +117,11 @@ func run(ctx context.Context, mode string, cfg appConfig, logger *slog.Logger, p
 	}
 }
 
-func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool *pgxpool.Pool, notifSvc *pulsenotification.Service) error {
+func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool *pgxpool.Pool, notifSvc *pulsenotification.Service, pushSvc *pulsepush.Service) error {
 	authSvc := &pulseauth.Service{DB: pool}
 	postSvc := &pulsepost.Service{DB: pool}
+	permSvc := &pulseperm.Service{DB: pool}
+	auditSvc := &pulseaudit.Service{DB: pool}
 
 	dispatcher, err := pulserealtime.New(ctx, cfg.databaseURL, logger.With("component", "realtime"))
 	if err != nil {
@@ -122,15 +131,17 @@ func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool 
 	resolver := &pulsegraphql.Resolver{
 		DB:            pool,
 		Auth:          authSvc,
-		Perm:          &pulseperm.Service{DB: pool},
+		Perm:          permSvc,
 		Tags:          &pulsetag.Service{DB: pool},
-		Audit:         &pulseaudit.Service{DB: pool},
+		Audit:         auditSvc,
 		Posts:         postSvc,
 		Comments:      &pulsecomment.Service{DB: pool},
 		Search:        &pulsesearch.Service{DB: pool},
 		Chat:          &pulsechat.Service{DB: pool, Posts: postSvc},
 		Tasks:         &pulsetask.Service{DB: pool},
 		Notifications: notifSvc,
+		Impersonation: &pulseimpersonation.Service{DB: pool, Perm: permSvc, Audit: auditSvc},
+		Push:          pushSvc,
 		Realtime:      dispatcher,
 	}
 

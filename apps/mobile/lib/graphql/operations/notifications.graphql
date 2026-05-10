@@ -1,0 +1,59 @@
+fragment NotificationSummary on Notification {
+  id
+  reason
+  urgency
+  sourceType
+  sourceId
+  readAt
+  createdAt
+  source {
+    __typename
+    ... on Post {
+      id
+      title
+    }
+    ... on Comment {
+      id
+      body
+    }
+    ... on Task {
+      id
+      title
+      status
+    }
+    ... on Message {
+      id
+      body
+    }
+  }
+  sourceTag {
+    id
+    slug
+    displayName
+  }
+}
+
+query NotificationsInbox($first: Int, $unreadOnly: Boolean) {
+  notifications(first: $first, filter: { unreadOnly: $unreadOnly }) {
+    unreadCount
+    edges {
+      node {
+        ...NotificationSummary
+      }
+    }
+  }
+}
+
+mutation MarkNotificationRead($ids: [ID!]!) {
+  markNotificationRead(notificationIds: $ids)
+}
+
+mutation MarkAllNotificationsRead {
+  markAllNotificationsRead
+}
+
+subscription NotificationReceived {
+  notificationReceived {
+    ...NotificationSummary
+  }
+}

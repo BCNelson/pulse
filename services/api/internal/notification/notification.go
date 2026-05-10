@@ -59,8 +59,21 @@ type Querier interface {
 	Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error)
 }
 
+// Pusher is what notification.fanout dispatches push notifications
+// through. internal/push.Service satisfies it; tests can substitute a
+// fake. The interface is declared here so the notification package
+// stays decoupled from the concrete provider.
+type Pusher interface {
+	Dispatch(ctx context.Context, notificationID uuid.UUID, title, body string) error
+}
+
 type Service struct {
 	DB *pgxpool.Pool
+
+	// Push is optional. When non-nil the fan-out handler dispatches a
+	// push for any high-urgency notification. v1 ships with a stub
+	// LogProvider so dev/test runs don't accidentally hit external APIs.
+	Push Pusher
 }
 
 // Recipient is the resolved target of a notification — recipient,
@@ -555,12 +568,17 @@ func (s *Service) subscriptionDecision(ctx context.Context, principal uuid.UUID,
 // writeAndNotify inserts notifications rows and emits one
 // notif.<principal_id> NOTIFY per recipient. Insert and NOTIFY happen in
 // the same transaction so a recipient that observes the NOTIFY can read
-// the row.
+// the row. After commit, high-urgency notifications fan out to push.
 func (s *Service) writeAndNotify(ctx context.Context, sourceType string, sourceID uuid.UUID, recipients []Recipient) error {
 	if len(recipients) == 0 {
 		return nil
 	}
-	return s.runInTx(ctx, func(tx pgx.Tx) error {
+	type written struct {
+		notifID uuid.UUID
+		urgency string
+	}
+	var pushTargets []written
+	err := s.runInTx(ctx, func(tx pgx.Tx) error {
 		for _, r := range recipients {
 			var notifID uuid.UUID
 			if err := tx.QueryRow(ctx, `
@@ -582,9 +600,42 @@ func (s *Service) writeAndNotify(ctx context.Context, sourceType string, sourceI
 			if _, err := tx.Exec(ctx, notifySQL, args...); err != nil {
 				return fmt.Errorf("pg_notify: %w", err)
 			}
+			if r.Urgency == UrgencyHigh {
+				pushTargets = append(pushTargets, written{notifID: notifID, urgency: r.Urgency})
+			}
 		}
 		return nil
 	})
+	if err != nil {
+		return err
+	}
+	// Push dispatch happens after commit so we never push a row that
+	// rolled back. Best-effort — failures don't fail the worker.
+	if s.Push != nil && len(pushTargets) > 0 {
+		title, body := pushSummary(sourceType, sourceID)
+		for _, t := range pushTargets {
+			_ = s.Push.Dispatch(ctx, t.notifID, title, body)
+		}
+	}
+	return nil
+}
+
+// pushSummary returns a generic title/body. v2 will pull the actual
+// content (post title, message body) but that requires a perm-checked
+// fetch — for v1, a generic summary is enough so the device can show
+// "Pulse" with a "View" affordance.
+func pushSummary(sourceType string, _ uuid.UUID) (string, string) {
+	switch sourceType {
+	case "task":
+		return "Pulse", "You have a new task update"
+	case "post":
+		return "Pulse", "New post in a tag you follow"
+	case "comment":
+		return "Pulse", "New comment on a thread you follow"
+	case "message":
+		return "Pulse", "New message"
+	}
+	return "Pulse", "New activity"
 }
 
 func (s *Service) runInTx(ctx context.Context, fn func(pgx.Tx) error) error {

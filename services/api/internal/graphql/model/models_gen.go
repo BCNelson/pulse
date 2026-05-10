@@ -146,6 +146,12 @@ type GrantTagInput struct {
 	Cascade     *bool            `json:"cascade,omitempty"`
 }
 
+type ImpersonationState struct {
+	IsImpersonating bool      `json:"isImpersonating"`
+	Acting          Principal `json:"acting,omitempty"`
+	Effective       Principal `json:"effective,omitempty"`
+}
+
 type LoginPayload struct {
 	Token     string    `json:"token"`
 	ExpiresAt time.Time `json:"expiresAt"`
@@ -469,6 +475,63 @@ func (e *DecisionStatus) UnmarshalJSON(b []byte) error {
 }
 
 func (e DecisionStatus) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type DevicePlatform string
+
+const (
+	DevicePlatformIos     DevicePlatform = "IOS"
+	DevicePlatformAndroid DevicePlatform = "ANDROID"
+	DevicePlatformWeb     DevicePlatform = "WEB"
+)
+
+var AllDevicePlatform = []DevicePlatform{
+	DevicePlatformIos,
+	DevicePlatformAndroid,
+	DevicePlatformWeb,
+}
+
+func (e DevicePlatform) IsValid() bool {
+	switch e {
+	case DevicePlatformIos, DevicePlatformAndroid, DevicePlatformWeb:
+		return true
+	}
+	return false
+}
+
+func (e DevicePlatform) String() string {
+	return string(e)
+}
+
+func (e *DevicePlatform) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = DevicePlatform(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid DevicePlatform", str)
+	}
+	return nil
+}
+
+func (e DevicePlatform) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *DevicePlatform) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e DevicePlatform) MarshalJSON() ([]byte, error) {
 	var buf bytes.Buffer
 	e.MarshalGQL(&buf)
 	return buf.Bytes(), nil

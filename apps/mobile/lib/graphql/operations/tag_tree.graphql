@@ -1,0 +1,35 @@
+fragment TagSummary on Tag {
+  id
+  slug
+  displayName
+  path
+  rootKind
+  archivedAt
+}
+
+query TagTree {
+  myTagRoots {
+    ...TagSummary
+    children {
+      ...TagSummary
+      children {
+        ...TagSummary
+        children {
+          ...TagSummary
+        }
+      }
+    }
+  }
+}
+
+query TagChildren($id: ID!) {
+  tag(id: $id) {
+    id
+    children {
+      ...TagSummary
+      children {
+        ...TagSummary
+      }
+    }
+  }
+}

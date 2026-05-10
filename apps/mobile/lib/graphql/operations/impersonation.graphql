@@ -1,0 +1,49 @@
+query ViewerImpersonationState {
+  viewerImpersonationState {
+    isImpersonating
+    acting {
+      id
+      displayName
+    }
+    effective {
+      id
+      displayName
+    }
+  }
+}
+
+mutation Impersonate($principalId: ID!, $reason: String!) {
+  impersonate(principalId: $principalId, reason: $reason) {
+    isImpersonating
+    acting {
+      id
+      displayName
+    }
+    effective {
+      id
+      displayName
+    }
+  }
+}
+
+mutation EndImpersonation {
+  endImpersonation {
+    isImpersonating
+    acting {
+      id
+      displayName
+    }
+    effective {
+      id
+      displayName
+    }
+  }
+}
+
+mutation RegisterDeviceToken($token: String!, $platform: DevicePlatform!) {
+  registerDeviceToken(token: $token, platform: $platform)
+}
+
+mutation UnregisterDeviceToken($token: String!) {
+  unregisterDeviceToken(token: $token)
+}

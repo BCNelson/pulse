@@ -217,6 +217,23 @@ class GNotificationUrgency extends EnumClass {
       _$gNotificationUrgencyValueOf(name);
 }
 
+class GDevicePlatform extends EnumClass {
+  const GDevicePlatform._(String name) : super(name);
+
+  static const GDevicePlatform IOS = _$gDevicePlatformIOS;
+
+  static const GDevicePlatform ANDROID = _$gDevicePlatformANDROID;
+
+  static const GDevicePlatform WEB = _$gDevicePlatformWEB;
+
+  static Serializer<GDevicePlatform> get serializer =>
+      _$gDevicePlatformSerializer;
+
+  static BuiltSet<GDevicePlatform> get values => _$gDevicePlatformValues;
+
+  static GDevicePlatform valueOf(String name) => _$gDevicePlatformValueOf(name);
+}
+
 class GPostSort extends EnumClass {
   const GPostSort._(String name) : super(name);
 

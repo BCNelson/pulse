@@ -5,3 +5,10 @@ analyzer:
     - "lib/**/__generated__/**"
     - "lib/**/*.gql.dart"
     - "lib/**/*.g.dart"
+
+linter:
+  rules:
+    # The codebase prefers grouping const inside larger non-const trees
+    # for readability; we don't lint each leaf.
+    prefer_const_constructors: false
+    prefer_const_literals_to_create_immutables: false
