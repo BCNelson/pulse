@@ -2,67 +2,136 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
-	"log"
+	"flag"
+	"fmt"
+	"log/slog"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
-	"github.com/graphql-go/graphql"
+	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/handler/extension"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
+	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	pulsedb "github.com/bcnelson/pulse/services/api/internal/db"
+	pulsegraphql "github.com/bcnelson/pulse/services/api/internal/graphql"
+	pulsejob "github.com/bcnelson/pulse/services/api/internal/job"
 )
 
-type graphQLRequest struct {
-	Query         string                 `json:"query"`
-	OperationName string                 `json:"operationName"`
-	Variables     map[string]interface{} `json:"variables"`
-}
+const (
+	modeAPI    = "api"
+	modeWorker = "worker"
+	modeBoth   = "both"
+)
 
 func main() {
-	ctx := context.Background()
+	mode := flag.String("mode", envOrDefault("PULSE_MODE", modeBoth), "process mode: api | worker | both")
+	flag.Parse()
 
 	cfg := configFromEnv()
-	db, err := pgxpool.New(ctx, cfg.databaseURL)
+	logger := slog.New(slog.NewJSONHandler(os.Stderr, nil))
+
+	rootCtx, cancel := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
+	defer cancel()
+
+	if err := pulsedb.Migrate(rootCtx, cfg.databaseURL, cfg.migrationsDir); err != nil {
+		logger.Error("apply migrations", "err", err)
+		os.Exit(1)
+	}
+
+	pool, err := pulsedb.NewPool(rootCtx, cfg.databaseURL)
 	if err != nil {
-		log.Fatalf("connect database: %v", err)
+		logger.Error("connect database", "err", err)
+		os.Exit(1)
 	}
-	defer db.Close()
+	defer pool.Close()
 
-	if err := db.Ping(ctx); err != nil {
-		log.Fatalf("ping database: %v", err)
+	if err := run(rootCtx, *mode, cfg, logger, pool); err != nil {
+		logger.Error("server exited with error", "err", err)
+		os.Exit(1)
+	}
+}
+
+func run(ctx context.Context, mode string, cfg appConfig, logger *slog.Logger, pool *pgxpool.Pool) error {
+	runAPI := mode == modeAPI || mode == modeBoth
+	runWorker := mode == modeWorker || mode == modeBoth
+	if !runAPI && !runWorker {
+		return fmt.Errorf("invalid mode %q (use api|worker|both)", mode)
 	}
 
-	schema, err := newSchema(db)
-	if err != nil {
-		log.Fatalf("create graphql schema: %v", err)
+	errs := make(chan error, 2)
+
+	if runAPI {
+		go func() { errs <- runAPIServer(ctx, cfg, logger.With("component", "api"), pool) }()
+	}
+	if runWorker {
+		worker := &pulsejob.Worker{DB: pool, Logger: logger.With("component", "worker")}
+		go func() { errs <- worker.Run(ctx) }()
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/healthz", healthHandler(db))
-	mux.HandleFunc("/graphql", graphQLHandler(schema))
+	select {
+	case <-ctx.Done():
+		return nil
+	case err := <-errs:
+		return err
+	}
+}
+
+func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool *pgxpool.Pool) error {
+	srv := handler.New(pulsegraphql.NewExecutableSchema(pulsegraphql.Config{
+		Resolvers: &pulsegraphql.Resolver{DB: pool},
+	}))
+	srv.AddTransport(transport.POST{})
+	srv.AddTransport(transport.Options{})
+	srv.AddTransport(transport.GET{})
+	srv.Use(extension.Introspection{})
+
+	r := chi.NewRouter()
+	r.Use(middleware.RealIP)
+	r.Use(middleware.RequestID)
+	r.Use(middleware.Recoverer)
+	r.Get("/healthz", healthHandler(pool))
+	r.Handle("/graphql", srv)
+	r.Get("/playground", playground.Handler("Pulse", "/graphql"))
 
 	server := &http.Server{
 		Addr:              cfg.apiAddr,
-		Handler:           mux,
+		Handler:           r,
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
-	log.Printf("listening on http://%s/graphql", cfg.apiAddr)
+	go func() {
+		<-ctx.Done()
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		_ = server.Shutdown(shutdownCtx)
+	}()
+
+	logger.Info("listening", "addr", cfg.apiAddr)
 	if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
-		log.Fatalf("serve api: %v", err)
+		return fmt.Errorf("listen: %w", err)
 	}
+	return nil
 }
 
 type appConfig struct {
-	apiAddr     string
-	databaseURL string
+	apiAddr       string
+	databaseURL   string
+	migrationsDir string
 }
 
 func configFromEnv() appConfig {
 	return appConfig{
-		apiAddr:     envOrDefault("API_ADDR", "127.0.0.1:8080"),
-		databaseURL: envOrDefault("DATABASE_URL", "postgres://pulse:pulse@127.0.0.1:5432/pulse?sslmode=disable"),
+		apiAddr:       envOrDefault("API_ADDR", "127.0.0.1:8080"),
+		databaseURL:   envOrDefault("DATABASE_URL", "postgres://pulse:pulse@127.0.0.1:5432/pulse?sslmode=disable"),
+		migrationsDir: envOrDefault("GOOSE_MIGRATION_DIR", "db/migrations"),
 	}
 }
 
@@ -73,80 +142,13 @@ func envOrDefault(key, fallback string) string {
 	return fallback
 }
 
-func healthHandler(db *pgxpool.Pool) http.HandlerFunc {
+func healthHandler(pool *pgxpool.Pool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodGet {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
-		}
-
-		if err := db.Ping(r.Context()); err != nil {
+		if err := pool.Ping(r.Context()); err != nil {
 			http.Error(w, "database unavailable", http.StatusServiceUnavailable)
 			return
 		}
-
 		w.Header().Set("Content-Type", "application/json")
-		_ = json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
+		_, _ = w.Write([]byte(`{"status":"ok"}`))
 	}
-}
-
-func graphQLHandler(schema graphql.Schema) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			w.WriteHeader(http.StatusMethodNotAllowed)
-			return
-		}
-
-		var req graphQLRequest
-		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-			http.Error(w, "invalid graphql request", http.StatusBadRequest)
-			return
-		}
-
-		result := graphql.Do(graphql.Params{
-			Schema:         schema,
-			RequestString:  req.Query,
-			OperationName:  req.OperationName,
-			VariableValues: req.Variables,
-			Context:        r.Context(),
-		})
-
-		status := http.StatusOK
-		if len(result.Errors) > 0 {
-			status = http.StatusBadRequest
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(status)
-		_ = json.NewEncoder(w).Encode(result)
-	}
-}
-
-func newSchema(db *pgxpool.Pool) (graphql.Schema, error) {
-	query := graphql.NewObject(graphql.ObjectConfig{
-		Name: "Query",
-		Fields: graphql.Fields{
-			"health": &graphql.Field{
-				Type: graphql.NewNonNull(graphql.String),
-				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					if err := db.Ping(params.Context); err != nil {
-						return nil, err
-					}
-					return "ok", nil
-				},
-			},
-			"serverTime": &graphql.Field{
-				Type: graphql.NewNonNull(graphql.String),
-				Resolve: func(params graphql.ResolveParams) (interface{}, error) {
-					var value time.Time
-					if err := db.QueryRow(params.Context, "SELECT now()").Scan(&value); err != nil {
-						return nil, err
-					}
-					return value.Format(time.RFC3339), nil
-				},
-			},
-		},
-	})
-
-	return graphql.NewSchema(graphql.SchemaConfig{Query: query})
 }

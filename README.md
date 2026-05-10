@@ -21,6 +21,9 @@ Run the Flutter app from another shell:
 
 ```sh
 devenv shell
+cd apps/mobile
+flutter create .            # one-time, creates platform folders (gitignored)
+dart run build_runner build # ferry codegen for GraphQL operations
 mobile
 ```
 
@@ -31,6 +34,15 @@ devenv test         # run go tests
 dbshell             # psql against the local pulse database
 migrate up          # apply pending migrations (also: down, status, create NAME sql)
 ```
+
+The Go API embeds Goose and applies pending migrations on startup, so `migrate up` is only needed when iterating on migrations outside of an API restart.
+
+GraphQL schema and operations are codegen'd:
+
+- API (Go): `cd services/api && go run github.com/99designs/gqlgen generate`
+- Mobile (Dart): `cd apps/mobile && dart run build_runner build`
+
+Generated files (`internal/graphql/generated.go`, `lib/**/__generated__/`) are committed.
 
 ## Environment overrides
 

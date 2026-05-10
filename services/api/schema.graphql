@@ -1,0 +1,14 @@
+"""
+Pulse GraphQL schema.
+
+M0 carries forward only the health-check surface from the bootstrap. Real
+domain types (Principal, Tag, Post, ...) land in M1 onward — see
+docs/technical-architecture-v1.md for the full v1 schema shape.
+"""
+
+scalar Time
+
+type Query {
+  health: String!
+  serverTime: Time!
+}

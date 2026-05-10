@@ -1,85 +1,84 @@
+import 'package:ferry/ferry.dart';
 import 'package:flutter/material.dart';
-import 'package:graphql_flutter/graphql_flutter.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gql_http_link/gql_http_link.dart';
+
+import 'graphql/operations/__generated__/health.data.gql.dart';
+import 'graphql/operations/__generated__/health.req.gql.dart';
+import 'graphql/operations/__generated__/health.var.gql.dart';
 
 const graphQLEndpoint = String.fromEnvironment(
   'GRAPHQL_ENDPOINT',
   defaultValue: 'http://127.0.0.1:8080/graphql',
 );
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await initHiveForFlutter();
+final ferryClientProvider = Provider<Client>((ref) {
+  final client = Client(link: HttpLink(graphQLEndpoint));
+  ref.onDispose(client.dispose);
+  return client;
+});
 
-  final client = ValueNotifier(
-    GraphQLClient(
-      link: HttpLink(graphQLEndpoint),
-      cache: GraphQLCache(store: HiveStore()),
-    ),
-  );
+final healthProvider =
+    StreamProvider<OperationResponse<GHealthData, GHealthVars>>((ref) {
+  final client = ref.watch(ferryClientProvider);
+  return client.request(GHealthReq());
+});
 
-  runApp(PulseApp(client: client));
+void main() {
+  runApp(const ProviderScope(child: PulseApp()));
 }
 
 class PulseApp extends StatelessWidget {
-  const PulseApp({super.key, required this.client});
-
-  final ValueNotifier<GraphQLClient> client;
+  const PulseApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return GraphQLProvider(
-      client: client,
-      child: MaterialApp(
-        title: 'Pulse',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1B7F79)),
-          useMaterial3: true,
-        ),
-        home: const HomeScreen(),
+    return MaterialApp(
+      title: 'Pulse',
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1B7F79)),
+        useMaterial3: true,
       ),
+      home: const HomeScreen(),
     );
   }
 }
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
-  static const healthQuery = '''
-    query Health {
-      health
-      serverTime
-    }
-  ''';
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncResp = ref.watch(healthProvider);
+
     return Scaffold(
       appBar: AppBar(title: const Text('Pulse')),
       body: Center(
-        child: Query(
-          options: QueryOptions(
-            document: gql(healthQuery),
-            pollInterval: const Duration(seconds: 10),
+        child: asyncResp.when(
+          loading: () => const CircularProgressIndicator(),
+          error: (err, _) => StatusPanel(
+            title: 'API unavailable',
+            subtitle: err.toString(),
+            onRefresh: () => ref.invalidate(healthProvider),
           ),
-          builder: (result, {fetchMore, refetch}) {
-            if (result.isLoading && result.data == null) {
-              return const CircularProgressIndicator();
-            }
-
-            final error = result.exception;
-            if (error != null) {
+          data: (resp) {
+            if (resp.hasErrors) {
+              final errors = resp.graphqlErrors
+                      ?.map((e) => e.message)
+                      .join('\n') ??
+                  resp.linkException?.toString() ??
+                  'unknown error';
               return StatusPanel(
-                title: 'API unavailable',
-                subtitle: error.toString(),
-                onRefresh: refetch,
+                title: 'API errors',
+                subtitle: errors,
+                onRefresh: () => ref.invalidate(healthProvider),
               );
             }
-
-            final data = result.data ?? {};
+            final data = resp.data;
             return StatusPanel(
-              title: 'API ${data['health'] ?? 'unknown'}',
-              subtitle: 'Server time: ${data['serverTime'] ?? '-'}',
-              onRefresh: refetch,
+              title: 'API ${data?.health ?? "unknown"}',
+              subtitle: 'Server time: ${data?.serverTime.value ?? "-"}',
+              onRefresh: () => ref.invalidate(healthProvider),
             );
           },
         ),
@@ -98,7 +97,7 @@ class StatusPanel extends StatelessWidget {
 
   final String title;
   final String subtitle;
-  final Future<QueryResult<Object?>> Function()? onRefresh;
+  final VoidCallback? onRefresh;
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +112,7 @@ class StatusPanel extends StatelessWidget {
           const SizedBox(height: 16),
           IconButton.filled(
             tooltip: 'Refresh',
-            onPressed: onRefresh == null ? null : () => onRefresh!(),
+            onPressed: onRefresh,
             icon: const Icon(Icons.refresh),
           ),
         ],

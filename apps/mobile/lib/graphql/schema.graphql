@@ -1,0 +1,12 @@
+"""
+Mirror of services/api/schema.graphql kept in lib/ so ferry codegen can read it.
+Keep them in sync — M0 carries forward only the health-check surface; later
+milestones extend both files together.
+"""
+
+scalar Time
+
+type Query {
+  health: String!
+  serverTime: Time!
+}

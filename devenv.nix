@@ -76,7 +76,7 @@
   '';
 
   processes.api = {
-    exec = "goose up && api";
+    exec = "api";
     process-compose.depends_on.postgres.condition = "process_healthy";
   };
 

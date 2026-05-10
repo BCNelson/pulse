@@ -27,3 +27,13 @@ apps/mobile/windows/
 
 # Postgres/devenv state
 .devenv-state/
+
+# Claude Code per-machine state
+.claude/
+
+# Nix-generated, machine-local
+local.properties
+
+# devenv git-hooks installs a symlink wherever it's activated; only the root copy is meaningful
+services/**/.pre-commit-config.yaml
+
