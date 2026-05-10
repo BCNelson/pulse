@@ -20,9 +20,13 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 
+	pulseaudit "github.com/bcnelson/pulse/services/api/internal/audit"
+	pulseauth "github.com/bcnelson/pulse/services/api/internal/auth"
 	pulsedb "github.com/bcnelson/pulse/services/api/internal/db"
 	pulsegraphql "github.com/bcnelson/pulse/services/api/internal/graphql"
 	pulsejob "github.com/bcnelson/pulse/services/api/internal/job"
+	pulseperm "github.com/bcnelson/pulse/services/api/internal/perm"
+	pulsetag "github.com/bcnelson/pulse/services/api/internal/tag"
 )
 
 const (
@@ -85,20 +89,33 @@ func run(ctx context.Context, mode string, cfg appConfig, logger *slog.Logger, p
 }
 
 func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool *pgxpool.Pool) error {
+	authSvc := &pulseauth.Service{DB: pool}
+	resolver := &pulsegraphql.Resolver{
+		DB:    pool,
+		Auth:  authSvc,
+		Perm:  &pulseperm.Service{DB: pool},
+		Tag:   &pulsetag.Service{DB: pool},
+		Audit: &pulseaudit.Service{DB: pool},
+	}
+
 	srv := handler.New(pulsegraphql.NewExecutableSchema(pulsegraphql.Config{
-		Resolvers: &pulsegraphql.Resolver{DB: pool},
+		Resolvers: resolver,
 	}))
 	srv.AddTransport(transport.POST{})
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
 	srv.Use(extension.Introspection{})
 
+	// Per-request perm cache wraps every GraphQL operation; auth middleware
+	// resolves bearer/cookie -> Identity before the resolver runs.
+	gql := pulseperm.WithRequestCacheMiddleware(authSvc.HTTPMiddleware(srv))
+
 	r := chi.NewRouter()
 	r.Use(middleware.RealIP)
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Recoverer)
 	r.Get("/healthz", healthHandler(pool))
-	r.Handle("/graphql", srv)
+	r.Handle("/graphql", gql)
 	r.Get("/playground", playground.Handler("Pulse", "/graphql"))
 
 	server := &http.Server{

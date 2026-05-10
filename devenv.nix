@@ -32,6 +32,7 @@
     APP_ENV = "development";
     API_ADDR = "127.0.0.1:8080";
     DATABASE_URL = "postgres://pulse:pulse@127.0.0.1:5432/pulse?sslmode=disable";
+    PULSE_TEST_DB_URL = "postgres://pulse:pulse@127.0.0.1:5432/pulse_test?sslmode=disable";
     GRAPHQL_ENDPOINT = "http://127.0.0.1:8080/graphql";
     GOCACHE = "${config.env.DEVENV_STATE}/go-cache";
     GOMODCACHE = "${config.env.DEVENV_STATE}/go-mod-cache";
@@ -48,6 +49,11 @@
     initialDatabases = [
       {
         name = "pulse";
+        user = "pulse";
+        pass = "pulse";
+      }
+      {
+        name = "pulse_test";
         user = "pulse";
         pass = "pulse";
       }
@@ -72,7 +78,9 @@
   '';
 
   scripts.test.exec = ''
-    go test ./services/api/...
+    # -p 1 serializes test packages so they don't deadlock on the shared
+    # test database. Per-package isolation via TRUNCATE assumes one writer.
+    go test -p 1 ./services/api/...
   '';
 
   processes.api = {
@@ -91,7 +99,7 @@
   '';
 
   enterTest = ''
-    go test ./services/api/...
+    go test -p 1 ./services/api/...
   '';
 
   git-hooks.hooks = {

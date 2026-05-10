@@ -2,5 +2,406 @@
 
 package model
 
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"strconv"
+	"time"
+)
+
+type Principal interface {
+	IsPrincipal()
+	GetID() string
+	GetGlobalURI() string
+	GetKind() PrincipalKind
+	GetStatus() PrincipalStatus
+	GetDisplayName() string
+	GetHomeTag() *Tag
+}
+
+type Bot struct {
+	ID             string          `json:"id"`
+	GlobalURI      string          `json:"globalUri"`
+	Kind           PrincipalKind   `json:"kind"`
+	Status         PrincipalStatus `json:"status"`
+	DisplayName    string          `json:"displayName"`
+	HomeTag        *Tag            `json:"homeTag,omitempty"`
+	OwnerPrincipal Principal       `json:"ownerPrincipal,omitempty"`
+}
+
+func (Bot) IsPrincipal()                    {}
+func (this Bot) GetID() string              { return this.ID }
+func (this Bot) GetGlobalURI() string       { return this.GlobalURI }
+func (this Bot) GetKind() PrincipalKind     { return this.Kind }
+func (this Bot) GetStatus() PrincipalStatus { return this.Status }
+func (this Bot) GetDisplayName() string     { return this.DisplayName }
+func (this Bot) GetHomeTag() *Tag           { return this.HomeTag }
+
+type CreateTagInput struct {
+	ParentID    string  `json:"parentId"`
+	Slug        string  `json:"slug"`
+	DisplayName string  `json:"displayName"`
+	Defaults    *string `json:"defaults,omitempty"`
+}
+
+type GrantTagInput struct {
+	TagID       string           `json:"tagId"`
+	PrincipalID string           `json:"principalId"`
+	Bundle      PermissionBundle `json:"bundle"`
+	Extras      []string         `json:"extras,omitempty"`
+	Cascade     *bool            `json:"cascade,omitempty"`
+}
+
+type LoginPayload struct {
+	Token     string    `json:"token"`
+	ExpiresAt time.Time `json:"expiresAt"`
+	Viewer    *User     `json:"viewer"`
+}
+
+type Mutation struct {
+}
+
 type Query struct {
+}
+
+type SubscribeTagInput struct {
+	TagID        string               `json:"tagId"`
+	Cascade      *bool                `json:"cascade,omitempty"`
+	Urgency      *SubscriptionUrgency `json:"urgency,omitempty"`
+	ReasonFilter []string             `json:"reasonFilter,omitempty"`
+}
+
+type Tag struct {
+	ID             string           `json:"id"`
+	GlobalURI      string           `json:"globalUri"`
+	Slug           string           `json:"slug"`
+	DisplayName    string           `json:"displayName"`
+	Path           string           `json:"path"`
+	RootKind       TagRootKind      `json:"rootKind"`
+	Parent         *Tag             `json:"parent,omitempty"`
+	Children       []*Tag           `json:"children"`
+	Defaults       string           `json:"defaults"`
+	ArchivedAt     *time.Time       `json:"archivedAt,omitempty"`
+	CreatedAt      time.Time        `json:"createdAt"`
+	MyPermissions  *TagPermissions  `json:"myPermissions"`
+	MySubscription *TagSubscription `json:"mySubscription,omitempty"`
+}
+
+// Per-viewer permission summary on a tag. Computed alongside the tag fetch
+// so clients don't make a separate round trip.
+type TagPermissions struct {
+	Bundle        *PermissionBundle `json:"bundle,omitempty"`
+	Extras        []string          `json:"extras"`
+	CanView       bool              `json:"canView"`
+	CanContribute bool              `json:"canContribute"`
+	CanModerate   bool              `json:"canModerate"`
+	CanOwn        bool              `json:"canOwn"`
+}
+
+type TagSubscription struct {
+	Cascade      bool                `json:"cascade"`
+	Urgency      SubscriptionUrgency `json:"urgency"`
+	ReasonFilter []string            `json:"reasonFilter"`
+}
+
+type User struct {
+	ID          string          `json:"id"`
+	GlobalURI   string          `json:"globalUri"`
+	Kind        PrincipalKind   `json:"kind"`
+	Status      PrincipalStatus `json:"status"`
+	DisplayName string          `json:"displayName"`
+	HomeTag     *Tag            `json:"homeTag,omitempty"`
+	Email       *string         `json:"email,omitempty"`
+}
+
+func (User) IsPrincipal()                    {}
+func (this User) GetID() string              { return this.ID }
+func (this User) GetGlobalURI() string       { return this.GlobalURI }
+func (this User) GetKind() PrincipalKind     { return this.Kind }
+func (this User) GetStatus() PrincipalStatus { return this.Status }
+func (this User) GetDisplayName() string     { return this.DisplayName }
+func (this User) GetHomeTag() *Tag           { return this.HomeTag }
+
+type PermissionBundle string
+
+const (
+	PermissionBundleViewer      PermissionBundle = "VIEWER"
+	PermissionBundleContributor PermissionBundle = "CONTRIBUTOR"
+	PermissionBundleModerator   PermissionBundle = "MODERATOR"
+	PermissionBundleOwner       PermissionBundle = "OWNER"
+)
+
+var AllPermissionBundle = []PermissionBundle{
+	PermissionBundleViewer,
+	PermissionBundleContributor,
+	PermissionBundleModerator,
+	PermissionBundleOwner,
+}
+
+func (e PermissionBundle) IsValid() bool {
+	switch e {
+	case PermissionBundleViewer, PermissionBundleContributor, PermissionBundleModerator, PermissionBundleOwner:
+		return true
+	}
+	return false
+}
+
+func (e PermissionBundle) String() string {
+	return string(e)
+}
+
+func (e *PermissionBundle) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PermissionBundle(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PermissionBundle", str)
+	}
+	return nil
+}
+
+func (e PermissionBundle) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *PermissionBundle) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e PermissionBundle) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type PrincipalKind string
+
+const (
+	PrincipalKindUser PrincipalKind = "USER"
+	PrincipalKindBot  PrincipalKind = "BOT"
+)
+
+var AllPrincipalKind = []PrincipalKind{
+	PrincipalKindUser,
+	PrincipalKindBot,
+}
+
+func (e PrincipalKind) IsValid() bool {
+	switch e {
+	case PrincipalKindUser, PrincipalKindBot:
+		return true
+	}
+	return false
+}
+
+func (e PrincipalKind) String() string {
+	return string(e)
+}
+
+func (e *PrincipalKind) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PrincipalKind(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PrincipalKind", str)
+	}
+	return nil
+}
+
+func (e PrincipalKind) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *PrincipalKind) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e PrincipalKind) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type PrincipalStatus string
+
+const (
+	PrincipalStatusActive     PrincipalStatus = "ACTIVE"
+	PrincipalStatusTombstoned PrincipalStatus = "TOMBSTONED"
+)
+
+var AllPrincipalStatus = []PrincipalStatus{
+	PrincipalStatusActive,
+	PrincipalStatusTombstoned,
+}
+
+func (e PrincipalStatus) IsValid() bool {
+	switch e {
+	case PrincipalStatusActive, PrincipalStatusTombstoned:
+		return true
+	}
+	return false
+}
+
+func (e PrincipalStatus) String() string {
+	return string(e)
+}
+
+func (e *PrincipalStatus) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = PrincipalStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid PrincipalStatus", str)
+	}
+	return nil
+}
+
+func (e PrincipalStatus) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *PrincipalStatus) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e PrincipalStatus) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type SubscriptionUrgency string
+
+const (
+	SubscriptionUrgencyHigh   SubscriptionUrgency = "HIGH"
+	SubscriptionUrgencyNormal SubscriptionUrgency = "NORMAL"
+	SubscriptionUrgencyLow    SubscriptionUrgency = "LOW"
+	SubscriptionUrgencyMute   SubscriptionUrgency = "MUTE"
+)
+
+var AllSubscriptionUrgency = []SubscriptionUrgency{
+	SubscriptionUrgencyHigh,
+	SubscriptionUrgencyNormal,
+	SubscriptionUrgencyLow,
+	SubscriptionUrgencyMute,
+}
+
+func (e SubscriptionUrgency) IsValid() bool {
+	switch e {
+	case SubscriptionUrgencyHigh, SubscriptionUrgencyNormal, SubscriptionUrgencyLow, SubscriptionUrgencyMute:
+		return true
+	}
+	return false
+}
+
+func (e SubscriptionUrgency) String() string {
+	return string(e)
+}
+
+func (e *SubscriptionUrgency) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = SubscriptionUrgency(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid SubscriptionUrgency", str)
+	}
+	return nil
+}
+
+func (e SubscriptionUrgency) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *SubscriptionUrgency) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e SubscriptionUrgency) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
+}
+
+type TagRootKind string
+
+const (
+	TagRootKindOrg  TagRootKind = "ORG"
+	TagRootKindUser TagRootKind = "USER"
+)
+
+var AllTagRootKind = []TagRootKind{
+	TagRootKindOrg,
+	TagRootKindUser,
+}
+
+func (e TagRootKind) IsValid() bool {
+	switch e {
+	case TagRootKindOrg, TagRootKindUser:
+		return true
+	}
+	return false
+}
+
+func (e TagRootKind) String() string {
+	return string(e)
+}
+
+func (e *TagRootKind) UnmarshalGQL(v any) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = TagRootKind(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid TagRootKind", str)
+	}
+	return nil
+}
+
+func (e TagRootKind) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+func (e *TagRootKind) UnmarshalJSON(b []byte) error {
+	s, err := strconv.Unquote(string(b))
+	if err != nil {
+		return err
+	}
+	return e.UnmarshalGQL(s)
+}
+
+func (e TagRootKind) MarshalJSON() ([]byte, error) {
+	var buf bytes.Buffer
+	e.MarshalGQL(&buf)
+	return buf.Bytes(), nil
 }

@@ -1,14 +1,173 @@
 """
-Pulse GraphQL schema.
+Pulse GraphQL schema (M1).
 
-M0 carries forward only the health-check surface from the bootstrap. Real
-domain types (Principal, Tag, Post, ...) land in M1 onward — see
-docs/technical-architecture-v1.md for the full v1 schema shape.
+Surfaces the identity + tag + permission spine. Posts/comments/chat/tasks
+land in M2+. Real-time GraphQL subscriptions land in M3.
+
+Errors: M1 surfaces typed failures (PermissionDenied, NotFound, Conflict)
+through standard GraphQL errors. M2 may switch hot mutations to result-
+envelope unions if the typed-error pattern proves insufficient.
 """
 
 scalar Time
+scalar JSON
+
+# ----- enums -----
+
+enum TagRootKind {
+  ORG
+  USER
+}
+
+enum PermissionBundle {
+  VIEWER
+  CONTRIBUTOR
+  MODERATOR
+  OWNER
+}
+
+enum SubscriptionUrgency {
+  HIGH
+  NORMAL
+  LOW
+  MUTE
+}
+
+enum PrincipalKind {
+  USER
+  BOT
+}
+
+enum PrincipalStatus {
+  ACTIVE
+  TOMBSTONED
+}
+
+# ----- types -----
+
+interface Principal {
+  id: ID!
+  globalUri: String!
+  kind: PrincipalKind!
+  status: PrincipalStatus!
+  displayName: String!
+  homeTag: Tag
+}
+
+type User implements Principal {
+  id: ID!
+  globalUri: String!
+  kind: PrincipalKind!
+  status: PrincipalStatus!
+  displayName: String!
+  homeTag: Tag
+  email: String
+}
+
+type Bot implements Principal {
+  id: ID!
+  globalUri: String!
+  kind: PrincipalKind!
+  status: PrincipalStatus!
+  displayName: String!
+  homeTag: Tag
+  ownerPrincipal: Principal
+}
+
+"""
+Per-viewer permission summary on a tag. Computed alongside the tag fetch
+so clients don't make a separate round trip.
+"""
+type TagPermissions {
+  bundle: PermissionBundle
+  extras: [String!]!
+  canView: Boolean!
+  canContribute: Boolean!
+  canModerate: Boolean!
+  canOwn: Boolean!
+}
+
+type TagSubscription {
+  cascade: Boolean!
+  urgency: SubscriptionUrgency!
+  reasonFilter: [String!]!
+}
+
+type Tag {
+  id: ID!
+  globalUri: String!
+  slug: String!
+  displayName: String!
+  path: String!
+  rootKind: TagRootKind!
+  parent: Tag
+  children: [Tag!]!
+  defaults: JSON!
+  archivedAt: Time
+  createdAt: Time!
+  myPermissions: TagPermissions!
+  mySubscription: TagSubscription
+}
+
+# ----- queries -----
 
 type Query {
   health: String!
   serverTime: Time!
+
+  """
+  The signed-in viewer. Returns null when the request is anonymous.
+  """
+  viewer: User
+
+  """
+  Look up a tag by id. Returns null when the tag is not visible to the viewer
+  (we conflate not-found with not-visible to avoid leaking existence).
+  """
+  tag(id: ID!): Tag
+}
+
+# ----- mutations -----
+
+input CreateTagInput {
+  parentId: ID!
+  slug: String!
+  displayName: String!
+  defaults: JSON
+}
+
+input GrantTagInput {
+  tagId: ID!
+  principalId: ID!
+  bundle: PermissionBundle!
+  extras: [String!]
+  cascade: Boolean
+}
+
+input SubscribeTagInput {
+  tagId: ID!
+  cascade: Boolean
+  urgency: SubscriptionUrgency
+  reasonFilter: [String!]
+}
+
+type LoginPayload {
+  token: String!
+  expiresAt: Time!
+  viewer: User!
+}
+
+type Mutation {
+  login(email: String!, password: String!): LoginPayload!
+  logout: Boolean!
+
+  createTag(input: CreateTagInput!): Tag!
+  moveTag(tagId: ID!, newParentId: ID!, reason: String): Tag!
+  archiveTag(tagId: ID!): Tag!
+
+  grantTag(input: GrantTagInput!): Tag!
+  revokeTagGrant(tagId: ID!, principalId: ID!): Tag!
+
+  subscribeTag(input: SubscribeTagInput!): TagSubscription!
+  unsubscribeTag(tagId: ID!): Boolean!
 }

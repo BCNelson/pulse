@@ -7,8 +7,351 @@ package graphql
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"time"
+
+	"github.com/google/uuid"
+
+	"github.com/bcnelson/pulse/services/api/internal/audit"
+	"github.com/bcnelson/pulse/services/api/internal/auth"
+	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
+	"github.com/bcnelson/pulse/services/api/internal/perm"
+	"github.com/bcnelson/pulse/services/api/internal/tag"
 )
+
+// Login is the resolver for the login field.
+func (r *mutationResolver) Login(ctx context.Context, email string, password string) (*model.LoginPayload, error) {
+	userAgent := ""
+	issued, principalID, err := r.Auth.Login(ctx, email, password, userAgent)
+	if err != nil {
+		if errors.Is(err, auth.ErrInvalidCredentials) {
+			return nil, fmt.Errorf("invalid credentials")
+		}
+		return nil, err
+	}
+	user, err := r.loadUser(ctx, principalID)
+	if err != nil {
+		return nil, err
+	}
+	return &model.LoginPayload{
+		Token:     issued.Token,
+		ExpiresAt: issued.ExpiresAt,
+		Viewer:    user,
+	}, nil
+}
+
+// Logout is the resolver for the logout field.
+func (r *mutationResolver) Logout(ctx context.Context) (bool, error) {
+	// Token cannot be retrieved from ctx in M1 (we only stash Identity).
+	// For now Logout requires the bearer to be present in context as a
+	// stash; see TODO in middleware. Returning true unconditionally so the
+	// client can drop its token even if server-side revocation is deferred.
+	// M5 will tighten this once impersonation/elevated-session columns land.
+	identity := auth.FromContext(ctx)
+	if identity.IsAnonymous() {
+		return false, nil
+	}
+	if token, ok := tokenFromContext(ctx); ok {
+		if err := r.Auth.Logout(ctx, token); err != nil {
+			return false, err
+		}
+	}
+	return true, nil
+}
+
+// CreateTag is the resolver for the createTag field.
+func (r *mutationResolver) CreateTag(ctx context.Context, input model.CreateTagInput) (*model.Tag, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	parentID, err := uuid.Parse(input.ParentID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid parentId: %w", err)
+	}
+	// Authorization: must contribute on the parent.
+	can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionContribute, parentID)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	defaults, err := jsonOrEmpty(input.Defaults)
+	if err != nil {
+		return nil, err
+	}
+
+	id, err := r.Tag.Create(ctx, tag.CreateInput{
+		ParentID:    &parentID,
+		Slug:        input.Slug,
+		DisplayName: input.DisplayName,
+		RootKind:    tag.RootKindOrg,
+		Defaults:    defaults,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action:     "tag.create",
+		TargetType: "tag",
+		TargetID:   id,
+		Diff:       json.RawMessage(fmt.Sprintf(`{"parent_id":"%s","slug":%q}`, parentID, input.Slug)),
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadTag(ctx, id)
+}
+
+// MoveTag is the resolver for the moveTag field.
+func (r *mutationResolver) MoveTag(ctx context.Context, tagID string, newParentID string, reason *string) (*model.Tag, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	src, err := uuid.Parse(tagID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tagId: %w", err)
+	}
+	dst, err := uuid.Parse(newParentID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid newParentId: %w", err)
+	}
+
+	// Per architecture Q1: authority check on both source and destination.
+	canSrc, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionOwn, src)
+	if err != nil {
+		return nil, err
+	}
+	canDst, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionOwn, dst)
+	if err != nil {
+		return nil, err
+	}
+	if !canSrc || !canDst {
+		return nil, errPermissionDenied
+	}
+
+	// TODO(M4): for large subtree*principals products, enqueue a permission-diff job
+	// instead of computing inline. M1 always inlines; we accept the latency budget
+	// for tags below the architecture's stated comfort threshold.
+	gained, lost, err := r.computePermissionDiff(ctx, src, dst)
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Tag.Move(ctx, src, dst); err != nil {
+		return nil, err
+	}
+	diff, _ := json.Marshal(map[string]any{
+		"gained": gained,
+		"lost":   lost,
+	})
+	reasonStr := ""
+	if reason != nil {
+		reasonStr = *reason
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action:     "tag.move",
+		TargetType: "tag",
+		TargetID:   src,
+		Diff:       diff,
+		Reason:     reasonStr,
+	}); err != nil {
+		return nil, err
+	}
+	if _, err := r.DB.Exec(ctx, `SELECT pg_notify('tag.' || $1::text || '.structure', $2)`,
+		src, fmt.Sprintf(`{"kind":"moved","tag_id":"%s","new_parent_id":"%s"}`, src, dst)); err != nil {
+		return nil, err
+	}
+	return r.loadTag(ctx, src)
+}
+
+// ArchiveTag is the resolver for the archiveTag field.
+func (r *mutationResolver) ArchiveTag(ctx context.Context, tagID string) (*model.Tag, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	id, err := uuid.Parse(tagID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tagId: %w", err)
+	}
+	can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionOwn, id)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if err := r.Tag.Archive(ctx, id); err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action:     "tag.archive",
+		TargetType: "tag",
+		TargetID:   id,
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadTag(ctx, id)
+}
+
+// GrantTag is the resolver for the grantTag field.
+func (r *mutationResolver) GrantTag(ctx context.Context, input model.GrantTagInput) (*model.Tag, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tagID, err := uuid.Parse(input.TagID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tagId: %w", err)
+	}
+	principalID, err := uuid.Parse(input.PrincipalID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid principalId: %w", err)
+	}
+	// Granting on a tag requires moderate-or-better on that tag.
+	can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionModerate, tagID)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	cascade := true
+	if input.Cascade != nil {
+		cascade = *input.Cascade
+	}
+	extras := input.Extras
+	if extras == nil {
+		extras = []string{}
+	}
+	bundleDB := mapBundleGQLToDB(input.Bundle)
+	_, err = r.DB.Exec(ctx, `
+        INSERT INTO tag_grants (tag_id, principal_id, bundle, extra_perms, cascade, granted_by)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        ON CONFLICT (tag_id, principal_id) DO UPDATE
+            SET bundle = EXCLUDED.bundle,
+                extra_perms = EXCLUDED.extra_perms,
+                cascade = EXCLUDED.cascade,
+                granted_by = EXCLUDED.granted_by
+    `, tagID, principalID, string(bundleDB), extras, cascade, identity.EffectiveID)
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action:     "tag.grant",
+		TargetType: "tag",
+		TargetID:   tagID,
+		Diff:       json.RawMessage(fmt.Sprintf(`{"principal_id":"%s","bundle":%q,"cascade":%t}`, principalID, bundleDB, cascade)),
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadTag(ctx, tagID)
+}
+
+// RevokeTagGrant is the resolver for the revokeTagGrant field.
+func (r *mutationResolver) RevokeTagGrant(ctx context.Context, tagID string, principalID string) (*model.Tag, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tID, err := uuid.Parse(tagID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tagId: %w", err)
+	}
+	pID, err := uuid.Parse(principalID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid principalId: %w", err)
+	}
+	can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionModerate, tID)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	if _, err := r.DB.Exec(ctx,
+		`DELETE FROM tag_grants WHERE tag_id = $1 AND principal_id = $2`, tID, pID); err != nil {
+		return nil, err
+	}
+	if err := r.Audit.Write(ctx, audit.Event{
+		Action:     "tag.revoke",
+		TargetType: "tag",
+		TargetID:   tID,
+		Diff:       json.RawMessage(fmt.Sprintf(`{"principal_id":"%s"}`, pID)),
+	}); err != nil {
+		return nil, err
+	}
+	return r.loadTag(ctx, tID)
+}
+
+// SubscribeTag is the resolver for the subscribeTag field.
+func (r *mutationResolver) SubscribeTag(ctx context.Context, input model.SubscribeTagInput) (*model.TagSubscription, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tagID, err := uuid.Parse(input.TagID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tagId: %w", err)
+	}
+	can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionView, tagID)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	cascade := true
+	if input.Cascade != nil {
+		cascade = *input.Cascade
+	}
+	urgency := model.SubscriptionUrgencyNormal
+	if input.Urgency != nil {
+		urgency = *input.Urgency
+	}
+	reasonFilter := input.ReasonFilter
+	if reasonFilter == nil {
+		reasonFilter = []string{}
+	}
+	urgDB := mapUrgencyGQLToDB(urgency)
+	if _, err := r.DB.Exec(ctx, `
+        INSERT INTO subscriptions (principal_id, tag_id, cascade, urgency, reason_filter)
+        VALUES ($1, $2, $3, $4, $5)
+        ON CONFLICT (principal_id, tag_id) DO UPDATE
+            SET cascade = EXCLUDED.cascade,
+                urgency = EXCLUDED.urgency,
+                reason_filter = EXCLUDED.reason_filter
+    `, identity.EffectiveID, tagID, cascade, urgDB, reasonFilter); err != nil {
+		return nil, err
+	}
+	return &model.TagSubscription{
+		Cascade:      cascade,
+		Urgency:      urgency,
+		ReasonFilter: reasonFilter,
+	}, nil
+}
+
+// UnsubscribeTag is the resolver for the unsubscribeTag field.
+func (r *mutationResolver) UnsubscribeTag(ctx context.Context, tagID string) (bool, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return false, err
+	}
+	tID, err := uuid.Parse(tagID)
+	if err != nil {
+		return false, fmt.Errorf("invalid tagId: %w", err)
+	}
+	if _, err := r.DB.Exec(ctx,
+		`DELETE FROM subscriptions WHERE principal_id = $1 AND tag_id = $2`,
+		identity.EffectiveID, tID); err != nil {
+		return false, err
+	}
+	return true, nil
+}
 
 // Health is the resolver for the health field.
 func (r *queryResolver) Health(ctx context.Context) (string, error) {
@@ -27,7 +370,110 @@ func (r *queryResolver) ServerTime(ctx context.Context) (*time.Time, error) {
 	return &value, nil
 }
 
+// Viewer is the resolver for the viewer field.
+func (r *queryResolver) Viewer(ctx context.Context) (*model.User, error) {
+	id := auth.FromContext(ctx)
+	if id.IsAnonymous() {
+		return nil, nil
+	}
+	return r.loadUser(ctx, id.EffectiveID)
+}
+
+// Tag is the resolver for the tag field.
+func (r *queryResolver) Tag(ctx context.Context, id string) (*model.Tag, error) {
+	tagID, err := uuid.Parse(id)
+	if err != nil {
+		return nil, fmt.Errorf("invalid id: %w", err)
+	}
+	return r.loadTag(ctx, tagID)
+}
+
+// Mutation returns MutationResolver implementation.
+func (r *Resolver) Mutation() MutationResolver { return &mutationResolver{r} }
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
+type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
+
+// --- shared helpers ---
+
+var errPermissionDenied = errors.New("permission denied")
+
+func requireIdentity(ctx context.Context) (auth.Identity, error) {
+	id := auth.FromContext(ctx)
+	if id.IsAnonymous() {
+		return id, fmt.Errorf("authentication required")
+	}
+	return id, nil
+}
+
+// computePermissionDiff captures the (principal -> gained|lost) delta a
+// tag move induces. M1 implementation walks every principal with a grant
+// touching either subtree and re-evaluates effective permission before
+// and after. Cheap on small subtrees; a job-queue path for big ones lands
+// in M4.
+func (r *Resolver) computePermissionDiff(ctx context.Context, src, dst uuid.UUID) ([]map[string]string, []map[string]string, error) {
+	// Snapshot principals affected: anyone with a grant on src's subtree, plus
+	// anyone with a grant on dst's ancestors.
+	rows, err := r.DB.Query(ctx, `
+        WITH affected_principals AS (
+          SELECT DISTINCT g.principal_id
+          FROM tag_grants g
+          JOIN tag_closure c ON c.ancestor_id = g.tag_id
+          WHERE c.descendant_id IN (SELECT descendant_id FROM tag_closure WHERE ancestor_id = $1)
+             OR c.descendant_id = $2
+             OR c.ancestor_id  IN (SELECT ancestor_id FROM tag_closure WHERE descendant_id = $2)
+        )
+        SELECT principal_id FROM affected_principals
+    `, src, dst)
+	if err != nil {
+		return nil, nil, err
+	}
+	defer rows.Close()
+	var principals []uuid.UUID
+	for rows.Next() {
+		var pid uuid.UUID
+		if err := rows.Scan(&pid); err != nil {
+			return nil, nil, err
+		}
+		principals = append(principals, pid)
+	}
+	// For each principal, compute effective on every descendant of src
+	// before the move. After the move we'll re-evaluate; but Move() runs
+	// in a separate transaction so we can't cleanly do "before/after"
+	// without a savepoint. Pragmatic M1 approach: record "principals
+	// involved" as the diff payload — full before/after diff lands in M5
+	// when impersonation tooling needs the audit trail to be richer.
+	gained := []map[string]string{}
+	lost := []map[string]string{}
+	for _, pid := range principals {
+		bundle, _, err := r.Perm.EffectiveOnTag(ctx, pid, src)
+		if err != nil {
+			return nil, nil, err
+		}
+		// Without a precise before/after, mark each affected principal as
+		// "may have changed" with their current bundle. Honest signal,
+		// inexpensive to compute; M5 sharpens this.
+		entry := map[string]string{"principal_id": pid.String(), "bundle": string(bundle)}
+		gained = append(gained, entry)
+	}
+	return gained, lost, nil
+}
+
+// tokenFromContext is a placeholder for retrieving the bearer/cookie token
+// the request arrived with. Wired up properly when the middleware stores
+// the raw token alongside the resolved Identity (M5 — needed for impersonation).
+type tokenCtxKey struct{}
+
+func tokenFromContext(ctx context.Context) (string, bool) {
+	v, ok := ctx.Value(tokenCtxKey{}).(string)
+	return v, ok
+}
+
+// WithToken is exported so the auth middleware can stash the raw token
+// alongside Identity. Callers should treat the token as opaque.
+func WithToken(ctx context.Context, token string) context.Context {
+	return context.WithValue(ctx, tokenCtxKey{}, token)
+}
