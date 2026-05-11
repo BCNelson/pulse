@@ -6,6 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/ferry_client.dart';
 import '../../core/selection.dart';
+import '../../design/atoms/pulse_kbd.dart';
+import '../../design/atoms/pulse_section_head.dart';
+import '../../design/tokens.dart';
+import '../../design/typography.dart';
 import '../../graphql/operations/__generated__/search.req.gql.dart';
 
 /// CommandPaletteOverlay wraps the app and listens for Cmd/Ctrl+K to
@@ -20,8 +24,7 @@ class CommandPaletteOverlay extends ConsumerStatefulWidget {
       _CommandPaletteOverlayState();
 }
 
-class _CommandPaletteOverlayState
-    extends ConsumerState<CommandPaletteOverlay> {
+class _CommandPaletteOverlayState extends ConsumerState<CommandPaletteOverlay> {
   bool _open = false;
 
   void _toggle() => setState(() => _open = !_open);
@@ -29,6 +32,7 @@ class _CommandPaletteOverlayState
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
     return CallbackShortcuts(
       bindings: {
         const SingleActivator(LogicalKeyboardKey.keyK, control: true): _toggle,
@@ -45,9 +49,11 @@ class _CommandPaletteOverlayState
                 child: GestureDetector(
                   onTap: _close,
                   child: Container(
-                    color: Colors.black54,
+                    color: t.isDark
+                        ? Colors.black.withValues(alpha: 0.7)
+                        : Colors.black.withValues(alpha: 0.35),
                     alignment: Alignment.topCenter,
-                    padding: const EdgeInsets.only(top: 80),
+                    padding: const EdgeInsets.only(top: 64),
                     child: GestureDetector(
                       onTap: () {},
                       child: ConstrainedBox(
@@ -95,31 +101,117 @@ class _PaletteState extends ConsumerState<_Palette> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      borderRadius: BorderRadius.circular(12),
-      elevation: 8,
-      child: SizedBox(
-        height: 480,
+    final t = context.tokens;
+    return Container(
+      height: 480,
+      margin: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: t.paper,
+        border: Border.all(color: t.hair),
+        borderRadius: BorderRadius.circular(t.radiusLg),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: t.isDark ? 0.5 : 0.12),
+            blurRadius: 24,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(t.radiusLg),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: TextField(
-                controller: _controller,
-                autofocus: true,
-                decoration: const InputDecoration(
-                  prefixIcon: Icon(Icons.search),
-                  hintText: 'Search tags or content...',
-                  border: OutlineInputBorder(),
-                ),
-                onChanged: _onChanged,
+            // Search input
+            Container(
+              padding: const EdgeInsets.fromLTRB(14, 12, 12, 12),
+              decoration: BoxDecoration(
+                color: t.paper,
+                border: Border(bottom: BorderSide(color: t.hair2)),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    '⌘',
+                    style: TextStyle(
+                      fontFamily: pulseMonoFamily,
+                      fontSize: 14,
+                      color: t.ink3,
+                      height: 1.0,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: TextField(
+                      controller: _controller,
+                      autofocus: true,
+                      style: TextStyle(fontSize: 14, color: t.ink),
+                      decoration: InputDecoration(
+                        hintText: 'jump or search…',
+                        hintStyle: TextStyle(color: t.ink3, fontSize: 14),
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        filled: false,
+                        isCollapsed: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      onChanged: _onChanged,
+                    ),
+                  ),
+                  const PulseKbd('esc'),
+                ],
               ),
             ),
-            const Divider(height: 1),
             Expanded(
-              child: _query.isEmpty
-                  ? const Center(child: Text('Type to search.'))
-                  : _Results(query: _query, onClose: widget.onClose),
+              child: Container(
+                color: t.paper,
+                child: _query.isEmpty
+                    ? Center(
+                        child: Text(
+                          'type to search · tags, posts, comments',
+                          style: TextStyle(
+                            fontFamily: pulseMonoFamily,
+                            fontSize: 11,
+                            color: t.ink3,
+                          ),
+                        ),
+                      )
+                    : _Results(query: _query, onClose: widget.onClose),
+              ),
+            ),
+            // Footer hint strip
+            Container(
+              height: 28,
+              padding: const EdgeInsets.symmetric(horizontal: 14),
+              decoration: BoxDecoration(
+                color: t.paper2,
+                border: Border(top: BorderSide(color: t.hair2)),
+              ),
+              child: Row(
+                children: [
+                  const PulseKbd('↵'),
+                  const SizedBox(width: 6),
+                  Text(
+                    'open',
+                    style: TextStyle(
+                      fontFamily: pulseMonoFamily,
+                      fontSize: 10.5,
+                      color: t.ink3,
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  const PulseKbd('↑↓'),
+                  const SizedBox(width: 6),
+                  Text(
+                    'navigate',
+                    style: TextStyle(
+                      fontFamily: pulseMonoFamily,
+                      fontSize: 10.5,
+                      color: t.ink3,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -138,8 +230,9 @@ class _Results extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final client = ref.watch(ferryClientProvider);
     return ListView(
+      padding: const EdgeInsets.only(bottom: 6),
       children: [
-        _SectionHeader(title: 'Tags'),
+        const PulseSectionHead(title: 'TAGS'),
         StreamBuilder(
           stream: client.request(
             GSearchTagsReq(
@@ -151,21 +244,18 @@ class _Results extends ConsumerWidget {
           builder: (context, snap) {
             final hits = snap.data?.data?.searchTags.toList() ?? [];
             if (hits.isEmpty) {
-              return const ListTile(
-                dense: true,
-                title: Text('No tag matches', style: TextStyle(fontStyle: FontStyle.italic)),
-              );
+              return _Empty(label: 'no tag matches');
             }
             return Column(
               children: [
                 for (final hit in hits)
-                  ListTile(
-                    dense: true,
-                    leading: const Icon(Icons.label_outline),
-                    title: Text(hit.tag.displayName),
-                    subtitle: Text(hit.tag.path),
+                  _ResultRow(
+                    prefix: '#',
+                    title: hit.tag.displayName,
+                    subtitle: hit.tag.path,
                     onTap: () {
-                      ref.read(selectedTagIdProvider.notifier).state = hit.tag.id;
+                      ref.read(selectedTagIdProvider.notifier).state =
+                          hit.tag.id;
                       onClose();
                     },
                   ),
@@ -173,8 +263,7 @@ class _Results extends ConsumerWidget {
             );
           },
         ),
-        const Divider(),
-        _SectionHeader(title: 'Posts & comments'),
+        const PulseSectionHead(title: 'POSTS · COMMENTS'),
         StreamBuilder(
           stream: client.request(
             GSearchReq(
@@ -186,19 +275,15 @@ class _Results extends ConsumerWidget {
           builder: (context, snap) {
             final edges = snap.data?.data?.search.edges.toList() ?? [];
             if (edges.isEmpty) {
-              return const ListTile(
-                dense: true,
-                title: Text('No content matches', style: TextStyle(fontStyle: FontStyle.italic)),
-              );
+              return _Empty(label: 'no content matches');
             }
             return Column(
               children: [
                 for (final edge in edges)
-                  ListTile(
-                    dense: true,
-                    leading: const Icon(Icons.article_outlined),
-                    title: Text(_titleOf(edge.node) ?? '(untitled)'),
-                    subtitle: Text(edge.node.G__typename),
+                  _ResultRow(
+                    prefix: _prefixOf(edge.node.G__typename),
+                    title: _titleOf(edge.node) ?? '(untitled)',
+                    subtitle: edge.node.G__typename.toLowerCase(),
                     onTap: () {
                       final id = _idOf(edge.node);
                       if (id != null) {
@@ -213,6 +298,21 @@ class _Results extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  String _prefixOf(String typename) {
+    switch (typename) {
+      case 'Post':
+        return '¶';
+      case 'Comment':
+        return '↳';
+      case 'Task':
+        return '☐';
+      case 'Message':
+        return '✉';
+      default:
+        return '·';
+    }
   }
 
   String? _titleOf(dynamic node) {
@@ -236,21 +336,96 @@ class _Results extends ConsumerWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title});
+class _ResultRow extends StatelessWidget {
+  const _ResultRow({
+    required this.prefix,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
 
+  final String prefix;
   final String title;
+  final String subtitle;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-              color: Theme.of(context).colorScheme.outline,
-              fontWeight: FontWeight.w700,
+    final t = context.tokens;
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 18,
+              child: Text(
+                prefix,
+                style: TextStyle(
+                  fontFamily: pulseMonoFamily,
+                  fontSize: 12,
+                  color: t.ink3,
+                  height: 1.0,
+                ),
+              ),
             ),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: t.ink,
+                      fontWeight: FontWeight.w500,
+                      height: 1.3,
+                    ),
+                  ),
+                  if (subtitle.isNotEmpty)
+                    Text(
+                      subtitle,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontFamily: pulseMonoFamily,
+                        fontSize: 10.5,
+                        color: t.ink3,
+                        height: 1.3,
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _Empty extends StatelessWidget {
+  const _Empty({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 6, 14, 6),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontFamily: pulseMonoFamily,
+          fontSize: 11,
+          color: t.ink3,
+          fontStyle: FontStyle.italic,
+        ),
       ),
     );
   }

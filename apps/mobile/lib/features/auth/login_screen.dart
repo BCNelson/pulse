@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/auth_controller.dart';
+import '../../design/atoms/pulse_button.dart';
+import '../../design/tokens.dart';
+import '../../design/typography.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -46,7 +49,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
     return Scaffold(
+      backgroundColor: t.paper,
       body: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 360),
@@ -58,26 +63,73 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Pulse', style: Theme.of(context).textTheme.headlineLarge),
+                  Row(
+                    children: [
+                      Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          color: t.ink,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'pulse',
+                        style: TextStyle(
+                          fontFamily: pulseMonoFamily,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.04 * 18,
+                          color: t.ink,
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: 24),
+                  Text(
+                    'sign in',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w600,
+                      color: t.ink,
+                      letterSpacing: -0.012 * 28,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'workplace · posts · chat',
+                    style: TextStyle(
+                      fontFamily: pulseMonoFamily,
+                      fontSize: 11,
+                      color: t.ink3,
+                      letterSpacing: 0.04 * 11,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  _Label(label: 'EMAIL'),
                   TextFormField(
                     controller: _emailController,
                     autofocus: true,
                     keyboardType: TextInputType.emailAddress,
                     autofillHints: const [AutofillHints.email],
-                    decoration: const InputDecoration(labelText: 'Email'),
-                    validator: (v) =>
-                        (v == null || v.trim().isEmpty) ? 'Email required' : null,
+                    style: TextStyle(fontSize: 13, color: t.ink),
+                    decoration: const InputDecoration(),
+                    validator: (v) => (v == null || v.trim().isEmpty)
+                        ? 'email required'
+                        : null,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
+                  _Label(label: 'PASSWORD'),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: true,
                     autofillHints: const [AutofillHints.password],
-                    decoration: const InputDecoration(labelText: 'Password'),
+                    style: TextStyle(fontSize: 13, color: t.ink),
+                    decoration: const InputDecoration(),
                     onFieldSubmitted: (_) => _submit(),
                     validator: (v) =>
-                        (v == null || v.isEmpty) ? 'Password required' : null,
+                        (v == null || v.isEmpty) ? 'password required' : null,
                   ),
                   const SizedBox(height: 16),
                   if (_error != null)
@@ -85,23 +137,49 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Text(
                         _error!,
-                        style: TextStyle(color: Theme.of(context).colorScheme.error),
+                        style: TextStyle(
+                          fontFamily: pulseMonoFamily,
+                          fontSize: 11,
+                          color: t.amberInk,
+                        ),
                       ),
                     ),
-                  FilledButton(
-                    onPressed: _busy ? null : _submit,
-                    child: _busy
-                        ? const SizedBox(
-                            height: 18,
-                            width: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Sign in'),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: PulseButton(
+                      label: _busy ? 'Signing in…' : 'Sign in',
+                      variant: PulseButtonVariant.primary,
+                      onPressed: _busy ? null : _submit,
+                      kbdHint: '↩',
+                    ),
                   ),
                 ],
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Label extends StatelessWidget {
+  const _Label({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = context.tokens;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontFamily: pulseMonoFamily,
+          fontSize: 10,
+          color: t.ink3,
+          letterSpacing: 0.08 * 10,
         ),
       ),
     );

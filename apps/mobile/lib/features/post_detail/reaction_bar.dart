@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/ferry_client.dart';
+import '../../design/tokens.dart';
+import '../../design/typography.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
 
 typedef ReactionInfo = ({String emoji, int count, bool byViewer});
@@ -65,26 +67,37 @@ class _ReactionChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
     final count = info?.count ?? 0;
     final byViewer = info?.byViewer ?? false;
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(999),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
         decoration: BoxDecoration(
-          color: byViewer
-              ? Theme.of(context).colorScheme.primaryContainer
-              : Theme.of(context).colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(16),
+          color: byViewer ? t.paper2 : t.paper,
+          border: Border.all(
+            color: byViewer ? t.ink : t.hair,
+            width: byViewer ? 1.2 : 1.0,
+          ),
+          borderRadius: BorderRadius.circular(999),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 16)),
+            Text(emoji, style: const TextStyle(fontSize: 13, height: 1.0)),
             if (count > 0) ...[
               const SizedBox(width: 4),
-              Text('$count'),
+              Text(
+                '$count',
+                style: TextStyle(
+                  fontFamily: pulseMonoFamily,
+                  fontSize: 10.5,
+                  color: t.ink2,
+                  height: 1.0,
+                ),
+              ),
             ],
           ],
         ),

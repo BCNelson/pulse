@@ -52,6 +52,9 @@ abstract class GPostsForTagData_tag
   @BuiltValueField(wireName: '__typename')
   String get G__typename;
   String get id;
+  String get slug;
+  String get displayName;
+  String get path;
   GPostsForTagData_tag_posts get posts;
   static Serializer<GPostsForTagData_tag> get serializer =>
       _$gPostsForTagDataTagSerializer;

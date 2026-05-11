@@ -1,0 +1,20 @@
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o ./tmp/pulse-api ./cmd/api"
+  bin = "./tmp/pulse-api"
+  include_ext = ["go", "graphql", "sql"]
+  exclude_dir = ["tmp", "internal/graphql/__generated", ".git"]
+  exclude_file = ["internal/graphql/generated.go"]
+  exclude_regex = ["_test\\.go$"]
+  delay = 500
+  send_interrupt = true
+  kill_delay = "10s"
+  stop_on_error = false
+
+[log]
+  time = false
+
+[misc]
+  clean_on_exit = true

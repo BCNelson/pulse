@@ -34,8 +34,7 @@ class AuthSignedIn extends AuthState {
 class AuthController extends Notifier<AuthState> {
   late final AuthStorage _storage;
 
-  String? get token =>
-      switch (state) { AuthSignedIn s => s.token, _ => null };
+  String? get token => switch (state) { AuthSignedIn s => s.token, _ => null };
 
   @override
   AuthState build() {

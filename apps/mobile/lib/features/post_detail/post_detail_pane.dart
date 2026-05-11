@@ -3,6 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/ferry_client.dart';
 import '../../core/selection.dart';
+import '../../design/atoms/pulse_avatar.dart';
+import '../../design/atoms/pulse_section_head.dart';
+import '../../design/tokens.dart';
+import '../../design/typography.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
 import '../composer/comment_composer.dart';
 import 'reaction_bar.dart';
@@ -12,16 +16,28 @@ class PostDetailPane extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.tokens;
     final postId = ref.watch(selectedPostIdProvider);
     if (postId == null) {
-      return const Center(
-        child: Padding(
-          padding: EdgeInsets.all(24),
-          child: Text('Pick a post to read it.', textAlign: TextAlign.center),
+      return Container(
+        color: t.paper,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Text(
+              'pick a post to read it',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: pulseMonoFamily,
+                fontSize: 12,
+                color: t.ink3,
+              ),
+            ),
+          ),
         ),
       );
     }
-    return _PostDetail(postId: postId);
+    return Container(color: t.paper, child: _PostDetail(postId: postId));
   }
 }
 
@@ -30,8 +46,28 @@ class _PostDetail extends ConsumerWidget {
 
   final String postId;
 
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return '··';
+    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
+    return (parts.first.substring(0, 1) + parts.last.substring(0, 1))
+        .toUpperCase();
+  }
+
+  String _shortWhen(String iso) {
+    final parsed = DateTime.tryParse(iso);
+    if (parsed == null) return '';
+    final diff = DateTime.now().toUtc().difference(parsed.toUtc());
+    if (diff.inMinutes < 1) return 'just now';
+    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
+    if (diff.inDays < 1) return '${diff.inHours}h ago';
+    if (diff.inDays < 7) return '${diff.inDays}d ago';
+    return '${(diff.inDays / 7).floor()}w ago';
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.tokens;
     final client = ref.watch(ferryClientProvider);
     final req = GPostDetailReq((b) => b..vars.id = postId);
     return StreamBuilder(
@@ -40,7 +76,13 @@ class _PostDetail extends ConsumerWidget {
         final resp = snap.data;
         final data = resp?.data;
         if (snap.connectionState == ConnectionState.waiting && data == null) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2, color: t.ink2),
+            ),
+          );
         }
         if (resp != null && resp.hasErrors) {
           return Center(
@@ -50,72 +92,160 @@ class _PostDetail extends ConsumerWidget {
                 resp.graphqlErrors?.map((e) => e.message).join('\n') ??
                     'unknown error',
                 textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: pulseMonoFamily,
+                  fontSize: 11,
+                  color: t.ink2,
+                ),
               ),
             ),
           );
         }
         final post = data?.post;
         if (post == null) {
-          return const Center(child: Text('Post not found or hidden.'));
+          return Center(
+            child: Text(
+              'post not found or hidden',
+              style: TextStyle(
+                fontFamily: pulseMonoFamily,
+                fontSize: 12,
+                color: t.ink3,
+              ),
+            ),
+          );
         }
         return Column(
           children: [
             Expanded(
               child: ListView(
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.zero,
                 children: [
-                  Text(
-                    post.title,
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'By ${post.author.displayName}',
-                    style: Theme.of(context).textTheme.bodySmall,
-                  ),
-                  const SizedBox(height: 16),
-                  Text(post.body),
-                  const SizedBox(height: 12),
-                  ReactionBar(
-                    postId: post.id,
-                    reactions: post.reactions
-                        .map((r) => (
-                              emoji: r.emoji,
-                              count: r.count,
-                              byViewer: r.byViewer,
-                            ))
-                        .toList(),
-                  ),
-                  const Divider(height: 32),
-                  Text(
-                    'Comments (${post.comments.edges.length})',
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                  const SizedBox(height: 8),
-                  for (final edge in post.comments.edges)
-                    Padding(
-                      padding: EdgeInsets.only(left: 16.0 * edge.node.depth),
-                      child: Card(
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                edge.node.author.displayName,
-                                style: Theme.of(context).textTheme.bodySmall,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(edge.node.body),
-                            ],
+                  // Hero post block
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(22, 16, 22, 14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 1),
+                          decoration: BoxDecoration(
+                            color: t.ink,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                          child: Text(
+                            'POST',
+                            style: TextStyle(
+                              fontFamily: pulseMonoFamily,
+                              fontSize: 9.5,
+                              color: t.paper,
+                              letterSpacing: 0.10 * 9.5,
+                            ),
                           ),
                         ),
+                        const SizedBox(height: 8),
+                        Text(post.title,
+                            style: Theme.of(context).textTheme.headlineMedium),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            PulseAvatar(
+                                initials: _initials(post.author.displayName)),
+                            const SizedBox(width: 8),
+                            Text(
+                              post.author.displayName,
+                              style: pulseMono(context, size: 11, color: t.ink),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '· ${_shortWhen(post.createdAt.value)}',
+                              style:
+                                  pulseMono(context, size: 11, color: t.ink3),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Text(
+                          post.body,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                        const SizedBox(height: 10),
+                        ReactionBar(
+                          postId: post.id,
+                          reactions: post.reactions
+                              .map((r) => (
+                                    emoji: r.emoji,
+                                    count: r.count,
+                                    byViewer: r.byViewer,
+                                  ))
+                              .toList(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Divider(height: 1, color: t.hair2),
+                  PulseSectionHead.inbox(
+                    title: 'COMMENTS',
+                    count: post.comments.edges.length,
+                  ),
+                  for (final edge in post.comments.edges)
+                    Container(
+                      padding: EdgeInsets.fromLTRB(
+                        22 + 16.0 * edge.node.depth,
+                        10,
+                        22,
+                        10,
+                      ),
+                      decoration: BoxDecoration(
+                        border: Border(bottom: BorderSide(color: t.hair2)),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          PulseAvatar(
+                            initials: _initials(edge.node.author.displayName),
+                            size: PulseAvatarSize.sm,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
+                                  children: [
+                                    Text(
+                                      edge.node.author.displayName,
+                                      style: pulseMono(context,
+                                          size: 11,
+                                          color: t.ink,
+                                          weight: FontWeight.w600),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Text(
+                                      '· ${_shortWhen(edge.node.createdAt.value)}',
+                                      style: pulseMono(context,
+                                          size: 11, color: t.ink3),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  edge.node.body,
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                 ],
               ),
             ),
-            const Divider(height: 1),
+            Divider(height: 1, color: t.hair2),
             CommentComposer(postId: post.id),
           ],
         );

@@ -192,6 +192,13 @@ class _$GPostsForTagData_tagSerializer
           specifiedType: const FullType(String)),
       'id',
       serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
       'posts',
       serializers.serialize(object.posts,
           specifiedType: const FullType(GPostsForTagData_tag_posts)),
@@ -218,6 +225,18 @@ class _$GPostsForTagData_tagSerializer
           break;
         case 'id':
           result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
         case 'posts':
@@ -3325,6 +3344,12 @@ class _$GPostsForTagData_tag extends GPostsForTagData_tag {
   @override
   final String id;
   @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+  @override
   final GPostsForTagData_tag_posts posts;
 
   factory _$GPostsForTagData_tag(
@@ -3332,7 +3357,12 @@ class _$GPostsForTagData_tag extends GPostsForTagData_tag {
       (GPostsForTagData_tagBuilder()..update(updates))._build();
 
   _$GPostsForTagData_tag._(
-      {required this.G__typename, required this.id, required this.posts})
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path,
+      required this.posts})
       : super._();
   @override
   GPostsForTagData_tag rebuild(
@@ -3349,6 +3379,9 @@ class _$GPostsForTagData_tag extends GPostsForTagData_tag {
     return other is GPostsForTagData_tag &&
         G__typename == other.G__typename &&
         id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path &&
         posts == other.posts;
   }
 
@@ -3357,6 +3390,9 @@ class _$GPostsForTagData_tag extends GPostsForTagData_tag {
     var _$hash = 0;
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
     _$hash = $jc(_$hash, posts.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -3367,6 +3403,9 @@ class _$GPostsForTagData_tag extends GPostsForTagData_tag {
     return (newBuiltValueToStringHelper(r'GPostsForTagData_tag')
           ..add('G__typename', G__typename)
           ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path)
           ..add('posts', posts))
         .toString();
   }
@@ -3384,6 +3423,18 @@ class GPostsForTagData_tagBuilder
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
   GPostsForTagData_tag_postsBuilder? _posts;
   GPostsForTagData_tag_postsBuilder get posts =>
       _$this._posts ??= GPostsForTagData_tag_postsBuilder();
@@ -3398,6 +3449,9 @@ class GPostsForTagData_tagBuilder
     if ($v != null) {
       _G__typename = $v.G__typename;
       _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
       _posts = $v.posts.toBuilder();
       _$v = null;
     }
@@ -3426,6 +3480,12 @@ class GPostsForTagData_tagBuilder
                 G__typename, r'GPostsForTagData_tag', 'G__typename'),
             id: BuiltValueNullFieldError.checkNotNull(
                 id, r'GPostsForTagData_tag', 'id'),
+            slug: BuiltValueNullFieldError.checkNotNull(
+                slug, r'GPostsForTagData_tag', 'slug'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName, r'GPostsForTagData_tag', 'displayName'),
+            path: BuiltValueNullFieldError.checkNotNull(
+                path, r'GPostsForTagData_tag', 'path'),
             posts: posts.build(),
           );
     } catch (_) {

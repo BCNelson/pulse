@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/auth_controller.dart';
 import 'core/outbox_replay.dart';
+import 'design/theme_controller.dart';
+import 'design/themes.dart';
 import 'features/auth/login_screen.dart';
 import 'features/shell/three_pane_shell.dart';
 
@@ -10,17 +12,15 @@ void main() {
   runApp(const ProviderScope(child: PulseApp()));
 }
 
-class PulseApp extends StatelessWidget {
+class PulseApp extends ConsumerWidget {
   const PulseApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeKey = ref.watch(pulseThemeControllerProvider);
     return MaterialApp(
       title: 'Pulse',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1B7F79)),
-        useMaterial3: true,
-      ),
+      theme: pulseTheme(themeKey),
       home: const AuthGate(),
     );
   }

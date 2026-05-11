@@ -8,6 +8,7 @@
 # Go
 bin/
 coverage.out
+services/api/tmp/
 
 # Flutter/Dart
 .dart_tool/

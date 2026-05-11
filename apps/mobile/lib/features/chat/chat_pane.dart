@@ -3,6 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/ferry_client.dart';
 import '../../core/selection.dart';
+import '../../design/atoms/pulse_chat_msg.dart';
+import '../../design/atoms/pulse_day_divider.dart';
+import '../../design/atoms/pulse_page_head.dart';
+import '../../design/tokens.dart';
+import '../../design/typography.dart';
 import '../../graphql/operations/__generated__/chat.req.gql.dart';
 import 'message_added_listener.dart';
 
@@ -11,24 +16,30 @@ class ChatPane extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.tokens;
     final roomId = ref.watch(selectedRoomIdProvider);
-    return LayoutBuilder(
-      builder: (context, c) {
-        if (c.maxWidth >= 720) {
-          return Row(
-            children: [
-              const SizedBox(width: 280, child: _RoomList()),
-              const VerticalDivider(width: 1),
-              Expanded(
-                child: roomId == null
-                    ? const _RoomPlaceholder()
-                    : _RoomDetail(roomId: roomId),
-              ),
-            ],
-          );
-        }
-        return roomId == null ? const _RoomList() : _RoomDetail(roomId: roomId);
-      },
+    return Container(
+      color: t.paper,
+      child: LayoutBuilder(
+        builder: (context, c) {
+          if (c.maxWidth >= 720) {
+            return Row(
+              children: [
+                const SizedBox(width: 280, child: _RoomList()),
+                VerticalDivider(width: 1, color: t.hair, thickness: 1),
+                Expanded(
+                  child: roomId == null
+                      ? const _RoomPlaceholder()
+                      : _RoomDetail(roomId: roomId),
+                ),
+              ],
+            );
+          }
+          return roomId == null
+              ? const _RoomList()
+              : _RoomDetail(roomId: roomId);
+        },
+      ),
     );
   }
 }
@@ -38,16 +49,30 @@ class _RoomList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // M5.A doesn't ship a "list rooms" query — we'd need a new resolver
-    // for that. For now show a placeholder and let users navigate via
-    // notifications or DMs created elsewhere; M5.B/M5.C extend this.
-    return const Center(
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Text(
-          'Room list lands in M5.B+ — open a room from a notification.',
-          textAlign: TextAlign.center,
-        ),
+    final t = context.tokens;
+    return Container(
+      color: t.paper2,
+      child: Column(
+        children: [
+          const PulsePageHead(title: 'Chat', subtitle: 'rooms · DMs'),
+          Expanded(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Text(
+                  'Room list lands in M5.B+\nopen a room from a notification.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontFamily: pulseMonoFamily,
+                    fontSize: 11,
+                    color: t.ink3,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -58,8 +83,16 @@ class _RoomPlaceholder extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Pick a room.'),
+    final t = context.tokens;
+    return Center(
+      child: Text(
+        'pick a room',
+        style: TextStyle(
+          fontFamily: pulseMonoFamily,
+          fontSize: 12,
+          color: t.ink3,
+        ),
+      ),
     );
   }
 }
@@ -101,11 +134,40 @@ class _RoomDetailState extends ConsumerState<_RoomDetail> {
     }
   }
 
+  String _initials(String name) {
+    final parts = name.trim().split(RegExp(r'\s+'));
+    if (parts.isEmpty || parts.first.isEmpty) return '··';
+    if (parts.length == 1) return parts.first.substring(0, 1).toUpperCase();
+    return (parts.first.substring(0, 1) + parts.last.substring(0, 1))
+        .toUpperCase();
+  }
+
+  String _shortTime(String iso) {
+    final parsed = DateTime.tryParse(iso);
+    if (parsed == null) return '';
+    final local = parsed.toLocal();
+    return '${local.hour.toString().padLeft(2, '0')}:${local.minute.toString().padLeft(2, '0')}';
+  }
+
+  String _dayLabel(DateTime d) {
+    final today = DateTime.now();
+    if (d.year == today.year && d.month == today.month && d.day == today.day) {
+      return 'TODAY';
+    }
+    final yesterday = today.subtract(const Duration(days: 1));
+    if (d.year == yesterday.year &&
+        d.month == yesterday.month &&
+        d.day == yesterday.day) {
+      return 'YESTERDAY';
+    }
+    return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+  }
+
   @override
   Widget build(BuildContext context) {
-    // Live-tail messages.
     ref.listen(messageAddedListenerProvider(widget.roomId), (_, __) {});
 
+    final t = context.tokens;
     final client = ref.watch(ferryClientProvider);
     final req = GChatRoomDetailReq((b) => b..vars.id = widget.roomId);
     return StreamBuilder(
@@ -114,59 +176,133 @@ class _RoomDetailState extends ConsumerState<_RoomDetail> {
         final data = snap.data?.data;
         final room = data?.chatRoom;
         if (room == null) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: SizedBox(
+              width: 18,
+              height: 18,
+              child: CircularProgressIndicator(strokeWidth: 2, color: t.ink2),
+            ),
+          );
+        }
+        // Build day-grouped widget list.
+        final children = <Widget>[];
+        DateTime? lastDay;
+        for (final edge in room.messages.edges) {
+          final created = DateTime.tryParse(edge.node.createdAt.value);
+          if (created != null) {
+            final day = DateTime(created.year, created.month, created.day);
+            if (lastDay == null || day != lastDay) {
+              children.add(PulseDayDivider(label: _dayLabel(day)));
+              lastDay = day;
+            }
+          }
+          children.add(PulseChatMsg(
+            who: edge.node.author.displayName,
+            initials: _initials(edge.node.author.displayName),
+            text: edge.node.body,
+            when: _shortTime(edge.node.createdAt.value),
+          ));
         }
         return Column(
           children: [
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(8),
+            // Header
+            Container(
+              padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
+              decoration: BoxDecoration(
+                color: t.paper,
+                border: Border(bottom: BorderSide(color: t.hair2)),
+              ),
+              child: Row(
                 children: [
-                  for (final edge in room.messages.edges)
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              edge.node.author.displayName,
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(edge.node.body),
-                          ],
+                  Container(
+                    width: 7,
+                    height: 7,
+                    decoration: BoxDecoration(
+                      color: t.green,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: t.greenSoft,
+                          blurRadius: 0,
+                          spreadRadius: 2,
                         ),
-                      ),
+                      ],
                     ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'live',
+                    style: pulseMono(context, size: 11, color: t.ink2),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    '${room.messages.edges.length} messages',
+                    style: pulseMono(context, size: 11, color: t.ink3),
+                  ),
                 ],
               ),
             ),
-            const Divider(height: 1),
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Row(
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                children: children,
+              ),
+            ),
+            // Composer
+            Container(
+              decoration: BoxDecoration(
+                color: t.paper,
+                border: Border(top: BorderSide(color: t.hair2)),
+              ),
+              padding: const EdgeInsets.fromLTRB(10, 8, 10, 10),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
+                  Container(
+                    decoration: BoxDecoration(
+                      color: t.paper,
+                      border: Border.all(color: t.hair),
+                      borderRadius: BorderRadius.circular(t.radius),
+                    ),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     child: TextField(
                       controller: _controller,
-                      decoration: const InputDecoration(
-                        hintText: 'Message',
-                        border: OutlineInputBorder(),
-                        isDense: true,
+                      style: TextStyle(fontSize: 12, color: t.ink),
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        hintText: 'message…',
+                        hintStyle: TextStyle(color: t.ink3, fontSize: 12),
+                        isCollapsed: true,
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(vertical: 8),
                       ),
                       onSubmitted: (_) => _send(),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  IconButton.filled(
-                    onPressed: _busy ? null : _send,
-                    icon: _busy
-                        ? const SizedBox(
-                            height: 16, width: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Icon(Icons.send),
+                  const SizedBox(height: 6),
+                  Row(
+                    children: [
+                      Text(
+                        '@ # / promote',
+                        style: pulseMono(context, size: 10, color: t.ink3),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints:
+                            const BoxConstraints(minWidth: 32, minHeight: 32),
+                        onPressed: _busy ? null : _send,
+                        icon: _busy
+                            ? SizedBox(
+                                height: 14,
+                                width: 14,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: t.ink2),
+                              )
+                            : Icon(Icons.send, size: 16, color: t.ink),
+                      ),
+                    ],
                   ),
                 ],
               ),

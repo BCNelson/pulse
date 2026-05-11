@@ -14,7 +14,8 @@ part 'outbox.g.dart';
 @DataClassName('PendingMutation')
 class PendingMutations extends Table {
   IntColumn get id => integer().autoIncrement()();
-  TextColumn get kind => text()(); // 'createPost', 'createComment', 'sendMessage', etc.
+  TextColumn get kind =>
+      text()(); // 'createPost', 'createComment', 'sendMessage', etc.
   TextColumn get payload => text()(); // JSON-encoded variables
   IntColumn get attempts => integer().withDefault(const Constant(0))();
   DateTimeColumn get queuedAt => dateTime().withDefault(currentDateAndTime)();
@@ -70,8 +71,5 @@ final outboxDatabaseProvider = Provider<OutboxDatabase>((ref) {
 /// badge in the UI.
 final outboxCountProvider = StreamProvider<int>((ref) {
   final db = ref.watch(outboxDatabaseProvider);
-  return db
-      .select(db.pendingMutations)
-      .watch()
-      .map((rows) => rows.length);
+  return db.select(db.pendingMutations).watch().map((rows) => rows.length);
 });

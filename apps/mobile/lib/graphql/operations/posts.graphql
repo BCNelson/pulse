@@ -20,6 +20,9 @@ fragment PostSummary on Post {
 query PostsForTag($tagId: ID!, $first: Int) {
   tag(id: $tagId) {
     id
+    slug
+    displayName
+    path
     posts(first: $first) {
       edges {
         cursor

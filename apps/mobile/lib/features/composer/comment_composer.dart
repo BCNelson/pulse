@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/ferry_client.dart';
+import '../../design/tokens.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
 
 class CommentComposer extends ConsumerStatefulWidget {
@@ -38,7 +39,6 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
     setState(() => _busy = false);
     if (!resp.hasErrors) {
       _controller.clear();
-      // Re-fire the post detail query so the new comment appears.
       // ignore: invalid_use_of_protected_member
       client.requestController.add(
         GPostDetailReq((b) => b..vars.id = widget.postId),
@@ -48,33 +48,52 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
 
   @override
   Widget build(BuildContext context) {
+    final t = context.tokens;
     return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(8),
+      child: Container(
+        color: t.paper,
+        padding: const EdgeInsets.fromLTRB(14, 8, 10, 10),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Expanded(
-              child: TextField(
-                controller: _controller,
-                decoration: const InputDecoration(
-                  hintText: 'Add a comment...',
-                  border: OutlineInputBorder(),
-                  isDense: true,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: t.paper,
+                  border: Border.all(color: t.hair),
+                  borderRadius: BorderRadius.circular(t.radius),
                 ),
-                minLines: 1,
-                maxLines: 4,
-                onSubmitted: (_) => _submit(),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                child: TextField(
+                  controller: _controller,
+                  style: TextStyle(fontSize: 12, color: t.ink),
+                  minLines: 1,
+                  maxLines: 4,
+                  decoration: InputDecoration(
+                    hintText: 'add a comment…',
+                    hintStyle: TextStyle(color: t.ink3, fontSize: 12),
+                    isCollapsed: true,
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                  ),
+                  onSubmitted: (_) => _submit(),
+                ),
               ),
             ),
             const SizedBox(width: 8),
-            IconButton.filled(
+            IconButton(
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
               onPressed: _busy ? null : _submit,
               icon: _busy
-                  ? const SizedBox(
-                      height: 16, width: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                  ? SizedBox(
+                      height: 14,
+                      width: 14,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: t.ink2),
                     )
-                  : const Icon(Icons.send),
+                  : Icon(Icons.send, size: 16, color: t.ink),
             ),
           ],
         ),

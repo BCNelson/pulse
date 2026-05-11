@@ -61,7 +61,9 @@ final ferryClientProvider = Provider<Client>((ref) {
     graphQLWsEndpoint,
     initialPayload: () {
       final token = authNotifier.token;
-      return token == null ? <String, dynamic>{} : {'authorization': 'Bearer $token'};
+      return token == null
+          ? <String, dynamic>{}
+          : {'authorization': 'Bearer $token'};
     },
   );
   final authLink = AuthLink(() => authNotifier.token);

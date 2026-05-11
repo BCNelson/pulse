@@ -41,7 +41,8 @@ class OutboxReplayer {
     }
   }
 
-  Future<void> _replay(client, String kind, Map<String, dynamic> payload) async {
+  Future<void> _replay(
+      client, String kind, Map<String, dynamic> payload) async {
     switch (kind) {
       case 'createPost':
         final req = GCreatePostReq(
@@ -49,8 +50,8 @@ class OutboxReplayer {
             ..vars.input.title = payload['title'] as String
             ..vars.input.body = payload['body'] as String
             ..vars.input.tags.add(
-              GPostTagInput((tb) => tb..tagId = payload['tagId'] as String),
-            ),
+                  GPostTagInput((tb) => tb..tagId = payload['tagId'] as String),
+                ),
         );
         final resp = await client.request(req).first;
         if (resp.hasErrors) throw Exception('replay failed: createPost');
