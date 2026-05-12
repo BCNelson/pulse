@@ -316,14 +316,14 @@ class _PostDetail extends ConsumerWidget {
                                       final notifier = ref.read(
                                           replyingToCommentProvider.notifier);
                                       if (isTarget) {
-                                        notifier.state = null;
+                                        notifier.set(null);
                                       } else {
-                                        notifier.state = ReplyTarget(
+                                        notifier.set(ReplyTarget(
                                           commentId: edge.node.id,
                                           authorDisplayName:
                                               edge.node.author.displayName,
                                           body: edge.node.body,
-                                        );
+                                        ));
                                       }
                                     },
                                     child: Padding(

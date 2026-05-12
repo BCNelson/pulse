@@ -254,8 +254,9 @@ class _Results extends ConsumerWidget {
                     title: hit.tag.displayName,
                     subtitle: hit.tag.path,
                     onTap: () {
-                      ref.read(selectedTagIdProvider.notifier).state =
-                          hit.tag.id;
+                      ref
+                          .read(selectedTagIdProvider.notifier)
+                          .set(hit.tag.id);
                       onClose();
                     },
                   ),
@@ -287,7 +288,7 @@ class _Results extends ConsumerWidget {
                     onTap: () {
                       final id = _idOf(edge.node);
                       if (id != null) {
-                        ref.read(selectedPostIdProvider.notifier).state = id;
+                        ref.read(selectedPostIdProvider.notifier).set(id);
                       }
                       onClose();
                     },

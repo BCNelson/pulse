@@ -265,7 +265,7 @@ class _Row extends ConsumerWidget {
       urgent: isUrgent,
       onTap: () {
         if (node.sourceType == 'post') {
-          ref.read(selectedPostIdProvider.notifier).state = node.sourceId;
+          ref.read(selectedPostIdProvider.notifier).set(node.sourceId);
         }
         // ignore: invalid_use_of_protected_member
         client.requestController.add(

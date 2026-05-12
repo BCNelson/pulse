@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/draft_storage.dart';
 import '../../core/ferry_client.dart';
 import '../../core/selection.dart';
 import '../../design/tokens.dart';
@@ -21,23 +24,71 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
   final _controller = TextEditingController();
   final _focusNode = FocusNode();
   bool _busy = false;
+  Timer? _saveDebounce;
+
+  /// Tracks which (postId, replyTargetCommentId) key the current text in
+  /// [_controller] belongs to so we save and load the right draft when
+  /// the reply target changes.
+  String? _activeReplyTargetId;
+
+  /// Suppresses debounced saves while [_controller.text] is being
+  /// programmatically populated from a loaded draft.
+  bool _loadingDraft = false;
 
   @override
   void initState() {
     super.initState();
-    // Focus the input whenever a reply target is set from elsewhere.
+    final initialTarget = ref.read(replyingToCommentProvider);
+    _activeReplyTargetId = initialTarget?.commentId;
+    _loadDraftFor(_activeReplyTargetId);
+    _controller.addListener(_onTextChanged);
+
     ref.listenManual<ReplyTarget?>(replyingToCommentProvider, (prev, next) {
       if (next != null && next != prev) {
         _focusNode.requestFocus();
       }
+      if (prev?.commentId == next?.commentId) return;
+      // Reply target changed: flush any pending save against the old key,
+      // then swap in the draft for the new key.
+      _saveDebounce?.cancel();
+      _flushSave(_activeReplyTargetId);
+      _activeReplyTargetId = next?.commentId;
+      _loadDraftFor(_activeReplyTargetId);
     });
+  }
+
+  void _onTextChanged() {
+    if (_loadingDraft) return;
+    _saveDebounce?.cancel();
+    _saveDebounce = Timer(const Duration(milliseconds: 400),
+        () => _flushSave(_activeReplyTargetId));
+  }
+
+  void _flushSave(String? replyTargetId) {
+    ref
+        .read(draftStorageProvider)
+        .write(widget.postId, replyTargetId, _controller.text);
+  }
+
+  void _loadDraftFor(String? replyTargetId) {
+    final saved =
+        ref.read(draftStorageProvider).read(widget.postId, replyTargetId) ??
+            '';
+    _loadingDraft = true;
+    _controller.text = saved;
+    _loadingDraft = false;
   }
 
   @override
   void dispose() {
-    // Clear any active reply target on unmount so it doesn't bleed into
-    // the next post the user opens.
-    ref.read(replyingToCommentProvider.notifier).state = null;
+    _saveDebounce?.cancel();
+    // Flush the latest text so a hot restart picks it up.
+    _flushSave(_activeReplyTargetId);
+    _controller.removeListener(_onTextChanged);
+    // Note: deliberately do NOT clear replyingToCommentProvider here.
+    // Its build() is keyed off selectedPostIdProvider so it resets
+    // automatically when the user backs out of the post, and that
+    // ensures per-post reply state stays persisted across navigation.
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -104,8 +155,17 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
       );
       return;
     }
+    // Clear the draft for whatever key we just submitted against, then
+    // drop reply mode. Order matters: clear before flipping target so we
+    // delete the right key.
+    _saveDebounce?.cancel();
+    await ref
+        .read(draftStorageProvider)
+        .clear(widget.postId, _activeReplyTargetId);
+    _loadingDraft = true;
     _controller.clear();
-    ref.read(replyingToCommentProvider.notifier).state = null;
+    _loadingDraft = false;
+    ref.read(replyingToCommentProvider.notifier).set(null);
   }
 
   @override
@@ -170,9 +230,18 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
                       ),
                     ),
                     InkWell(
-                      onTap: () => ref
-                          .read(replyingToCommentProvider.notifier)
-                          .state = null,
+                      onTap: () {
+                        // Discard this reply's draft when the user
+                        // explicitly cancels — they don't want it back.
+                        final dismissed = target.commentId;
+                        _saveDebounce?.cancel();
+                        ref
+                            .read(draftStorageProvider)
+                            .clear(widget.postId, dismissed);
+                        ref
+                            .read(replyingToCommentProvider.notifier)
+                            .set(null);
+                      },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),

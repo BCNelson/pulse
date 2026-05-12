@@ -196,7 +196,7 @@ class _PostList extends ConsumerWidget {
           comments: node.reactions.length,
           cursor: selected,
           onTap: () =>
-              ref.read(selectedPostIdProvider.notifier).state = node.id,
+              ref.read(selectedPostIdProvider.notifier).set(node.id),
         );
       },
     );

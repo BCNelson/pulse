@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/auth_controller.dart';
+import '../../core/prefs_provider.dart';
 import '../../core/selection.dart';
+import '../../core/ui_state_storage.dart';
 import '../../design/atoms/pulse_status_bar.dart';
 import '../../design/tokens.dart';
 import '../../design/typography.dart';
@@ -24,8 +26,23 @@ enum ShellTab { inbox, feed, chat }
 
 class _ShellTabNotifier extends Notifier<ShellTab> {
   @override
-  ShellTab build() => ShellTab.inbox;
-  void set(ShellTab t) => state = t;
+  ShellTab build() {
+    final storage = ref.watch(uiStateStorageProvider);
+    final stored = storage.readString(UiStateStorage.shellTabKey);
+    if (stored != null) {
+      for (final tab in ShellTab.values) {
+        if (tab.name == stored) return tab;
+      }
+    }
+    return ShellTab.inbox;
+  }
+
+  void set(ShellTab t) {
+    state = t;
+    ref
+        .read(uiStateStorageProvider)
+        .writeString(UiStateStorage.shellTabKey, t.name);
+  }
 }
 
 final shellTabProvider =
@@ -275,7 +292,7 @@ class _FeedStack extends ConsumerWidget {
         canPop: false,
         onPopInvokedWithResult: (didPop, _) {
           if (!didPop) {
-            ref.read(selectedPostIdProvider.notifier).state = null;
+            ref.read(selectedPostIdProvider.notifier).set(null);
           }
         },
         child: Scaffold(
@@ -283,7 +300,7 @@ class _FeedStack extends ConsumerWidget {
             toolbarHeight: 40,
             leading: BackButton(
               onPressed: () =>
-                  ref.read(selectedPostIdProvider.notifier).state = null,
+                  ref.read(selectedPostIdProvider.notifier).set(null),
             ),
             title: Text('Post', style: pulseMono(context, size: 12)),
           ),
@@ -296,7 +313,7 @@ class _FeedStack extends ConsumerWidget {
         canPop: false,
         onPopInvokedWithResult: (didPop, _) {
           if (!didPop) {
-            ref.read(selectedTagIdProvider.notifier).state = null;
+            ref.read(selectedTagIdProvider.notifier).set(null);
           }
         },
         child: Scaffold(
@@ -304,7 +321,7 @@ class _FeedStack extends ConsumerWidget {
             toolbarHeight: 40,
             leading: BackButton(
               onPressed: () =>
-                  ref.read(selectedTagIdProvider.notifier).state = null,
+                  ref.read(selectedTagIdProvider.notifier).set(null),
             ),
             title: Text('Posts', style: pulseMono(context, size: 12)),
           ),

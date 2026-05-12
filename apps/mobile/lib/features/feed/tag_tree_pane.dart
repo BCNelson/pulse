@@ -13,8 +13,8 @@ import '../../graphql/operations/__generated__/tag_tree.data.gql.dart';
 import '../../graphql/operations/__generated__/tag_tree.req.gql.dart';
 
 void _selectTag(WidgetRef ref, String tagId) {
-  ref.read(selectedTagIdProvider.notifier).state = tagId;
-  ref.read(selectedPostIdProvider.notifier).state = null;
+  ref.read(selectedTagIdProvider.notifier).set(tagId);
+  ref.read(selectedPostIdProvider.notifier).set(null);
 }
 
 class TagTreePane extends ConsumerWidget {
