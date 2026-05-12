@@ -41,7 +41,11 @@ class ServerConfigController extends Notifier<ServerConfigState> {
   @override
   ServerConfigState build() {
     _storage = ServerConfigStorage();
-    _restore();
+    // Schedule _restore as a microtask so build() returns ServerConfigLoading
+    // first. Calling _restore() inline lets its env-set branch (which has no
+    // awaits) assign state synchronously, where Riverpod 3 overwrites it with
+    // build()'s return value.
+    Future.microtask(_restore);
     return const ServerConfigLoading();
   }
 

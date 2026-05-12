@@ -1,13 +1,15 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+import 'instance_id.dart';
+
 /// Stores the session token in OS-keychain-equivalent secure storage so
 /// it survives app restarts. v1 keeps it simple: one token per device.
 class AuthStorage {
   AuthStorage([FlutterSecureStorage? storage])
       : _storage = storage ?? const FlutterSecureStorage();
 
-  static const _tokenKey = 'pulse.session.token';
-  static const _emailKey = 'pulse.session.email';
+  static final _tokenKey = namespacedKey('pulse.session.token');
+  static final _emailKey = namespacedKey('pulse.session.email');
 
   final FlutterSecureStorage _storage;
 

@@ -6,6 +6,8 @@ import 'package:drift/native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'instance_id.dart';
+
 part 'outbox.g.dart';
 
 /// PendingMutations rows are mutations the user composed while
@@ -56,7 +58,8 @@ class OutboxDatabase extends _$OutboxDatabase {
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
     final dir = await getApplicationDocumentsDirectory();
-    final file = File('${dir.path}/pulse_outbox.sqlite');
+    final file =
+        File('${dir.path}/${namespacedFile('pulse_outbox', 'sqlite')}');
     return NativeDatabase.createInBackground(file);
   });
 }

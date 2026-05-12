@@ -23,7 +23,7 @@ services/api/tmp/
 .packages
 build/
 pubspec.lock
-.android
+/.android
 
 # Android/iOS generated output
 apps/mobile/android/
@@ -38,6 +38,8 @@ apps/mobile/windows/
 
 # Claude Code per-machine state
 .claude/
+
+.codex/
 
 # Nix-generated, machine-local
 local.properties

@@ -121,10 +121,24 @@
 
   scripts.mobile.exec = ''
     cd "$DEVENV_ROOT/apps/mobile"
-    # Build flag pins the app to the local API by default so first-run
-    # skips the server URL screen. Override per-invocation with
-    # PULSE_SERVER_URL=https://staging.example.com mobile
-    flutter run --dart-define=PULSE_SERVER_URL="''${PULSE_SERVER_URL:-http://127.0.0.1:8080}" "$@"
+    # Default client uses PULSE_INSTANCE_ID=devA so its prefs/keychain/sqlite
+    # don't collide with a second client launched via `mobile-b`. Override per
+    # invocation: PULSE_SERVER_URL=https://staging.example.com mobile
+    flutter run \
+      --dart-define=PULSE_INSTANCE_ID=devA \
+      --dart-define=PULSE_SERVER_URL="''${PULSE_SERVER_URL:-http://127.0.0.1:8080}" \
+      "$@"
+  '';
+
+  scripts.mobile-b.exec = ''
+    cd "$DEVENV_ROOT/apps/mobile"
+    # Second concurrent client. Pinned to -d linux because side-by-side
+    # desktop is the explicit use case; a separate PULSE_INSTANCE_ID gives it
+    # its own SharedPreferences keys, libsecret entries, and outbox sqlite.
+    flutter run -d linux \
+      --dart-define=PULSE_INSTANCE_ID=devB \
+      --dart-define=PULSE_SERVER_URL="''${PULSE_SERVER_URL:-http://127.0.0.1:8080}" \
+      "$@"
   '';
 
   scripts.mobile-init.exec = ''

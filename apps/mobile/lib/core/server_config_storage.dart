@@ -1,12 +1,14 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'instance_id.dart';
+
 /// Persists the normalized server base URL so first-run users only have
 /// to enter it once. Mirrors the SharedPreferences pattern used by the
 /// theme controller.
 class ServerConfigStorage {
   ServerConfigStorage([SharedPreferences? prefs]) : _prefs = prefs;
 
-  static const _baseUrlKey = 'pulse.server.baseUrl';
+  static final _baseUrlKey = namespacedKey('pulse.server.baseUrl');
 
   SharedPreferences? _prefs;
 
