@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/auth_controller.dart';
 import 'core/outbox_replay.dart';
+import 'core/server_config_controller.dart';
 import 'design/theme_controller.dart';
 import 'design/themes.dart';
 import 'features/auth/login_screen.dart';
+import 'features/onboarding/server_url_screen.dart';
 import 'features/shell/three_pane_shell.dart';
 
 void main() {
@@ -26,16 +28,21 @@ class PulseApp extends ConsumerWidget {
   }
 }
 
-/// AuthGate switches between the login screen and the app shell based
-/// on the auth controller's state. While the controller boots from
-/// secure storage we render a splash so we don't flash the login screen
-/// to a returning user.
+/// AuthGate is the top-level routing widget. It walks two state
+/// machines in order:
+///   1. ServerConfig — until the app knows what URL to talk to, the
+///      login screen and shell can't render anything useful.
+///   2. Auth — once we have a server URL, decide login vs. shell.
+///
+/// While either is bootstrapping from storage we render a splash so
+/// returning users don't get a flash of the URL or login screen.
 class AuthGate extends ConsumerWidget {
   const AuthGate({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(authControllerProvider);
+    final serverCfg = ref.watch(serverConfigControllerProvider);
+    final auth = ref.watch(authControllerProvider);
     // On login (or returning user), drain any pending outbox mutations.
     // The replayer is idempotent and self-guarded so multiple triggers
     // are harmless.
@@ -44,10 +51,16 @@ class AuthGate extends ConsumerWidget {
         ref.read(outboxReplayProvider).drain();
       }
     });
-    return switch (state) {
-      AuthLoading() => const _Splash(),
-      AuthSignedOut() => const LoginScreen(),
+
+    if (serverCfg is ServerConfigLoading || auth is AuthLoading) {
+      return const _Splash();
+    }
+    if (serverCfg is ServerConfigMissing) {
+      return const ServerUrlScreen();
+    }
+    return switch (auth) {
       AuthSignedIn() => const ThreePaneShell(),
+      _ => const LoginScreen(),
     };
   }
 }

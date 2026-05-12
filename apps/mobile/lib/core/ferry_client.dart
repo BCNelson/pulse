@@ -5,18 +5,7 @@ import 'package:gql_http_link/gql_http_link.dart';
 import 'package:gql_websocket_link/gql_websocket_link.dart';
 
 import 'auth_controller.dart';
-
-/// Endpoint configuration. Override at build time with --dart-define so
-/// the same artifact can ship to local dev and production.
-const graphQLEndpoint = String.fromEnvironment(
-  'GRAPHQL_ENDPOINT',
-  defaultValue: 'http://127.0.0.1:8080/graphql',
-);
-
-const graphQLWsEndpoint = String.fromEnvironment(
-  'GRAPHQL_WS_ENDPOINT',
-  defaultValue: 'ws://127.0.0.1:8080/graphql',
-);
+import 'server_config_controller.dart';
 
 /// AuthLink stamps Authorization: Bearer <token> onto every outbound
 /// request when a token is present. The token comes from the Riverpod
@@ -51,14 +40,26 @@ class AuthLink extends Link {
 
 /// ferryClientProvider builds a ferry Client wired with auth + a split
 /// link that routes subscriptions over WebSocket and everything else
-/// over HTTP. The client lives for the app's lifetime; auth changes
-/// flow through AuthLink without recreating it.
+/// over HTTP. The client is keyed to the configured server URL: when
+/// the URL changes the provider rebuilds and the old client is
+/// disposed via [ref.onDispose].
+///
+/// Callers must only read this after the server URL has been
+/// configured (the AuthGate widget guards on that). Reading earlier
+/// throws — that is a programmer error, not a runtime condition.
 final ferryClientProvider = Provider<Client>((ref) {
+  final cfgState = ref.watch(serverConfigControllerProvider);
+  if (cfgState is! ServerConfigReady) {
+    throw StateError(
+      'ferryClientProvider read before server URL was configured',
+    );
+  }
+  final cfg = cfgState.config;
   final authNotifier = ref.read(authControllerProvider.notifier);
 
-  final httpLink = HttpLink(graphQLEndpoint);
+  final httpLink = HttpLink(cfg.graphqlHttpUrl);
   final wsLink = WebSocketLink(
-    graphQLWsEndpoint,
+    cfg.graphqlWsUrl,
     initialPayload: () {
       final token = authNotifier.token;
       return token == null

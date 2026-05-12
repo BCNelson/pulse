@@ -34,7 +34,6 @@
     APP_ENV = "development";
     API_ADDR = "127.0.0.1:8080";
     DATABASE_URL = "postgres://pulse:pulse@127.0.0.1:5432/pulse?sslmode=disable";
-    GRAPHQL_ENDPOINT = "http://127.0.0.1:8080/graphql";
     GOCACHE = "${config.env.DEVENV_STATE}/go-cache";
     GOMODCACHE = "${config.env.DEVENV_STATE}/go-mod-cache";
     GOOSE_DBSTRING = "postgres://pulse:pulse@127.0.0.1:5432/pulse?sslmode=disable";
@@ -122,7 +121,10 @@
 
   scripts.mobile.exec = ''
     cd "$DEVENV_ROOT/apps/mobile"
-    flutter run --dart-define=GRAPHQL_ENDPOINT="$GRAPHQL_ENDPOINT" "$@"
+    # Build flag pins the app to the local API by default so first-run
+    # skips the server URL screen. Override per-invocation with
+    # PULSE_SERVER_URL=https://staging.example.com mobile
+    flutter run --dart-define=PULSE_SERVER_URL="''${PULSE_SERVER_URL:-http://127.0.0.1:8080}" "$@"
   '';
 
   scripts.mobile-init.exec = ''
