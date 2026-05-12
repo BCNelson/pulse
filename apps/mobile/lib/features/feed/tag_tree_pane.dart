@@ -12,6 +12,11 @@ import '../../graphql/__generated__/schema.schema.gql.dart';
 import '../../graphql/operations/__generated__/tag_tree.data.gql.dart';
 import '../../graphql/operations/__generated__/tag_tree.req.gql.dart';
 
+void _selectTag(WidgetRef ref, String tagId) {
+  ref.read(selectedTagIdProvider.notifier).state = tagId;
+  ref.read(selectedPostIdProvider.notifier).state = null;
+}
+
 class TagTreePane extends ConsumerWidget {
   const TagTreePane({super.key});
 
@@ -127,8 +132,7 @@ class _TagNodeState extends ConsumerState<_TagNode> {
                 indent: widget.depth,
                 prefix: widget.node.rootKind == GTagRootKind.USER ? '~' : '#',
                 isActive: isSelected,
-                onTap: () => ref.read(selectedTagIdProvider.notifier).state =
-                    widget.node.id,
+                onTap: () => _selectTag(ref, widget.node.id),
               ),
             ),
           ],
@@ -163,8 +167,7 @@ class _RecursiveChild extends StatelessWidget {
             indent: depth,
             prefix: '·',
             isActive: isSelected,
-            onTap: () =>
-                ref.read(selectedTagIdProvider.notifier).state = child.id,
+            onTap: () => _selectTag(ref, child.id as String),
           ),
         );
       },

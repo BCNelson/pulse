@@ -176,16 +176,15 @@ class _WideLayout extends ConsumerWidget {
         Expanded(
           child: Row(
             children: [
-              SizedBox(
-                width: 224,
-                child: const TagTreePane(),
-              ),
+              const _WideNavRail(),
               VerticalDivider(width: 1, color: t.hair, thickness: 1),
               Expanded(
                 child: switch (tab) {
                   ShellTab.inbox => const InboxScreen(),
                   ShellTab.feed => Row(
                       children: [
+                        const SizedBox(width: 224, child: TagTreePane()),
+                        VerticalDivider(width: 1, color: t.hair, thickness: 1),
                         const SizedBox(width: 320, child: PostListPane()),
                         VerticalDivider(width: 1, color: t.hair, thickness: 1),
                         const Expanded(child: PostDetailPane()),
@@ -204,6 +203,41 @@ class _WideLayout extends ConsumerWidget {
                   ? 'feed'
                   : 'chat',
           right: const [],
+        ),
+      ],
+    );
+  }
+}
+
+/// Vertical NavigationRail on the far left of the wide layout. Mirrors
+/// the destinations of [_PulseBottomNav] (which is the narrow-layout
+/// equivalent) and writes to the same [shellTabProvider].
+class _WideNavRail extends ConsumerWidget {
+  const _WideNavRail();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final tab = ref.watch(shellTabProvider);
+    return NavigationRail(
+      selectedIndex: tab.index,
+      onDestinationSelected: (i) =>
+          ref.read(shellTabProvider.notifier).set(ShellTab.values[i]),
+      labelType: NavigationRailLabelType.selected,
+      destinations: const [
+        NavigationRailDestination(
+          icon: Icon(Icons.inbox_outlined),
+          selectedIcon: Icon(Icons.inbox),
+          label: Text('INBOX'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.tag),
+          selectedIcon: Icon(Icons.tag),
+          label: Text('FEED'),
+        ),
+        NavigationRailDestination(
+          icon: Icon(Icons.forum_outlined),
+          selectedIcon: Icon(Icons.forum),
+          label: Text('CHAT'),
         ),
       ],
     );

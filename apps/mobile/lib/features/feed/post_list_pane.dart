@@ -87,21 +87,23 @@ class _PostList extends ConsumerWidget {
                             color: t.ink3,
                             letterSpacing: 0.08 * 10,
                           )),
-                      Consumer(builder: (context, ref, _) {
-                        final mode = ref.watch(_sortModeProvider);
-                        return PulseSegmented<_SortMode>(
-                          options: _SortMode.values,
-                          selected: mode,
-                          onChanged: (m) =>
-                              ref.read(_sortModeProvider.notifier).set(m),
-                          labelOf: (m) => switch (m) {
-                            _SortMode.forYou => 'For you',
-                            _SortMode.recent => 'Recent',
-                            _SortMode.unread => 'Unread',
-                            _SortMode.active => 'Active',
-                          },
-                        );
-                      }),
+                      Expanded(
+                        child: Consumer(builder: (context, ref, _) {
+                          final mode = ref.watch(_sortModeProvider);
+                          return PulseSegmented<_SortMode>(
+                            options: _SortMode.values,
+                            selected: mode,
+                            onChanged: (m) =>
+                                ref.read(_sortModeProvider.notifier).set(m),
+                            labelOf: (m) => switch (m) {
+                              _SortMode.forYou => 'For you',
+                              _SortMode.recent => 'Recent',
+                              _SortMode.unread => 'Unread',
+                              _SortMode.active => 'Active',
+                            },
+                          );
+                        }),
+                      ),
                     ],
                   ),
                 ),
