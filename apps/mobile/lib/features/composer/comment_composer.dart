@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/draft_storage.dart';
 import '../../core/ferry_client.dart';
+import '../../core/post_cache.dart';
 import '../../core/selection.dart';
 import '../../design/tokens.dart';
 import '../../design/typography.dart';
@@ -26,6 +27,10 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
   bool _busy = false;
   Timer? _saveDebounce;
 
+  /// Captured at initState. Used from dispose() too, where ref.read is
+  /// no longer legal under Riverpod 3.x.
+  late final DraftStorage _drafts;
+
   /// Tracks which (postId, replyTargetCommentId) key the current text in
   /// [_controller] belongs to so we save and load the right draft when
   /// the reply target changes.
@@ -38,6 +43,7 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
   @override
   void initState() {
     super.initState();
+    _drafts = ref.read(draftStorageProvider);
     final initialTarget = ref.read(replyingToCommentProvider);
     _activeReplyTargetId = initialTarget?.commentId;
     _loadDraftFor(_activeReplyTargetId);
@@ -65,15 +71,11 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
   }
 
   void _flushSave(String? replyTargetId) {
-    ref
-        .read(draftStorageProvider)
-        .write(widget.postId, replyTargetId, _controller.text);
+    _drafts.write(widget.postId, replyTargetId, _controller.text);
   }
 
   void _loadDraftFor(String? replyTargetId) {
-    final saved =
-        ref.read(draftStorageProvider).read(widget.postId, replyTargetId) ??
-            '';
+    final saved = _drafts.read(widget.postId, replyTargetId) ?? '';
     _loadingDraft = true;
     _controller.text = saved;
     _loadingDraft = false;
@@ -143,6 +145,16 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
         errorMessage = resp.graphqlErrors?.map((e) => e.message).join('\n') ??
             resp.linkException?.toString() ??
             'comment failed';
+      } else {
+        // Mirror Ferry's now-updated PostDetail cache into the persistent
+        // store so the comment survives restarts.
+        final freshDetail = client.cache.readQuery(
+          GPostDetailReq((b) => b..vars.id = widget.postId),
+        );
+        final freshPost = freshDetail?.post;
+        if (freshPost != null) {
+          await ref.read(postCacheStoreProvider).upsertPostDetail(freshPost);
+        }
       }
     } catch (e) {
       errorMessage = e.toString();

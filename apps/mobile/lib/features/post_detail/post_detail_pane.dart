@@ -3,14 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/ferry_client.dart';
 import '../../core/selection.dart';
 import '../../design/atoms/pulse_avatar.dart';
 import '../../design/atoms/pulse_section_head.dart';
 import '../../design/tokens.dart';
 import '../../design/typography.dart';
-import '../../graphql/operations/__generated__/posts.req.gql.dart';
 import '../composer/comment_composer.dart';
+import 'cached_post_detail_provider.dart';
 import 'reaction_bar.dart';
 
 /// Shows a "sending…" pill if the optimistic comment hasn't been
@@ -58,8 +57,7 @@ class _SendingBadgeState extends State<_SendingBadge> {
             child: CircularProgressIndicator(strokeWidth: 1.4, color: t.ink3),
           ),
           const SizedBox(width: 4),
-          Text('sending…',
-              style: pulseMono(context, size: 10, color: t.ink3)),
+          Text('sending…', style: pulseMono(context, size: 10, color: t.ink3)),
         ],
       ),
     );
@@ -123,238 +121,220 @@ class _PostDetail extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
-    final client = ref.watch(ferryClientProvider);
     final replyTarget = ref.watch(replyingToCommentProvider);
-    final req = GPostDetailReq((b) => b..vars.id = postId);
-    return StreamBuilder(
-      stream: client.request(req),
-      builder: (context, snap) {
-        final resp = snap.data;
-        final data = resp?.data;
-        if (snap.connectionState == ConnectionState.waiting && data == null) {
-          return Center(
-            child: SizedBox(
-              width: 18,
-              height: 18,
-              child: CircularProgressIndicator(strokeWidth: 2, color: t.ink2),
-            ),
-          );
-        }
-        if (resp != null && resp.hasErrors) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Text(
-                resp.graphqlErrors?.map((e) => e.message).join('\n') ??
-                    'unknown error',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontFamily: pulseMonoFamily,
-                  fontSize: 11,
-                  color: t.ink2,
-                ),
-              ),
-            ),
-          );
-        }
-        final post = data?.post;
-        if (post == null) {
-          return Center(
+    final detailAsync = ref.watch(cachedPostDetailProvider(postId));
+    final post = detailAsync.asData?.value;
+    if (post == null) {
+      if (detailAsync.isLoading) {
+        return Center(
+          child: SizedBox(
+            width: 18,
+            height: 18,
+            child: CircularProgressIndicator(strokeWidth: 2, color: t.ink2),
+          ),
+        );
+      }
+      if (detailAsync.hasError) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
             child: Text(
-              'post not found or hidden',
+              detailAsync.error.toString(),
+              textAlign: TextAlign.center,
               style: TextStyle(
                 fontFamily: pulseMonoFamily,
-                fontSize: 12,
-                color: t.ink3,
+                fontSize: 11,
+                color: t.ink2,
               ),
             ),
-          );
-        }
-        return Column(
-          children: [
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  // Hero post block
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(22, 16, 22, 14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+          ),
+        );
+      }
+      return Center(
+        child: Text(
+          'post not found or hidden',
+          style: TextStyle(
+            fontFamily: pulseMonoFamily,
+            fontSize: 12,
+            color: t.ink3,
+          ),
+        ),
+      );
+    }
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              // Hero post block
+              Padding(
+                padding: const EdgeInsets.fromLTRB(22, 16, 22, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 6, vertical: 1),
+                      decoration: BoxDecoration(
+                        color: t.ink,
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: Text(
+                        'POST',
+                        style: TextStyle(
+                          fontFamily: pulseMonoFamily,
+                          fontSize: 9.5,
+                          color: t.paper,
+                          letterSpacing: 0.10 * 9.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(post.title,
+                        style: Theme.of(context).textTheme.headlineMedium),
+                    const SizedBox(height: 8),
+                    Row(
                       children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 6, vertical: 1),
-                          decoration: BoxDecoration(
-                            color: t.ink,
-                            borderRadius: BorderRadius.circular(3),
-                          ),
-                          child: Text(
-                            'POST',
-                            style: TextStyle(
-                              fontFamily: pulseMonoFamily,
-                              fontSize: 9.5,
-                              color: t.paper,
-                              letterSpacing: 0.10 * 9.5,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(post.title,
-                            style: Theme.of(context).textTheme.headlineMedium),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            PulseAvatar(
-                                initials: _initials(post.author.displayName)),
-                            const SizedBox(width: 8),
-                            Text(
-                              post.author.displayName,
-                              style: pulseMono(context, size: 11, color: t.ink),
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              '· ${_shortWhen(post.createdAt.value)}',
-                              style:
-                                  pulseMono(context, size: 11, color: t.ink3),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 14),
+                        PulseAvatar(
+                            initials: _initials(post.author.displayName)),
+                        const SizedBox(width: 8),
                         Text(
-                          post.body,
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          post.author.displayName,
+                          style: pulseMono(context, size: 11, color: t.ink),
                         ),
-                        const SizedBox(height: 10),
-                        ReactionBar(
-                          postId: post.id,
-                          reactions: post.reactions
-                              .map((r) => (
-                                    emoji: r.emoji,
-                                    count: r.count,
-                                    byViewer: r.byViewer,
-                                  ))
-                              .toList(),
+                        const SizedBox(width: 6),
+                        Text(
+                          '· ${_shortWhen(post.createdAt.value)}',
+                          style: pulseMono(context, size: 11, color: t.ink3),
                         ),
                       ],
                     ),
-                  ),
-                  Divider(height: 1, color: t.hair2),
-                  PulseSectionHead.inbox(
-                    title: 'COMMENTS',
-                    count: post.comments.edges.length,
-                  ),
-                  for (final edge in post.comments.edges)
-                    Builder(builder: (context) {
-                      final isTarget =
-                          replyTarget?.commentId == edge.node.id;
-                      final leftIndent =
-                          22 + 16.0 * edge.node.depth.clamp(0, 6);
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: isTarget
-                              ? t.ink.withValues(alpha: 0.04)
-                              : null,
-                          border: Border(
-                            bottom: BorderSide(color: t.hair2),
-                            left: BorderSide(
-                              color: isTarget ? t.ink : Colors.transparent,
-                              width: 2,
-                            ),
-                          ),
+                    const SizedBox(height: 14),
+                    Text(
+                      post.body,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                    const SizedBox(height: 10),
+                    ReactionBar(
+                      postId: post.id,
+                      reactions: post.reactions
+                          .map((r) => (
+                                emoji: r.emoji,
+                                count: r.count,
+                                byViewer: r.byViewer,
+                              ))
+                          .toList(),
+                    ),
+                  ],
+                ),
+              ),
+              Divider(height: 1, color: t.hair2),
+              PulseSectionHead.inbox(
+                title: 'COMMENTS',
+                count: post.comments.edges.length,
+              ),
+              for (final edge in post.comments.edges)
+                Builder(builder: (context) {
+                  final isTarget = replyTarget?.commentId == edge.node.id;
+                  final leftIndent = 22 + 16.0 * edge.node.depth.clamp(0, 6);
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: isTarget ? t.ink.withValues(alpha: 0.04) : null,
+                      border: Border(
+                        bottom: BorderSide(color: t.hair2),
+                        left: BorderSide(
+                          color: isTarget ? t.ink : Colors.transparent,
+                          width: 2,
                         ),
-                        padding: EdgeInsets.fromLTRB(
-                          leftIndent - (isTarget ? 2 : 0),
-                          10,
-                          22,
-                          10,
+                      ),
+                    ),
+                    padding: EdgeInsets.fromLTRB(
+                      leftIndent - (isTarget ? 2 : 0),
+                      10,
+                      22,
+                      10,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        PulseAvatar(
+                          initials: _initials(edge.node.author.displayName),
+                          size: PulseAvatarSize.sm,
                         ),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            PulseAvatar(
-                              initials:
-                                  _initials(edge.node.author.displayName),
-                              size: PulseAvatarSize.sm,
-                            ),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.baseline,
+                                textBaseline: TextBaseline.alphabetic,
                                 children: [
-                                  Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.baseline,
-                                    textBaseline: TextBaseline.alphabetic,
-                                    children: [
-                                      Text(
-                                        edge.node.author.displayName,
-                                        style: pulseMono(context,
-                                            size: 11,
-                                            color: t.ink,
-                                            weight: FontWeight.w600),
-                                      ),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        '· ${_shortWhen(edge.node.createdAt.value)}',
-                                        style: pulseMono(context,
-                                            size: 11, color: t.ink3),
-                                      ),
-                                      if (edge.node.id.startsWith('opt-'))
-                                        const _SendingBadge(),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 2),
                                   Text(
-                                    edge.node.body,
-                                    style:
-                                        Theme.of(context).textTheme.bodyMedium,
+                                    edge.node.author.displayName,
+                                    style: pulseMono(context,
+                                        size: 11,
+                                        color: t.ink,
+                                        weight: FontWeight.w600),
                                   ),
-                                  const SizedBox(height: 4),
-                                  InkWell(
-                                    onTap: () {
-                                      final notifier = ref.read(
-                                          replyingToCommentProvider.notifier);
-                                      if (isTarget) {
-                                        notifier.set(null);
-                                      } else {
-                                        notifier.set(ReplyTarget(
-                                          commentId: edge.node.id,
-                                          authorDisplayName:
-                                              edge.node.author.displayName,
-                                          body: edge.node.body,
-                                        ));
-                                      }
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 2),
-                                      child: Text(
-                                        isTarget ? 'cancel reply' : 'reply',
-                                        style: pulseMono(context,
-                                            size: 11,
-                                            color: isTarget ? t.ink : t.ink3,
-                                            weight: isTarget
-                                                ? FontWeight.w600
-                                                : null),
-                                      ),
-                                    ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    '· ${_shortWhen(edge.node.createdAt.value)}',
+                                    style: pulseMono(context,
+                                        size: 11, color: t.ink3),
                                   ),
+                                  if (edge.node.id.startsWith('opt-'))
+                                    const _SendingBadge(),
                                 ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 2),
+                              Text(
+                                edge.node.body,
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                              const SizedBox(height: 4),
+                              InkWell(
+                                onTap: () {
+                                  final notifier = ref
+                                      .read(replyingToCommentProvider.notifier);
+                                  if (isTarget) {
+                                    notifier.set(null);
+                                  } else {
+                                    notifier.set(ReplyTarget(
+                                      commentId: edge.node.id,
+                                      authorDisplayName:
+                                          edge.node.author.displayName,
+                                      body: edge.node.body,
+                                    ));
+                                  }
+                                },
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 2),
+                                  child: Text(
+                                    isTarget ? 'cancel reply' : 'reply',
+                                    style: pulseMono(context,
+                                        size: 11,
+                                        color: isTarget ? t.ink : t.ink3,
+                                        weight:
+                                            isTarget ? FontWeight.w600 : null),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      );
-                    }),
-                ],
-              ),
-            ),
-            Divider(height: 1, color: t.hair2),
-            CommentComposer(postId: post.id),
-          ],
-        );
-      },
+                      ],
+                    ),
+                  );
+                }),
+            ],
+          ),
+        ),
+        Divider(height: 1, color: t.hair2),
+        CommentComposer(postId: post.id),
+      ],
     );
   }
 }

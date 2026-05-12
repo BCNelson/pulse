@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/ferry_client.dart';
 import '../../core/outbox.dart';
+import '../../core/post_cache.dart';
 import '../../design/atoms/pulse_button.dart';
 import '../../design/tokens.dart';
 import '../../design/typography.dart';
 import '../../graphql/__generated__/schema.schema.gql.dart';
 import '../../graphql/cache_handlers.dart';
+import '../../graphql/operations/__generated__/posts.data.gql.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
 
 class PostComposer extends ConsumerStatefulWidget {
@@ -63,6 +65,18 @@ class _PostComposerState extends ConsumerState<PostComposer> {
               'create failed';
         });
         return;
+      }
+      // Persist the new post at the head of this tag's cached feed so a
+      // cold relaunch immediately shows it.
+      final created = resp.data?.createPost;
+      if (created != null) {
+        final summary = GPostSummaryData.fromJson(created.toJson());
+        if (summary != null) {
+          await ref.read(postCacheStoreProvider).prependPostToTags(
+            summary: summary,
+            tagIds: [widget.tagId],
+          );
+        }
       }
       setState(() => _busy = false);
       Navigator.of(context).pop();

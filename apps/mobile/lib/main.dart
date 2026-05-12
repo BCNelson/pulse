@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/auth_controller.dart';
+import 'core/cache_evictor.dart';
 import 'core/outbox_replay.dart';
 import 'core/prefs_provider.dart';
 import 'core/server_config_controller.dart';
@@ -51,10 +52,12 @@ class AuthGate extends ConsumerWidget {
     final prefs = ref.watch(sharedPreferencesProvider);
     // On login (or returning user), drain any pending outbox mutations.
     // The replayer is idempotent and self-guarded so multiple triggers
-    // are harmless.
+    // are harmless. Also kick off a full cache-eviction pass so any TTL
+    // expirations and per-room cap trimming run once per session.
     ref.listen(authControllerProvider, (prev, next) {
       if (next is AuthSignedIn) {
         ref.read(outboxReplayProvider).drain();
+        ref.read(cacheEvictorProvider).evict();
       }
     });
 

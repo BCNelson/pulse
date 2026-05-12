@@ -15,6 +15,7 @@ import '../inbox/inbox_screen.dart';
 import '../palette/command_palette_overlay.dart';
 import '../post_detail/post_detail_pane.dart';
 import '../impersonation/impersonation_banner.dart';
+import '../settings/cache_settings_screen.dart';
 import '../settings/theme_picker_screen.dart';
 import 'outbox_indicator.dart';
 
@@ -149,6 +150,15 @@ class _PulseAppBar extends ConsumerWidget implements PreferredSizeWidget {
             MaterialPageRoute(builder: (_) => const ThemePickerScreen()),
           ),
           icon: const Icon(Icons.palette_outlined, size: 18),
+        ),
+        IconButton(
+          tooltip: 'Cache',
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+          onPressed: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const CacheSettingsScreen()),
+          ),
+          icon: const Icon(Icons.storage_outlined, size: 18),
         ),
         IconButton(
           tooltip: 'Sign out',
