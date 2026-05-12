@@ -6,9 +6,15 @@
 !.env.dev.example
 
 # Go
+# `bin/` matches any directory named bin at any depth — preferred output
+# dir for compiled binaries (e.g. `go build -o services/api/bin/seed`).
 bin/
 coverage.out
 services/api/tmp/
+# Stray binaries from `go build ./cmd/<name>` run inside services/api/.
+# The output lands next to cmd/ with the same name as the package and
+# shadows the source dir, so list known offenders explicitly.
+/services/api/seed
 
 # Flutter/Dart
 .dart_tool/
@@ -17,6 +23,7 @@ services/api/tmp/
 .packages
 build/
 pubspec.lock
+.android
 
 # Android/iOS generated output
 apps/mobile/android/
@@ -37,4 +44,3 @@ local.properties
 
 # devenv git-hooks installs a symlink wherever it's activated; only the root copy is meaningful
 services/**/.pre-commit-config.yaml
-
