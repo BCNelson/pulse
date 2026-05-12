@@ -12,3 +12,19 @@ final selectedPostIdProvider = StateProvider<String?>((ref) => null);
 
 /// selectedRoomIdProvider for chat. Null = no room selected.
 final selectedRoomIdProvider = StateProvider<String?>((ref) => null);
+
+class ReplyTarget {
+  const ReplyTarget({
+    required this.commentId,
+    required this.authorDisplayName,
+    this.body,
+  });
+  final String commentId;
+  final String authorDisplayName;
+  final String? body;
+}
+
+/// replyingToCommentProvider holds the comment the composer is currently
+/// replying to. Null means the next submission is a top-level comment on
+/// the open post.
+final replyingToCommentProvider = StateProvider<ReplyTarget?>((ref) => null);

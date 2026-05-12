@@ -7,6 +7,7 @@ import '../../design/atoms/pulse_button.dart';
 import '../../design/tokens.dart';
 import '../../design/typography.dart';
 import '../../graphql/__generated__/schema.schema.gql.dart';
+import '../../graphql/cache_handlers.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
 
 class PostComposer extends ConsumerStatefulWidget {
@@ -37,13 +38,19 @@ class _PostComposerState extends ConsumerState<PostComposer> {
       _error = null;
     });
     final client = ref.read(ferryClientProvider);
+    final title = _title.text.trim();
+    final body = _body.text.trim();
     final req = GCreatePostReq(
       (b) => b
-        ..vars.input.title = _title.text.trim()
-        ..vars.input.body = _body.text.trim()
+        ..vars.input.title = title
+        ..vars.input.body = body
         ..vars.input.tags.add(
               GPostTagInput((tb) => tb..tagId = widget.tagId),
-            ),
+            )
+        ..updateCacheHandlerKey = kPrependPostHandlerKey
+        ..optimisticResponse.replace(
+          buildOptimisticCreatePost(title: title, body: body),
+        ),
     );
     try {
       final resp = await client.request(req).first;

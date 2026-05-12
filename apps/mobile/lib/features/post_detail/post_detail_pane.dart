@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,6 +12,59 @@ import '../../design/typography.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
 import '../composer/comment_composer.dart';
 import 'reaction_bar.dart';
+
+/// Shows a "sending…" pill if the optimistic comment hasn't been
+/// confirmed by the server within [delay]. Mounts when the optimistic
+/// node first renders and disposes when the real comment replaces it,
+/// so the timer is cleaned up automatically.
+class _SendingBadge extends StatefulWidget {
+  const _SendingBadge();
+
+  @override
+  State<_SendingBadge> createState() => _SendingBadgeState();
+}
+
+class _SendingBadgeState extends State<_SendingBadge> {
+  static const _delay = Duration(seconds: 3);
+  bool _show = false;
+  Timer? _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer(_delay, () {
+      if (mounted) setState(() => _show = true);
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_show) return const SizedBox.shrink();
+    final t = context.tokens;
+    return Padding(
+      padding: const EdgeInsets.only(left: 6),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 8,
+            height: 8,
+            child: CircularProgressIndicator(strokeWidth: 1.4, color: t.ink3),
+          ),
+          const SizedBox(width: 4),
+          Text('sending…',
+              style: pulseMono(context, size: 10, color: t.ink3)),
+        ],
+      ),
+    );
+  }
+}
 
 class PostDetailPane extends ConsumerWidget {
   const PostDetailPane({super.key});
@@ -69,6 +124,7 @@ class _PostDetail extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
     final client = ref.watch(ferryClientProvider);
+    final replyTarget = ref.watch(replyingToCommentProvider);
     final req = GPostDetailReq((b) => b..vars.id = postId);
     return StreamBuilder(
       stream: client.request(req),
@@ -189,59 +245,108 @@ class _PostDetail extends ConsumerWidget {
                     count: post.comments.edges.length,
                   ),
                   for (final edge in post.comments.edges)
-                    Container(
-                      padding: EdgeInsets.fromLTRB(
-                        22 + 16.0 * edge.node.depth,
-                        10,
-                        22,
-                        10,
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border(bottom: BorderSide(color: t.hair2)),
-                      ),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          PulseAvatar(
-                            initials: _initials(edge.node.author.displayName),
-                            size: PulseAvatarSize.sm,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  crossAxisAlignment:
-                                      CrossAxisAlignment.baseline,
-                                  textBaseline: TextBaseline.alphabetic,
-                                  children: [
-                                    Text(
-                                      edge.node.author.displayName,
-                                      style: pulseMono(context,
-                                          size: 11,
-                                          color: t.ink,
-                                          weight: FontWeight.w600),
-                                    ),
-                                    const SizedBox(width: 6),
-                                    Text(
-                                      '· ${_shortWhen(edge.node.createdAt.value)}',
-                                      style: pulseMono(context,
-                                          size: 11, color: t.ink3),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  edge.node.body,
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
+                    Builder(builder: (context) {
+                      final isTarget =
+                          replyTarget?.commentId == edge.node.id;
+                      final leftIndent =
+                          22 + 16.0 * edge.node.depth.clamp(0, 6);
+                      return Container(
+                        decoration: BoxDecoration(
+                          color: isTarget
+                              ? t.ink.withValues(alpha: 0.04)
+                              : null,
+                          border: Border(
+                            bottom: BorderSide(color: t.hair2),
+                            left: BorderSide(
+                              color: isTarget ? t.ink : Colors.transparent,
+                              width: 2,
                             ),
                           ),
-                        ],
-                      ),
-                    ),
+                        ),
+                        padding: EdgeInsets.fromLTRB(
+                          leftIndent - (isTarget ? 2 : 0),
+                          10,
+                          22,
+                          10,
+                        ),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            PulseAvatar(
+                              initials:
+                                  _initials(edge.node.author.displayName),
+                              size: PulseAvatarSize.sm,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.baseline,
+                                    textBaseline: TextBaseline.alphabetic,
+                                    children: [
+                                      Text(
+                                        edge.node.author.displayName,
+                                        style: pulseMono(context,
+                                            size: 11,
+                                            color: t.ink,
+                                            weight: FontWeight.w600),
+                                      ),
+                                      const SizedBox(width: 6),
+                                      Text(
+                                        '· ${_shortWhen(edge.node.createdAt.value)}',
+                                        style: pulseMono(context,
+                                            size: 11, color: t.ink3),
+                                      ),
+                                      if (edge.node.id.startsWith('opt-'))
+                                        const _SendingBadge(),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    edge.node.body,
+                                    style:
+                                        Theme.of(context).textTheme.bodyMedium,
+                                  ),
+                                  const SizedBox(height: 4),
+                                  InkWell(
+                                    onTap: () {
+                                      final notifier = ref.read(
+                                          replyingToCommentProvider.notifier);
+                                      if (isTarget) {
+                                        notifier.state = null;
+                                      } else {
+                                        notifier.state = ReplyTarget(
+                                          commentId: edge.node.id,
+                                          authorDisplayName:
+                                              edge.node.author.displayName,
+                                          body: edge.node.body,
+                                        );
+                                      }
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 2),
+                                      child: Text(
+                                        isTarget ? 'cancel reply' : 'reply',
+                                        style: pulseMono(context,
+                                            size: 11,
+                                            color: isTarget ? t.ink : t.ink3,
+                                            weight: isTarget
+                                                ? FontWeight.w600
+                                                : null),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
                 ],
               ),
             ),

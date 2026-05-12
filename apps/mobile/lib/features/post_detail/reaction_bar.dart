@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/ferry_client.dart';
 import '../../design/tokens.dart';
 import '../../design/typography.dart';
+import '../../graphql/cache_handlers.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
 
 typedef ReactionInfo = ({String emoji, int count, bool byViewer});
@@ -21,6 +22,56 @@ class ReactionBar extends ConsumerWidget {
     final client = ref.watch(ferryClientProvider);
     final shown = {for (final r in reactions) r.emoji: r};
     final allEmoji = <String>{...shown.keys, ..._quickEmoji};
+
+    Future<void> toggle(String emoji, bool byViewer) async {
+      // The mutation response carries `{id, reactions {...}}` for the
+      // post. Ferry's normalized cache merges that into the existing
+      // Post:<id> entity automatically — every query referencing this
+      // post re-emits with the updated reactions. The optimistic
+      // response below flips the chip instantly; the real response
+      // (identical shape) overwrites it on confirmation.
+      final resp = byViewer
+          ? await client
+              .request(
+                GUnreactToPostReq((b) => b
+                  ..vars.postId = postId
+                  ..vars.emoji = emoji
+                  ..optimisticResponse.replace(
+                    buildOptimisticUnreact(
+                      postId: postId,
+                      emoji: emoji,
+                      currentReactions: reactions,
+                    ),
+                  )),
+              )
+              .first
+          : await client
+              .request(
+                GReactToPostReq((b) => b
+                  ..vars.postId = postId
+                  ..vars.emoji = emoji
+                  ..optimisticResponse.replace(
+                    buildOptimisticReact(
+                      postId: postId,
+                      emoji: emoji,
+                      currentReactions: reactions,
+                    ),
+                  )),
+              )
+              .first;
+      if (resp.hasErrors && context.mounted) {
+        ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+          SnackBar(
+            content: Text(
+              resp.graphqlErrors?.map((e) => e.message).join('\n') ??
+                  resp.linkException?.toString() ??
+                  'reaction failed',
+            ),
+          ),
+        );
+      }
+    }
+
     return Wrap(
       spacing: 6,
       runSpacing: 6,
@@ -29,25 +80,7 @@ class ReactionBar extends ConsumerWidget {
           _ReactionChip(
             emoji: emoji,
             info: shown[emoji],
-            onTap: () {
-              if (shown[emoji]?.byViewer == true) {
-                client.requestController.add(
-                  GUnreactToPostReq(
-                    (b) => b
-                      ..vars.postId = postId
-                      ..vars.emoji = emoji,
-                  ),
-                );
-              } else {
-                client.requestController.add(
-                  GReactToPostReq(
-                    (b) => b
-                      ..vars.postId = postId
-                      ..vars.emoji = emoji,
-                  ),
-                );
-              }
-            },
+            onTap: () => toggle(emoji, shown[emoji]?.byViewer == true),
           ),
       ],
     );

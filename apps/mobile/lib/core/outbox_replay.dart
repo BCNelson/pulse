@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../graphql/__generated__/schema.schema.gql.dart';
+import '../graphql/cache_handlers.dart';
 import '../graphql/operations/__generated__/posts.req.gql.dart';
 import 'ferry_client.dart';
 import 'outbox.dart';
@@ -51,7 +52,8 @@ class OutboxReplayer {
             ..vars.input.body = payload['body'] as String
             ..vars.input.tags.add(
                   GPostTagInput((tb) => tb..tagId = payload['tagId'] as String),
-                ),
+                )
+            ..updateCacheHandlerKey = kPrependPostHandlerKey,
         );
         final resp = await client.request(req).first;
         if (resp.hasErrors) throw Exception('replay failed: createPost');
@@ -60,7 +62,8 @@ class OutboxReplayer {
         final req = GCreateCommentReq(
           (b) => b
             ..vars.input.postId = payload['postId'] as String
-            ..vars.input.body = payload['body'] as String,
+            ..vars.input.body = payload['body'] as String
+            ..updateCacheHandlerKey = kAppendCommentHandlerKey,
         );
         final resp = await client.request(req).first;
         if (resp.hasErrors) throw Exception('replay failed: createComment');
