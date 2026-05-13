@@ -109,8 +109,7 @@ class PulsePostCard extends StatelessWidget {
       PulsePostDecision.none => null,
     };
 
-    final card = Container(
-      padding: const EdgeInsets.fromLTRB(22, 10, 22, 10),
+    final card = DecoratedBox(
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: t.hair2)),
       ),
@@ -124,7 +123,7 @@ class PulsePostCard extends StatelessWidget {
               child: Container(width: 2, color: t.ink),
             ),
           Padding(
-            padding: const EdgeInsets.only(left: 0),
+            padding: const EdgeInsets.fromLTRB(22, 10, 22, 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

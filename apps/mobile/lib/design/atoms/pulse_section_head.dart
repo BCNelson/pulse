@@ -12,7 +12,7 @@ class PulseSectionHead extends StatelessWidget {
     this.count,
     this.action,
     this.padding =
-        const EdgeInsets.only(top: 10, bottom: 4, left: 12, right: 12),
+        const EdgeInsets.only(top: 8, bottom: 2, left: 4, right: 8),
     this.dense = true,
   });
 

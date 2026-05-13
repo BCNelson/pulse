@@ -250,6 +250,8 @@ class _WideNavRail extends ConsumerWidget {
       onDestinationSelected: (i) =>
           ref.read(shellTabProvider.notifier).set(ShellTab.values[i]),
       labelType: NavigationRailLabelType.selected,
+      minWidth: 52,
+      useIndicator: false,
       destinations: const [
         NavigationRailDestination(
           icon: Icon(Icons.inbox_outlined),

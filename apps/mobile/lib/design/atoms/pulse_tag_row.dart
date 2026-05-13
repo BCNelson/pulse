@@ -46,7 +46,7 @@ class PulseTagRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = context.tokens;
-    final leftPad = 18.0 + indent * 12.0;
+    final leftPad = 2.0 + indent * 10.0;
 
     Widget? trailing;
     if (attentionCount != null) {
@@ -108,14 +108,14 @@ class PulseTagRow extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(
                 left: leftPad,
-                right: 12,
-                top: 4,
-                bottom: 4,
+                right: 8,
+                top: 3,
+                bottom: 3,
               ),
               child: Row(
                 children: [
                   SizedBox(
-                    width: 14,
+                    width: 10,
                     child: Text(
                       prefix,
                       textAlign: TextAlign.right,
@@ -127,7 +127,7 @@ class PulseTagRow extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
                   if (dotColor != null) ...[
                     Container(
                       width: 6,

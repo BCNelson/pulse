@@ -109,7 +109,7 @@ class _TagNodeState extends ConsumerState<_TagNode> {
           children: [
             if (hasChildren)
               SizedBox(
-                width: 18,
+                width: 12,
                 child: InkWell(
                   onTap: () => setState(() => _expanded = !_expanded),
                   child: Padding(
@@ -125,7 +125,7 @@ class _TagNodeState extends ConsumerState<_TagNode> {
                 ),
               )
             else
-              const SizedBox(width: 18),
+              const SizedBox(width: 12),
             Expanded(
               child: PulseTagRow(
                 label: widget.node.displayName,
@@ -161,7 +161,7 @@ class _RecursiveChild extends StatelessWidget {
         final selected = ref.watch(selectedTagIdProvider);
         final isSelected = selected == child.id;
         return Padding(
-          padding: const EdgeInsets.only(left: 18),
+          padding: const EdgeInsets.only(left: 12),
           child: PulseTagRow(
             label: child.displayName as String,
             indent: depth,
