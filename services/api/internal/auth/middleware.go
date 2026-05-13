@@ -50,22 +50,34 @@ func (s *Service) HTTPMiddleware(next http.Handler) http.Handler {
 
 func (s *Service) identityFromRequest(r *http.Request) (Identity, uuid.UUID, bool) {
 	if header := r.Header.Get("Authorization"); header != "" {
-		if strings.HasPrefix(header, bearerKind) {
-			token := strings.TrimPrefix(header, bearerKind)
-			if sess, err := s.LookupSession(r.Context(), token); err == nil {
-				return Identity{ActingID: sess.ActingID, EffectiveID: sess.EffectiveID}, sess.SessionID, true
-			}
-		}
-		if strings.HasPrefix(header, botKind) {
-			key := strings.TrimPrefix(header, botKind)
-			if pid, err := s.AuthenticateBotKey(r.Context(), key); err == nil {
-				return Identity{ActingID: pid, EffectiveID: pid}, uuid.Nil, true
-			}
+		if id, sid, ok := s.IdentityFromAuthHeader(r.Context(), header); ok {
+			return id, sid, true
 		}
 	}
 	if c, err := r.Cookie(cookieName); err == nil {
 		if sess, err := s.LookupSession(r.Context(), c.Value); err == nil {
 			return Identity{ActingID: sess.ActingID, EffectiveID: sess.EffectiveID}, sess.SessionID, true
+		}
+	}
+	return Identity{}, uuid.Nil, false
+}
+
+// IdentityFromAuthHeader resolves a raw Authorization-style header value
+// ("Bearer …" or "Bot …") to an Identity. Returns ok=false for empty,
+// unrecognized prefix, or invalid/expired tokens. Cookie-based auth is
+// HTTP-only and intentionally not handled here, so the WebSocket
+// connection_init path can reuse this helper.
+func (s *Service) IdentityFromAuthHeader(ctx context.Context, header string) (Identity, uuid.UUID, bool) {
+	if strings.HasPrefix(header, bearerKind) {
+		token := strings.TrimPrefix(header, bearerKind)
+		if sess, err := s.LookupSession(ctx, token); err == nil {
+			return Identity{ActingID: sess.ActingID, EffectiveID: sess.EffectiveID}, sess.SessionID, true
+		}
+	}
+	if strings.HasPrefix(header, botKind) {
+		key := strings.TrimPrefix(header, botKind)
+		if pid, err := s.AuthenticateBotKey(ctx, key); err == nil {
+			return Identity{ActingID: pid, EffectiveID: pid}, uuid.Nil, true
 		}
 	}
 	return Identity{}, uuid.Nil, false

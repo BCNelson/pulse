@@ -1,10 +1,8 @@
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:drift/drift.dart';
-import 'package:drift/native.dart';
+import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'instance_id.dart';
 
@@ -55,14 +53,13 @@ class OutboxDatabase extends _$OutboxDatabase {
   }
 }
 
-LazyDatabase _openConnection() {
-  return LazyDatabase(() async {
-    final dir = await getApplicationDocumentsDirectory();
-    final file =
-        File('${dir.path}/${namespacedFile('pulse_outbox', 'sqlite')}');
-    return NativeDatabase.createInBackground(file);
-  });
-}
+QueryExecutor _openConnection() => driftDatabase(
+      name: namespacedName('pulse_outbox'),
+      web: DriftWebOptions(
+        sqlite3Wasm: Uri.parse('sqlite3.wasm'),
+        driftWorker: Uri.parse('drift_worker.dart.js'),
+      ),
+    );
 
 final outboxDatabaseProvider = Provider<OutboxDatabase>((ref) {
   final db = OutboxDatabase();

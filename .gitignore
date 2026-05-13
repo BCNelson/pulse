@@ -30,8 +30,15 @@ apps/mobile/android/
 apps/mobile/ios/
 apps/mobile/linux/
 apps/mobile/macos/
-apps/mobile/web/
 apps/mobile/windows/
+
+# `flutter create` regenerates web/; we ignore everything except the two
+# drift-on-web artifacts we explicitly version (sqlite3.wasm via LFS, and
+# the hand-written drift worker source).
+apps/mobile/web/*
+apps/mobile/web/icons/
+!apps/mobile/web/sqlite3.wasm
+!apps/mobile/web/drift_worker.dart
 
 # Postgres/devenv state
 .devenv-state/

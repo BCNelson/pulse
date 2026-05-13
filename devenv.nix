@@ -55,14 +55,7 @@
     # plugin). Nix doesn't put package libs on the loader path automatically.
     LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [ pkgs.sqlite ];
 
-    # Flutter hardcodes `google-chrome` for auto-opening DevTools and the
-    # web target. Point it at a shim that hands the URL to xdg-open, which
-    # respects the user's default browser.
-    CHROME_EXECUTABLE = toString (
-      pkgs.writeShellScript "flutter-open-url" ''
-        exec ${pkgs.xdg-utils}/bin/xdg-open "$@"
-      ''
-    );
+    CHROME_EXECUTABLE = "${pkgs.chromium}/bin/chromium";
   };
 
   services.postgres = {
@@ -146,12 +139,16 @@
     cd "$DEVENV_ROOT/apps/mobile"
     flutter create .
     flutter pub get
-    dart run build_runner build --delete-conflicting-outputs
+    mobile-codegen
   '';
 
   scripts.mobile-codegen.exec = ''
+    set -euo pipefail
     cd "$DEVENV_ROOT/apps/mobile"
     dart run build_runner build --delete-conflicting-outputs
+    # Compile the drift web worker. sqlite3.wasm is committed via git-lfs;
+    # this produces its companion drift_worker.dart.js next to web/index.html.
+    dart compile js -O4 web/drift_worker.dart -o web/drift_worker.dart.js
   '';
 
   scripts.mobile-watch.exec = ''

@@ -10,3 +10,9 @@ String namespacedKey(String key) =>
 String namespacedFile(String baseName, String ext) => pulseInstanceId.isEmpty
     ? '$baseName.$ext'
     : '${baseName}_$pulseInstanceId.$ext';
+
+/// Like [namespacedFile] but returns a bare name (no extension), suitable for
+/// `driftDatabase(name:)` which appends `.sqlite` on native and uses the value
+/// as an OPFS / IndexedDB key on web.
+String namespacedName(String baseName) =>
+    pulseInstanceId.isEmpty ? baseName : '${baseName}_$pulseInstanceId';

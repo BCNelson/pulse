@@ -18,6 +18,8 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	awsconfig "github.com/aws/aws-sdk-go-v2/config"
@@ -173,8 +175,40 @@ func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
 	// Subscriptions over WebSocket (graphql-transport-ws).
+	//
+	// CheckOrigin shares the CORS allowlist so cross-origin browser
+	// clients (Flutter web on a separate port, prod web on a different
+	// host than the API) aren't 403'd by gorilla's default same-origin
+	// rule. InitFunc reads the bearer token from the connection_init
+	// payload — browsers can't set Authorization on a WS handshake, so
+	// the client sends it in the GraphQL init message instead.
+	policy := loadOriginPolicy()
 	srv.AddTransport(transport.Websocket{
+		Upgrader: websocket.Upgrader{
+			CheckOrigin: func(r *http.Request) bool {
+				return policy.allows(r.Header.Get("Origin"))
+			},
+		},
 		KeepAlivePingInterval: 30 * time.Second,
+		// Close the connection if connection_init (where the auth payload
+		// arrives) doesn't show up promptly. Prevents idle half-open
+		// sockets from sitting on server resources.
+		InitTimeout: 10 * time.Second,
+		InitFunc: func(ctx context.Context, payload transport.InitPayload) (context.Context, *transport.InitPayload, error) {
+			header := payload.Authorization()
+			if header == "" {
+				return ctx, nil, nil
+			}
+			id, sessionID, ok := authSvc.IdentityFromAuthHeader(ctx, header)
+			if !ok {
+				return ctx, nil, nil
+			}
+			ctx = pulseauth.WithIdentity(ctx, id)
+			if sessionID != uuid.Nil {
+				ctx = pulseauth.WithSessionID(ctx, sessionID)
+			}
+			return ctx, nil, nil
+		},
 	})
 	srv.Use(extension.Introspection{})
 
@@ -191,10 +225,18 @@ func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool 
 	r.Use(middleware.RealIP)
 	r.Use(middleware.RequestID)
 	r.Use(middleware.Recoverer)
+	r.Use(corsMiddleware(policy))
 	r.Get("/healthz", healthHandler(pool))
 	r.Handle("/graphql", gql)
 	r.Get("/playground", playground.Handler("Pulse", "/graphql"))
 	r.Handle("/metrics", metrics.Handler())
+	// Single-origin prod: when PULSE_WEB_DIR points at the flutter build
+	// output, serve the SPA from any unmatched path. Dev uses
+	// `flutter run -d chrome` (separate origin) and relies on
+	// corsMiddleware instead.
+	if cfg.webDir != "" {
+		r.NotFound(staticSPAHandler(cfg.webDir))
+	}
 
 	server := &http.Server{
 		Addr:              cfg.apiAddr,
@@ -220,6 +262,7 @@ type appConfig struct {
 	apiAddr       string
 	databaseURL   string
 	migrationsDir string
+	webDir        string
 
 	s3Endpoint  string
 	s3Region    string
@@ -234,6 +277,7 @@ func configFromEnv() appConfig {
 		apiAddr:       envOrDefault("API_ADDR", "127.0.0.1:8080"),
 		databaseURL:   envOrDefault("DATABASE_URL", "postgres://pulse:pulse@127.0.0.1:5432/pulse?sslmode=disable"),
 		migrationsDir: envOrDefault("GOOSE_MIGRATION_DIR", "db/migrations"),
+		webDir:        os.Getenv("PULSE_WEB_DIR"),
 
 		// S3-compatible config. Defaults target a local MinIO. Production
 		// deployments override AWS_S3_* / S3_ENDPOINT / S3_BUCKET.
