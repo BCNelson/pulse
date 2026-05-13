@@ -8,8 +8,10 @@ import '../../design/atoms/pulse_avatar.dart';
 import '../../design/atoms/pulse_section_head.dart';
 import '../../design/tokens.dart';
 import '../../design/typography.dart';
+import '../../graphql/operations/__generated__/posts.data.gql.dart';
 import '../composer/comment_composer.dart';
 import 'cached_post_detail_provider.dart';
+import 'comment_tree.dart';
 import 'reaction_bar.dart';
 
 /// Shows a "sending…" pill if the optimistic comment hasn't been
@@ -90,14 +92,37 @@ class PostDetailPane extends ConsumerWidget {
         ),
       );
     }
-    return Container(color: t.paper, child: _PostDetail(postId: postId));
+    return Container(
+      color: t.paper,
+      child: _PostDetail(key: ValueKey(postId), postId: postId),
+    );
   }
 }
 
-class _PostDetail extends ConsumerWidget {
-  const _PostDetail({required this.postId});
+class _PostDetail extends ConsumerStatefulWidget {
+  const _PostDetail({super.key, required this.postId});
 
   final String postId;
+
+  @override
+  ConsumerState<_PostDetail> createState() => _PostDetailState();
+}
+
+class _PostDetailState extends ConsumerState<_PostDetail> {
+  // Lazy-init via a getter so DDC hot-reload state desync (where the field
+  // can read as `null`) doesn't crash with "Null is not Set<String>".
+  Set<String>? _collapsedSubtreesField;
+  Set<String> get _collapsedSubtrees =>
+      _collapsedSubtreesField ??= <String>{};
+
+  void _toggleCollapsed(String commentId) {
+    setState(() {
+      final s = _collapsedSubtrees;
+      if (!s.remove(commentId)) {
+        s.add(commentId);
+      }
+    });
+  }
 
   String _initials(String name) {
     final parts = name.trim().split(RegExp(r'\s+'));
@@ -119,10 +144,10 @@ class _PostDetail extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final t = context.tokens;
     final replyTarget = ref.watch(replyingToCommentProvider);
-    final detailAsync = ref.watch(cachedPostDetailProvider(postId));
+    final detailAsync = ref.watch(cachedPostDetailProvider(widget.postId));
     final post = detailAsync.asData?.value;
     if (post == null) {
       if (detailAsync.isLoading) {
@@ -199,9 +224,13 @@ class _PostDetail extends ConsumerWidget {
                         PulseAvatar(
                             initials: _initials(post.author.displayName)),
                         const SizedBox(width: 8),
-                        Text(
-                          post.author.displayName,
-                          style: pulseMono(context, size: 11, color: t.ink),
+                        Flexible(
+                          child: Text(
+                            post.author.displayName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pulseMono(context, size: 11, color: t.ink),
+                          ),
                         ),
                         const SizedBox(width: 6),
                         Text(
@@ -234,101 +263,11 @@ class _PostDetail extends ConsumerWidget {
                 title: 'COMMENTS',
                 count: post.comments.edges.length,
               ),
-              for (final edge in post.comments.edges)
-                Builder(builder: (context) {
-                  final isTarget = replyTarget?.commentId == edge.node.id;
-                  final leftIndent = 22 + 16.0 * edge.node.depth.clamp(0, 6);
-                  return Container(
-                    decoration: BoxDecoration(
-                      color: isTarget ? t.ink.withValues(alpha: 0.04) : null,
-                      border: Border(
-                        bottom: BorderSide(color: t.hair2),
-                        left: BorderSide(
-                          color: isTarget ? t.ink : Colors.transparent,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                    padding: EdgeInsets.fromLTRB(
-                      leftIndent - (isTarget ? 2 : 0),
-                      10,
-                      22,
-                      10,
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        PulseAvatar(
-                          initials: _initials(edge.node.author.displayName),
-                          size: PulseAvatarSize.sm,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.baseline,
-                                textBaseline: TextBaseline.alphabetic,
-                                children: [
-                                  Text(
-                                    edge.node.author.displayName,
-                                    style: pulseMono(context,
-                                        size: 11,
-                                        color: t.ink,
-                                        weight: FontWeight.w600),
-                                  ),
-                                  const SizedBox(width: 6),
-                                  Text(
-                                    '· ${_shortWhen(edge.node.createdAt.value)}',
-                                    style: pulseMono(context,
-                                        size: 11, color: t.ink3),
-                                  ),
-                                  if (edge.node.id.startsWith('opt-'))
-                                    const _SendingBadge(),
-                                ],
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                edge.node.body,
-                                style: Theme.of(context).textTheme.bodyMedium,
-                              ),
-                              const SizedBox(height: 4),
-                              InkWell(
-                                onTap: () {
-                                  final notifier = ref
-                                      .read(replyingToCommentProvider.notifier);
-                                  if (isTarget) {
-                                    notifier.set(null);
-                                  } else {
-                                    notifier.set(ReplyTarget(
-                                      commentId: edge.node.id,
-                                      authorDisplayName:
-                                          edge.node.author.displayName,
-                                      body: edge.node.body,
-                                    ));
-                                  }
-                                },
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 2),
-                                  child: Text(
-                                    isTarget ? 'cancel reply' : 'reply',
-                                    style: pulseMono(context,
-                                        size: 11,
-                                        color: isTarget ? t.ink : t.ink3,
-                                        weight:
-                                            isTarget ? FontWeight.w600 : null),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }),
+              for (final row in buildCommentRows(
+                flat: _toSummaries(post.comments.edges),
+                collapsedSubtrees: _collapsedSubtrees,
+              ))
+                _buildRow(row, t, replyTarget),
             ],
           ),
         ),
@@ -337,4 +276,277 @@ class _PostDetail extends ConsumerWidget {
       ],
     );
   }
+
+  List<CommentSummary> _toSummaries(
+    Iterable<GPostDetailData_post_comments_edges> edges,
+  ) {
+    return [
+      for (final e in edges)
+        CommentSummary(
+          id: e.node.id,
+          parentId: e.node.parentId,
+          depth: e.node.depth,
+          isOptimistic: e.node.id.startsWith('opt-'),
+          body: e.node.body,
+          authorDisplayName: e.node.author.displayName,
+          createdAtIso: e.node.createdAt.value,
+        ),
+    ];
+  }
+
+  // Geometry constants.
+  static const double _indentStep = 16; // px per depth.
+  static const double _avatarRadius = 7; // PulseAvatarSize.sm diameter / 2.
+  // Horizontal position of column k's stroke (1px line). Centered on the
+  // avatar's column. Clamped at the max visible depth.
+  static const int _maxIndentDepth = 6;
+  double _columnLineLeft(int k) {
+    final visibleK = k.clamp(0, _maxIndentDepth);
+    return _indentStep * visibleK + _avatarRadius - 0.5 + 8;
+  }
+  // Row content starts at the avatar's left edge.
+  double _rowContentLeft(int depth) {
+    final visibleD = depth.clamp(0, _maxIndentDepth);
+    return _indentStep * visibleD + 8;
+  }
+  // Y of the elbow's bend / avatar vertical center within the row.
+  static const double _elbowBendY = 17;
+  // Y where the OwnTrunk begins (just below the avatar's bottom).
+  static const double _ownTrunkTopY = 26;
+
+  Widget _buildRow(RowState row, PulseTokens t, ReplyTarget? replyTarget) {
+    return switch (row) {
+      CommentRowState() => _buildCommentRow(row, t, replyTarget),
+      StubRowState() => _buildStubRow(row, t),
+    };
+  }
+
+  /// Common trunk-line pieces, derived from a RowState. Returns the list
+  /// of [Positioned] widgets that go *behind* the row content.
+  List<Widget> _trunkPieces(RowState row, PulseTokens t,
+      {required bool drawOwnTrunk}) {
+    final d = row.depth;
+    final pieces = <Widget>[];
+
+    // 1. Deeper-ancestor verticals (k in [0, d-2]).
+    for (var k = 0; k < d - 1; k++) {
+      if (!row.isLastSibling[k]) {
+        pieces.add(Positioned(
+          left: _columnLineLeft(k),
+          top: 0,
+          bottom: 0,
+          child: Container(width: 1, color: t.hair2),
+        ));
+      }
+    }
+
+    // 2. Elbow at column d-1 (always if d > 0).
+    if (d > 0) {
+      pieces.add(Positioned(
+        left: _columnLineLeft(d - 1),
+        top: 0,
+        width: _indentStep,
+        height: _elbowBendY,
+        child: CustomPaint(painter: _ThreadElbowPainter(color: t.hair2)),
+      ));
+      // 3. Parent continuation below the bend.
+      if (!row.isLastSibling[d - 1]) {
+        pieces.add(Positioned(
+          left: _columnLineLeft(d - 1),
+          top: _elbowBendY,
+          bottom: 0,
+          child: Container(width: 1, color: t.hair2),
+        ));
+      }
+    }
+
+    // 4. OwnTrunk at column d.
+    if (drawOwnTrunk) {
+      pieces.add(Positioned(
+        left: _columnLineLeft(d),
+        top: _ownTrunkTopY,
+        bottom: 0,
+        child: Container(width: 1, color: t.hair2),
+      ));
+    }
+
+    return pieces;
+  }
+
+  Widget _buildCommentRow(
+    CommentRowState row,
+    PulseTokens t,
+    ReplyTarget? replyTarget,
+  ) {
+    final comment = row.comment;
+    final isTarget = replyTarget?.commentId == comment.id;
+    final contentLeft = _rowContentLeft(row.depth);
+    final hasChildren = row.hasOwnTrunk; // any children, expanded or collapsed
+    return Container(
+      decoration: BoxDecoration(
+        color: isTarget ? t.ink.withValues(alpha: 0.04) : null,
+        border: Border(
+          left: BorderSide(
+            color: isTarget ? t.ink : Colors.transparent,
+            width: 2,
+          ),
+        ),
+      ),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ..._trunkPieces(row, t, drawOwnTrunk: row.hasOwnTrunk),
+          Padding(
+            padding: EdgeInsets.fromLTRB(contentLeft, 10, 22, 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                PulseAvatar(
+                  initials: _initials(comment.authorDisplayName),
+                  size: PulseAvatarSize.sm,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(
+                            comment.authorDisplayName,
+                            style: pulseMono(context,
+                                size: 11,
+                                color: t.ink,
+                                weight: FontWeight.w600),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            '· ${_shortWhen(comment.createdAtIso)}',
+                            style: pulseMono(context, size: 11, color: t.ink3),
+                          ),
+                          if (comment.isOptimistic) const _SendingBadge(),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        comment.body,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(height: 4),
+                      InkWell(
+                        onTap: () {
+                          final notifier =
+                              ref.read(replyingToCommentProvider.notifier);
+                          if (isTarget) {
+                            notifier.set(null);
+                          } else {
+                            notifier.set(ReplyTarget(
+                              commentId: comment.id,
+                              authorDisplayName: comment.authorDisplayName,
+                              body: comment.body,
+                            ));
+                          }
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Text(
+                            isTarget ? 'cancel reply' : 'reply',
+                            style: pulseMono(context,
+                                size: 11,
+                                color: isTarget ? t.ink : t.ink3,
+                                weight: isTarget ? FontWeight.w600 : null),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // CollapseToggle overlay on the OwnTrunk, just below the avatar.
+          if (hasChildren)
+            Positioned(
+              left: _columnLineLeft(row.depth) - 6.5,
+              top: _ownTrunkTopY - 2,
+              child: InkWell(
+                onTap: () => _toggleCollapsed(comment.id),
+                child: Container(
+                  color: t.paper,
+                  padding: const EdgeInsets.all(1),
+                  child: Icon(
+                    row.isCollapsed
+                        ? Icons.add_circle_outline
+                        : Icons.remove_circle_outline,
+                    size: 14,
+                    color: t.ink3,
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStubRow(StubRowState row, PulseTokens t) {
+    final contentLeft = _rowContentLeft(row.depth);
+    final label =
+        '${row.hiddenCount} more ${row.hiddenCount == 1 ? 'reply' : 'replies'}';
+    return InkWell(
+      onTap: () => _toggleCollapsed(row.parentId),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          ..._trunkPieces(row, t, drawOwnTrunk: false),
+          Padding(
+            padding: EdgeInsets.fromLTRB(contentLeft - 4, 6, 22, 8),
+            child: Row(
+              children: [
+                Container(
+                  color: t.paper,
+                  padding: const EdgeInsets.all(1),
+                  child: Icon(Icons.add_circle_outline,
+                      size: 14, color: t.ink3),
+                ),
+                const SizedBox(width: 6),
+                Text(label, style: pulseMono(context, size: 11, color: t.ink3)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
+
+/// Draws an L-shaped connector with a rounded inner corner: a vertical
+/// segment along the left edge, curving 90° at the bottom and continuing
+/// horizontally to the right edge. Used to "point" each parent's thread
+/// line at its child's avatar.
+class _ThreadElbowPainter extends CustomPainter {
+  _ThreadElbowPainter({required this.color});
+
+  final Color color;
+  static const double _radius = 5;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 1
+      ..style = PaintingStyle.stroke;
+    final path = Path()
+      ..moveTo(0.5, 0)
+      ..lineTo(0.5, size.height - _radius)
+      ..quadraticBezierTo(0.5, size.height, _radius + 0.5, size.height)
+      ..lineTo(size.width, size.height);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(_ThreadElbowPainter old) => old.color != color;
+}
+

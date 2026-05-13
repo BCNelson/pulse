@@ -86,6 +86,13 @@ type demoPost struct {
 type demoComment struct {
 	Author string // email
 	Body   string
+	// Key is an optional local id so child comments can reference this one
+	// via ParentKey. Empty means this comment cannot be referenced.
+	Key string
+	// ParentKey is the Key of another comment in the same post. Empty means
+	// this is a top-level (root) comment. Parents must appear earlier in
+	// the slice than their children.
+	ParentKey string
 }
 
 var demoPosts = []demoPost{
@@ -106,6 +113,86 @@ var demoPosts = []demoPost{
 		Body:    "Drafting Q3 themes here. Replies welcome.",
 		Comments: []demoComment{
 			{Author: "bob@pulse.dev", Body: "Could we link the spec doc?"},
+		},
+	},
+	// A deeply-threaded post for exercising the spine-rendered comment view
+	// in the mobile client. Layout:
+	//   - Root A: 12-deep primary thread (spine) with off-spine branches
+	//     at depths 0, 2, 5, 7, 9 — including one 7-deep off-spine subtree
+	//     that exercises the relativeDepth clamp when expanded.
+	//   - Root B: shorter spine + one off-spine branch.
+	//   - Root C: standalone single-comment thread (no hairline).
+	//   - Root D: medium spine with sibling stubs.
+	{
+		TagSlug: "engineering",
+		Author:  "alice@pulse.dev",
+		Title:   "Threaded: v1 rollout discussion",
+		Body:    "Use this post to poke at the spine-threaded comment view. Plenty of nesting below.",
+		Comments: []demoComment{
+			// Root A: 12-deep primary thread.
+			{Key: "A", Author: "alice@pulse.dev", Body: "What's the best way to ship the v1 rollout?"},
+			{Key: "A1", ParentKey: "A", Author: "bob@pulse.dev", Body: "I'd start by gating it behind a workspace flag."},
+			{Key: "A2", ParentKey: "A1", Author: "charlie@pulse.dev", Body: "Agree. What's the default state of the flag?"},
+			{Key: "A3", ParentKey: "A2", Author: "alice@pulse.dev", Body: "Off. We'll flip it per workspace once metrics look healthy."},
+			{Key: "A4", ParentKey: "A3", Author: "bob@pulse.dev", Body: "How are we monitoring those metrics?"},
+			{Key: "A5", ParentKey: "A4", Author: "charlie@pulse.dev", Body: "I'll wire a Grafana board off the audit log next week."},
+			{Key: "A6", ParentKey: "A5", Author: "alice@pulse.dev", Body: "Make sure error rate and p99 are on it."},
+			{Key: "A7", ParentKey: "A6", Author: "bob@pulse.dev", Body: "Should we alert if either crosses a threshold?"},
+			{Key: "A8", ParentKey: "A7", Author: "charlie@pulse.dev", Body: "Yes. Page on-call if p99 > 2s for 5 min."},
+			{Key: "A9", ParentKey: "A8", Author: "alice@pulse.dev", Body: "Add a separate alert for sustained 5xx > 1%."},
+			{Key: "A10", ParentKey: "A9", Author: "bob@pulse.dev", Body: "Will do. Both fire to the #oncall room."},
+			{Key: "A11", ParentKey: "A10", Author: "charlie@pulse.dev", Body: "Great — let's ship it Monday."},
+
+			// Off-spine at A (depth 0): nested two deep.
+			{Key: "S1", ParentKey: "A", Author: defaultAdminEmail, Body: "Have we considered a percentage rollout instead?"},
+			{Key: "S1a", ParentKey: "S1", Author: "bob@pulse.dev", Body: "Could, but workspaces are coarser and easier to reason about."},
+			{Key: "S1b", ParentKey: "S1a", Author: defaultAdminEmail, Body: "Fair. Workspace flag it is."},
+
+			// Off-spine at A (depth 0): a Y-shaped branch (two leaves under one root).
+			{Key: "T1", ParentKey: "A", Author: "charlie@pulse.dev", Body: "Out of curiosity, what does v1 actually include?"},
+			{Key: "T1a", ParentKey: "T1", Author: "alice@pulse.dev", Body: "Posts, comments, reactions, tags, basic search."},
+			{Key: "T1b", ParentKey: "T1", Author: "bob@pulse.dev", Body: "Notifications too, but only in-app for v1."},
+
+			// Off-spine at A2 (depth 2): a deep 7-level chain that exercises
+			// the indent clamp on ExpandedBranchRow (clamp kicks in at depth 6+).
+			{Key: "U1", ParentKey: "A2", Author: defaultAdminEmail, Body: "Side note — what about org-level overrides?"},
+			{Key: "U2", ParentKey: "U1", Author: "alice@pulse.dev", Body: "Out of scope for v1. Filed a separate ticket."},
+			{Key: "U3", ParentKey: "U2", Author: defaultAdminEmail, Body: "Ticket number?"},
+			{Key: "U4", ParentKey: "U3", Author: "alice@pulse.dev", Body: "ENG-422."},
+			{Key: "U5", ParentKey: "U4", Author: defaultAdminEmail, Body: "Linking from the rollout doc."},
+			{Key: "U6", ParentKey: "U5", Author: "alice@pulse.dev", Body: "Thanks."},
+			{Key: "U7", ParentKey: "U6", Author: "bob@pulse.dev", Body: "(Indent should be visibly clamped from here on down.)"},
+
+			// Off-spine at A5 (depth 5): three sibling leaves — multiple
+			// collapsed stubs at the same parent.
+			{Key: "V1", ParentKey: "A5", Author: "bob@pulse.dev", Body: "Tangent: can we backfill Grafana data?"},
+			{Key: "V2", ParentKey: "A5", Author: "alice@pulse.dev", Body: "Tangent: who owns the Grafana folder permissions?"},
+			{Key: "V3", ParentKey: "A5", Author: defaultAdminEmail, Body: "Tangent: are we paying for Grafana Cloud or self-hosting?"},
+
+			// Off-spine at A7 (depth 7): short branch.
+			{Key: "W1", ParentKey: "A7", Author: defaultAdminEmail, Body: "Will the alert link back to a runbook?"},
+			{Key: "W2", ParentKey: "W1", Author: "charlie@pulse.dev", Body: "Yes, the runbook lives in /docs/oncall/v1."},
+
+			// Off-spine at A9 (depth 9): single leaf.
+			{Key: "X1", ParentKey: "A9", Author: "alice@pulse.dev", Body: "Add a 4xx-rate panel too while you're in there."},
+
+			// Root B: short spine + one branch.
+			{Key: "B", Author: "bob@pulse.dev", Body: "Where are we tracking the migration tasks?"},
+			{Key: "B1", ParentKey: "B", Author: "alice@pulse.dev", Body: "There's a Linear project — link is in the docs."},
+			{Key: "B2", ParentKey: "B1", Author: "charlie@pulse.dev", Body: "Subscribed."},
+			{Key: "BS1", ParentKey: "B", Author: defaultAdminEmail, Body: "Aside: should we mirror to GitHub issues for visibility?"},
+			{Key: "BS2", ParentKey: "BS1", Author: "alice@pulse.dev", Body: "Not for v1 — too much noise."},
+
+			// Root C: single comment with no replies (tests the no-hairline case).
+			{Author: defaultAdminEmail, Body: "Reminder: feature freeze starts Thursday."},
+
+			// Root D: medium spine.
+			{Key: "D", Author: "charlie@pulse.dev", Body: "Quick poll — release on Friday or punt to Monday?"},
+			{Key: "D1", ParentKey: "D", Author: "alice@pulse.dev", Body: "Monday. No one wants a weekend page."},
+			{Key: "D2", ParentKey: "D1", Author: "bob@pulse.dev", Body: "+1 Monday."},
+			{Key: "D3", ParentKey: "D2", Author: defaultAdminEmail, Body: "Monday it is."},
+			// One sibling stub off D1.
+			{Key: "DS1", ParentKey: "D1", Author: defaultAdminEmail, Body: "What's the actual window — morning or afternoon?"},
 		},
 	},
 }
@@ -384,23 +471,43 @@ func ensureDemoPosts(ctx context.Context, pool *pgxpool.Pool, adminID uuid.UUID,
 		}
 		out[p.Title] = id
 
+		idByKey := map[string]uuid.UUID{}
 		for _, c := range p.Comments {
-			var existing int
-			if err := pool.QueryRow(ctx,
-				`SELECT count(*) FROM comments WHERE post_id = $1 AND body = $2`, id, c.Body).
-				Scan(&existing); err != nil {
-				return nil, fmt.Errorf("count comments on %q: %w", p.Title, err)
+			var parentID *uuid.UUID
+			if c.ParentKey != "" {
+				pid, ok := idByKey[c.ParentKey]
+				if !ok {
+					return nil, fmt.Errorf("comment on %q references unknown ParentKey %q (parents must appear before children)", p.Title, c.ParentKey)
+				}
+				parentID = &pid
 			}
-			if existing > 0 {
+
+			var existingID uuid.UUID
+			err := pool.QueryRow(ctx,
+				`SELECT id FROM comments WHERE post_id = $1 AND body = $2 LIMIT 1`, id, c.Body).
+				Scan(&existingID)
+			if err == nil {
+				if c.Key != "" {
+					idByKey[c.Key] = existingID
+				}
 				continue
 			}
+			if !errors.Is(err, pgx.ErrNoRows) {
+				return nil, fmt.Errorf("lookup comment on %q: %w", p.Title, err)
+			}
+
 			authorID := principalFor(c.Author, adminID, users)
-			if _, err := commentSvc.Create(ctx, comment.CreateInput{
+			newID, err := commentSvc.Create(ctx, comment.CreateInput{
 				PostID:   id,
+				ParentID: parentID,
 				AuthorID: authorID,
 				Body:     c.Body,
-			}); err != nil {
+			})
+			if err != nil {
 				return nil, fmt.Errorf("create comment on %q: %w", p.Title, err)
+			}
+			if c.Key != "" {
+				idByKey[c.Key] = newID
 			}
 		}
 	}
