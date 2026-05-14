@@ -8,6 +8,7 @@ import 'core/cache_evictor.dart';
 import 'core/outbox_replay.dart';
 import 'core/prefs_provider.dart';
 import 'core/server_config_controller.dart';
+import 'devtools/pulse_devtools_service.dart';
 import 'design/theme_controller.dart';
 import 'design/themes.dart';
 import 'features/auth/login_screen.dart';
@@ -23,6 +24,7 @@ class PulseApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    assert(registerPulseDevToolsService(ref));
     final themeKey = ref.watch(pulseThemeControllerProvider);
     return MaterialApp(
       title: 'Pulse',

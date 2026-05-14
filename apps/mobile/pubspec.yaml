@@ -33,6 +33,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^4.0.0
+  pulse_devtools:
+    path: ../../packages/pulse_devtools
   build_runner: ^2.15.0
   ferry_generator: ^0.12.0
   drift_dev: ^2.33.0

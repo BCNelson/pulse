@@ -1,0 +1,5 @@
+name: pulse_devtools
+issueTracker: https://github.com/BCNelson/pulse/issues
+version: 0.1.0
+materialIconCodePoint: '0xe1b1'
+requiresConnection: true

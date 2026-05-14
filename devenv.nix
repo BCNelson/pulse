@@ -151,6 +151,20 @@
     dart compile js -O4 web/drift_worker.dart -o web/drift_worker.dart.js
   '';
 
+  scripts.mobile-devtools-build.exec = ''
+    set -euo pipefail
+    cd "$DEVENV_ROOT/packages/pulse_devtools"
+    flutter pub get
+    dart run devtools_extensions build_and_copy --source=. --dest=extension/devtools
+  '';
+
+  scripts.mobile-devtools-validate.exec = ''
+    set -euo pipefail
+    cd "$DEVENV_ROOT/packages/pulse_devtools"
+    flutter analyze
+    dart run devtools_extensions validate --package=.
+  '';
+
   scripts.mobile-watch.exec = ''
     cd "$DEVENV_ROOT/apps/mobile"
     dart run build_runner watch --delete-conflicting-outputs
@@ -205,6 +219,8 @@
     echo "  mobile-init       # one-time flutter create + codegen"
     echo "  mobile-codegen    # rerun ferry / build_runner codegen"
     echo "  mobile            # flutter run"
+    echo "  mobile-devtools-build     # rebuild Pulse DevTools extension assets"
+    echo "  mobile-devtools-validate  # analyze and validate Pulse DevTools extension"
     echo "  dbshell           # psql"
     echo "  migrate ...       # goose passthrough (up, down, create NAME sql)"
   '';

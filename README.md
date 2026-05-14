@@ -40,6 +40,8 @@ seed -fresh         # wipe the demo data (admin + org root preserved) and re-see
 reset-db            # drop the public schema, re-migrate, re-seed
 mobile-codegen      # rerun build_runner once
 mobile-watch        # run build_runner in watch mode
+mobile-devtools-build     # rebuild the Pulse DevTools extension assets
+mobile-devtools-validate  # analyze and validate the Pulse DevTools extension
 dbshell             # psql against the local pulse database
 migrate up          # apply pending migrations (also: down, status, create NAME sql)
 ```
@@ -54,6 +56,12 @@ GraphQL schema and operations are codegen'd:
 - Mobile (Dart): `cd apps/mobile && dart run build_runner build`
 
 Generated files (`internal/graphql/generated.go`, `lib/**/__generated__/`) are committed.
+
+The Pulse-specific Flutter DevTools extension lives in `packages/pulse_devtools`.
+After changing it, run `mobile-devtools-build` and `mobile-devtools-validate`.
+The generated DevTools extension assets under
+`packages/pulse_devtools/extension/devtools/build` are intentionally ignored;
+each developer generates them locally before using the extension.
 
 ## Environment overrides
 
