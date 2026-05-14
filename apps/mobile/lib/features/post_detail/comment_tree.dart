@@ -63,13 +63,13 @@ class CommentRowState extends RowState {
 
 class StubRowState extends RowState {
   const StubRowState({
-    required this.parentId,
+    required this.collapsedCommentId,
     required this.depth,
     required this.isLastSibling,
     required this.hiddenCount,
   });
 
-  final String parentId;
+  final String collapsedCommentId;
   @override
   final int depth;
   @override
@@ -116,25 +116,25 @@ void _walk(
   final isCollapsed = hasChildren && collapsed.contains(node.id);
   final isLastSibling = List<bool>.unmodifiable(stack);
 
+  if (isCollapsed) {
+    out.add(StubRowState(
+      collapsedCommentId: node.id,
+      depth: stack.length,
+      isLastSibling: isLastSibling,
+      hiddenCount: _subtreeSize(node, childrenOf),
+    ));
+    return;
+  }
+
   out.add(CommentRowState(
     comment: node,
     depth: stack.length,
     isLastSibling: isLastSibling,
     hasOwnTrunk: hasChildren,
-    isCollapsed: isCollapsed,
+    isCollapsed: false,
   ));
 
   if (!hasChildren) return;
-
-  if (isCollapsed) {
-    out.add(StubRowState(
-      parentId: node.id,
-      depth: stack.length + 1,
-      isLastSibling: List<bool>.unmodifiable([...stack, true]),
-      hiddenCount: _subtreeSize(node, childrenOf) - 1,
-    ));
-    return;
-  }
 
   for (var i = 0; i < kids.length; i++) {
     final isLast = i == kids.length - 1;

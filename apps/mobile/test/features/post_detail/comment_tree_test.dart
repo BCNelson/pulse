@@ -22,19 +22,19 @@ CommentSummary _c(
     _summary(RowState r) {
   return switch (r) {
     CommentRowState() => (
-      id: r.comment.id,
-      depth: r.depth,
-      isLast: r.isLastSibling,
-      hasOwn: r.hasOwnTrunk,
-      isCollapsed: r.isCollapsed,
-    ),
+        id: r.comment.id,
+        depth: r.depth,
+        isLast: r.isLastSibling,
+        hasOwn: r.hasOwnTrunk,
+        isCollapsed: r.isCollapsed,
+      ),
     StubRowState() => (
-      id: '<stub:${r.parentId}>',
-      depth: r.depth,
-      isLast: r.isLastSibling,
-      hasOwn: false,
-      isCollapsed: false,
-    ),
+        id: '<stub:${r.collapsedCommentId}>',
+        depth: r.depth,
+        isLast: r.isLastSibling,
+        hasOwn: false,
+        isCollapsed: false,
+      ),
   };
 }
 
@@ -95,8 +95,7 @@ void main() {
         collapsedSubtrees: {},
       );
       final byId = {
-        for (final r in rows.whereType<CommentRowState>())
-          r.comment.id: r,
+        for (final r in rows.whereType<CommentRowState>()) r.comment.id: r,
       };
       expect(byId['b']!.isLastSibling, [false]); // not last child of a
       expect(byId['b']!.hasOwnTrunk, isFalse);
@@ -124,14 +123,15 @@ void main() {
         ],
         collapsedSubtrees: {},
       );
-      final v3 = rows.whereType<CommentRowState>()
+      final v3 = rows
+          .whereType<CommentRowState>()
           .firstWhere((r) => r.comment.id == 'V3');
       expect(v3.depth, 6);
       expect(v3.isLastSibling, [false, true, false, true, true, true]);
       expect(v3.hasOwnTrunk, isFalse);
     });
 
-    test('collapsed subtree emits a stub with the right isLastSibling', () {
+    test('collapsed subtree replaces the clicked comment with a stub', () {
       final rows = buildCommentRows(
         flat: [
           _c('a'),
@@ -141,18 +141,13 @@ void main() {
         ],
         collapsedSubtrees: {'b'},
       );
-      // a, b(collapsed), stub(b)
-      expect(rows, hasLength(3));
-      final b = rows[1] as CommentRowState;
-      expect(b.comment.id, 'b');
-      expect(b.isCollapsed, isTrue);
-      expect(b.hasOwnTrunk, isTrue);
-      final stub = rows[2] as StubRowState;
-      expect(stub.parentId, 'b');
-      expect(stub.depth, 2);
-      // b's isLastSibling = [true]; stub's = [true, true]
-      expect(stub.isLastSibling, [true, true]);
-      expect(stub.hiddenCount, 2); // c + d
+      // a, stub(b). The clicked comment and its descendants are hidden.
+      expect(rows, hasLength(2));
+      final stub = rows[1] as StubRowState;
+      expect(stub.collapsedCommentId, 'b');
+      expect(stub.depth, 1);
+      expect(stub.isLastSibling, [true]);
+      expect(stub.hiddenCount, 3); // b + c + d
     });
 
     test('collapsing a leaf is a no-op', () {
@@ -161,7 +156,8 @@ void main() {
         collapsedSubtrees: {'b'},
       );
       expect(rows.whereType<StubRowState>(), isEmpty);
-      final b = rows.whereType<CommentRowState>()
+      final b = rows
+          .whereType<CommentRowState>()
           .firstWhere((r) => r.comment.id == 'b');
       expect(b.isCollapsed, isFalse);
       expect(b.hasOwnTrunk, isFalse);
@@ -194,10 +190,8 @@ void main() {
         ],
         collapsedSubtrees: {},
       );
-      final roots = rows
-          .whereType<CommentRowState>()
-          .where((r) => r.depth == 0)
-          .toList();
+      final roots =
+          rows.whereType<CommentRowState>().where((r) => r.depth == 0).toList();
       expect(roots, hasLength(2));
       expect(roots.every((r) => r.isLastSibling.isEmpty), isTrue);
     });

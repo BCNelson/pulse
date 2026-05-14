@@ -297,21 +297,50 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
   // Horizontal position of column k's stroke (1px line). Centered on the
   // avatar's column. Clamped at the max visible depth.
   static const int _maxIndentDepth = 6;
+  int _visibleColumn(int depth) => depth.clamp(0, _maxIndentDepth);
+
   double _columnLineLeft(int k) {
-    final visibleK = k.clamp(0, _maxIndentDepth);
+    final visibleK = _visibleColumn(k);
     return _indentStep * visibleK + _avatarRadius - 0.5 + 8;
   }
 
   // Row content starts at the avatar's left edge.
   double _rowContentLeft(int depth) {
-    final visibleD = depth.clamp(0, _maxIndentDepth);
+    final visibleD = _visibleColumn(depth);
     return _indentStep * visibleD + 8;
   }
+
+  double _elbowWidth(int depth) {
+    if (depth <= 0) return 0;
+    return _columnLineLeft(depth) - _columnLineLeft(depth - 1);
+  }
+
+  double _stubIconLeft(int depth) {
+    final lineCenter = _columnLineLeft(depth) + 0.5;
+    return lineCenter - (_stubIconSize / 2);
+  }
+
+  double _collapseHitLeft(int depth) {
+    return _stubIconLeft(depth) - 10;
+  }
+
+  double get _collapseHitTop => _ownTrunkTopY - 2;
 
   // Y of the elbow's bend / avatar vertical center within the row.
   static const double _elbowBendY = 17;
   // Y where the OwnTrunk begins (just below the avatar's bottom).
   static const double _ownTrunkTopY = 26;
+  static const double _stubIconSize = 16;
+  static const double _collapseHitSize = 32;
+  static const double _collapseIconSize = 14;
+
+  Widget _collapseIcon(PulseTokens t, IconData icon) {
+    return Container(
+      color: t.paper,
+      padding: const EdgeInsets.all(1),
+      child: Icon(icon, size: _collapseIconSize, color: t.ink3),
+    );
+  }
 
   Widget _buildRow(RowState row, PulseTokens t, ReplyTarget? replyTarget) {
     return switch (row) {
@@ -341,17 +370,27 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
 
     // 2. Elbow at column d-1 (always if d > 0).
     if (d > 0) {
-      pieces.add(Positioned(
-        left: _columnLineLeft(d - 1),
-        top: 0,
-        width: _indentStep,
-        height: _elbowBendY,
-        child: CustomPaint(painter: _ThreadElbowPainter(color: t.hair2)),
-      ));
+      final elbowWidth = _elbowWidth(d);
+      if (elbowWidth > 0) {
+        pieces.add(Positioned(
+          left: _columnLineLeft(d - 1),
+          top: 0,
+          width: elbowWidth,
+          height: _elbowBendY,
+          child: CustomPaint(painter: _ThreadElbowPainter(color: t.hair2)),
+        ));
+      } else {
+        pieces.add(Positioned(
+          left: _columnLineLeft(d),
+          top: 0,
+          height: _elbowBendY,
+          child: Container(width: 1, color: t.hair2),
+        ));
+      }
       // 3. Parent continuation below the bend.
       if (!row.isLastSibling[d - 1]) {
         pieces.add(Positioned(
-          left: _columnLineLeft(d - 1),
+          left: elbowWidth > 0 ? _columnLineLeft(d - 1) : _columnLineLeft(d),
           top: _elbowBendY,
           bottom: 0,
           child: Container(width: 1, color: t.hair2),
@@ -384,16 +423,17 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
     return Container(
       decoration: BoxDecoration(
         color: isTarget ? t.ink.withValues(alpha: 0.04) : null,
-        border: Border(
-          left: BorderSide(
-            color: isTarget ? t.ink : Colors.transparent,
-            width: 2,
-          ),
-        ),
       ),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          if (isTarget)
+            Positioned(
+              left: 0,
+              top: 0,
+              bottom: 0,
+              child: Container(width: 2, color: t.ink),
+            ),
           ..._trunkPieces(row, t, drawOwnTrunk: row.hasOwnTrunk),
           Padding(
             padding: EdgeInsets.fromLTRB(contentLeft, 10, 22, 8),
@@ -465,19 +505,23 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
           // CollapseToggle overlay on the OwnTrunk, just below the avatar.
           if (hasChildren)
             Positioned(
-              left: _columnLineLeft(row.depth) - 6.5,
-              top: _ownTrunkTopY - 2,
-              child: InkWell(
-                onTap: () => _toggleCollapsed(comment.id),
-                child: Container(
-                  color: t.paper,
-                  padding: const EdgeInsets.all(1),
-                  child: Icon(
-                    row.isCollapsed
-                        ? Icons.add_circle_outline
-                        : Icons.remove_circle_outline,
-                    size: 14,
-                    color: t.ink3,
+              left: _collapseHitLeft(row.depth),
+              top: _collapseHitTop,
+              child: SizedBox.square(
+                dimension: _collapseHitSize,
+                child: InkWell(
+                  onTap: () => _toggleCollapsed(comment.id),
+                  child: Align(
+                    alignment: Alignment.topRight,
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 0, right: 6),
+                      child: _collapseIcon(
+                        t,
+                        row.isCollapsed
+                            ? Icons.add_circle_outline
+                            : Icons.remove_circle_outline,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -488,25 +532,20 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
   }
 
   Widget _buildStubRow(StubRowState row, PulseTokens t) {
-    final contentLeft = _rowContentLeft(row.depth);
+    final iconLeft = _stubIconLeft(row.depth);
     final label =
-        '${row.hiddenCount} more ${row.hiddenCount == 1 ? 'reply' : 'replies'}';
+        '${row.hiddenCount} hidden ${row.hiddenCount == 1 ? 'comment' : 'comments'}';
     return InkWell(
-      onTap: () => _toggleCollapsed(row.parentId),
+      onTap: () => _toggleCollapsed(row.collapsedCommentId),
       child: Stack(
         clipBehavior: Clip.none,
         children: [
           ..._trunkPieces(row, t, drawOwnTrunk: false),
           Padding(
-            padding: EdgeInsets.fromLTRB(contentLeft - 4, 6, 22, 8),
+            padding: EdgeInsets.fromLTRB(iconLeft, 9, 22, 8),
             child: Row(
               children: [
-                Container(
-                  color: t.paper,
-                  padding: const EdgeInsets.all(1),
-                  child:
-                      Icon(Icons.add_circle_outline, size: 14, color: t.ink3),
-                ),
+                _collapseIcon(t, Icons.add_circle_outline),
                 const SizedBox(width: 6),
                 Text(label, style: pulseMono(context, size: 11, color: t.ink3)),
               ],
