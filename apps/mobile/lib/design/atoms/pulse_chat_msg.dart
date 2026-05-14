@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../tokens.dart';
 import '../typography.dart';
+import 'pulse_markdown_body.dart';
 import 'pulse_avatar.dart';
 
 /// Chat message matching `.hf-msg`.
@@ -74,14 +75,7 @@ class PulseChatMsg extends StatelessWidget {
                               Border(left: BorderSide(color: t.ink, width: 2)),
                         )
                       : null,
-                  child: Text(
-                    text,
-                    style: TextStyle(
-                      fontSize: 12.5,
-                      color: t.ink,
-                      height: 1.4,
-                    ),
-                  ),
+                  child: PulseMarkdownBody(data: text, compact: true),
                 ),
                 if (promoted) ...[
                   const SizedBox(height: 2),

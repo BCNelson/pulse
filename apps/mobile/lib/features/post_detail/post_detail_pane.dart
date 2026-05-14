@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/selection.dart';
 import '../../design/atoms/pulse_avatar.dart';
+import '../../design/atoms/pulse_markdown_body.dart';
 import '../../design/atoms/pulse_section_head.dart';
 import '../../design/tokens.dart';
 import '../../design/typography.dart';
@@ -112,8 +113,7 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
   // Lazy-init via a getter so DDC hot-reload state desync (where the field
   // can read as `null`) doesn't crash with "Null is not Set<String>".
   Set<String>? _collapsedSubtreesField;
-  Set<String> get _collapsedSubtrees =>
-      _collapsedSubtreesField ??= <String>{};
+  Set<String> get _collapsedSubtrees => _collapsedSubtreesField ??= <String>{};
 
   void _toggleCollapsed(String commentId) {
     setState(() {
@@ -240,10 +240,7 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
                       ],
                     ),
                     const SizedBox(height: 14),
-                    Text(
-                      post.body,
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
+                    PulseMarkdownBody(data: post.body),
                     const SizedBox(height: 10),
                     ReactionBar(
                       postId: post.id,
@@ -304,11 +301,13 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
     final visibleK = k.clamp(0, _maxIndentDepth);
     return _indentStep * visibleK + _avatarRadius - 0.5 + 8;
   }
+
   // Row content starts at the avatar's left edge.
   double _rowContentLeft(int depth) {
     final visibleD = depth.clamp(0, _maxIndentDepth);
     return _indentStep * visibleD + 8;
   }
+
   // Y of the elbow's bend / avatar vertical center within the row.
   static const double _elbowBendY = 17;
   // Y where the OwnTrunk begins (just below the avatar's bottom).
@@ -430,10 +429,7 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
                         ],
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        comment.body,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                      ),
+                      PulseMarkdownBody(data: comment.body),
                       const SizedBox(height: 4),
                       InkWell(
                         onTap: () {
@@ -508,8 +504,8 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
                 Container(
                   color: t.paper,
                   padding: const EdgeInsets.all(1),
-                  child: Icon(Icons.add_circle_outline,
-                      size: 14, color: t.ink3),
+                  child:
+                      Icon(Icons.add_circle_outline, size: 14, color: t.ink3),
                 ),
                 const SizedBox(width: 6),
                 Text(label, style: pulseMono(context, size: 11, color: t.ink3)),
@@ -549,4 +545,3 @@ class _ThreadElbowPainter extends CustomPainter {
   @override
   bool shouldRepaint(_ThreadElbowPainter old) => old.color != color;
 }
-

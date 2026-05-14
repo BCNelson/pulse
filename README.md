@@ -64,3 +64,4 @@ Generated files (`internal/graphql/generated.go`, `lib/**/__generated__/`) are c
 - `apps/mobile`: Flutter app shell
 - `services/api`: Go GraphQL API
 - `db/migrations`: SQL migrations and schema history
+- `docs/rich-text-editing-process.md`: process for introducing rich text editing

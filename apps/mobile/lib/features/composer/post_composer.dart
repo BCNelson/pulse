@@ -11,6 +11,7 @@ import '../../graphql/__generated__/schema.schema.gql.dart';
 import '../../graphql/cache_handlers.dart';
 import '../../graphql/operations/__generated__/posts.data.gql.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
+import 'markdown_composer.dart';
 
 class PostComposer extends ConsumerStatefulWidget {
   const PostComposer({super.key, required this.tagId});
@@ -78,6 +79,7 @@ class _PostComposerState extends ConsumerState<PostComposer> {
           );
         }
       }
+      if (!mounted) return;
       setState(() => _busy = false);
       Navigator.of(context).pop();
     } catch (e) {
@@ -150,20 +152,13 @@ class _PostComposerState extends ConsumerState<PostComposer> {
           ),
           Divider(height: 1, color: t.hair2),
           const SizedBox(height: 8),
-          TextField(
+          MarkdownComposer(
             controller: _body,
-            maxLines: 6,
-            style: TextStyle(fontSize: 13, color: t.ink, height: 1.5),
-            decoration: InputDecoration(
-              hintText: 'Body…',
-              hintStyle: TextStyle(fontSize: 13, color: t.ink3),
-              border: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              filled: false,
-              isCollapsed: true,
-              contentPadding: const EdgeInsets.symmetric(vertical: 6),
-            ),
+            hintText: 'Body…',
+            minLines: 4,
+            maxLines: 8,
+            textStyle: TextStyle(fontSize: 13, color: t.ink, height: 1.5),
+            contentPadding: const EdgeInsets.fromLTRB(8, 10, 8, 10),
           ),
           const SizedBox(height: 12),
           if (_error != null)

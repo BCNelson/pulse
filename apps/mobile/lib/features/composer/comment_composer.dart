@@ -11,6 +11,7 @@ import '../../design/tokens.dart';
 import '../../design/typography.dart';
 import '../../graphql/cache_handlers.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
+import 'markdown_composer.dart';
 
 class CommentComposer extends ConsumerStatefulWidget {
   const CommentComposer({super.key, required this.postId});
@@ -194,8 +195,7 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
             if (target != null)
               Container(
                 margin: const EdgeInsets.fromLTRB(2, 0, 2, 6),
-                padding:
-                    const EdgeInsets.fromLTRB(8, 6, 4, 6),
+                padding: const EdgeInsets.fromLTRB(8, 6, 4, 6),
                 decoration: BoxDecoration(
                   color: t.ink.withValues(alpha: 0.04),
                   border: Border(
@@ -225,8 +225,7 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
                               target.body!.isNotEmpty) ...[
                             const SizedBox(height: 4),
                             ConstrainedBox(
-                              constraints:
-                                  const BoxConstraints(maxHeight: 96),
+                              constraints: const BoxConstraints(maxHeight: 96),
                               child: SingleChildScrollView(
                                 child: Text(
                                   target.body!,
@@ -250,9 +249,7 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
                         ref
                             .read(draftStorageProvider)
                             .clear(widget.postId, dismissed);
-                        ref
-                            .read(replyingToCommentProvider.notifier)
-                            .set(null);
+                        ref.read(replyingToCommentProvider.notifier).set(null);
                       },
                       child: Padding(
                         padding: const EdgeInsets.symmetric(
@@ -267,30 +264,14 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: t.paper,
-                      border: Border.all(color: t.hair),
-                      borderRadius: BorderRadius.circular(t.radius),
-                    ),
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    child: TextField(
-                      controller: _controller,
-                      focusNode: _focusNode,
-                      style: TextStyle(fontSize: 12, color: t.ink),
-                      minLines: 1,
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        hintText: target == null ? 'add a comment…' : 'reply…',
-                        hintStyle: TextStyle(color: t.ink3, fontSize: 12),
-                        isCollapsed: true,
-                        border: InputBorder.none,
-                        contentPadding:
-                            const EdgeInsets.symmetric(vertical: 8),
-                      ),
-                      onSubmitted: (_) => _submit(),
-                    ),
+                  child: MarkdownComposer(
+                    controller: _controller,
+                    focusNode: _focusNode,
+                    minLines: 1,
+                    maxLines: 4,
+                    hintText: target == null ? 'add a comment…' : 'reply…',
+                    textStyle: TextStyle(fontSize: 12, color: t.ink),
+                    onSubmitted: (_) => _submit(),
                   ),
                 ),
                 const SizedBox(width: 8),

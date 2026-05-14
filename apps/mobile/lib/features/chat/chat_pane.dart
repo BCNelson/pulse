@@ -11,6 +11,7 @@ import '../../design/tokens.dart';
 import '../../design/typography.dart';
 import '../../graphql/operations/__generated__/chat.data.gql.dart';
 import '../../graphql/operations/__generated__/chat.req.gql.dart';
+import '../composer/markdown_composer.dart';
 import 'cached_chat_room_provider.dart';
 import 'message_added_listener.dart';
 
@@ -266,27 +267,13 @@ class _RoomDetailState extends ConsumerState<_RoomDetail> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  color: t.paper,
-                  border: Border.all(color: t.hair),
-                  borderRadius: BorderRadius.circular(t.radius),
-                ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                child: TextField(
-                  controller: _controller,
-                  style: TextStyle(fontSize: 12, color: t.ink),
-                  maxLines: null,
-                  decoration: InputDecoration(
-                    hintText: 'message…',
-                    hintStyle: TextStyle(color: t.ink3, fontSize: 12),
-                    isCollapsed: true,
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                  ),
-                  onSubmitted: (_) => _send(),
-                ),
+              MarkdownComposer(
+                controller: _controller,
+                textStyle: TextStyle(fontSize: 12, color: t.ink),
+                hintText: 'message…',
+                minLines: 1,
+                maxLines: null,
+                onSubmitted: (_) => _send(),
               ),
               const SizedBox(height: 6),
               Row(
