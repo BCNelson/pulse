@@ -11,6 +11,7 @@ import '../../design/tokens.dart';
 import '../../design/typography.dart';
 import '../../graphql/cache_handlers.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
+import '../post_detail/post_read_marker.dart';
 import 'markdown_composer.dart';
 
 class CommentComposer extends ConsumerStatefulWidget {
@@ -156,6 +157,9 @@ class _CommentComposerState extends ConsumerState<CommentComposer> {
         if (freshPost != null) {
           await ref.read(postCacheStoreProvider).upsertPostDetail(freshPost);
         }
+        ref
+            .read(postReadMarkerProvider(widget.postId).notifier)
+            .markIfAdvanced();
       }
     } catch (e) {
       errorMessage = e.toString();

@@ -3663,7 +3663,16 @@ const Mutation = _i1.ObjectTypeDefinitionNode(
             isNonNull: true,
           ),
           defaultValue: null,
-        )
+        ),
+        _i1.InputValueDefinitionNode(
+          name: _i1.NameNode(value: 'seenAt'),
+          directives: [],
+          type: _i1.NamedTypeNode(
+            name: _i1.NameNode(value: 'Time'),
+            isNonNull: false,
+          ),
+          defaultValue: null,
+        ),
       ],
       type: _i1.NamedTypeNode(
         name: _i1.NameNode(value: 'Post'),

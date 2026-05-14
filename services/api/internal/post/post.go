@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
@@ -241,13 +242,17 @@ type EmojiCount struct {
 	ByViewer bool
 }
 
-// MarkRead upserts the viewer's last_read_at on a post.
-func (s *Service) MarkRead(ctx context.Context, id, principal uuid.UUID) error {
+// MarkRead upserts the viewer's last_read_at on a post. If seenAt is nil
+// the timestamp is the current server time. The stored value is clamped
+// with GREATEST so a stale-client timestamp or clock skew can never move
+// the read mark backwards.
+func (s *Service) MarkRead(ctx context.Context, id, principal uuid.UUID, seenAt *time.Time) error {
 	_, err := s.DB.Exec(ctx, `
         INSERT INTO principal_post_read (principal_id, post_id, last_read_at)
-        VALUES ($1, $2, now())
-        ON CONFLICT (principal_id, post_id) DO UPDATE SET last_read_at = EXCLUDED.last_read_at
-    `, principal, id)
+        VALUES ($1, $2, COALESCE($3, now()))
+        ON CONFLICT (principal_id, post_id) DO UPDATE
+          SET last_read_at = GREATEST(principal_post_read.last_read_at, COALESCE($3, now()))
+    `, principal, id, seenAt)
 	return err
 }
 

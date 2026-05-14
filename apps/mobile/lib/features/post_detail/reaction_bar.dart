@@ -6,6 +6,7 @@ import '../../design/tokens.dart';
 import '../../design/typography.dart';
 import '../../graphql/cache_handlers.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
+import 'post_read_marker.dart';
 
 typedef ReactionInfo = ({String emoji, int count, bool byViewer});
 
@@ -24,6 +25,7 @@ class ReactionBar extends ConsumerWidget {
     final allEmoji = <String>{...shown.keys, ..._quickEmoji};
 
     Future<void> toggle(String emoji, bool byViewer) async {
+      ref.read(postReadMarkerProvider(postId).notifier).markIfAdvanced();
       // The mutation response carries `{id, reactions {...}}` for the
       // post. Ferry's normalized cache merges that into the existing
       // Post:<id> entity automatically — every query referencing this

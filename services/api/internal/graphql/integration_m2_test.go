@@ -3,6 +3,7 @@ package graphql_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -132,12 +133,34 @@ func TestM2EndToEnd(t *testing.T) {
 		t.Errorf("charlie should see zero hits; got %d", len(cEdges))
 	}
 
-	// alice marks the post read.
-	markResp := gqlPost(t, ts.URL, aliceTok, `mutation($p:ID!){ markPostRead(postId:$p){ lastReadAt } }`,
-		map[string]any{"p": postID})
+	// alice marks the post read at an explicit seenAt timestamp.
+	seenAt := time.Now().UTC().Add(-1 * time.Hour).Format(time.RFC3339Nano)
+	markResp := gqlPost(t, ts.URL, aliceTok, `mutation($p:ID!,$s:Time){ markPostRead(postId:$p, seenAt:$s){ lastReadAt } }`,
+		map[string]any{"p": postID, "s": seenAt})
 	assertNoErrors(t, markResp)
-	if got := markResp.path("data", "markPostRead", "lastReadAt"); got == nil {
-		t.Error("lastReadAt should be set after markPostRead")
+	gotMark, ok := markResp.path("data", "markPostRead", "lastReadAt").(string)
+	if !ok || gotMark == "" {
+		t.Fatalf("lastReadAt should be a non-empty string after markPostRead, got %v", markResp.path("data", "markPostRead", "lastReadAt"))
+	}
+
+	// A second mark with an *older* seenAt must not move last_read_at
+	// backwards (GREATEST clamp). The returned lastReadAt should match
+	// the first call's timestamp.
+	olderSeenAt := time.Now().UTC().Add(-2 * time.Hour).Format(time.RFC3339Nano)
+	markResp2 := gqlPost(t, ts.URL, aliceTok, `mutation($p:ID!,$s:Time){ markPostRead(postId:$p, seenAt:$s){ lastReadAt } }`,
+		map[string]any{"p": postID, "s": olderSeenAt})
+	assertNoErrors(t, markResp2)
+	if got := markResp2.path("data", "markPostRead", "lastReadAt"); got != gotMark {
+		t.Errorf("monotonic mark violated: got %v, want %v", got, gotMark)
+	}
+
+	// Omitting seenAt falls back to now() and must move the timestamp forward.
+	markResp3 := gqlPost(t, ts.URL, aliceTok, `mutation($p:ID!){ markPostRead(postId:$p){ lastReadAt } }`,
+		map[string]any{"p": postID})
+	assertNoErrors(t, markResp3)
+	gotMark3, _ := markResp3.path("data", "markPostRead", "lastReadAt").(string)
+	if gotMark3 <= gotMark {
+		t.Errorf("markPostRead without seenAt should advance lastReadAt; got %v after %v", gotMark3, gotMark)
 	}
 
 	// alice edits the post; edit-history row should land.

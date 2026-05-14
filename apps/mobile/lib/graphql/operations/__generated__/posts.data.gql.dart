@@ -167,6 +167,8 @@ abstract class GPostsForTagData_tag_posts_edges_node
   @override
   bool get denyFlag;
   @override
+  _i2.GTime? get lastReadAt;
+  @override
   GPostsForTagData_tag_posts_edges_node_author get author;
   @override
   BuiltList<GPostsForTagData_tag_posts_edges_node_reactions> get reactions;
@@ -443,6 +445,8 @@ abstract class GPostDetailData_post
   _i2.GDecisionStatus? get decisionStatus;
   @override
   bool get denyFlag;
+  @override
+  _i2.GTime? get lastReadAt;
   @override
   GPostDetailData_post_author get author;
   @override
@@ -903,6 +907,8 @@ abstract class GCreatePostData_createPost
   @override
   bool get denyFlag;
   @override
+  _i2.GTime? get lastReadAt;
+  @override
   GCreatePostData_createPost_author get author;
   @override
   BuiltList<GCreatePostData_createPost_reactions> get reactions;
@@ -1275,6 +1281,67 @@ abstract class GCreateCommentData_createComment_reactions
       );
 }
 
+abstract class GMarkPostReadData
+    implements Built<GMarkPostReadData, GMarkPostReadDataBuilder> {
+  GMarkPostReadData._();
+
+  factory GMarkPostReadData(
+          [void Function(GMarkPostReadDataBuilder b) updates]) =
+      _$GMarkPostReadData;
+
+  static void _initializeBuilder(GMarkPostReadDataBuilder b) =>
+      b..G__typename = 'Mutation';
+
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  GMarkPostReadData_markPostRead get markPostRead;
+  static Serializer<GMarkPostReadData> get serializer =>
+      _$gMarkPostReadDataSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GMarkPostReadData.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GMarkPostReadData? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GMarkPostReadData.serializer,
+        json,
+      );
+}
+
+abstract class GMarkPostReadData_markPostRead
+    implements
+        Built<GMarkPostReadData_markPostRead,
+            GMarkPostReadData_markPostReadBuilder> {
+  GMarkPostReadData_markPostRead._();
+
+  factory GMarkPostReadData_markPostRead(
+          [void Function(GMarkPostReadData_markPostReadBuilder b) updates]) =
+      _$GMarkPostReadData_markPostRead;
+
+  static void _initializeBuilder(GMarkPostReadData_markPostReadBuilder b) =>
+      b..G__typename = 'Post';
+
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  String get id;
+  _i2.GTime? get lastReadAt;
+  static Serializer<GMarkPostReadData_markPostRead> get serializer =>
+      _$gMarkPostReadDataMarkPostReadSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GMarkPostReadData_markPostRead.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GMarkPostReadData_markPostRead? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GMarkPostReadData_markPostRead.serializer,
+        json,
+      );
+}
+
 abstract class GReactToPostData
     implements Built<GReactToPostData, GReactToPostDataBuilder> {
   GReactToPostData._();
@@ -1527,6 +1594,8 @@ abstract class GPostChangedData_postChanged
   @override
   bool get denyFlag;
   @override
+  _i2.GTime? get lastReadAt;
+  @override
   GPostChangedData_postChanged_author get author;
   @override
   BuiltList<GPostChangedData_postChanged_reactions> get reactions;
@@ -1749,6 +1818,7 @@ abstract class GPostSummary {
   _i2.GTime? get editedAt;
   _i2.GDecisionStatus? get decisionStatus;
   bool get denyFlag;
+  _i2.GTime? get lastReadAt;
   GPostSummary_author get author;
   BuiltList<GPostSummary_reactions> get reactions;
   GPostSummary_comments get comments;
@@ -1815,6 +1885,8 @@ abstract class GPostSummaryData
   _i2.GDecisionStatus? get decisionStatus;
   @override
   bool get denyFlag;
+  @override
+  _i2.GTime? get lastReadAt;
   @override
   GPostSummaryData_author get author;
   @override

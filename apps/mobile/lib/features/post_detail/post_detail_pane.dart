@@ -13,6 +13,7 @@ import '../../graphql/operations/__generated__/posts.data.gql.dart';
 import '../composer/comment_composer.dart';
 import 'cached_post_detail_provider.dart';
 import 'comment_tree.dart';
+import 'post_read_marker.dart';
 import 'reaction_bar.dart';
 
 /// Shows a "sending…" pill if the optimistic comment hasn't been
@@ -115,6 +116,55 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
   Set<String>? _collapsedSubtreesField;
   Set<String> get _collapsedSubtrees => _collapsedSubtreesField ??= <String>{};
 
+  /// Frozen at view entry: the viewer's `Post.lastReadAt` at the moment
+  /// they opened the post. Used as the comparison anchor for "is this
+  /// comment new?". Stays frozen for the whole visit so highlights don't
+  /// vanish when we mark-as-read mid-visit. Null when the user has never
+  /// marked this post read — in that case, nothing is highlighted.
+  DateTime? _entryLastReadAt;
+  bool _entrySnapshotTaken = false;
+
+  final ScrollController _scrollController = ScrollController();
+  double? _initialScrollOffset;
+  Timer? _scrollSettleTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Each visit starts with a fresh marker — even if the user re-opens
+    // the same post within Riverpod's auto-keep-alive window.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(postReadMarkerProvider(widget.postId).notifier).reset();
+    });
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollSettleTimer?.cancel();
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final px = _scrollController.position.pixels;
+    _initialScrollOffset ??= px;
+    if ((px - _initialScrollOffset!).abs() <= 4) return;
+    // Coalesce scroll ticks: only attempt to advance the read mark once
+    // the user has stopped scrolling for a moment. Repeated scrolling
+    // after the mark is cheap (the provider no-ops when seenAt hasn't
+    // advanced), but this keeps a fast flick from issuing a burst.
+    _scrollSettleTimer?.cancel();
+    _scrollSettleTimer = Timer(const Duration(milliseconds: 250), _markRead);
+  }
+
+  void _markRead() {
+    ref.read(postReadMarkerProvider(widget.postId).notifier).markIfAdvanced();
+  }
+
   void _toggleCollapsed(String commentId) {
     setState(() {
       final s = _collapsedSubtrees;
@@ -122,6 +172,7 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
         s.add(commentId);
       }
     });
+    _markRead();
   }
 
   String _initials(String name) {
@@ -149,6 +200,11 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
     final replyTarget = ref.watch(replyingToCommentProvider);
     final detailAsync = ref.watch(cachedPostDetailProvider(widget.postId));
     final post = detailAsync.asData?.value;
+    if (post != null && !_entrySnapshotTaken) {
+      final iso = post.lastReadAt?.value;
+      _entryLastReadAt = iso == null ? null : DateTime.tryParse(iso)?.toUtc();
+      _entrySnapshotTaken = true;
+    }
     if (post == null) {
       if (detailAsync.isLoading) {
         return Center(
@@ -190,6 +246,7 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
       children: [
         Expanded(
           child: ListView(
+            controller: _scrollController,
             padding: EdgeInsets.zero,
             children: [
               // Hero post block
@@ -344,9 +401,23 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
 
   Widget _buildRow(RowState row, PulseTokens t, ReplyTarget? replyTarget) {
     return switch (row) {
-      CommentRowState() => _buildCommentRow(row, t, replyTarget),
+      CommentRowState() => _buildCommentRow(row, t, replyTarget, _isNew(row)),
       StubRowState() => _buildStubRow(row, t),
     };
+  }
+
+  /// True iff this row's comment is newer than the entry snapshot. Always
+  /// false when `_entryLastReadAt` is null (the user has never marked
+  /// this post read), so a fully-unread post starts with no highlights.
+  /// Optimistic rows are never highlighted — their `createdAt` is local
+  /// and not meaningful for the comparison.
+  bool _isNew(CommentRowState row) {
+    final anchor = _entryLastReadAt;
+    if (anchor == null) return false;
+    if (row.comment.isOptimistic) return false;
+    final created = DateTime.tryParse(row.comment.createdAtIso)?.toUtc();
+    if (created == null) return false;
+    return created.isAfter(anchor);
   }
 
   /// Common trunk-line pieces, derived from a RowState. Returns the list
@@ -415,15 +486,20 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
     CommentRowState row,
     PulseTokens t,
     ReplyTarget? replyTarget,
+    bool isNew,
   ) {
     final comment = row.comment;
     final isTarget = replyTarget?.commentId == comment.id;
     final contentLeft = _rowContentLeft(row.depth);
     final hasChildren = row.hasOwnTrunk; // any children, expanded or collapsed
+    // Reply-target tint takes precedence over unread tint — the two would
+    // otherwise stack and produce a muddy color, and reply-target is more
+    // actionable.
+    final Color? rowBg = isTarget
+        ? t.ink.withValues(alpha: 0.04)
+        : (isNew ? t.blueSoft : null);
     return Container(
-      decoration: BoxDecoration(
-        color: isTarget ? t.ink.withValues(alpha: 0.04) : null,
-      ),
+      decoration: BoxDecoration(color: rowBg),
       child: Stack(
         clipBehavior: Clip.none,
         children: [

@@ -103,6 +103,31 @@ abstract class GCreateCommentVars
       );
 }
 
+abstract class GMarkPostReadVars
+    implements Built<GMarkPostReadVars, GMarkPostReadVarsBuilder> {
+  GMarkPostReadVars._();
+
+  factory GMarkPostReadVars(
+          [void Function(GMarkPostReadVarsBuilder b) updates]) =
+      _$GMarkPostReadVars;
+
+  String get postId;
+  _i2.GTime? get seenAt;
+  static Serializer<GMarkPostReadVars> get serializer =>
+      _$gMarkPostReadVarsSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GMarkPostReadVars.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GMarkPostReadVars? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GMarkPostReadVars.serializer,
+        json,
+      );
+}
+
 abstract class GReactToPostVars
     implements Built<GReactToPostVars, GReactToPostVarsBuilder> {
   GReactToPostVars._();

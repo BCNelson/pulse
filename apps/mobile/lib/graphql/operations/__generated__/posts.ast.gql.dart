@@ -63,6 +63,13 @@ const PostSummary = _i1.FragmentDefinitionNode(
       selectionSet: null,
     ),
     _i1.FieldNode(
+      name: _i1.NameNode(value: 'lastReadAt'),
+      alias: null,
+      arguments: [],
+      directives: [],
+      selectionSet: null,
+    ),
+    _i1.FieldNode(
       name: _i1.NameNode(value: 'author'),
       alias: null,
       arguments: [],
@@ -574,6 +581,64 @@ const CreateComment = _i1.OperationDefinitionNode(
     )
   ]),
 );
+const MarkPostRead = _i1.OperationDefinitionNode(
+  type: _i1.OperationType.mutation,
+  name: _i1.NameNode(value: 'MarkPostRead'),
+  variableDefinitions: [
+    _i1.VariableDefinitionNode(
+      variable: _i1.VariableNode(name: _i1.NameNode(value: 'postId')),
+      type: _i1.NamedTypeNode(
+        name: _i1.NameNode(value: 'ID'),
+        isNonNull: true,
+      ),
+      defaultValue: _i1.DefaultValueNode(value: null),
+      directives: [],
+    ),
+    _i1.VariableDefinitionNode(
+      variable: _i1.VariableNode(name: _i1.NameNode(value: 'seenAt')),
+      type: _i1.NamedTypeNode(
+        name: _i1.NameNode(value: 'Time'),
+        isNonNull: false,
+      ),
+      defaultValue: _i1.DefaultValueNode(value: null),
+      directives: [],
+    ),
+  ],
+  directives: [],
+  selectionSet: _i1.SelectionSetNode(selections: [
+    _i1.FieldNode(
+      name: _i1.NameNode(value: 'markPostRead'),
+      alias: null,
+      arguments: [
+        _i1.ArgumentNode(
+          name: _i1.NameNode(value: 'postId'),
+          value: _i1.VariableNode(name: _i1.NameNode(value: 'postId')),
+        ),
+        _i1.ArgumentNode(
+          name: _i1.NameNode(value: 'seenAt'),
+          value: _i1.VariableNode(name: _i1.NameNode(value: 'seenAt')),
+        ),
+      ],
+      directives: [],
+      selectionSet: _i1.SelectionSetNode(selections: [
+        _i1.FieldNode(
+          name: _i1.NameNode(value: 'id'),
+          alias: null,
+          arguments: [],
+          directives: [],
+          selectionSet: null,
+        ),
+        _i1.FieldNode(
+          name: _i1.NameNode(value: 'lastReadAt'),
+          alias: null,
+          arguments: [],
+          directives: [],
+          selectionSet: null,
+        ),
+      ]),
+    )
+  ]),
+);
 const ReactToPost = _i1.OperationDefinitionNode(
   type: _i1.OperationType.mutation,
   name: _i1.NameNode(value: 'ReactToPost'),
@@ -776,6 +841,7 @@ const document = _i1.DocumentNode(definitions: [
   PostDetail,
   CreatePost,
   CreateComment,
+  MarkPostRead,
   ReactToPost,
   UnreactToPost,
   PostChanged,

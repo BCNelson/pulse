@@ -606,7 +606,7 @@ func (r *mutationResolver) UnreactToPost(ctx context.Context, postID string, emo
 }
 
 // MarkPostRead is the resolver for the markPostRead field.
-func (r *mutationResolver) MarkPostRead(ctx context.Context, postID string) (*model.Post, error) {
+func (r *mutationResolver) MarkPostRead(ctx context.Context, postID string, seenAt *time.Time) (*model.Post, error) {
 	identity, err := requireIdentity(ctx)
 	if err != nil {
 		return nil, err
@@ -622,7 +622,7 @@ func (r *mutationResolver) MarkPostRead(ctx context.Context, postID string) (*mo
 	if !can {
 		return nil, errPermissionDenied
 	}
-	if err := r.Posts.MarkRead(ctx, id, identity.EffectiveID); err != nil {
+	if err := r.Posts.MarkRead(ctx, id, identity.EffectiveID, seenAt); err != nil {
 		return nil, err
 	}
 	return r.loadPost(ctx, id)

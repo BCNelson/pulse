@@ -95,6 +95,11 @@ Serializer<GCreateCommentData_createComment_author>
 Serializer<GCreateCommentData_createComment_reactions>
     _$gCreateCommentDataCreateCommentReactionsSerializer =
     _$GCreateCommentData_createComment_reactionsSerializer();
+Serializer<GMarkPostReadData> _$gMarkPostReadDataSerializer =
+    _$GMarkPostReadDataSerializer();
+Serializer<GMarkPostReadData_markPostRead>
+    _$gMarkPostReadDataMarkPostReadSerializer =
+    _$GMarkPostReadData_markPostReadSerializer();
 Serializer<GReactToPostData> _$gReactToPostDataSerializer =
     _$GReactToPostDataSerializer();
 Serializer<GReactToPostData_reactToPost>
@@ -464,6 +469,13 @@ class _$GPostsForTagData_tag_posts_edges_nodeSerializer
         ..add(serializers.serialize(value,
             specifiedType: const FullType(_i2.GDecisionStatus)));
     }
+    value = object.lastReadAt;
+    if (value != null) {
+      result
+        ..add('lastReadAt')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(_i2.GTime)));
+    }
     return result;
   }
 
@@ -511,6 +523,10 @@ class _$GPostsForTagData_tag_posts_edges_nodeSerializer
         case 'denyFlag':
           result.denyFlag = serializers.deserialize(value,
               specifiedType: const FullType(bool))! as bool;
+          break;
+        case 'lastReadAt':
+          result.lastReadAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
           break;
         case 'author':
           result.author.replace(serializers.deserialize(value,
@@ -957,6 +973,13 @@ class _$GPostDetailData_postSerializer
         ..add(serializers.serialize(value,
             specifiedType: const FullType(_i2.GDecisionStatus)));
     }
+    value = object.lastReadAt;
+    if (value != null) {
+      result
+        ..add('lastReadAt')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(_i2.GTime)));
+    }
     return result;
   }
 
@@ -1004,6 +1027,10 @@ class _$GPostDetailData_postSerializer
         case 'denyFlag':
           result.denyFlag = serializers.deserialize(value,
               specifiedType: const FullType(bool))! as bool;
+          break;
+        case 'lastReadAt':
+          result.lastReadAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
           break;
         case 'author':
           result.author.replace(serializers.deserialize(value,
@@ -1820,6 +1847,13 @@ class _$GCreatePostData_createPostSerializer
         ..add(serializers.serialize(value,
             specifiedType: const FullType(_i2.GDecisionStatus)));
     }
+    value = object.lastReadAt;
+    if (value != null) {
+      result
+        ..add('lastReadAt')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(_i2.GTime)));
+    }
     return result;
   }
 
@@ -1867,6 +1901,10 @@ class _$GCreatePostData_createPostSerializer
         case 'denyFlag':
           result.denyFlag = serializers.deserialize(value,
               specifiedType: const FullType(bool))! as bool;
+          break;
+        case 'lastReadAt':
+          result.lastReadAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
           break;
         case 'author':
           result.author.replace(serializers.deserialize(value,
@@ -2483,6 +2521,120 @@ class _$GCreateCommentData_createComment_reactionsSerializer
   }
 }
 
+class _$GMarkPostReadDataSerializer
+    implements StructuredSerializer<GMarkPostReadData> {
+  @override
+  final Iterable<Type> types = const [GMarkPostReadData, _$GMarkPostReadData];
+  @override
+  final String wireName = 'GMarkPostReadData';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, GMarkPostReadData object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'markPostRead',
+      serializers.serialize(object.markPostRead,
+          specifiedType: const FullType(GMarkPostReadData_markPostRead)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GMarkPostReadData deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GMarkPostReadDataBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'markPostRead':
+          result.markPostRead.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GMarkPostReadData_markPostRead))!
+              as GMarkPostReadData_markPostRead);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GMarkPostReadData_markPostReadSerializer
+    implements StructuredSerializer<GMarkPostReadData_markPostRead> {
+  @override
+  final Iterable<Type> types = const [
+    GMarkPostReadData_markPostRead,
+    _$GMarkPostReadData_markPostRead
+  ];
+  @override
+  final String wireName = 'GMarkPostReadData_markPostRead';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GMarkPostReadData_markPostRead object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.lastReadAt;
+    if (value != null) {
+      result
+        ..add('lastReadAt')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(_i2.GTime)));
+    }
+    return result;
+  }
+
+  @override
+  GMarkPostReadData_markPostRead deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GMarkPostReadData_markPostReadBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'lastReadAt':
+          result.lastReadAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
 class _$GReactToPostDataSerializer
     implements StructuredSerializer<GReactToPostData> {
   @override
@@ -2950,6 +3102,13 @@ class _$GPostChangedData_postChangedSerializer
         ..add(serializers.serialize(value,
             specifiedType: const FullType(_i2.GDecisionStatus)));
     }
+    value = object.lastReadAt;
+    if (value != null) {
+      result
+        ..add('lastReadAt')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(_i2.GTime)));
+    }
     return result;
   }
 
@@ -2997,6 +3156,10 @@ class _$GPostChangedData_postChangedSerializer
         case 'denyFlag':
           result.denyFlag = serializers.deserialize(value,
               specifiedType: const FullType(bool))! as bool;
+          break;
+        case 'lastReadAt':
+          result.lastReadAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
           break;
         case 'author':
           result.author.replace(serializers.deserialize(value,
@@ -3368,6 +3531,13 @@ class _$GPostSummaryDataSerializer
         ..add(serializers.serialize(value,
             specifiedType: const FullType(_i2.GDecisionStatus)));
     }
+    value = object.lastReadAt;
+    if (value != null) {
+      result
+        ..add('lastReadAt')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(_i2.GTime)));
+    }
     return result;
   }
 
@@ -3415,6 +3585,10 @@ class _$GPostSummaryDataSerializer
         case 'denyFlag':
           result.denyFlag = serializers.deserialize(value,
               specifiedType: const FullType(bool))! as bool;
+          break;
+        case 'lastReadAt':
+          result.lastReadAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
           break;
         case 'author':
           result.author.replace(serializers.deserialize(value,
@@ -4509,6 +4683,8 @@ class _$GPostsForTagData_tag_posts_edges_node
   @override
   final bool denyFlag;
   @override
+  final _i2.GTime? lastReadAt;
+  @override
   final GPostsForTagData_tag_posts_edges_node_author author;
   @override
   final BuiltList<GPostsForTagData_tag_posts_edges_node_reactions> reactions;
@@ -4530,6 +4706,7 @@ class _$GPostsForTagData_tag_posts_edges_node
       this.editedAt,
       this.decisionStatus,
       required this.denyFlag,
+      this.lastReadAt,
       required this.author,
       required this.reactions,
       required this.comments})
@@ -4556,6 +4733,7 @@ class _$GPostsForTagData_tag_posts_edges_node
         editedAt == other.editedAt &&
         decisionStatus == other.decisionStatus &&
         denyFlag == other.denyFlag &&
+        lastReadAt == other.lastReadAt &&
         author == other.author &&
         reactions == other.reactions &&
         comments == other.comments;
@@ -4572,6 +4750,7 @@ class _$GPostsForTagData_tag_posts_edges_node
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, decisionStatus.hashCode);
     _$hash = $jc(_$hash, denyFlag.hashCode);
+    _$hash = $jc(_$hash, lastReadAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jc(_$hash, comments.hashCode);
@@ -4591,6 +4770,7 @@ class _$GPostsForTagData_tag_posts_edges_node
           ..add('editedAt', editedAt)
           ..add('decisionStatus', decisionStatus)
           ..add('denyFlag', denyFlag)
+          ..add('lastReadAt', lastReadAt)
           ..add('author', author)
           ..add('reactions', reactions)
           ..add('comments', comments))
@@ -4637,6 +4817,11 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
   bool? get denyFlag => _$this._denyFlag;
   set denyFlag(bool? denyFlag) => _$this._denyFlag = denyFlag;
 
+  _i2.GTimeBuilder? _lastReadAt;
+  _i2.GTimeBuilder get lastReadAt => _$this._lastReadAt ??= _i2.GTimeBuilder();
+  set lastReadAt(_i2.GTimeBuilder? lastReadAt) =>
+      _$this._lastReadAt = lastReadAt;
+
   GPostsForTagData_tag_posts_edges_node_authorBuilder? _author;
   GPostsForTagData_tag_posts_edges_node_authorBuilder get author =>
       _$this._author ??= GPostsForTagData_tag_posts_edges_node_authorBuilder();
@@ -4675,6 +4860,7 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
       _editedAt = $v.editedAt?.toBuilder();
       _decisionStatus = $v.decisionStatus;
       _denyFlag = $v.denyFlag;
+      _lastReadAt = $v.lastReadAt?.toBuilder();
       _author = $v.author.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _comments = $v.comments.toBuilder();
@@ -4715,6 +4901,7 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
             decisionStatus: decisionStatus,
             denyFlag: BuiltValueNullFieldError.checkNotNull(
                 denyFlag, r'GPostsForTagData_tag_posts_edges_node', 'denyFlag'),
+            lastReadAt: _lastReadAt?.build(),
             author: author.build(),
             reactions: reactions.build(),
             comments: comments.build(),
@@ -4727,6 +4914,8 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
         _$failedField = 'editedAt';
         _editedAt?.build();
 
+        _$failedField = 'lastReadAt';
+        _lastReadAt?.build();
         _$failedField = 'author';
         author.build();
         _$failedField = 'reactions';
@@ -5520,6 +5709,8 @@ class _$GPostDetailData_post extends GPostDetailData_post {
   @override
   final bool denyFlag;
   @override
+  final _i2.GTime? lastReadAt;
+  @override
   final GPostDetailData_post_author author;
   @override
   final BuiltList<GPostDetailData_post_reactions> reactions;
@@ -5543,6 +5734,7 @@ class _$GPostDetailData_post extends GPostDetailData_post {
       this.editedAt,
       this.decisionStatus,
       required this.denyFlag,
+      this.lastReadAt,
       required this.author,
       required this.reactions,
       required this.comments,
@@ -5570,6 +5762,7 @@ class _$GPostDetailData_post extends GPostDetailData_post {
         editedAt == other.editedAt &&
         decisionStatus == other.decisionStatus &&
         denyFlag == other.denyFlag &&
+        lastReadAt == other.lastReadAt &&
         author == other.author &&
         reactions == other.reactions &&
         comments == other.comments &&
@@ -5588,6 +5781,7 @@ class _$GPostDetailData_post extends GPostDetailData_post {
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, decisionStatus.hashCode);
     _$hash = $jc(_$hash, denyFlag.hashCode);
+    _$hash = $jc(_$hash, lastReadAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jc(_$hash, comments.hashCode);
@@ -5608,6 +5802,7 @@ class _$GPostDetailData_post extends GPostDetailData_post {
           ..add('editedAt', editedAt)
           ..add('decisionStatus', decisionStatus)
           ..add('denyFlag', denyFlag)
+          ..add('lastReadAt', lastReadAt)
           ..add('author', author)
           ..add('reactions', reactions)
           ..add('comments', comments)
@@ -5654,6 +5849,11 @@ class GPostDetailData_postBuilder
   bool? get denyFlag => _$this._denyFlag;
   set denyFlag(bool? denyFlag) => _$this._denyFlag = denyFlag;
 
+  _i2.GTimeBuilder? _lastReadAt;
+  _i2.GTimeBuilder get lastReadAt => _$this._lastReadAt ??= _i2.GTimeBuilder();
+  set lastReadAt(_i2.GTimeBuilder? lastReadAt) =>
+      _$this._lastReadAt = lastReadAt;
+
   GPostDetailData_post_authorBuilder? _author;
   GPostDetailData_post_authorBuilder get author =>
       _$this._author ??= GPostDetailData_post_authorBuilder();
@@ -5698,6 +5898,7 @@ class GPostDetailData_postBuilder
       _editedAt = $v.editedAt?.toBuilder();
       _decisionStatus = $v.decisionStatus;
       _denyFlag = $v.denyFlag;
+      _lastReadAt = $v.lastReadAt?.toBuilder();
       _author = $v.author.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _comments = $v.comments.toBuilder();
@@ -5739,6 +5940,7 @@ class GPostDetailData_postBuilder
             decisionStatus: decisionStatus,
             denyFlag: BuiltValueNullFieldError.checkNotNull(
                 denyFlag, r'GPostDetailData_post', 'denyFlag'),
+            lastReadAt: _lastReadAt?.build(),
             author: author.build(),
             reactions: reactions.build(),
             comments: comments.build(),
@@ -5753,6 +5955,8 @@ class GPostDetailData_postBuilder
         _$failedField = 'editedAt';
         _editedAt?.build();
 
+        _$failedField = 'lastReadAt';
+        _lastReadAt?.build();
         _$failedField = 'author';
         author.build();
         _$failedField = 'reactions';
@@ -7263,6 +7467,8 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
   @override
   final bool denyFlag;
   @override
+  final _i2.GTime? lastReadAt;
+  @override
   final GCreatePostData_createPost_author author;
   @override
   final BuiltList<GCreatePostData_createPost_reactions> reactions;
@@ -7282,6 +7488,7 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
       this.editedAt,
       this.decisionStatus,
       required this.denyFlag,
+      this.lastReadAt,
       required this.author,
       required this.reactions,
       required this.comments})
@@ -7307,6 +7514,7 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
         editedAt == other.editedAt &&
         decisionStatus == other.decisionStatus &&
         denyFlag == other.denyFlag &&
+        lastReadAt == other.lastReadAt &&
         author == other.author &&
         reactions == other.reactions &&
         comments == other.comments;
@@ -7323,6 +7531,7 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, decisionStatus.hashCode);
     _$hash = $jc(_$hash, denyFlag.hashCode);
+    _$hash = $jc(_$hash, lastReadAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jc(_$hash, comments.hashCode);
@@ -7341,6 +7550,7 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
           ..add('editedAt', editedAt)
           ..add('decisionStatus', decisionStatus)
           ..add('denyFlag', denyFlag)
+          ..add('lastReadAt', lastReadAt)
           ..add('author', author)
           ..add('reactions', reactions)
           ..add('comments', comments))
@@ -7386,6 +7596,11 @@ class GCreatePostData_createPostBuilder
   bool? get denyFlag => _$this._denyFlag;
   set denyFlag(bool? denyFlag) => _$this._denyFlag = denyFlag;
 
+  _i2.GTimeBuilder? _lastReadAt;
+  _i2.GTimeBuilder get lastReadAt => _$this._lastReadAt ??= _i2.GTimeBuilder();
+  set lastReadAt(_i2.GTimeBuilder? lastReadAt) =>
+      _$this._lastReadAt = lastReadAt;
+
   GCreatePostData_createPost_authorBuilder? _author;
   GCreatePostData_createPost_authorBuilder get author =>
       _$this._author ??= GCreatePostData_createPost_authorBuilder();
@@ -7419,6 +7634,7 @@ class GCreatePostData_createPostBuilder
       _editedAt = $v.editedAt?.toBuilder();
       _decisionStatus = $v.decisionStatus;
       _denyFlag = $v.denyFlag;
+      _lastReadAt = $v.lastReadAt?.toBuilder();
       _author = $v.author.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _comments = $v.comments.toBuilder();
@@ -7458,6 +7674,7 @@ class GCreatePostData_createPostBuilder
             decisionStatus: decisionStatus,
             denyFlag: BuiltValueNullFieldError.checkNotNull(
                 denyFlag, r'GCreatePostData_createPost', 'denyFlag'),
+            lastReadAt: _lastReadAt?.build(),
             author: author.build(),
             reactions: reactions.build(),
             comments: comments.build(),
@@ -7470,6 +7687,8 @@ class GCreatePostData_createPostBuilder
         _$failedField = 'editedAt';
         _editedAt?.build();
 
+        _$failedField = 'lastReadAt';
+        _lastReadAt?.build();
         _$failedField = 'author';
         author.build();
         _$failedField = 'reactions';
@@ -8687,6 +8906,245 @@ class GCreateCommentData_createComment_reactionsBuilder
   }
 }
 
+class _$GMarkPostReadData extends GMarkPostReadData {
+  @override
+  final String G__typename;
+  @override
+  final GMarkPostReadData_markPostRead markPostRead;
+
+  factory _$GMarkPostReadData(
+          [void Function(GMarkPostReadDataBuilder)? updates]) =>
+      (GMarkPostReadDataBuilder()..update(updates))._build();
+
+  _$GMarkPostReadData._({required this.G__typename, required this.markPostRead})
+      : super._();
+  @override
+  GMarkPostReadData rebuild(void Function(GMarkPostReadDataBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GMarkPostReadDataBuilder toBuilder() =>
+      GMarkPostReadDataBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GMarkPostReadData &&
+        G__typename == other.G__typename &&
+        markPostRead == other.markPostRead;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, markPostRead.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GMarkPostReadData')
+          ..add('G__typename', G__typename)
+          ..add('markPostRead', markPostRead))
+        .toString();
+  }
+}
+
+class GMarkPostReadDataBuilder
+    implements Builder<GMarkPostReadData, GMarkPostReadDataBuilder> {
+  _$GMarkPostReadData? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  GMarkPostReadData_markPostReadBuilder? _markPostRead;
+  GMarkPostReadData_markPostReadBuilder get markPostRead =>
+      _$this._markPostRead ??= GMarkPostReadData_markPostReadBuilder();
+  set markPostRead(GMarkPostReadData_markPostReadBuilder? markPostRead) =>
+      _$this._markPostRead = markPostRead;
+
+  GMarkPostReadDataBuilder() {
+    GMarkPostReadData._initializeBuilder(this);
+  }
+
+  GMarkPostReadDataBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _markPostRead = $v.markPostRead.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GMarkPostReadData other) {
+    _$v = other as _$GMarkPostReadData;
+  }
+
+  @override
+  void update(void Function(GMarkPostReadDataBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GMarkPostReadData build() => _build();
+
+  _$GMarkPostReadData _build() {
+    _$GMarkPostReadData _$result;
+    try {
+      _$result = _$v ??
+          _$GMarkPostReadData._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GMarkPostReadData', 'G__typename'),
+            markPostRead: markPostRead.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'markPostRead';
+        markPostRead.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GMarkPostReadData', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GMarkPostReadData_markPostRead extends GMarkPostReadData_markPostRead {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final _i2.GTime? lastReadAt;
+
+  factory _$GMarkPostReadData_markPostRead(
+          [void Function(GMarkPostReadData_markPostReadBuilder)? updates]) =>
+      (GMarkPostReadData_markPostReadBuilder()..update(updates))._build();
+
+  _$GMarkPostReadData_markPostRead._(
+      {required this.G__typename, required this.id, this.lastReadAt})
+      : super._();
+  @override
+  GMarkPostReadData_markPostRead rebuild(
+          void Function(GMarkPostReadData_markPostReadBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GMarkPostReadData_markPostReadBuilder toBuilder() =>
+      GMarkPostReadData_markPostReadBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GMarkPostReadData_markPostRead &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        lastReadAt == other.lastReadAt;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, lastReadAt.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GMarkPostReadData_markPostRead')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('lastReadAt', lastReadAt))
+        .toString();
+  }
+}
+
+class GMarkPostReadData_markPostReadBuilder
+    implements
+        Builder<GMarkPostReadData_markPostRead,
+            GMarkPostReadData_markPostReadBuilder> {
+  _$GMarkPostReadData_markPostRead? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  _i2.GTimeBuilder? _lastReadAt;
+  _i2.GTimeBuilder get lastReadAt => _$this._lastReadAt ??= _i2.GTimeBuilder();
+  set lastReadAt(_i2.GTimeBuilder? lastReadAt) =>
+      _$this._lastReadAt = lastReadAt;
+
+  GMarkPostReadData_markPostReadBuilder() {
+    GMarkPostReadData_markPostRead._initializeBuilder(this);
+  }
+
+  GMarkPostReadData_markPostReadBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _lastReadAt = $v.lastReadAt?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GMarkPostReadData_markPostRead other) {
+    _$v = other as _$GMarkPostReadData_markPostRead;
+  }
+
+  @override
+  void update(void Function(GMarkPostReadData_markPostReadBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GMarkPostReadData_markPostRead build() => _build();
+
+  _$GMarkPostReadData_markPostRead _build() {
+    _$GMarkPostReadData_markPostRead _$result;
+    try {
+      _$result = _$v ??
+          _$GMarkPostReadData_markPostRead._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GMarkPostReadData_markPostRead', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GMarkPostReadData_markPostRead', 'id'),
+            lastReadAt: _lastReadAt?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'lastReadAt';
+        _lastReadAt?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GMarkPostReadData_markPostRead', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
 class _$GReactToPostData extends GReactToPostData {
   @override
   final String G__typename;
@@ -9575,6 +10033,8 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
   @override
   final bool denyFlag;
   @override
+  final _i2.GTime? lastReadAt;
+  @override
   final GPostChangedData_postChanged_author author;
   @override
   final BuiltList<GPostChangedData_postChanged_reactions> reactions;
@@ -9594,6 +10054,7 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
       this.editedAt,
       this.decisionStatus,
       required this.denyFlag,
+      this.lastReadAt,
       required this.author,
       required this.reactions,
       required this.comments})
@@ -9619,6 +10080,7 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
         editedAt == other.editedAt &&
         decisionStatus == other.decisionStatus &&
         denyFlag == other.denyFlag &&
+        lastReadAt == other.lastReadAt &&
         author == other.author &&
         reactions == other.reactions &&
         comments == other.comments;
@@ -9635,6 +10097,7 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, decisionStatus.hashCode);
     _$hash = $jc(_$hash, denyFlag.hashCode);
+    _$hash = $jc(_$hash, lastReadAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jc(_$hash, comments.hashCode);
@@ -9653,6 +10116,7 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
           ..add('editedAt', editedAt)
           ..add('decisionStatus', decisionStatus)
           ..add('denyFlag', denyFlag)
+          ..add('lastReadAt', lastReadAt)
           ..add('author', author)
           ..add('reactions', reactions)
           ..add('comments', comments))
@@ -9699,6 +10163,11 @@ class GPostChangedData_postChangedBuilder
   bool? get denyFlag => _$this._denyFlag;
   set denyFlag(bool? denyFlag) => _$this._denyFlag = denyFlag;
 
+  _i2.GTimeBuilder? _lastReadAt;
+  _i2.GTimeBuilder get lastReadAt => _$this._lastReadAt ??= _i2.GTimeBuilder();
+  set lastReadAt(_i2.GTimeBuilder? lastReadAt) =>
+      _$this._lastReadAt = lastReadAt;
+
   GPostChangedData_postChanged_authorBuilder? _author;
   GPostChangedData_postChanged_authorBuilder get author =>
       _$this._author ??= GPostChangedData_postChanged_authorBuilder();
@@ -9734,6 +10203,7 @@ class GPostChangedData_postChangedBuilder
       _editedAt = $v.editedAt?.toBuilder();
       _decisionStatus = $v.decisionStatus;
       _denyFlag = $v.denyFlag;
+      _lastReadAt = $v.lastReadAt?.toBuilder();
       _author = $v.author.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _comments = $v.comments.toBuilder();
@@ -9773,6 +10243,7 @@ class GPostChangedData_postChangedBuilder
             decisionStatus: decisionStatus,
             denyFlag: BuiltValueNullFieldError.checkNotNull(
                 denyFlag, r'GPostChangedData_postChanged', 'denyFlag'),
+            lastReadAt: _lastReadAt?.build(),
             author: author.build(),
             reactions: reactions.build(),
             comments: comments.build(),
@@ -9785,6 +10256,8 @@ class GPostChangedData_postChangedBuilder
         _$failedField = 'editedAt';
         _editedAt?.build();
 
+        _$failedField = 'lastReadAt';
+        _lastReadAt?.build();
         _$failedField = 'author';
         author.build();
         _$failedField = 'reactions';
@@ -10436,6 +10909,8 @@ class _$GPostSummaryData extends GPostSummaryData {
   @override
   final bool denyFlag;
   @override
+  final _i2.GTime? lastReadAt;
+  @override
   final GPostSummaryData_author author;
   @override
   final BuiltList<GPostSummaryData_reactions> reactions;
@@ -10455,6 +10930,7 @@ class _$GPostSummaryData extends GPostSummaryData {
       this.editedAt,
       this.decisionStatus,
       required this.denyFlag,
+      this.lastReadAt,
       required this.author,
       required this.reactions,
       required this.comments})
@@ -10479,6 +10955,7 @@ class _$GPostSummaryData extends GPostSummaryData {
         editedAt == other.editedAt &&
         decisionStatus == other.decisionStatus &&
         denyFlag == other.denyFlag &&
+        lastReadAt == other.lastReadAt &&
         author == other.author &&
         reactions == other.reactions &&
         comments == other.comments;
@@ -10495,6 +10972,7 @@ class _$GPostSummaryData extends GPostSummaryData {
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, decisionStatus.hashCode);
     _$hash = $jc(_$hash, denyFlag.hashCode);
+    _$hash = $jc(_$hash, lastReadAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jc(_$hash, comments.hashCode);
@@ -10513,6 +10991,7 @@ class _$GPostSummaryData extends GPostSummaryData {
           ..add('editedAt', editedAt)
           ..add('decisionStatus', decisionStatus)
           ..add('denyFlag', denyFlag)
+          ..add('lastReadAt', lastReadAt)
           ..add('author', author)
           ..add('reactions', reactions)
           ..add('comments', comments))
@@ -10557,6 +11036,11 @@ class GPostSummaryDataBuilder
   bool? get denyFlag => _$this._denyFlag;
   set denyFlag(bool? denyFlag) => _$this._denyFlag = denyFlag;
 
+  _i2.GTimeBuilder? _lastReadAt;
+  _i2.GTimeBuilder get lastReadAt => _$this._lastReadAt ??= _i2.GTimeBuilder();
+  set lastReadAt(_i2.GTimeBuilder? lastReadAt) =>
+      _$this._lastReadAt = lastReadAt;
+
   GPostSummaryData_authorBuilder? _author;
   GPostSummaryData_authorBuilder get author =>
       _$this._author ??= GPostSummaryData_authorBuilder();
@@ -10589,6 +11073,7 @@ class GPostSummaryDataBuilder
       _editedAt = $v.editedAt?.toBuilder();
       _decisionStatus = $v.decisionStatus;
       _denyFlag = $v.denyFlag;
+      _lastReadAt = $v.lastReadAt?.toBuilder();
       _author = $v.author.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _comments = $v.comments.toBuilder();
@@ -10628,6 +11113,7 @@ class GPostSummaryDataBuilder
             decisionStatus: decisionStatus,
             denyFlag: BuiltValueNullFieldError.checkNotNull(
                 denyFlag, r'GPostSummaryData', 'denyFlag'),
+            lastReadAt: _lastReadAt?.build(),
             author: author.build(),
             reactions: reactions.build(),
             comments: comments.build(),
@@ -10640,6 +11126,8 @@ class GPostSummaryDataBuilder
         _$failedField = 'editedAt';
         _editedAt?.build();
 
+        _$failedField = 'lastReadAt';
+        _lastReadAt?.build();
         _$failedField = 'author';
         author.build();
         _$failedField = 'reactions';

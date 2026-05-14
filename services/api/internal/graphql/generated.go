@@ -180,7 +180,7 @@ type ComplexityRoot struct {
 		Logout                   func(childComplexity int) int
 		MarkAllNotificationsRead func(childComplexity int) int
 		MarkNotificationRead     func(childComplexity int, notificationIds []string) int
-		MarkPostRead             func(childComplexity int, postID string) int
+		MarkPostRead             func(childComplexity int, postID string, seenAt *time.Time) int
 		MoveTag                  func(childComplexity int, tagID string, newParentID string, reason *string) int
 		PromoteCommentToTask     func(childComplexity int, commentID string, title string, dueAt *time.Time, assignees []string) int
 		PromoteMessage           func(childComplexity int, messageID string) int
@@ -446,7 +446,7 @@ type MutationResolver interface {
 	SetDenyFlag(ctx context.Context, postID string, deny bool) (*model.Post, error)
 	ReactToPost(ctx context.Context, postID string, emoji string) (*model.Post, error)
 	UnreactToPost(ctx context.Context, postID string, emoji string) (*model.Post, error)
-	MarkPostRead(ctx context.Context, postID string) (*model.Post, error)
+	MarkPostRead(ctx context.Context, postID string, seenAt *time.Time) (*model.Post, error)
 	CreateComment(ctx context.Context, input model.CreateCommentInput) (*model.Comment, error)
 	EditComment(ctx context.Context, commentID string, body string) (*model.Comment, error)
 	DeleteComment(ctx context.Context, commentID string) (bool, error)
@@ -1244,7 +1244,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Mutation.MarkPostRead(childComplexity, args["postId"].(string)), true
+		return e.ComplexityRoot.Mutation.MarkPostRead(childComplexity, args["postId"].(string), args["seenAt"].(*time.Time)), true
 	case "Mutation.moveTag":
 		if e.ComplexityRoot.Mutation.MoveTag == nil {
 			break
@@ -3099,7 +3099,7 @@ type Mutation {
   setDenyFlag(postId: ID!, deny: Boolean!): Post!
   reactToPost(postId: ID!, emoji: String!): Post!
   unreactToPost(postId: ID!, emoji: String!): Post!
-  markPostRead(postId: ID!): Post!
+  markPostRead(postId: ID!, seenAt: Time): Post!
 
   createComment(input: CreateCommentInput!): Comment!
   editComment(commentId: ID!, body: String!): Comment!
@@ -4313,6 +4313,14 @@ func (ec *executionContext) field_Mutation_markPostRead_args(ctx context.Context
 		return nil, err
 	}
 	args["postId"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "seenAt",
+		func(ctx context.Context, v any) (*time.Time, error) {
+			return ec.unmarshalOTime2ᚖtimeᚐTime(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["seenAt"] = arg1
 	return args, nil
 }
 
@@ -7678,7 +7686,7 @@ func (ec *executionContext) _Mutation_markPostRead(ctx context.Context, field gr
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Mutation().MarkPostRead(ctx, fc.Args["postId"].(string))
+			return ec.Resolvers.Mutation().MarkPostRead(ctx, fc.Args["postId"].(string), fc.Args["seenAt"].(*time.Time))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v *model.Post) graphql.Marshaler {

@@ -6,6 +6,7 @@ fragment PostSummary on Post {
   editedAt
   decisionStatus
   denyFlag
+  lastReadAt
   author {
     id
     displayName
@@ -94,6 +95,13 @@ mutation CreatePost($input: CreatePostInput!) {
 mutation CreateComment($input: CreateCommentInput!) {
   createComment(input: $input) {
     ...CommentSummary
+  }
+}
+
+mutation MarkPostRead($postId: ID!, $seenAt: Time) {
+  markPostRead(postId: $postId, seenAt: $seenAt) {
+    id
+    lastReadAt
   }
 }
 

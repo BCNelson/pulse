@@ -583,7 +583,7 @@ type Mutation {
   setDenyFlag(postId: ID!, deny: Boolean!): Post!
   reactToPost(postId: ID!, emoji: String!): Post!
   unreactToPost(postId: ID!, emoji: String!): Post!
-  markPostRead(postId: ID!): Post!
+  markPostRead(postId: ID!, seenAt: Time): Post!
 
   createComment(input: CreateCommentInput!): Comment!
   editComment(commentId: ID!, body: String!): Comment!

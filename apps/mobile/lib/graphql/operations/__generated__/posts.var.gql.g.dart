@@ -14,6 +14,8 @@ Serializer<GCreatePostVars> _$gCreatePostVarsSerializer =
     _$GCreatePostVarsSerializer();
 Serializer<GCreateCommentVars> _$gCreateCommentVarsSerializer =
     _$GCreateCommentVarsSerializer();
+Serializer<GMarkPostReadVars> _$gMarkPostReadVarsSerializer =
+    _$GMarkPostReadVarsSerializer();
 Serializer<GReactToPostVars> _$gReactToPostVarsSerializer =
     _$GReactToPostVarsSerializer();
 Serializer<GUnreactToPostVars> _$gUnreactToPostVarsSerializer =
@@ -197,6 +199,59 @@ class _$GCreateCommentVarsSerializer
           result.input.replace(serializers.deserialize(value,
                   specifiedType: const FullType(_i2.GCreateCommentInput))!
               as _i2.GCreateCommentInput);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GMarkPostReadVarsSerializer
+    implements StructuredSerializer<GMarkPostReadVars> {
+  @override
+  final Iterable<Type> types = const [GMarkPostReadVars, _$GMarkPostReadVars];
+  @override
+  final String wireName = 'GMarkPostReadVars';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, GMarkPostReadVars object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'postId',
+      serializers.serialize(object.postId,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.seenAt;
+    if (value != null) {
+      result
+        ..add('seenAt')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(_i2.GTime)));
+    }
+    return result;
+  }
+
+  @override
+  GMarkPostReadVars deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GMarkPostReadVarsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'postId':
+          result.postId = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'seenAt':
+          result.seenAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
           break;
       }
     }
@@ -746,6 +801,113 @@ class GCreateCommentVarsBuilder
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'GCreateCommentVars', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GMarkPostReadVars extends GMarkPostReadVars {
+  @override
+  final String postId;
+  @override
+  final _i2.GTime? seenAt;
+
+  factory _$GMarkPostReadVars(
+          [void Function(GMarkPostReadVarsBuilder)? updates]) =>
+      (GMarkPostReadVarsBuilder()..update(updates))._build();
+
+  _$GMarkPostReadVars._({required this.postId, this.seenAt}) : super._();
+  @override
+  GMarkPostReadVars rebuild(void Function(GMarkPostReadVarsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GMarkPostReadVarsBuilder toBuilder() =>
+      GMarkPostReadVarsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GMarkPostReadVars &&
+        postId == other.postId &&
+        seenAt == other.seenAt;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, postId.hashCode);
+    _$hash = $jc(_$hash, seenAt.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GMarkPostReadVars')
+          ..add('postId', postId)
+          ..add('seenAt', seenAt))
+        .toString();
+  }
+}
+
+class GMarkPostReadVarsBuilder
+    implements Builder<GMarkPostReadVars, GMarkPostReadVarsBuilder> {
+  _$GMarkPostReadVars? _$v;
+
+  String? _postId;
+  String? get postId => _$this._postId;
+  set postId(String? postId) => _$this._postId = postId;
+
+  _i2.GTimeBuilder? _seenAt;
+  _i2.GTimeBuilder get seenAt => _$this._seenAt ??= _i2.GTimeBuilder();
+  set seenAt(_i2.GTimeBuilder? seenAt) => _$this._seenAt = seenAt;
+
+  GMarkPostReadVarsBuilder();
+
+  GMarkPostReadVarsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _postId = $v.postId;
+      _seenAt = $v.seenAt?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GMarkPostReadVars other) {
+    _$v = other as _$GMarkPostReadVars;
+  }
+
+  @override
+  void update(void Function(GMarkPostReadVarsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GMarkPostReadVars build() => _build();
+
+  _$GMarkPostReadVars _build() {
+    _$GMarkPostReadVars _$result;
+    try {
+      _$result = _$v ??
+          _$GMarkPostReadVars._(
+            postId: BuiltValueNullFieldError.checkNotNull(
+                postId, r'GMarkPostReadVars', 'postId'),
+            seenAt: _seenAt?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'seenAt';
+        _seenAt?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GMarkPostReadVars', _$failedField, e.toString());
       }
       rethrow;
     }
