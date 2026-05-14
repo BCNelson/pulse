@@ -5,9 +5,11 @@
 // migrations itself, so it works against an empty database too.
 //
 // Bootstrap admin: admin@pulse.dev / pulse-dev (override via PULSE_BOOTSTRAP_*).
-// Demo users: alice@pulse.dev, bob@pulse.dev, charlie@pulse.dev (password "pulse-dev").
-// Demo tags: engineering, product (under the org root).
-// Demo posts + comments: a small thread under each sub-tag.
+// Demo users: alice@pulse.dev, bob@pulse.dev, charlie@pulse.dev, plus generated
+// teammates (password "pulse-dev").
+// Demo tags: engineering, product, plus a generated catalog under the org root.
+// Demo posts + comments: hand-authored threads plus hundreds of generated posts
+// with varied comment counts and a few high-volume threads.
 //
 // When S3_ENDPOINT and S3_BUCKET are set the bucket is created if missing
 // and a single demo attachment is uploaded + recorded.
@@ -19,6 +21,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"math"
 	"os"
 	"strings"
 
@@ -57,23 +60,29 @@ type demoUser struct {
 	DisplayName string
 }
 
-var demoUsers = []demoUser{
+var baseDemoUsers = []demoUser{
 	{Email: "alice@pulse.dev", DisplayName: "Alice"},
 	{Email: "bob@pulse.dev", DisplayName: "Bob"},
 	{Email: "charlie@pulse.dev", DisplayName: "Charlie"},
 }
 
+var demoUsers = buildDemoUsers()
+
 type demoTag struct {
 	Slug        string
 	DisplayName string
+	// ParentSlug nests this tag below another demo tag. Empty means org root.
+	ParentSlug string
 	// Members is the demo users granted contributor on this tag.
 	Members []string
 }
 
-var demoTags = []demoTag{
+var baseDemoTags = []demoTag{
 	{Slug: "engineering", DisplayName: "Engineering", Members: []string{"alice@pulse.dev", "bob@pulse.dev"}},
 	{Slug: "product", DisplayName: "Product", Members: []string{"bob@pulse.dev", "charlie@pulse.dev"}},
 }
+
+var demoTags = buildDemoTags()
 
 type demoPost struct {
 	TagSlug  string
@@ -95,7 +104,7 @@ type demoComment struct {
 	ParentKey string
 }
 
-var demoPosts = []demoPost{
+var baseDemoPosts = []demoPost{
 	{
 		TagSlug: "engineering",
 		Author:  "alice@pulse.dev",
@@ -195,6 +204,373 @@ var demoPosts = []demoPost{
 			{Key: "DS1", ParentKey: "D1", Author: defaultAdminEmail, Body: "What's the actual window — morning or afternoon?"},
 		},
 	},
+}
+
+var demoPosts = buildDemoPosts()
+
+func buildDemoUsers() []demoUser {
+	generated := []string{
+		"Jordan Lee",
+		"Morgan Patel",
+		"Riley Chen",
+		"Taylor Kim",
+		"Casey Nguyen",
+		"Avery Brooks",
+		"Quinn Rivera",
+		"Sam Morgan",
+		"Jamie Stone",
+		"Drew Harper",
+		"Cameron Ellis",
+		"Parker Singh",
+		"Reese Turner",
+		"Skyler Woods",
+		"Hayden Price",
+		"Emerson Reed",
+		"Finley Cox",
+		"Kendall Flores",
+		"Rowan Bennett",
+		"Blair Foster",
+		"Devon Hayes",
+		"Marley Ross",
+		"Alexis Ward",
+		"Remy Torres",
+		"Sage Murphy",
+		"Robin Gray",
+		"Harper Diaz",
+		"Logan Perry",
+		"Micah Bell",
+		"Shawn Powell",
+		"Addison Long",
+		"Bailey Simmons",
+		"Dakota Hughes",
+		"Elliot Ramirez",
+		"Frankie Coleman",
+		"Kai Griffin",
+		"Lane Jenkins",
+		"Phoenix Bryant",
+		"River Sullivan",
+		"Tatum Russell",
+		"Winter Cooper",
+		"Zion Morris",
+	}
+
+	out := append([]demoUser{}, baseDemoUsers...)
+	for _, name := range generated {
+		out = append(out, demoUser{
+			Email:       emailForDisplayName(name),
+			DisplayName: name,
+		})
+	}
+	return out
+}
+
+func demoUserEmails() []string {
+	emails := make([]string, 0, len(demoUsers))
+	for _, u := range demoUsers {
+		emails = append(emails, u.Email)
+	}
+	return emails
+}
+
+func demoMemberRotations() [][]string {
+	emails := demoUserEmails()
+	rotations := make([][]string, 0, 9)
+	for start := 0; start < 9; start++ {
+		groupSize := 4 + start%4
+		group := make([]string, 0, groupSize)
+		for offset := 0; offset < groupSize; offset++ {
+			group = append(group, emails[(start*5+offset*3)%len(emails)])
+		}
+		rotations = append(rotations, group)
+	}
+	return rotations
+}
+
+func emailForDisplayName(name string) string {
+	return strings.ToLower(strings.ReplaceAll(name, " ", ".")) + demoEmailDomain
+}
+
+func buildDemoTags() []demoTag {
+	generated := []struct {
+		Slug string
+		Name string
+	}{
+		{"platform", "Platform"},
+		{"infra", "Infrastructure"},
+		{"security", "Security"},
+		{"mobile", "Mobile"},
+		{"web", "Web"},
+		{"data", "Data"},
+		{"design", "Design"},
+		{"research", "Research"},
+		{"support", "Support"},
+		{"sales", "Sales"},
+		{"marketing", "Marketing"},
+		{"success", "Customer Success"},
+		{"ops", "Operations"},
+		{"finance", "Finance"},
+		{"legal", "Legal"},
+		{"people", "People"},
+		{"qa", "Quality Assurance"},
+		{"devrel", "Developer Relations"},
+		{"integrations", "Integrations"},
+		{"analytics", "Analytics"},
+		{"growth", "Growth"},
+		{"billing", "Billing"},
+		{"onboarding", "Onboarding"},
+		{"reliability", "Reliability"},
+		{"api", "API"},
+		{"workflow", "Workflow"},
+		{"docs", "Documentation"},
+		{"community", "Community"},
+		{"experiments", "Experiments"},
+		{"release", "Release"},
+		{"compliance", "Compliance"},
+		{"automation", "Automation"},
+		{"moderation", "Moderation"},
+		{"localization", "Localization"},
+		{"accessibility", "Accessibility"},
+		{"partnerships", "Partnerships"},
+	}
+	nested := []struct {
+		ParentSlug string
+		Slug       string
+		Name       string
+	}{
+		{"platform", "platform-runtime", "Runtime"},
+		{"platform-runtime", "platform-runtime-workers", "Workers"},
+		{"platform-runtime-workers", "platform-runtime-workers-queues", "Queues"},
+		{"platform-runtime-workers-queues", "platform-runtime-workers-queues-dead-letter", "Dead Letter Queues"},
+		{"platform-runtime-workers-queues-dead-letter", "platform-runtime-workers-queues-dead-letter-alerts", "Dead Letter Alerts"},
+
+		{"support", "support-enterprise", "Enterprise"},
+		{"support-enterprise", "support-enterprise-onboarding", "Onboarding"},
+		{"support-enterprise-onboarding", "support-enterprise-onboarding-migrations", "Migrations"},
+		{"support-enterprise-onboarding-migrations", "support-enterprise-onboarding-migrations-imports", "Imports"},
+		{"support-enterprise-onboarding-migrations-imports", "support-enterprise-onboarding-migrations-imports-validation", "Validation"},
+
+		{"release", "release-trains", "Trains"},
+		{"release-trains", "release-trains-mobile", "Mobile"},
+		{"release-trains-mobile", "release-trains-mobile-beta", "Beta"},
+		{"release-trains-mobile-beta", "release-trains-mobile-beta-ios", "iOS"},
+		{"release-trains-mobile-beta-ios", "release-trains-mobile-beta-ios-crash-review", "Crash Review"},
+	}
+	memberRotations := demoMemberRotations()
+
+	out := append([]demoTag{}, baseDemoTags...)
+	for i, t := range generated {
+		out = append(out, demoTag{
+			Slug:        t.Slug,
+			DisplayName: t.Name,
+			Members:     memberRotations[i%len(memberRotations)],
+		})
+	}
+	for i, t := range nested {
+		out = append(out, demoTag{
+			Slug:        t.Slug,
+			DisplayName: t.Name,
+			ParentSlug:  t.ParentSlug,
+			Members:     memberRotations[(len(generated)+i)%len(memberRotations)],
+		})
+	}
+	return out
+}
+
+func buildDemoPosts() []demoPost {
+	out := append([]demoPost{}, baseDemoPosts...)
+
+	commentCounts := []int{0, 1, 2, 3, 5, 8, 13}
+	themes := []string{
+		"planning",
+		"incident review",
+		"customer feedback",
+		"launch readiness",
+		"metrics check-in",
+		"handoff notes",
+		"design critique",
+		"weekly update",
+	}
+	authors := demoUserEmails()
+
+	for tagIndex, t := range demoTags {
+		if t.Slug == "engineering" || t.Slug == "product" {
+			continue
+		}
+		for postIndex, theme := range themes {
+			sequence := tagIndex*len(themes) + postIndex + 1
+			out = append(out, demoPost{
+				TagSlug:  t.Slug,
+				Author:   authors[(tagIndex+postIndex)%len(authors)],
+				Title:    fmt.Sprintf("%s %s %03d", t.DisplayName, titleCase(theme), sequence),
+				Body:     generatedPostBody(t.DisplayName, theme, sequence),
+				Comments: generatedComments(t.Slug, theme, sequence, commentCounts[(tagIndex+postIndex)%len(commentCounts)], authors),
+			})
+		}
+	}
+
+	heavyThreads := []struct {
+		TagSlug    string
+		Author     string
+		Title      string
+		Theme      string
+		CommentNum int
+	}{
+		{TagSlug: "platform", Author: "alice@pulse.dev", Title: "Platform mega thread: launch checklist", Theme: "launch checklist", CommentNum: 48},
+		{TagSlug: "support", Author: "bob@pulse.dev", Title: "Support mega thread: customer escalations", Theme: "customer escalations", CommentNum: 96},
+		{TagSlug: "release", Author: "charlie@pulse.dev", Title: "Release mega thread: final readiness", Theme: "final readiness", CommentNum: 160},
+	}
+	for i, thread := range heavyThreads {
+		out = append(out, demoPost{
+			TagSlug: thread.TagSlug,
+			Author:  thread.Author,
+			Title:   thread.Title,
+			Body: fmt.Sprintf(
+				"Generated high-volume demo post with %d comments for exercising long discussion loading, pagination, and nested thread rendering.",
+				thread.CommentNum,
+			),
+			Comments: generatedHeavyThreadComments(thread.TagSlug, thread.Theme, i+1, thread.CommentNum, authors),
+		})
+	}
+	return out
+}
+
+func generatedPostBody(tagName, theme string, sequence int) string {
+	return fmt.Sprintf(
+		"Generated demo post %03d for %s. Topic: %s. This gives local feeds, tag pages, search, and pagination enough volume to feel realistic.",
+		sequence,
+		tagName,
+		theme,
+	)
+}
+
+func generatedComments(tagSlug, theme string, sequence, count int, authors []string) []demoComment {
+	comments := make([]demoComment, 0, count)
+	for i := 0; i < count; i++ {
+		key := fmt.Sprintf("g-%s-%03d-%02d", tagSlug, sequence, i)
+		parentKey := ""
+		switch {
+		case i == 0:
+			parentKey = ""
+		case i%4 == 1:
+			parentKey = fmt.Sprintf("g-%s-%03d-%02d", tagSlug, sequence, 0)
+		case i%4 == 2:
+			parentKey = fmt.Sprintf("g-%s-%03d-%02d", tagSlug, sequence, i-1)
+		}
+		comments = append(comments, demoComment{
+			Key:       key,
+			ParentKey: parentKey,
+			Author:    authors[(sequence+i)%len(authors)],
+			Body:      generatedCommentBody(theme, sequence, i),
+		})
+	}
+	return comments
+}
+
+func generatedCommentBody(theme string, sequence, index int) string {
+	targetWords := normallyDistributedWordCount(sequence, index, 55, 36, 2, 190)
+	return generatedCommentText(theme, sequence, index, targetWords)
+}
+
+func generatedHeavyThreadComments(tagSlug, theme string, sequence, count int, authors []string) []demoComment {
+	comments := make([]demoComment, 0, count)
+	for i := 0; i < count; i++ {
+		key := fmt.Sprintf("heavy-%s-%02d-%03d", tagSlug, sequence, i)
+		parentKey := ""
+		switch {
+		case i == 0 || i%12 == 0:
+			parentKey = ""
+		case i%5 == 0:
+			parentKey = fmt.Sprintf("heavy-%s-%02d-%03d", tagSlug, sequence, i-5)
+		case i%3 == 0:
+			parentKey = fmt.Sprintf("heavy-%s-%02d-%03d", tagSlug, sequence, i-2)
+		default:
+			parentKey = fmt.Sprintf("heavy-%s-%02d-%03d", tagSlug, sequence, i-1)
+		}
+		comments = append(comments, demoComment{
+			Key:       key,
+			ParentKey: parentKey,
+			Author:    authors[(sequence+i)%len(authors)],
+			Body:      generatedHeavyThreadCommentBody(theme, count, i),
+		})
+	}
+	return comments
+}
+
+func generatedHeavyThreadCommentBody(theme string, count, index int) string {
+	targetWords := normallyDistributedWordCount(count, index, 70, 48, 2, 260)
+	return generatedCommentText(theme, count, index, targetWords)
+}
+
+func normallyDistributedWordCount(seedA, seedB, mean, stddev, min, max int) int {
+	u1 := deterministicUnit(seedA, seedB, 1)
+	u2 := deterministicUnit(seedA, seedB, 2)
+	z := math.Sqrt(-2*math.Log(u1)) * math.Cos(2*math.Pi*u2)
+	words := int(math.Round(float64(mean) + z*float64(stddev)))
+	if words < min {
+		return min
+	}
+	if words > max {
+		return max
+	}
+	return words
+}
+
+func deterministicUnit(a, b, salt int) float64 {
+	x := uint64(a+1)*0x9e3779b185ebca87 ^ uint64(b+1)*0xc2b2ae3d27d4eb4f ^ uint64(salt)*0x165667b19e3779f9
+	x ^= x >> 30
+	x *= 0xbf58476d1ce4e5b9
+	x ^= x >> 27
+	x *= 0x94d049bb133111eb
+	x ^= x >> 31
+	return (float64(x%1_000_000) + 1) / 1_000_001
+}
+
+func generatedCommentText(theme string, sequence, index, targetWords int) string {
+	short := []string{
+		"+1",
+		"LGTM.",
+		"Done.",
+		"Ship it.",
+		"Same concern here.",
+		"Can we split this out?",
+		"Please link the doc.",
+	}
+	if targetWords <= 6 {
+		return short[(sequence+index)%len(short)]
+	}
+
+	sentences := []string{
+		fmt.Sprintf("Tracking this for %s item %03d.", theme, sequence),
+		"The current plan looks workable, but the owner should write down the next checkpoint before this moves forward.",
+		"I want to make sure the rollout leaves enough room for review, iteration, and a clean handoff.",
+		"The main open question is whether the first milestone is narrow enough to validate without creating extra coordination work.",
+		"If the timeline changes, we should call that out early so support and release notes stay aligned.",
+		"This seeded reply is intentionally varied so local clients render mixed comment heights, line wrapping, and scroll positions.",
+		"The decision history matters here because someone joining later needs to understand the rejected alternatives.",
+		"A smaller first pass would let us catch confusing wording, slow screens, and missing notifications before the broader audience sees it.",
+		"I also want a clear follow-up owner because long discussions get hard to scan once replies start branching.",
+		"Nothing here needs to block the whole effort, but the risk should be visible in the thread.",
+	}
+
+	var parts []string
+	words := 0
+	for words < targetWords {
+		sentence := sentences[(sequence+index+len(parts))%len(sentences)]
+		parts = append(parts, sentence)
+		words += len(strings.Fields(sentence))
+	}
+	return strings.Join(parts, " ")
+}
+
+func titleCase(s string) string {
+	parts := strings.Fields(s)
+	for i, part := range parts {
+		if part == "" {
+			continue
+		}
+		parts[i] = strings.ToUpper(part[:1]) + part[1:]
+	}
+	return strings.Join(parts, " ")
 }
 
 func main() {
@@ -392,13 +768,24 @@ func ensureDemoTags(ctx context.Context, pool *pgxpool.Pool, orgTagID uuid.UUID,
 	tagSvc := &tag.Service{DB: pool}
 	out := map[string]uuid.UUID{}
 	for _, t := range demoTags {
+		parentID := orgTagID
+		parentLabel := "org"
+		if t.ParentSlug != "" {
+			id, ok := out[t.ParentSlug]
+			if !ok {
+				return nil, fmt.Errorf("tag %s references unknown ParentSlug %q (parents must appear before children)", t.Slug, t.ParentSlug)
+			}
+			parentID = id
+			parentLabel = t.ParentSlug
+		}
+
 		var id uuid.UUID
 		err := pool.QueryRow(ctx,
-			`SELECT id FROM tags WHERE parent_id = $1 AND slug = $2`, orgTagID, t.Slug).
+			`SELECT id FROM tags WHERE parent_id = $1 AND slug = $2`, parentID, t.Slug).
 			Scan(&id)
 		if errors.Is(err, pgx.ErrNoRows) {
 			id, err = tagSvc.Create(ctx, tag.CreateInput{
-				ParentID:    &orgTagID,
+				ParentID:    &parentID,
 				Slug:        t.Slug,
 				DisplayName: t.DisplayName,
 				RootKind:    tag.RootKindOrg,
@@ -406,7 +793,7 @@ func ensureDemoTags(ctx context.Context, pool *pgxpool.Pool, orgTagID uuid.UUID,
 			if err != nil {
 				return nil, fmt.Errorf("create tag %s: %w", t.Slug, err)
 			}
-			fmt.Printf("seed: created tag %s\n", t.Slug)
+			fmt.Printf("seed: created tag %s under %s\n", t.Slug, parentLabel)
 		} else if err != nil {
 			return nil, fmt.Errorf("lookup tag %s: %w", t.Slug, err)
 		}

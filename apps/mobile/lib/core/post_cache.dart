@@ -239,7 +239,14 @@ GPostSummaryData _extractSummary(GPostDetailData_post post) {
           post.reactions.map((r) => GPostSummaryData_reactions((rb) => rb
             ..emoji = r.emoji
             ..count = r.count
-            ..byViewer = r.byViewer))),
+            ..byViewer = r.byViewer)))
+      ..comments.edges.replace(
+            post.comments.edges.map(
+              (e) => GPostSummaryData_comments_edges(
+                (eb) => eb..node.id = e.node.id,
+              ),
+            ),
+          ),
   );
 }
 

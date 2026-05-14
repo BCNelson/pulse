@@ -181,7 +181,7 @@ class _PostList extends ConsumerWidget {
           authorInitials: _initials(node.author.displayName),
           authorName: node.author.displayName,
           whenLabel: _shortWhen(node.createdAt.value),
-          comments: node.reactions.length,
+          comments: node.comments.edges.length,
           cursor: selected,
           onTap: () => ref.read(selectedPostIdProvider.notifier).set(node.id),
         );

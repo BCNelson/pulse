@@ -15,6 +15,13 @@ fragment PostSummary on Post {
     count
     byViewer
   }
+  comments(first: 200) {
+    edges {
+      node {
+        id
+      }
+    }
+  }
 }
 
 query PostsForTag($tagId: ID!, $first: Int) {

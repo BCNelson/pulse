@@ -24,6 +24,15 @@ Serializer<GPostsForTagData_tag_posts_edges_node_author>
 Serializer<GPostsForTagData_tag_posts_edges_node_reactions>
     _$gPostsForTagDataTagPostsEdgesNodeReactionsSerializer =
     _$GPostsForTagData_tag_posts_edges_node_reactionsSerializer();
+Serializer<GPostsForTagData_tag_posts_edges_node_comments>
+    _$gPostsForTagDataTagPostsEdgesNodeCommentsSerializer =
+    _$GPostsForTagData_tag_posts_edges_node_commentsSerializer();
+Serializer<GPostsForTagData_tag_posts_edges_node_comments_edges>
+    _$gPostsForTagDataTagPostsEdgesNodeCommentsEdgesSerializer =
+    _$GPostsForTagData_tag_posts_edges_node_comments_edgesSerializer();
+Serializer<GPostsForTagData_tag_posts_edges_node_comments_edges_node>
+    _$gPostsForTagDataTagPostsEdgesNodeCommentsEdgesNodeSerializer =
+    _$GPostsForTagData_tag_posts_edges_node_comments_edges_nodeSerializer();
 Serializer<GPostDetailData> _$gPostDetailDataSerializer =
     _$GPostDetailDataSerializer();
 Serializer<GPostDetailData_post> _$gPostDetailDataPostSerializer =
@@ -33,11 +42,6 @@ Serializer<GPostDetailData_post_author> _$gPostDetailDataPostAuthorSerializer =
 Serializer<GPostDetailData_post_reactions>
     _$gPostDetailDataPostReactionsSerializer =
     _$GPostDetailData_post_reactionsSerializer();
-Serializer<GPostDetailData_post_tags> _$gPostDetailDataPostTagsSerializer =
-    _$GPostDetailData_post_tagsSerializer();
-Serializer<GPostDetailData_post_tags_tag>
-    _$gPostDetailDataPostTagsTagSerializer =
-    _$GPostDetailData_post_tags_tagSerializer();
 Serializer<GPostDetailData_post_comments>
     _$gPostDetailDataPostCommentsSerializer =
     _$GPostDetailData_post_commentsSerializer();
@@ -53,6 +57,11 @@ Serializer<GPostDetailData_post_comments_edges_node_author>
 Serializer<GPostDetailData_post_comments_edges_node_reactions>
     _$gPostDetailDataPostCommentsEdgesNodeReactionsSerializer =
     _$GPostDetailData_post_comments_edges_node_reactionsSerializer();
+Serializer<GPostDetailData_post_tags> _$gPostDetailDataPostTagsSerializer =
+    _$GPostDetailData_post_tagsSerializer();
+Serializer<GPostDetailData_post_tags_tag>
+    _$gPostDetailDataPostTagsTagSerializer =
+    _$GPostDetailData_post_tags_tagSerializer();
 Serializer<GPostDetailData_post_myPermissions>
     _$gPostDetailDataPostMyPermissionsSerializer =
     _$GPostDetailData_post_myPermissionsSerializer();
@@ -66,6 +75,15 @@ Serializer<GCreatePostData_createPost_author>
 Serializer<GCreatePostData_createPost_reactions>
     _$gCreatePostDataCreatePostReactionsSerializer =
     _$GCreatePostData_createPost_reactionsSerializer();
+Serializer<GCreatePostData_createPost_comments>
+    _$gCreatePostDataCreatePostCommentsSerializer =
+    _$GCreatePostData_createPost_commentsSerializer();
+Serializer<GCreatePostData_createPost_comments_edges>
+    _$gCreatePostDataCreatePostCommentsEdgesSerializer =
+    _$GCreatePostData_createPost_comments_edgesSerializer();
+Serializer<GCreatePostData_createPost_comments_edges_node>
+    _$gCreatePostDataCreatePostCommentsEdgesNodeSerializer =
+    _$GCreatePostData_createPost_comments_edges_nodeSerializer();
 Serializer<GCreateCommentData> _$gCreateCommentDataSerializer =
     _$GCreateCommentDataSerializer();
 Serializer<GCreateCommentData_createComment>
@@ -104,12 +122,29 @@ Serializer<GPostChangedData_postChanged_author>
 Serializer<GPostChangedData_postChanged_reactions>
     _$gPostChangedDataPostChangedReactionsSerializer =
     _$GPostChangedData_postChanged_reactionsSerializer();
+Serializer<GPostChangedData_postChanged_comments>
+    _$gPostChangedDataPostChangedCommentsSerializer =
+    _$GPostChangedData_postChanged_commentsSerializer();
+Serializer<GPostChangedData_postChanged_comments_edges>
+    _$gPostChangedDataPostChangedCommentsEdgesSerializer =
+    _$GPostChangedData_postChanged_comments_edgesSerializer();
+Serializer<GPostChangedData_postChanged_comments_edges_node>
+    _$gPostChangedDataPostChangedCommentsEdgesNodeSerializer =
+    _$GPostChangedData_postChanged_comments_edges_nodeSerializer();
 Serializer<GPostSummaryData> _$gPostSummaryDataSerializer =
     _$GPostSummaryDataSerializer();
 Serializer<GPostSummaryData_author> _$gPostSummaryDataAuthorSerializer =
     _$GPostSummaryData_authorSerializer();
 Serializer<GPostSummaryData_reactions> _$gPostSummaryDataReactionsSerializer =
     _$GPostSummaryData_reactionsSerializer();
+Serializer<GPostSummaryData_comments> _$gPostSummaryDataCommentsSerializer =
+    _$GPostSummaryData_commentsSerializer();
+Serializer<GPostSummaryData_comments_edges>
+    _$gPostSummaryDataCommentsEdgesSerializer =
+    _$GPostSummaryData_comments_edgesSerializer();
+Serializer<GPostSummaryData_comments_edges_node>
+    _$gPostSummaryDataCommentsEdgesNodeSerializer =
+    _$GPostSummaryData_comments_edges_nodeSerializer();
 Serializer<GCommentSummaryData> _$gCommentSummaryDataSerializer =
     _$GCommentSummaryDataSerializer();
 Serializer<GCommentSummaryData_author> _$gCommentSummaryDataAuthorSerializer =
@@ -409,6 +444,10 @@ class _$GPostsForTagData_tag_posts_edges_nodeSerializer
           specifiedType: const FullType(BuiltList, const [
             const FullType(GPostsForTagData_tag_posts_edges_node_reactions)
           ])),
+      'comments',
+      serializers.serialize(object.comments,
+          specifiedType:
+              const FullType(GPostsForTagData_tag_posts_edges_node_comments)),
     ];
     Object? value;
     value = object.editedAt;
@@ -484,6 +523,12 @@ class _$GPostsForTagData_tag_posts_edges_nodeSerializer
               specifiedType: const FullType(BuiltList, const [
                 const FullType(GPostsForTagData_tag_posts_edges_node_reactions)
               ]))! as BuiltList<Object?>);
+          break;
+        case 'comments':
+          result.comments.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GPostsForTagData_tag_posts_edges_node_comments))!
+              as GPostsForTagData_tag_posts_edges_node_comments);
           break;
       }
     }
@@ -619,6 +664,181 @@ class _$GPostsForTagData_tag_posts_edges_node_reactionsSerializer
   }
 }
 
+class _$GPostsForTagData_tag_posts_edges_node_commentsSerializer
+    implements
+        StructuredSerializer<GPostsForTagData_tag_posts_edges_node_comments> {
+  @override
+  final Iterable<Type> types = const [
+    GPostsForTagData_tag_posts_edges_node_comments,
+    _$GPostsForTagData_tag_posts_edges_node_comments
+  ];
+  @override
+  final String wireName = 'GPostsForTagData_tag_posts_edges_node_comments';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostsForTagData_tag_posts_edges_node_comments object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'edges',
+      serializers.serialize(object.edges,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GPostsForTagData_tag_posts_edges_node_comments_edges)
+          ])),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostsForTagData_tag_posts_edges_node_commentsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'edges':
+          result.edges.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(
+                    GPostsForTagData_tag_posts_edges_node_comments_edges)
+              ]))! as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_comments_edgesSerializer
+    implements
+        StructuredSerializer<
+            GPostsForTagData_tag_posts_edges_node_comments_edges> {
+  @override
+  final Iterable<Type> types = const [
+    GPostsForTagData_tag_posts_edges_node_comments_edges,
+    _$GPostsForTagData_tag_posts_edges_node_comments_edges
+  ];
+  @override
+  final String wireName =
+      'GPostsForTagData_tag_posts_edges_node_comments_edges';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostsForTagData_tag_posts_edges_node_comments_edges object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'node',
+      serializers.serialize(object.node,
+          specifiedType: const FullType(
+              GPostsForTagData_tag_posts_edges_node_comments_edges_node)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments_edges deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'node':
+          result.node.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GPostsForTagData_tag_posts_edges_node_comments_edges_node))!
+              as GPostsForTagData_tag_posts_edges_node_comments_edges_node);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_comments_edges_nodeSerializer
+    implements
+        StructuredSerializer<
+            GPostsForTagData_tag_posts_edges_node_comments_edges_node> {
+  @override
+  final Iterable<Type> types = const [
+    GPostsForTagData_tag_posts_edges_node_comments_edges_node,
+    _$GPostsForTagData_tag_posts_edges_node_comments_edges_node
+  ];
+  @override
+  final String wireName =
+      'GPostsForTagData_tag_posts_edges_node_comments_edges_node';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostsForTagData_tag_posts_edges_node_comments_edges_node object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments_edges_node deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
 class _$GPostDetailDataSerializer
     implements StructuredSerializer<GPostDetailData> {
   @override
@@ -711,13 +931,13 @@ class _$GPostDetailData_postSerializer
       serializers.serialize(object.reactions,
           specifiedType: const FullType(BuiltList,
               const [const FullType(GPostDetailData_post_reactions)])),
+      'comments',
+      serializers.serialize(object.comments,
+          specifiedType: const FullType(GPostDetailData_post_comments)),
       'tags',
       serializers.serialize(object.tags,
           specifiedType: const FullType(
               BuiltList, const [const FullType(GPostDetailData_post_tags)])),
-      'comments',
-      serializers.serialize(object.comments,
-          specifiedType: const FullType(GPostDetailData_post_comments)),
       'myPermissions',
       serializers.serialize(object.myPermissions,
           specifiedType: const FullType(GPostDetailData_post_myPermissions)),
@@ -796,16 +1016,16 @@ class _$GPostDetailData_postSerializer
                 const FullType(GPostDetailData_post_reactions)
               ]))! as BuiltList<Object?>);
           break;
+        case 'comments':
+          result.comments.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(GPostDetailData_post_comments))!
+              as GPostDetailData_post_comments);
+          break;
         case 'tags':
           result.tags.replace(serializers.deserialize(value,
               specifiedType: const FullType(BuiltList, const [
                 const FullType(GPostDetailData_post_tags)
               ]))! as BuiltList<Object?>);
-          break;
-        case 'comments':
-          result.comments.replace(serializers.deserialize(value,
-                  specifiedType: const FullType(GPostDetailData_post_comments))!
-              as GPostDetailData_post_comments);
           break;
         case 'myPermissions':
           result.myPermissions.replace(serializers.deserialize(value,
@@ -937,125 +1157,6 @@ class _$GPostDetailData_post_reactionsSerializer
         case 'byViewer':
           result.byViewer = serializers.deserialize(value,
               specifiedType: const FullType(bool))! as bool;
-          break;
-      }
-    }
-
-    return result.build();
-  }
-}
-
-class _$GPostDetailData_post_tagsSerializer
-    implements StructuredSerializer<GPostDetailData_post_tags> {
-  @override
-  final Iterable<Type> types = const [
-    GPostDetailData_post_tags,
-    _$GPostDetailData_post_tags
-  ];
-  @override
-  final String wireName = 'GPostDetailData_post_tags';
-
-  @override
-  Iterable<Object?> serialize(
-      Serializers serializers, GPostDetailData_post_tags object,
-      {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      '__typename',
-      serializers.serialize(object.G__typename,
-          specifiedType: const FullType(String)),
-      'tag',
-      serializers.serialize(object.tag,
-          specifiedType: const FullType(GPostDetailData_post_tags_tag)),
-    ];
-
-    return result;
-  }
-
-  @override
-  GPostDetailData_post_tags deserialize(
-      Serializers serializers, Iterable<Object?> serialized,
-      {FullType specifiedType = FullType.unspecified}) {
-    final result = GPostDetailData_post_tagsBuilder();
-
-    final iterator = serialized.iterator;
-    while (iterator.moveNext()) {
-      final key = iterator.current! as String;
-      iterator.moveNext();
-      final Object? value = iterator.current;
-      switch (key) {
-        case '__typename':
-          result.G__typename = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
-          break;
-        case 'tag':
-          result.tag.replace(serializers.deserialize(value,
-                  specifiedType: const FullType(GPostDetailData_post_tags_tag))!
-              as GPostDetailData_post_tags_tag);
-          break;
-      }
-    }
-
-    return result.build();
-  }
-}
-
-class _$GPostDetailData_post_tags_tagSerializer
-    implements StructuredSerializer<GPostDetailData_post_tags_tag> {
-  @override
-  final Iterable<Type> types = const [
-    GPostDetailData_post_tags_tag,
-    _$GPostDetailData_post_tags_tag
-  ];
-  @override
-  final String wireName = 'GPostDetailData_post_tags_tag';
-
-  @override
-  Iterable<Object?> serialize(
-      Serializers serializers, GPostDetailData_post_tags_tag object,
-      {FullType specifiedType = FullType.unspecified}) {
-    final result = <Object?>[
-      '__typename',
-      serializers.serialize(object.G__typename,
-          specifiedType: const FullType(String)),
-      'id',
-      serializers.serialize(object.id, specifiedType: const FullType(String)),
-      'slug',
-      serializers.serialize(object.slug, specifiedType: const FullType(String)),
-      'displayName',
-      serializers.serialize(object.displayName,
-          specifiedType: const FullType(String)),
-    ];
-
-    return result;
-  }
-
-  @override
-  GPostDetailData_post_tags_tag deserialize(
-      Serializers serializers, Iterable<Object?> serialized,
-      {FullType specifiedType = FullType.unspecified}) {
-    final result = GPostDetailData_post_tags_tagBuilder();
-
-    final iterator = serialized.iterator;
-    while (iterator.moveNext()) {
-      final key = iterator.current! as String;
-      iterator.moveNext();
-      final Object? value = iterator.current;
-      switch (key) {
-        case '__typename':
-          result.G__typename = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
-          break;
-        case 'id':
-          result.id = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
-          break;
-        case 'slug':
-          result.slug = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
-          break;
-        case 'displayName':
-          result.displayName = serializers.deserialize(value,
-              specifiedType: const FullType(String))! as String;
           break;
       }
     }
@@ -1426,6 +1527,125 @@ class _$GPostDetailData_post_comments_edges_node_reactionsSerializer
   }
 }
 
+class _$GPostDetailData_post_tagsSerializer
+    implements StructuredSerializer<GPostDetailData_post_tags> {
+  @override
+  final Iterable<Type> types = const [
+    GPostDetailData_post_tags,
+    _$GPostDetailData_post_tags
+  ];
+  @override
+  final String wireName = 'GPostDetailData_post_tags';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostDetailData_post_tags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'tag',
+      serializers.serialize(object.tag,
+          specifiedType: const FullType(GPostDetailData_post_tags_tag)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostDetailData_post_tags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostDetailData_post_tagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'tag':
+          result.tag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(GPostDetailData_post_tags_tag))!
+              as GPostDetailData_post_tags_tag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostDetailData_post_tags_tagSerializer
+    implements StructuredSerializer<GPostDetailData_post_tags_tag> {
+  @override
+  final Iterable<Type> types = const [
+    GPostDetailData_post_tags_tag,
+    _$GPostDetailData_post_tags_tag
+  ];
+  @override
+  final String wireName = 'GPostDetailData_post_tags_tag';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostDetailData_post_tags_tag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostDetailData_post_tags_tag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostDetailData_post_tags_tagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
 class _$GPostDetailData_post_myPermissionsSerializer
     implements StructuredSerializer<GPostDetailData_post_myPermissions> {
   @override
@@ -1581,6 +1801,9 @@ class _$GCreatePostData_createPostSerializer
       serializers.serialize(object.reactions,
           specifiedType: const FullType(BuiltList,
               const [const FullType(GCreatePostData_createPost_reactions)])),
+      'comments',
+      serializers.serialize(object.comments,
+          specifiedType: const FullType(GCreatePostData_createPost_comments)),
     ];
     Object? value;
     value = object.editedAt;
@@ -1656,6 +1879,12 @@ class _$GCreatePostData_createPostSerializer
               specifiedType: const FullType(BuiltList, const [
                 const FullType(GCreatePostData_createPost_reactions)
               ]))! as BuiltList<Object?>);
+          break;
+        case 'comments':
+          result.comments.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GCreatePostData_createPost_comments))!
+              as GCreatePostData_createPost_comments);
           break;
       }
     }
@@ -1781,6 +2010,172 @@ class _$GCreatePostData_createPost_reactionsSerializer
         case 'byViewer':
           result.byViewer = serializers.deserialize(value,
               specifiedType: const FullType(bool))! as bool;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreatePostData_createPost_commentsSerializer
+    implements StructuredSerializer<GCreatePostData_createPost_comments> {
+  @override
+  final Iterable<Type> types = const [
+    GCreatePostData_createPost_comments,
+    _$GCreatePostData_createPost_comments
+  ];
+  @override
+  final String wireName = 'GCreatePostData_createPost_comments';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCreatePostData_createPost_comments object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'edges',
+      serializers.serialize(object.edges,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GCreatePostData_createPost_comments_edges)
+          ])),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCreatePostData_createPost_comments deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreatePostData_createPost_commentsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'edges':
+          result.edges.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GCreatePostData_createPost_comments_edges)
+              ]))! as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreatePostData_createPost_comments_edgesSerializer
+    implements StructuredSerializer<GCreatePostData_createPost_comments_edges> {
+  @override
+  final Iterable<Type> types = const [
+    GCreatePostData_createPost_comments_edges,
+    _$GCreatePostData_createPost_comments_edges
+  ];
+  @override
+  final String wireName = 'GCreatePostData_createPost_comments_edges';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCreatePostData_createPost_comments_edges object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'node',
+      serializers.serialize(object.node,
+          specifiedType:
+              const FullType(GCreatePostData_createPost_comments_edges_node)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCreatePostData_createPost_comments_edges deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreatePostData_createPost_comments_edgesBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'node':
+          result.node.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GCreatePostData_createPost_comments_edges_node))!
+              as GCreatePostData_createPost_comments_edges_node);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreatePostData_createPost_comments_edges_nodeSerializer
+    implements
+        StructuredSerializer<GCreatePostData_createPost_comments_edges_node> {
+  @override
+  final Iterable<Type> types = const [
+    GCreatePostData_createPost_comments_edges_node,
+    _$GCreatePostData_createPost_comments_edges_node
+  ];
+  @override
+  final String wireName = 'GCreatePostData_createPost_comments_edges_node';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GCreatePostData_createPost_comments_edges_node object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCreatePostData_createPost_comments_edges_node deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreatePostData_createPost_comments_edges_nodeBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
       }
     }
@@ -2536,6 +2931,9 @@ class _$GPostChangedData_postChangedSerializer
       serializers.serialize(object.reactions,
           specifiedType: const FullType(BuiltList,
               const [const FullType(GPostChangedData_postChanged_reactions)])),
+      'comments',
+      serializers.serialize(object.comments,
+          specifiedType: const FullType(GPostChangedData_postChanged_comments)),
     ];
     Object? value;
     value = object.editedAt;
@@ -2611,6 +3009,12 @@ class _$GPostChangedData_postChangedSerializer
               specifiedType: const FullType(BuiltList, const [
                 const FullType(GPostChangedData_postChanged_reactions)
               ]))! as BuiltList<Object?>);
+          break;
+        case 'comments':
+          result.comments.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GPostChangedData_postChanged_comments))!
+              as GPostChangedData_postChanged_comments);
           break;
       }
     }
@@ -2744,6 +3148,173 @@ class _$GPostChangedData_postChanged_reactionsSerializer
   }
 }
 
+class _$GPostChangedData_postChanged_commentsSerializer
+    implements StructuredSerializer<GPostChangedData_postChanged_comments> {
+  @override
+  final Iterable<Type> types = const [
+    GPostChangedData_postChanged_comments,
+    _$GPostChangedData_postChanged_comments
+  ];
+  @override
+  final String wireName = 'GPostChangedData_postChanged_comments';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostChangedData_postChanged_comments object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'edges',
+      serializers.serialize(object.edges,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GPostChangedData_postChanged_comments_edges)
+          ])),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostChangedData_postChanged_comments deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostChangedData_postChanged_commentsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'edges':
+          result.edges.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GPostChangedData_postChanged_comments_edges)
+              ]))! as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostChangedData_postChanged_comments_edgesSerializer
+    implements
+        StructuredSerializer<GPostChangedData_postChanged_comments_edges> {
+  @override
+  final Iterable<Type> types = const [
+    GPostChangedData_postChanged_comments_edges,
+    _$GPostChangedData_postChanged_comments_edges
+  ];
+  @override
+  final String wireName = 'GPostChangedData_postChanged_comments_edges';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostChangedData_postChanged_comments_edges object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'node',
+      serializers.serialize(object.node,
+          specifiedType:
+              const FullType(GPostChangedData_postChanged_comments_edges_node)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostChangedData_postChanged_comments_edges deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostChangedData_postChanged_comments_edgesBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'node':
+          result.node.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GPostChangedData_postChanged_comments_edges_node))!
+              as GPostChangedData_postChanged_comments_edges_node);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostChangedData_postChanged_comments_edges_nodeSerializer
+    implements
+        StructuredSerializer<GPostChangedData_postChanged_comments_edges_node> {
+  @override
+  final Iterable<Type> types = const [
+    GPostChangedData_postChanged_comments_edges_node,
+    _$GPostChangedData_postChanged_comments_edges_node
+  ];
+  @override
+  final String wireName = 'GPostChangedData_postChanged_comments_edges_node';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostChangedData_postChanged_comments_edges_node object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostChangedData_postChanged_comments_edges_node deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostChangedData_postChanged_comments_edges_nodeBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
 class _$GPostSummaryDataSerializer
     implements StructuredSerializer<GPostSummaryData> {
   @override
@@ -2778,6 +3349,9 @@ class _$GPostSummaryDataSerializer
       serializers.serialize(object.reactions,
           specifiedType: const FullType(
               BuiltList, const [const FullType(GPostSummaryData_reactions)])),
+      'comments',
+      serializers.serialize(object.comments,
+          specifiedType: const FullType(GPostSummaryData_comments)),
     ];
     Object? value;
     value = object.editedAt;
@@ -2852,6 +3426,11 @@ class _$GPostSummaryDataSerializer
               specifiedType: const FullType(BuiltList, const [
                 const FullType(GPostSummaryData_reactions)
               ]))! as BuiltList<Object?>);
+          break;
+        case 'comments':
+          result.comments.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(GPostSummaryData_comments))!
+              as GPostSummaryData_comments);
           break;
       }
     }
@@ -2977,6 +3556,169 @@ class _$GPostSummaryData_reactionsSerializer
         case 'byViewer':
           result.byViewer = serializers.deserialize(value,
               specifiedType: const FullType(bool))! as bool;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostSummaryData_commentsSerializer
+    implements StructuredSerializer<GPostSummaryData_comments> {
+  @override
+  final Iterable<Type> types = const [
+    GPostSummaryData_comments,
+    _$GPostSummaryData_comments
+  ];
+  @override
+  final String wireName = 'GPostSummaryData_comments';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostSummaryData_comments object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'edges',
+      serializers.serialize(object.edges,
+          specifiedType: const FullType(BuiltList,
+              const [const FullType(GPostSummaryData_comments_edges)])),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostSummaryData_comments deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostSummaryData_commentsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'edges':
+          result.edges.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GPostSummaryData_comments_edges)
+              ]))! as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostSummaryData_comments_edgesSerializer
+    implements StructuredSerializer<GPostSummaryData_comments_edges> {
+  @override
+  final Iterable<Type> types = const [
+    GPostSummaryData_comments_edges,
+    _$GPostSummaryData_comments_edges
+  ];
+  @override
+  final String wireName = 'GPostSummaryData_comments_edges';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostSummaryData_comments_edges object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'node',
+      serializers.serialize(object.node,
+          specifiedType: const FullType(GPostSummaryData_comments_edges_node)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostSummaryData_comments_edges deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostSummaryData_comments_edgesBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'node':
+          result.node.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GPostSummaryData_comments_edges_node))!
+              as GPostSummaryData_comments_edges_node);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostSummaryData_comments_edges_nodeSerializer
+    implements StructuredSerializer<GPostSummaryData_comments_edges_node> {
+  @override
+  final Iterable<Type> types = const [
+    GPostSummaryData_comments_edges_node,
+    _$GPostSummaryData_comments_edges_node
+  ];
+  @override
+  final String wireName = 'GPostSummaryData_comments_edges_node';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostSummaryData_comments_edges_node object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostSummaryData_comments_edges_node deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostSummaryData_comments_edges_nodeBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
           break;
       }
     }
@@ -3770,6 +4512,8 @@ class _$GPostsForTagData_tag_posts_edges_node
   final GPostsForTagData_tag_posts_edges_node_author author;
   @override
   final BuiltList<GPostsForTagData_tag_posts_edges_node_reactions> reactions;
+  @override
+  final GPostsForTagData_tag_posts_edges_node_comments comments;
 
   factory _$GPostsForTagData_tag_posts_edges_node(
           [void Function(GPostsForTagData_tag_posts_edges_nodeBuilder)?
@@ -3787,7 +4531,8 @@ class _$GPostsForTagData_tag_posts_edges_node
       this.decisionStatus,
       required this.denyFlag,
       required this.author,
-      required this.reactions})
+      required this.reactions,
+      required this.comments})
       : super._();
   @override
   GPostsForTagData_tag_posts_edges_node rebuild(
@@ -3812,7 +4557,8 @@ class _$GPostsForTagData_tag_posts_edges_node
         decisionStatus == other.decisionStatus &&
         denyFlag == other.denyFlag &&
         author == other.author &&
-        reactions == other.reactions;
+        reactions == other.reactions &&
+        comments == other.comments;
   }
 
   @override
@@ -3828,6 +4574,7 @@ class _$GPostsForTagData_tag_posts_edges_node
     _$hash = $jc(_$hash, denyFlag.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
+    _$hash = $jc(_$hash, comments.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -3845,7 +4592,8 @@ class _$GPostsForTagData_tag_posts_edges_node
           ..add('decisionStatus', decisionStatus)
           ..add('denyFlag', denyFlag)
           ..add('author', author)
-          ..add('reactions', reactions))
+          ..add('reactions', reactions)
+          ..add('comments', comments))
         .toString();
   }
 }
@@ -3904,6 +4652,14 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
               reactions) =>
       _$this._reactions = reactions;
 
+  GPostsForTagData_tag_posts_edges_node_commentsBuilder? _comments;
+  GPostsForTagData_tag_posts_edges_node_commentsBuilder get comments =>
+      _$this._comments ??=
+          GPostsForTagData_tag_posts_edges_node_commentsBuilder();
+  set comments(
+          GPostsForTagData_tag_posts_edges_node_commentsBuilder? comments) =>
+      _$this._comments = comments;
+
   GPostsForTagData_tag_posts_edges_nodeBuilder() {
     GPostsForTagData_tag_posts_edges_node._initializeBuilder(this);
   }
@@ -3921,6 +4677,7 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
       _denyFlag = $v.denyFlag;
       _author = $v.author.toBuilder();
       _reactions = $v.reactions.toBuilder();
+      _comments = $v.comments.toBuilder();
       _$v = null;
     }
     return this;
@@ -3960,6 +4717,7 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
                 denyFlag, r'GPostsForTagData_tag_posts_edges_node', 'denyFlag'),
             author: author.build(),
             reactions: reactions.build(),
+            comments: comments.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -3973,6 +4731,8 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
         author.build();
         _$failedField = 'reactions';
         reactions.build();
+        _$failedField = 'comments';
+        comments.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'GPostsForTagData_tag_posts_edges_node',
@@ -4247,6 +5007,393 @@ class GPostsForTagData_tag_posts_edges_node_reactionsBuilder
   }
 }
 
+class _$GPostsForTagData_tag_posts_edges_node_comments
+    extends GPostsForTagData_tag_posts_edges_node_comments {
+  @override
+  final String G__typename;
+  @override
+  final BuiltList<GPostsForTagData_tag_posts_edges_node_comments_edges> edges;
+
+  factory _$GPostsForTagData_tag_posts_edges_node_comments(
+          [void Function(GPostsForTagData_tag_posts_edges_node_commentsBuilder)?
+              updates]) =>
+      (GPostsForTagData_tag_posts_edges_node_commentsBuilder()..update(updates))
+          ._build();
+
+  _$GPostsForTagData_tag_posts_edges_node_comments._(
+      {required this.G__typename, required this.edges})
+      : super._();
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments rebuild(
+          void Function(GPostsForTagData_tag_posts_edges_node_commentsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_commentsBuilder toBuilder() =>
+      GPostsForTagData_tag_posts_edges_node_commentsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostsForTagData_tag_posts_edges_node_comments &&
+        G__typename == other.G__typename &&
+        edges == other.edges;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, edges.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostsForTagData_tag_posts_edges_node_comments')
+          ..add('G__typename', G__typename)
+          ..add('edges', edges))
+        .toString();
+  }
+}
+
+class GPostsForTagData_tag_posts_edges_node_commentsBuilder
+    implements
+        Builder<GPostsForTagData_tag_posts_edges_node_comments,
+            GPostsForTagData_tag_posts_edges_node_commentsBuilder> {
+  _$GPostsForTagData_tag_posts_edges_node_comments? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  ListBuilder<GPostsForTagData_tag_posts_edges_node_comments_edges>? _edges;
+  ListBuilder<GPostsForTagData_tag_posts_edges_node_comments_edges> get edges =>
+      _$this._edges ??=
+          ListBuilder<GPostsForTagData_tag_posts_edges_node_comments_edges>();
+  set edges(
+          ListBuilder<GPostsForTagData_tag_posts_edges_node_comments_edges>?
+              edges) =>
+      _$this._edges = edges;
+
+  GPostsForTagData_tag_posts_edges_node_commentsBuilder() {
+    GPostsForTagData_tag_posts_edges_node_comments._initializeBuilder(this);
+  }
+
+  GPostsForTagData_tag_posts_edges_node_commentsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _edges = $v.edges.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostsForTagData_tag_posts_edges_node_comments other) {
+    _$v = other as _$GPostsForTagData_tag_posts_edges_node_comments;
+  }
+
+  @override
+  void update(
+      void Function(GPostsForTagData_tag_posts_edges_node_commentsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments build() => _build();
+
+  _$GPostsForTagData_tag_posts_edges_node_comments _build() {
+    _$GPostsForTagData_tag_posts_edges_node_comments _$result;
+    try {
+      _$result = _$v ??
+          _$GPostsForTagData_tag_posts_edges_node_comments._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename,
+                r'GPostsForTagData_tag_posts_edges_node_comments',
+                'G__typename'),
+            edges: edges.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'edges';
+        edges.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostsForTagData_tag_posts_edges_node_comments',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_comments_edges
+    extends GPostsForTagData_tag_posts_edges_node_comments_edges {
+  @override
+  final String G__typename;
+  @override
+  final GPostsForTagData_tag_posts_edges_node_comments_edges_node node;
+
+  factory _$GPostsForTagData_tag_posts_edges_node_comments_edges(
+          [void Function(
+                  GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder)?
+              updates]) =>
+      (GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GPostsForTagData_tag_posts_edges_node_comments_edges._(
+      {required this.G__typename, required this.node})
+      : super._();
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments_edges rebuild(
+          void Function(
+                  GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder toBuilder() =>
+      GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder()
+        ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostsForTagData_tag_posts_edges_node_comments_edges &&
+        G__typename == other.G__typename &&
+        node == other.node;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, node.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostsForTagData_tag_posts_edges_node_comments_edges')
+          ..add('G__typename', G__typename)
+          ..add('node', node))
+        .toString();
+  }
+}
+
+class GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder
+    implements
+        Builder<GPostsForTagData_tag_posts_edges_node_comments_edges,
+            GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder> {
+  _$GPostsForTagData_tag_posts_edges_node_comments_edges? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder? _node;
+  GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder get node =>
+      _$this._node ??=
+          GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder();
+  set node(
+          GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder?
+              node) =>
+      _$this._node = node;
+
+  GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder() {
+    GPostsForTagData_tag_posts_edges_node_comments_edges._initializeBuilder(
+        this);
+  }
+
+  GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _node = $v.node.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostsForTagData_tag_posts_edges_node_comments_edges other) {
+    _$v = other as _$GPostsForTagData_tag_posts_edges_node_comments_edges;
+  }
+
+  @override
+  void update(
+      void Function(
+              GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments_edges build() => _build();
+
+  _$GPostsForTagData_tag_posts_edges_node_comments_edges _build() {
+    _$GPostsForTagData_tag_posts_edges_node_comments_edges _$result;
+    try {
+      _$result = _$v ??
+          _$GPostsForTagData_tag_posts_edges_node_comments_edges._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename,
+                r'GPostsForTagData_tag_posts_edges_node_comments_edges',
+                'G__typename'),
+            node: node.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'node';
+        node.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostsForTagData_tag_posts_edges_node_comments_edges',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_comments_edges_node
+    extends GPostsForTagData_tag_posts_edges_node_comments_edges_node {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+
+  factory _$GPostsForTagData_tag_posts_edges_node_comments_edges_node(
+          [void Function(
+                  GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder)?
+              updates]) =>
+      (GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GPostsForTagData_tag_posts_edges_node_comments_edges_node._(
+      {required this.G__typename, required this.id})
+      : super._();
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments_edges_node rebuild(
+          void Function(
+                  GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder
+      toBuilder() =>
+          GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder()
+            ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostsForTagData_tag_posts_edges_node_comments_edges_node &&
+        G__typename == other.G__typename &&
+        id == other.id;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostsForTagData_tag_posts_edges_node_comments_edges_node')
+          ..add('G__typename', G__typename)
+          ..add('id', id))
+        .toString();
+  }
+}
+
+class GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder
+    implements
+        Builder<GPostsForTagData_tag_posts_edges_node_comments_edges_node,
+            GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder> {
+  _$GPostsForTagData_tag_posts_edges_node_comments_edges_node? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder() {
+    GPostsForTagData_tag_posts_edges_node_comments_edges_node
+        ._initializeBuilder(this);
+  }
+
+  GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(
+      GPostsForTagData_tag_posts_edges_node_comments_edges_node other) {
+    _$v = other as _$GPostsForTagData_tag_posts_edges_node_comments_edges_node;
+  }
+
+  @override
+  void update(
+      void Function(
+              GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments_edges_node build() => _build();
+
+  _$GPostsForTagData_tag_posts_edges_node_comments_edges_node _build() {
+    final _$result = _$v ??
+        _$GPostsForTagData_tag_posts_edges_node_comments_edges_node._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GPostsForTagData_tag_posts_edges_node_comments_edges_node',
+              'G__typename'),
+          id: BuiltValueNullFieldError.checkNotNull(
+              id,
+              r'GPostsForTagData_tag_posts_edges_node_comments_edges_node',
+              'id'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
 class _$GPostDetailData extends GPostDetailData {
   @override
   final String G__typename;
@@ -4377,9 +5524,9 @@ class _$GPostDetailData_post extends GPostDetailData_post {
   @override
   final BuiltList<GPostDetailData_post_reactions> reactions;
   @override
-  final BuiltList<GPostDetailData_post_tags> tags;
-  @override
   final GPostDetailData_post_comments comments;
+  @override
+  final BuiltList<GPostDetailData_post_tags> tags;
   @override
   final GPostDetailData_post_myPermissions myPermissions;
 
@@ -4398,8 +5545,8 @@ class _$GPostDetailData_post extends GPostDetailData_post {
       required this.denyFlag,
       required this.author,
       required this.reactions,
-      required this.tags,
       required this.comments,
+      required this.tags,
       required this.myPermissions})
       : super._();
   @override
@@ -4425,8 +5572,8 @@ class _$GPostDetailData_post extends GPostDetailData_post {
         denyFlag == other.denyFlag &&
         author == other.author &&
         reactions == other.reactions &&
-        tags == other.tags &&
         comments == other.comments &&
+        tags == other.tags &&
         myPermissions == other.myPermissions;
   }
 
@@ -4443,8 +5590,8 @@ class _$GPostDetailData_post extends GPostDetailData_post {
     _$hash = $jc(_$hash, denyFlag.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
-    _$hash = $jc(_$hash, tags.hashCode);
     _$hash = $jc(_$hash, comments.hashCode);
+    _$hash = $jc(_$hash, tags.hashCode);
     _$hash = $jc(_$hash, myPermissions.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -4463,8 +5610,8 @@ class _$GPostDetailData_post extends GPostDetailData_post {
           ..add('denyFlag', denyFlag)
           ..add('author', author)
           ..add('reactions', reactions)
-          ..add('tags', tags)
           ..add('comments', comments)
+          ..add('tags', tags)
           ..add('myPermissions', myPermissions))
         .toString();
   }
@@ -4519,16 +5666,16 @@ class GPostDetailData_postBuilder
   set reactions(ListBuilder<GPostDetailData_post_reactions>? reactions) =>
       _$this._reactions = reactions;
 
-  ListBuilder<GPostDetailData_post_tags>? _tags;
-  ListBuilder<GPostDetailData_post_tags> get tags =>
-      _$this._tags ??= ListBuilder<GPostDetailData_post_tags>();
-  set tags(ListBuilder<GPostDetailData_post_tags>? tags) => _$this._tags = tags;
-
   GPostDetailData_post_commentsBuilder? _comments;
   GPostDetailData_post_commentsBuilder get comments =>
       _$this._comments ??= GPostDetailData_post_commentsBuilder();
   set comments(GPostDetailData_post_commentsBuilder? comments) =>
       _$this._comments = comments;
+
+  ListBuilder<GPostDetailData_post_tags>? _tags;
+  ListBuilder<GPostDetailData_post_tags> get tags =>
+      _$this._tags ??= ListBuilder<GPostDetailData_post_tags>();
+  set tags(ListBuilder<GPostDetailData_post_tags>? tags) => _$this._tags = tags;
 
   GPostDetailData_post_myPermissionsBuilder? _myPermissions;
   GPostDetailData_post_myPermissionsBuilder get myPermissions =>
@@ -4553,8 +5700,8 @@ class GPostDetailData_postBuilder
       _denyFlag = $v.denyFlag;
       _author = $v.author.toBuilder();
       _reactions = $v.reactions.toBuilder();
-      _tags = $v.tags.toBuilder();
       _comments = $v.comments.toBuilder();
+      _tags = $v.tags.toBuilder();
       _myPermissions = $v.myPermissions.toBuilder();
       _$v = null;
     }
@@ -4594,8 +5741,8 @@ class GPostDetailData_postBuilder
                 denyFlag, r'GPostDetailData_post', 'denyFlag'),
             author: author.build(),
             reactions: reactions.build(),
-            tags: tags.build(),
             comments: comments.build(),
+            tags: tags.build(),
             myPermissions: myPermissions.build(),
           );
     } catch (_) {
@@ -4610,10 +5757,10 @@ class GPostDetailData_postBuilder
         author.build();
         _$failedField = 'reactions';
         reactions.build();
-        _$failedField = 'tags';
-        tags.build();
         _$failedField = 'comments';
         comments.build();
+        _$failedField = 'tags';
+        tags.build();
         _$failedField = 'myPermissions';
         myPermissions.build();
       } catch (e) {
@@ -4864,248 +6011,6 @@ class GPostDetailData_post_reactionsBuilder
               count, r'GPostDetailData_post_reactions', 'count'),
           byViewer: BuiltValueNullFieldError.checkNotNull(
               byViewer, r'GPostDetailData_post_reactions', 'byViewer'),
-        );
-    replace(_$result);
-    return _$result;
-  }
-}
-
-class _$GPostDetailData_post_tags extends GPostDetailData_post_tags {
-  @override
-  final String G__typename;
-  @override
-  final GPostDetailData_post_tags_tag tag;
-
-  factory _$GPostDetailData_post_tags(
-          [void Function(GPostDetailData_post_tagsBuilder)? updates]) =>
-      (GPostDetailData_post_tagsBuilder()..update(updates))._build();
-
-  _$GPostDetailData_post_tags._({required this.G__typename, required this.tag})
-      : super._();
-  @override
-  GPostDetailData_post_tags rebuild(
-          void Function(GPostDetailData_post_tagsBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
-
-  @override
-  GPostDetailData_post_tagsBuilder toBuilder() =>
-      GPostDetailData_post_tagsBuilder()..replace(this);
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(other, this)) return true;
-    return other is GPostDetailData_post_tags &&
-        G__typename == other.G__typename &&
-        tag == other.tag;
-  }
-
-  @override
-  int get hashCode {
-    var _$hash = 0;
-    _$hash = $jc(_$hash, G__typename.hashCode);
-    _$hash = $jc(_$hash, tag.hashCode);
-    _$hash = $jf(_$hash);
-    return _$hash;
-  }
-
-  @override
-  String toString() {
-    return (newBuiltValueToStringHelper(r'GPostDetailData_post_tags')
-          ..add('G__typename', G__typename)
-          ..add('tag', tag))
-        .toString();
-  }
-}
-
-class GPostDetailData_post_tagsBuilder
-    implements
-        Builder<GPostDetailData_post_tags, GPostDetailData_post_tagsBuilder> {
-  _$GPostDetailData_post_tags? _$v;
-
-  String? _G__typename;
-  String? get G__typename => _$this._G__typename;
-  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
-
-  GPostDetailData_post_tags_tagBuilder? _tag;
-  GPostDetailData_post_tags_tagBuilder get tag =>
-      _$this._tag ??= GPostDetailData_post_tags_tagBuilder();
-  set tag(GPostDetailData_post_tags_tagBuilder? tag) => _$this._tag = tag;
-
-  GPostDetailData_post_tagsBuilder() {
-    GPostDetailData_post_tags._initializeBuilder(this);
-  }
-
-  GPostDetailData_post_tagsBuilder get _$this {
-    final $v = _$v;
-    if ($v != null) {
-      _G__typename = $v.G__typename;
-      _tag = $v.tag.toBuilder();
-      _$v = null;
-    }
-    return this;
-  }
-
-  @override
-  void replace(GPostDetailData_post_tags other) {
-    _$v = other as _$GPostDetailData_post_tags;
-  }
-
-  @override
-  void update(void Function(GPostDetailData_post_tagsBuilder)? updates) {
-    if (updates != null) updates(this);
-  }
-
-  @override
-  GPostDetailData_post_tags build() => _build();
-
-  _$GPostDetailData_post_tags _build() {
-    _$GPostDetailData_post_tags _$result;
-    try {
-      _$result = _$v ??
-          _$GPostDetailData_post_tags._(
-            G__typename: BuiltValueNullFieldError.checkNotNull(
-                G__typename, r'GPostDetailData_post_tags', 'G__typename'),
-            tag: tag.build(),
-          );
-    } catch (_) {
-      late String _$failedField;
-      try {
-        _$failedField = 'tag';
-        tag.build();
-      } catch (e) {
-        throw BuiltValueNestedFieldError(
-            r'GPostDetailData_post_tags', _$failedField, e.toString());
-      }
-      rethrow;
-    }
-    replace(_$result);
-    return _$result;
-  }
-}
-
-class _$GPostDetailData_post_tags_tag extends GPostDetailData_post_tags_tag {
-  @override
-  final String G__typename;
-  @override
-  final String id;
-  @override
-  final String slug;
-  @override
-  final String displayName;
-
-  factory _$GPostDetailData_post_tags_tag(
-          [void Function(GPostDetailData_post_tags_tagBuilder)? updates]) =>
-      (GPostDetailData_post_tags_tagBuilder()..update(updates))._build();
-
-  _$GPostDetailData_post_tags_tag._(
-      {required this.G__typename,
-      required this.id,
-      required this.slug,
-      required this.displayName})
-      : super._();
-  @override
-  GPostDetailData_post_tags_tag rebuild(
-          void Function(GPostDetailData_post_tags_tagBuilder) updates) =>
-      (toBuilder()..update(updates)).build();
-
-  @override
-  GPostDetailData_post_tags_tagBuilder toBuilder() =>
-      GPostDetailData_post_tags_tagBuilder()..replace(this);
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(other, this)) return true;
-    return other is GPostDetailData_post_tags_tag &&
-        G__typename == other.G__typename &&
-        id == other.id &&
-        slug == other.slug &&
-        displayName == other.displayName;
-  }
-
-  @override
-  int get hashCode {
-    var _$hash = 0;
-    _$hash = $jc(_$hash, G__typename.hashCode);
-    _$hash = $jc(_$hash, id.hashCode);
-    _$hash = $jc(_$hash, slug.hashCode);
-    _$hash = $jc(_$hash, displayName.hashCode);
-    _$hash = $jf(_$hash);
-    return _$hash;
-  }
-
-  @override
-  String toString() {
-    return (newBuiltValueToStringHelper(r'GPostDetailData_post_tags_tag')
-          ..add('G__typename', G__typename)
-          ..add('id', id)
-          ..add('slug', slug)
-          ..add('displayName', displayName))
-        .toString();
-  }
-}
-
-class GPostDetailData_post_tags_tagBuilder
-    implements
-        Builder<GPostDetailData_post_tags_tag,
-            GPostDetailData_post_tags_tagBuilder> {
-  _$GPostDetailData_post_tags_tag? _$v;
-
-  String? _G__typename;
-  String? get G__typename => _$this._G__typename;
-  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
-
-  String? _id;
-  String? get id => _$this._id;
-  set id(String? id) => _$this._id = id;
-
-  String? _slug;
-  String? get slug => _$this._slug;
-  set slug(String? slug) => _$this._slug = slug;
-
-  String? _displayName;
-  String? get displayName => _$this._displayName;
-  set displayName(String? displayName) => _$this._displayName = displayName;
-
-  GPostDetailData_post_tags_tagBuilder() {
-    GPostDetailData_post_tags_tag._initializeBuilder(this);
-  }
-
-  GPostDetailData_post_tags_tagBuilder get _$this {
-    final $v = _$v;
-    if ($v != null) {
-      _G__typename = $v.G__typename;
-      _id = $v.id;
-      _slug = $v.slug;
-      _displayName = $v.displayName;
-      _$v = null;
-    }
-    return this;
-  }
-
-  @override
-  void replace(GPostDetailData_post_tags_tag other) {
-    _$v = other as _$GPostDetailData_post_tags_tag;
-  }
-
-  @override
-  void update(void Function(GPostDetailData_post_tags_tagBuilder)? updates) {
-    if (updates != null) updates(this);
-  }
-
-  @override
-  GPostDetailData_post_tags_tag build() => _build();
-
-  _$GPostDetailData_post_tags_tag _build() {
-    final _$result = _$v ??
-        _$GPostDetailData_post_tags_tag._(
-          G__typename: BuiltValueNullFieldError.checkNotNull(
-              G__typename, r'GPostDetailData_post_tags_tag', 'G__typename'),
-          id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GPostDetailData_post_tags_tag', 'id'),
-          slug: BuiltValueNullFieldError.checkNotNull(
-              slug, r'GPostDetailData_post_tags_tag', 'slug'),
-          displayName: BuiltValueNullFieldError.checkNotNull(
-              displayName, r'GPostDetailData_post_tags_tag', 'displayName'),
         );
     replace(_$result);
     return _$result;
@@ -5855,6 +6760,248 @@ class GPostDetailData_post_comments_edges_node_reactionsBuilder
   }
 }
 
+class _$GPostDetailData_post_tags extends GPostDetailData_post_tags {
+  @override
+  final String G__typename;
+  @override
+  final GPostDetailData_post_tags_tag tag;
+
+  factory _$GPostDetailData_post_tags(
+          [void Function(GPostDetailData_post_tagsBuilder)? updates]) =>
+      (GPostDetailData_post_tagsBuilder()..update(updates))._build();
+
+  _$GPostDetailData_post_tags._({required this.G__typename, required this.tag})
+      : super._();
+  @override
+  GPostDetailData_post_tags rebuild(
+          void Function(GPostDetailData_post_tagsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostDetailData_post_tagsBuilder toBuilder() =>
+      GPostDetailData_post_tagsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostDetailData_post_tags &&
+        G__typename == other.G__typename &&
+        tag == other.tag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, tag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostDetailData_post_tags')
+          ..add('G__typename', G__typename)
+          ..add('tag', tag))
+        .toString();
+  }
+}
+
+class GPostDetailData_post_tagsBuilder
+    implements
+        Builder<GPostDetailData_post_tags, GPostDetailData_post_tagsBuilder> {
+  _$GPostDetailData_post_tags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  GPostDetailData_post_tags_tagBuilder? _tag;
+  GPostDetailData_post_tags_tagBuilder get tag =>
+      _$this._tag ??= GPostDetailData_post_tags_tagBuilder();
+  set tag(GPostDetailData_post_tags_tagBuilder? tag) => _$this._tag = tag;
+
+  GPostDetailData_post_tagsBuilder() {
+    GPostDetailData_post_tags._initializeBuilder(this);
+  }
+
+  GPostDetailData_post_tagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _tag = $v.tag.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostDetailData_post_tags other) {
+    _$v = other as _$GPostDetailData_post_tags;
+  }
+
+  @override
+  void update(void Function(GPostDetailData_post_tagsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostDetailData_post_tags build() => _build();
+
+  _$GPostDetailData_post_tags _build() {
+    _$GPostDetailData_post_tags _$result;
+    try {
+      _$result = _$v ??
+          _$GPostDetailData_post_tags._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GPostDetailData_post_tags', 'G__typename'),
+            tag: tag.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'tag';
+        tag.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostDetailData_post_tags', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostDetailData_post_tags_tag extends GPostDetailData_post_tags_tag {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+
+  factory _$GPostDetailData_post_tags_tag(
+          [void Function(GPostDetailData_post_tags_tagBuilder)? updates]) =>
+      (GPostDetailData_post_tags_tagBuilder()..update(updates))._build();
+
+  _$GPostDetailData_post_tags_tag._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName})
+      : super._();
+  @override
+  GPostDetailData_post_tags_tag rebuild(
+          void Function(GPostDetailData_post_tags_tagBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostDetailData_post_tags_tagBuilder toBuilder() =>
+      GPostDetailData_post_tags_tagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostDetailData_post_tags_tag &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostDetailData_post_tags_tag')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName))
+        .toString();
+  }
+}
+
+class GPostDetailData_post_tags_tagBuilder
+    implements
+        Builder<GPostDetailData_post_tags_tag,
+            GPostDetailData_post_tags_tagBuilder> {
+  _$GPostDetailData_post_tags_tag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GPostDetailData_post_tags_tagBuilder() {
+    GPostDetailData_post_tags_tag._initializeBuilder(this);
+  }
+
+  GPostDetailData_post_tags_tagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostDetailData_post_tags_tag other) {
+    _$v = other as _$GPostDetailData_post_tags_tag;
+  }
+
+  @override
+  void update(void Function(GPostDetailData_post_tags_tagBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostDetailData_post_tags_tag build() => _build();
+
+  _$GPostDetailData_post_tags_tag _build() {
+    final _$result = _$v ??
+        _$GPostDetailData_post_tags_tag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename, r'GPostDetailData_post_tags_tag', 'G__typename'),
+          id: BuiltValueNullFieldError.checkNotNull(
+              id, r'GPostDetailData_post_tags_tag', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GPostDetailData_post_tags_tag', 'slug'),
+          displayName: BuiltValueNullFieldError.checkNotNull(
+              displayName, r'GPostDetailData_post_tags_tag', 'displayName'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
 class _$GPostDetailData_post_myPermissions
     extends GPostDetailData_post_myPermissions {
   @override
@@ -6119,6 +7266,8 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
   final GCreatePostData_createPost_author author;
   @override
   final BuiltList<GCreatePostData_createPost_reactions> reactions;
+  @override
+  final GCreatePostData_createPost_comments comments;
 
   factory _$GCreatePostData_createPost(
           [void Function(GCreatePostData_createPostBuilder)? updates]) =>
@@ -6134,7 +7283,8 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
       this.decisionStatus,
       required this.denyFlag,
       required this.author,
-      required this.reactions})
+      required this.reactions,
+      required this.comments})
       : super._();
   @override
   GCreatePostData_createPost rebuild(
@@ -6158,7 +7308,8 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
         decisionStatus == other.decisionStatus &&
         denyFlag == other.denyFlag &&
         author == other.author &&
-        reactions == other.reactions;
+        reactions == other.reactions &&
+        comments == other.comments;
   }
 
   @override
@@ -6174,6 +7325,7 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
     _$hash = $jc(_$hash, denyFlag.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
+    _$hash = $jc(_$hash, comments.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -6190,7 +7342,8 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
           ..add('decisionStatus', decisionStatus)
           ..add('denyFlag', denyFlag)
           ..add('author', author)
-          ..add('reactions', reactions))
+          ..add('reactions', reactions)
+          ..add('comments', comments))
         .toString();
   }
 }
@@ -6245,6 +7398,12 @@ class GCreatePostData_createPostBuilder
   set reactions(ListBuilder<GCreatePostData_createPost_reactions>? reactions) =>
       _$this._reactions = reactions;
 
+  GCreatePostData_createPost_commentsBuilder? _comments;
+  GCreatePostData_createPost_commentsBuilder get comments =>
+      _$this._comments ??= GCreatePostData_createPost_commentsBuilder();
+  set comments(GCreatePostData_createPost_commentsBuilder? comments) =>
+      _$this._comments = comments;
+
   GCreatePostData_createPostBuilder() {
     GCreatePostData_createPost._initializeBuilder(this);
   }
@@ -6262,6 +7421,7 @@ class GCreatePostData_createPostBuilder
       _denyFlag = $v.denyFlag;
       _author = $v.author.toBuilder();
       _reactions = $v.reactions.toBuilder();
+      _comments = $v.comments.toBuilder();
       _$v = null;
     }
     return this;
@@ -6300,6 +7460,7 @@ class GCreatePostData_createPostBuilder
                 denyFlag, r'GCreatePostData_createPost', 'denyFlag'),
             author: author.build(),
             reactions: reactions.build(),
+            comments: comments.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -6313,6 +7474,8 @@ class GCreatePostData_createPostBuilder
         author.build();
         _$failedField = 'reactions';
         reactions.build();
+        _$failedField = 'comments';
+        comments.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'GCreatePostData_createPost', _$failedField, e.toString());
@@ -6566,6 +7729,360 @@ class GCreatePostData_createPost_reactionsBuilder
               count, r'GCreatePostData_createPost_reactions', 'count'),
           byViewer: BuiltValueNullFieldError.checkNotNull(
               byViewer, r'GCreatePostData_createPost_reactions', 'byViewer'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreatePostData_createPost_comments
+    extends GCreatePostData_createPost_comments {
+  @override
+  final String G__typename;
+  @override
+  final BuiltList<GCreatePostData_createPost_comments_edges> edges;
+
+  factory _$GCreatePostData_createPost_comments(
+          [void Function(GCreatePostData_createPost_commentsBuilder)?
+              updates]) =>
+      (GCreatePostData_createPost_commentsBuilder()..update(updates))._build();
+
+  _$GCreatePostData_createPost_comments._(
+      {required this.G__typename, required this.edges})
+      : super._();
+  @override
+  GCreatePostData_createPost_comments rebuild(
+          void Function(GCreatePostData_createPost_commentsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreatePostData_createPost_commentsBuilder toBuilder() =>
+      GCreatePostData_createPost_commentsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreatePostData_createPost_comments &&
+        G__typename == other.G__typename &&
+        edges == other.edges;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, edges.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GCreatePostData_createPost_comments')
+          ..add('G__typename', G__typename)
+          ..add('edges', edges))
+        .toString();
+  }
+}
+
+class GCreatePostData_createPost_commentsBuilder
+    implements
+        Builder<GCreatePostData_createPost_comments,
+            GCreatePostData_createPost_commentsBuilder> {
+  _$GCreatePostData_createPost_comments? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  ListBuilder<GCreatePostData_createPost_comments_edges>? _edges;
+  ListBuilder<GCreatePostData_createPost_comments_edges> get edges =>
+      _$this._edges ??=
+          ListBuilder<GCreatePostData_createPost_comments_edges>();
+  set edges(ListBuilder<GCreatePostData_createPost_comments_edges>? edges) =>
+      _$this._edges = edges;
+
+  GCreatePostData_createPost_commentsBuilder() {
+    GCreatePostData_createPost_comments._initializeBuilder(this);
+  }
+
+  GCreatePostData_createPost_commentsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _edges = $v.edges.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreatePostData_createPost_comments other) {
+    _$v = other as _$GCreatePostData_createPost_comments;
+  }
+
+  @override
+  void update(
+      void Function(GCreatePostData_createPost_commentsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreatePostData_createPost_comments build() => _build();
+
+  _$GCreatePostData_createPost_comments _build() {
+    _$GCreatePostData_createPost_comments _$result;
+    try {
+      _$result = _$v ??
+          _$GCreatePostData_createPost_comments._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GCreatePostData_createPost_comments', 'G__typename'),
+            edges: edges.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'edges';
+        edges.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(r'GCreatePostData_createPost_comments',
+            _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreatePostData_createPost_comments_edges
+    extends GCreatePostData_createPost_comments_edges {
+  @override
+  final String G__typename;
+  @override
+  final GCreatePostData_createPost_comments_edges_node node;
+
+  factory _$GCreatePostData_createPost_comments_edges(
+          [void Function(GCreatePostData_createPost_comments_edgesBuilder)?
+              updates]) =>
+      (GCreatePostData_createPost_comments_edgesBuilder()..update(updates))
+          ._build();
+
+  _$GCreatePostData_createPost_comments_edges._(
+      {required this.G__typename, required this.node})
+      : super._();
+  @override
+  GCreatePostData_createPost_comments_edges rebuild(
+          void Function(GCreatePostData_createPost_comments_edgesBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreatePostData_createPost_comments_edgesBuilder toBuilder() =>
+      GCreatePostData_createPost_comments_edgesBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreatePostData_createPost_comments_edges &&
+        G__typename == other.G__typename &&
+        node == other.node;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, node.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GCreatePostData_createPost_comments_edges')
+          ..add('G__typename', G__typename)
+          ..add('node', node))
+        .toString();
+  }
+}
+
+class GCreatePostData_createPost_comments_edgesBuilder
+    implements
+        Builder<GCreatePostData_createPost_comments_edges,
+            GCreatePostData_createPost_comments_edgesBuilder> {
+  _$GCreatePostData_createPost_comments_edges? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  GCreatePostData_createPost_comments_edges_nodeBuilder? _node;
+  GCreatePostData_createPost_comments_edges_nodeBuilder get node =>
+      _$this._node ??= GCreatePostData_createPost_comments_edges_nodeBuilder();
+  set node(GCreatePostData_createPost_comments_edges_nodeBuilder? node) =>
+      _$this._node = node;
+
+  GCreatePostData_createPost_comments_edgesBuilder() {
+    GCreatePostData_createPost_comments_edges._initializeBuilder(this);
+  }
+
+  GCreatePostData_createPost_comments_edgesBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _node = $v.node.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreatePostData_createPost_comments_edges other) {
+    _$v = other as _$GCreatePostData_createPost_comments_edges;
+  }
+
+  @override
+  void update(
+      void Function(GCreatePostData_createPost_comments_edgesBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreatePostData_createPost_comments_edges build() => _build();
+
+  _$GCreatePostData_createPost_comments_edges _build() {
+    _$GCreatePostData_createPost_comments_edges _$result;
+    try {
+      _$result = _$v ??
+          _$GCreatePostData_createPost_comments_edges._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GCreatePostData_createPost_comments_edges', 'G__typename'),
+            node: node.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'node';
+        node.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GCreatePostData_createPost_comments_edges',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreatePostData_createPost_comments_edges_node
+    extends GCreatePostData_createPost_comments_edges_node {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+
+  factory _$GCreatePostData_createPost_comments_edges_node(
+          [void Function(GCreatePostData_createPost_comments_edges_nodeBuilder)?
+              updates]) =>
+      (GCreatePostData_createPost_comments_edges_nodeBuilder()..update(updates))
+          ._build();
+
+  _$GCreatePostData_createPost_comments_edges_node._(
+      {required this.G__typename, required this.id})
+      : super._();
+  @override
+  GCreatePostData_createPost_comments_edges_node rebuild(
+          void Function(GCreatePostData_createPost_comments_edges_nodeBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreatePostData_createPost_comments_edges_nodeBuilder toBuilder() =>
+      GCreatePostData_createPost_comments_edges_nodeBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreatePostData_createPost_comments_edges_node &&
+        G__typename == other.G__typename &&
+        id == other.id;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GCreatePostData_createPost_comments_edges_node')
+          ..add('G__typename', G__typename)
+          ..add('id', id))
+        .toString();
+  }
+}
+
+class GCreatePostData_createPost_comments_edges_nodeBuilder
+    implements
+        Builder<GCreatePostData_createPost_comments_edges_node,
+            GCreatePostData_createPost_comments_edges_nodeBuilder> {
+  _$GCreatePostData_createPost_comments_edges_node? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  GCreatePostData_createPost_comments_edges_nodeBuilder() {
+    GCreatePostData_createPost_comments_edges_node._initializeBuilder(this);
+  }
+
+  GCreatePostData_createPost_comments_edges_nodeBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreatePostData_createPost_comments_edges_node other) {
+    _$v = other as _$GCreatePostData_createPost_comments_edges_node;
+  }
+
+  @override
+  void update(
+      void Function(GCreatePostData_createPost_comments_edges_nodeBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreatePostData_createPost_comments_edges_node build() => _build();
+
+  _$GCreatePostData_createPost_comments_edges_node _build() {
+    final _$result = _$v ??
+        _$GCreatePostData_createPost_comments_edges_node._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GCreatePostData_createPost_comments_edges_node', 'G__typename'),
+          id: BuiltValueNullFieldError.checkNotNull(
+              id, r'GCreatePostData_createPost_comments_edges_node', 'id'),
         );
     replace(_$result);
     return _$result;
@@ -8061,6 +9578,8 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
   final GPostChangedData_postChanged_author author;
   @override
   final BuiltList<GPostChangedData_postChanged_reactions> reactions;
+  @override
+  final GPostChangedData_postChanged_comments comments;
 
   factory _$GPostChangedData_postChanged(
           [void Function(GPostChangedData_postChangedBuilder)? updates]) =>
@@ -8076,7 +9595,8 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
       this.decisionStatus,
       required this.denyFlag,
       required this.author,
-      required this.reactions})
+      required this.reactions,
+      required this.comments})
       : super._();
   @override
   GPostChangedData_postChanged rebuild(
@@ -8100,7 +9620,8 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
         decisionStatus == other.decisionStatus &&
         denyFlag == other.denyFlag &&
         author == other.author &&
-        reactions == other.reactions;
+        reactions == other.reactions &&
+        comments == other.comments;
   }
 
   @override
@@ -8116,6 +9637,7 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
     _$hash = $jc(_$hash, denyFlag.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
+    _$hash = $jc(_$hash, comments.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -8132,7 +9654,8 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
           ..add('decisionStatus', decisionStatus)
           ..add('denyFlag', denyFlag)
           ..add('author', author)
-          ..add('reactions', reactions))
+          ..add('reactions', reactions)
+          ..add('comments', comments))
         .toString();
   }
 }
@@ -8190,6 +9713,12 @@ class GPostChangedData_postChangedBuilder
           ListBuilder<GPostChangedData_postChanged_reactions>? reactions) =>
       _$this._reactions = reactions;
 
+  GPostChangedData_postChanged_commentsBuilder? _comments;
+  GPostChangedData_postChanged_commentsBuilder get comments =>
+      _$this._comments ??= GPostChangedData_postChanged_commentsBuilder();
+  set comments(GPostChangedData_postChanged_commentsBuilder? comments) =>
+      _$this._comments = comments;
+
   GPostChangedData_postChangedBuilder() {
     GPostChangedData_postChanged._initializeBuilder(this);
   }
@@ -8207,6 +9736,7 @@ class GPostChangedData_postChangedBuilder
       _denyFlag = $v.denyFlag;
       _author = $v.author.toBuilder();
       _reactions = $v.reactions.toBuilder();
+      _comments = $v.comments.toBuilder();
       _$v = null;
     }
     return this;
@@ -8245,6 +9775,7 @@ class GPostChangedData_postChangedBuilder
                 denyFlag, r'GPostChangedData_postChanged', 'denyFlag'),
             author: author.build(),
             reactions: reactions.build(),
+            comments: comments.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -8258,6 +9789,8 @@ class GPostChangedData_postChangedBuilder
         author.build();
         _$failedField = 'reactions';
         reactions.build();
+        _$failedField = 'comments';
+        comments.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'GPostChangedData_postChanged', _$failedField, e.toString());
@@ -8521,6 +10054,370 @@ class GPostChangedData_postChanged_reactionsBuilder
   }
 }
 
+class _$GPostChangedData_postChanged_comments
+    extends GPostChangedData_postChanged_comments {
+  @override
+  final String G__typename;
+  @override
+  final BuiltList<GPostChangedData_postChanged_comments_edges> edges;
+
+  factory _$GPostChangedData_postChanged_comments(
+          [void Function(GPostChangedData_postChanged_commentsBuilder)?
+              updates]) =>
+      (GPostChangedData_postChanged_commentsBuilder()..update(updates))
+          ._build();
+
+  _$GPostChangedData_postChanged_comments._(
+      {required this.G__typename, required this.edges})
+      : super._();
+  @override
+  GPostChangedData_postChanged_comments rebuild(
+          void Function(GPostChangedData_postChanged_commentsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostChangedData_postChanged_commentsBuilder toBuilder() =>
+      GPostChangedData_postChanged_commentsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostChangedData_postChanged_comments &&
+        G__typename == other.G__typename &&
+        edges == other.edges;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, edges.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostChangedData_postChanged_comments')
+          ..add('G__typename', G__typename)
+          ..add('edges', edges))
+        .toString();
+  }
+}
+
+class GPostChangedData_postChanged_commentsBuilder
+    implements
+        Builder<GPostChangedData_postChanged_comments,
+            GPostChangedData_postChanged_commentsBuilder> {
+  _$GPostChangedData_postChanged_comments? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  ListBuilder<GPostChangedData_postChanged_comments_edges>? _edges;
+  ListBuilder<GPostChangedData_postChanged_comments_edges> get edges =>
+      _$this._edges ??=
+          ListBuilder<GPostChangedData_postChanged_comments_edges>();
+  set edges(ListBuilder<GPostChangedData_postChanged_comments_edges>? edges) =>
+      _$this._edges = edges;
+
+  GPostChangedData_postChanged_commentsBuilder() {
+    GPostChangedData_postChanged_comments._initializeBuilder(this);
+  }
+
+  GPostChangedData_postChanged_commentsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _edges = $v.edges.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostChangedData_postChanged_comments other) {
+    _$v = other as _$GPostChangedData_postChanged_comments;
+  }
+
+  @override
+  void update(
+      void Function(GPostChangedData_postChanged_commentsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostChangedData_postChanged_comments build() => _build();
+
+  _$GPostChangedData_postChanged_comments _build() {
+    _$GPostChangedData_postChanged_comments _$result;
+    try {
+      _$result = _$v ??
+          _$GPostChangedData_postChanged_comments._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GPostChangedData_postChanged_comments', 'G__typename'),
+            edges: edges.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'edges';
+        edges.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostChangedData_postChanged_comments',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostChangedData_postChanged_comments_edges
+    extends GPostChangedData_postChanged_comments_edges {
+  @override
+  final String G__typename;
+  @override
+  final GPostChangedData_postChanged_comments_edges_node node;
+
+  factory _$GPostChangedData_postChanged_comments_edges(
+          [void Function(GPostChangedData_postChanged_comments_edgesBuilder)?
+              updates]) =>
+      (GPostChangedData_postChanged_comments_edgesBuilder()..update(updates))
+          ._build();
+
+  _$GPostChangedData_postChanged_comments_edges._(
+      {required this.G__typename, required this.node})
+      : super._();
+  @override
+  GPostChangedData_postChanged_comments_edges rebuild(
+          void Function(GPostChangedData_postChanged_comments_edgesBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostChangedData_postChanged_comments_edgesBuilder toBuilder() =>
+      GPostChangedData_postChanged_comments_edgesBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostChangedData_postChanged_comments_edges &&
+        G__typename == other.G__typename &&
+        node == other.node;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, node.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostChangedData_postChanged_comments_edges')
+          ..add('G__typename', G__typename)
+          ..add('node', node))
+        .toString();
+  }
+}
+
+class GPostChangedData_postChanged_comments_edgesBuilder
+    implements
+        Builder<GPostChangedData_postChanged_comments_edges,
+            GPostChangedData_postChanged_comments_edgesBuilder> {
+  _$GPostChangedData_postChanged_comments_edges? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  GPostChangedData_postChanged_comments_edges_nodeBuilder? _node;
+  GPostChangedData_postChanged_comments_edges_nodeBuilder get node =>
+      _$this._node ??=
+          GPostChangedData_postChanged_comments_edges_nodeBuilder();
+  set node(GPostChangedData_postChanged_comments_edges_nodeBuilder? node) =>
+      _$this._node = node;
+
+  GPostChangedData_postChanged_comments_edgesBuilder() {
+    GPostChangedData_postChanged_comments_edges._initializeBuilder(this);
+  }
+
+  GPostChangedData_postChanged_comments_edgesBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _node = $v.node.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostChangedData_postChanged_comments_edges other) {
+    _$v = other as _$GPostChangedData_postChanged_comments_edges;
+  }
+
+  @override
+  void update(
+      void Function(GPostChangedData_postChanged_comments_edgesBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostChangedData_postChanged_comments_edges build() => _build();
+
+  _$GPostChangedData_postChanged_comments_edges _build() {
+    _$GPostChangedData_postChanged_comments_edges _$result;
+    try {
+      _$result = _$v ??
+          _$GPostChangedData_postChanged_comments_edges._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GPostChangedData_postChanged_comments_edges', 'G__typename'),
+            node: node.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'node';
+        node.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostChangedData_postChanged_comments_edges',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostChangedData_postChanged_comments_edges_node
+    extends GPostChangedData_postChanged_comments_edges_node {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+
+  factory _$GPostChangedData_postChanged_comments_edges_node(
+          [void Function(
+                  GPostChangedData_postChanged_comments_edges_nodeBuilder)?
+              updates]) =>
+      (GPostChangedData_postChanged_comments_edges_nodeBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GPostChangedData_postChanged_comments_edges_node._(
+      {required this.G__typename, required this.id})
+      : super._();
+  @override
+  GPostChangedData_postChanged_comments_edges_node rebuild(
+          void Function(GPostChangedData_postChanged_comments_edges_nodeBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostChangedData_postChanged_comments_edges_nodeBuilder toBuilder() =>
+      GPostChangedData_postChanged_comments_edges_nodeBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostChangedData_postChanged_comments_edges_node &&
+        G__typename == other.G__typename &&
+        id == other.id;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostChangedData_postChanged_comments_edges_node')
+          ..add('G__typename', G__typename)
+          ..add('id', id))
+        .toString();
+  }
+}
+
+class GPostChangedData_postChanged_comments_edges_nodeBuilder
+    implements
+        Builder<GPostChangedData_postChanged_comments_edges_node,
+            GPostChangedData_postChanged_comments_edges_nodeBuilder> {
+  _$GPostChangedData_postChanged_comments_edges_node? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  GPostChangedData_postChanged_comments_edges_nodeBuilder() {
+    GPostChangedData_postChanged_comments_edges_node._initializeBuilder(this);
+  }
+
+  GPostChangedData_postChanged_comments_edges_nodeBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostChangedData_postChanged_comments_edges_node other) {
+    _$v = other as _$GPostChangedData_postChanged_comments_edges_node;
+  }
+
+  @override
+  void update(
+      void Function(GPostChangedData_postChanged_comments_edges_nodeBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostChangedData_postChanged_comments_edges_node build() => _build();
+
+  _$GPostChangedData_postChanged_comments_edges_node _build() {
+    final _$result = _$v ??
+        _$GPostChangedData_postChanged_comments_edges_node._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GPostChangedData_postChanged_comments_edges_node',
+              'G__typename'),
+          id: BuiltValueNullFieldError.checkNotNull(
+              id, r'GPostChangedData_postChanged_comments_edges_node', 'id'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
 class _$GPostSummaryData extends GPostSummaryData {
   @override
   final String G__typename;
@@ -8542,6 +10439,8 @@ class _$GPostSummaryData extends GPostSummaryData {
   final GPostSummaryData_author author;
   @override
   final BuiltList<GPostSummaryData_reactions> reactions;
+  @override
+  final GPostSummaryData_comments comments;
 
   factory _$GPostSummaryData(
           [void Function(GPostSummaryDataBuilder)? updates]) =>
@@ -8557,7 +10456,8 @@ class _$GPostSummaryData extends GPostSummaryData {
       this.decisionStatus,
       required this.denyFlag,
       required this.author,
-      required this.reactions})
+      required this.reactions,
+      required this.comments})
       : super._();
   @override
   GPostSummaryData rebuild(void Function(GPostSummaryDataBuilder) updates) =>
@@ -8580,7 +10480,8 @@ class _$GPostSummaryData extends GPostSummaryData {
         decisionStatus == other.decisionStatus &&
         denyFlag == other.denyFlag &&
         author == other.author &&
-        reactions == other.reactions;
+        reactions == other.reactions &&
+        comments == other.comments;
   }
 
   @override
@@ -8596,6 +10497,7 @@ class _$GPostSummaryData extends GPostSummaryData {
     _$hash = $jc(_$hash, denyFlag.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
+    _$hash = $jc(_$hash, comments.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -8612,7 +10514,8 @@ class _$GPostSummaryData extends GPostSummaryData {
           ..add('decisionStatus', decisionStatus)
           ..add('denyFlag', denyFlag)
           ..add('author', author)
-          ..add('reactions', reactions))
+          ..add('reactions', reactions)
+          ..add('comments', comments))
         .toString();
   }
 }
@@ -8665,6 +10568,12 @@ class GPostSummaryDataBuilder
   set reactions(ListBuilder<GPostSummaryData_reactions>? reactions) =>
       _$this._reactions = reactions;
 
+  GPostSummaryData_commentsBuilder? _comments;
+  GPostSummaryData_commentsBuilder get comments =>
+      _$this._comments ??= GPostSummaryData_commentsBuilder();
+  set comments(GPostSummaryData_commentsBuilder? comments) =>
+      _$this._comments = comments;
+
   GPostSummaryDataBuilder() {
     GPostSummaryData._initializeBuilder(this);
   }
@@ -8682,6 +10591,7 @@ class GPostSummaryDataBuilder
       _denyFlag = $v.denyFlag;
       _author = $v.author.toBuilder();
       _reactions = $v.reactions.toBuilder();
+      _comments = $v.comments.toBuilder();
       _$v = null;
     }
     return this;
@@ -8720,6 +10630,7 @@ class GPostSummaryDataBuilder
                 denyFlag, r'GPostSummaryData', 'denyFlag'),
             author: author.build(),
             reactions: reactions.build(),
+            comments: comments.build(),
           );
     } catch (_) {
       late String _$failedField;
@@ -8733,6 +10644,8 @@ class GPostSummaryDataBuilder
         author.build();
         _$failedField = 'reactions';
         reactions.build();
+        _$failedField = 'comments';
+        comments.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
             r'GPostSummaryData', _$failedField, e.toString());
@@ -8979,6 +10892,343 @@ class GPostSummaryData_reactionsBuilder
               count, r'GPostSummaryData_reactions', 'count'),
           byViewer: BuiltValueNullFieldError.checkNotNull(
               byViewer, r'GPostSummaryData_reactions', 'byViewer'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostSummaryData_comments extends GPostSummaryData_comments {
+  @override
+  final String G__typename;
+  @override
+  final BuiltList<GPostSummaryData_comments_edges> edges;
+
+  factory _$GPostSummaryData_comments(
+          [void Function(GPostSummaryData_commentsBuilder)? updates]) =>
+      (GPostSummaryData_commentsBuilder()..update(updates))._build();
+
+  _$GPostSummaryData_comments._(
+      {required this.G__typename, required this.edges})
+      : super._();
+  @override
+  GPostSummaryData_comments rebuild(
+          void Function(GPostSummaryData_commentsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostSummaryData_commentsBuilder toBuilder() =>
+      GPostSummaryData_commentsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostSummaryData_comments &&
+        G__typename == other.G__typename &&
+        edges == other.edges;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, edges.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostSummaryData_comments')
+          ..add('G__typename', G__typename)
+          ..add('edges', edges))
+        .toString();
+  }
+}
+
+class GPostSummaryData_commentsBuilder
+    implements
+        Builder<GPostSummaryData_comments, GPostSummaryData_commentsBuilder> {
+  _$GPostSummaryData_comments? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  ListBuilder<GPostSummaryData_comments_edges>? _edges;
+  ListBuilder<GPostSummaryData_comments_edges> get edges =>
+      _$this._edges ??= ListBuilder<GPostSummaryData_comments_edges>();
+  set edges(ListBuilder<GPostSummaryData_comments_edges>? edges) =>
+      _$this._edges = edges;
+
+  GPostSummaryData_commentsBuilder() {
+    GPostSummaryData_comments._initializeBuilder(this);
+  }
+
+  GPostSummaryData_commentsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _edges = $v.edges.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostSummaryData_comments other) {
+    _$v = other as _$GPostSummaryData_comments;
+  }
+
+  @override
+  void update(void Function(GPostSummaryData_commentsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostSummaryData_comments build() => _build();
+
+  _$GPostSummaryData_comments _build() {
+    _$GPostSummaryData_comments _$result;
+    try {
+      _$result = _$v ??
+          _$GPostSummaryData_comments._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GPostSummaryData_comments', 'G__typename'),
+            edges: edges.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'edges';
+        edges.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostSummaryData_comments', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostSummaryData_comments_edges
+    extends GPostSummaryData_comments_edges {
+  @override
+  final String G__typename;
+  @override
+  final GPostSummaryData_comments_edges_node node;
+
+  factory _$GPostSummaryData_comments_edges(
+          [void Function(GPostSummaryData_comments_edgesBuilder)? updates]) =>
+      (GPostSummaryData_comments_edgesBuilder()..update(updates))._build();
+
+  _$GPostSummaryData_comments_edges._(
+      {required this.G__typename, required this.node})
+      : super._();
+  @override
+  GPostSummaryData_comments_edges rebuild(
+          void Function(GPostSummaryData_comments_edgesBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostSummaryData_comments_edgesBuilder toBuilder() =>
+      GPostSummaryData_comments_edgesBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostSummaryData_comments_edges &&
+        G__typename == other.G__typename &&
+        node == other.node;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, node.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostSummaryData_comments_edges')
+          ..add('G__typename', G__typename)
+          ..add('node', node))
+        .toString();
+  }
+}
+
+class GPostSummaryData_comments_edgesBuilder
+    implements
+        Builder<GPostSummaryData_comments_edges,
+            GPostSummaryData_comments_edgesBuilder> {
+  _$GPostSummaryData_comments_edges? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  GPostSummaryData_comments_edges_nodeBuilder? _node;
+  GPostSummaryData_comments_edges_nodeBuilder get node =>
+      _$this._node ??= GPostSummaryData_comments_edges_nodeBuilder();
+  set node(GPostSummaryData_comments_edges_nodeBuilder? node) =>
+      _$this._node = node;
+
+  GPostSummaryData_comments_edgesBuilder() {
+    GPostSummaryData_comments_edges._initializeBuilder(this);
+  }
+
+  GPostSummaryData_comments_edgesBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _node = $v.node.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostSummaryData_comments_edges other) {
+    _$v = other as _$GPostSummaryData_comments_edges;
+  }
+
+  @override
+  void update(void Function(GPostSummaryData_comments_edgesBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostSummaryData_comments_edges build() => _build();
+
+  _$GPostSummaryData_comments_edges _build() {
+    _$GPostSummaryData_comments_edges _$result;
+    try {
+      _$result = _$v ??
+          _$GPostSummaryData_comments_edges._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GPostSummaryData_comments_edges', 'G__typename'),
+            node: node.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'node';
+        node.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostSummaryData_comments_edges', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostSummaryData_comments_edges_node
+    extends GPostSummaryData_comments_edges_node {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+
+  factory _$GPostSummaryData_comments_edges_node(
+          [void Function(GPostSummaryData_comments_edges_nodeBuilder)?
+              updates]) =>
+      (GPostSummaryData_comments_edges_nodeBuilder()..update(updates))._build();
+
+  _$GPostSummaryData_comments_edges_node._(
+      {required this.G__typename, required this.id})
+      : super._();
+  @override
+  GPostSummaryData_comments_edges_node rebuild(
+          void Function(GPostSummaryData_comments_edges_nodeBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostSummaryData_comments_edges_nodeBuilder toBuilder() =>
+      GPostSummaryData_comments_edges_nodeBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostSummaryData_comments_edges_node &&
+        G__typename == other.G__typename &&
+        id == other.id;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostSummaryData_comments_edges_node')
+          ..add('G__typename', G__typename)
+          ..add('id', id))
+        .toString();
+  }
+}
+
+class GPostSummaryData_comments_edges_nodeBuilder
+    implements
+        Builder<GPostSummaryData_comments_edges_node,
+            GPostSummaryData_comments_edges_nodeBuilder> {
+  _$GPostSummaryData_comments_edges_node? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  GPostSummaryData_comments_edges_nodeBuilder() {
+    GPostSummaryData_comments_edges_node._initializeBuilder(this);
+  }
+
+  GPostSummaryData_comments_edges_nodeBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostSummaryData_comments_edges_node other) {
+    _$v = other as _$GPostSummaryData_comments_edges_node;
+  }
+
+  @override
+  void update(
+      void Function(GPostSummaryData_comments_edges_nodeBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostSummaryData_comments_edges_node build() => _build();
+
+  _$GPostSummaryData_comments_edges_node _build() {
+    final _$result = _$v ??
+        _$GPostSummaryData_comments_edges_node._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GPostSummaryData_comments_edges_node', 'G__typename'),
+          id: BuiltValueNullFieldError.checkNotNull(
+              id, r'GPostSummaryData_comments_edges_node', 'id'),
         );
     replace(_$result);
     return _$result;

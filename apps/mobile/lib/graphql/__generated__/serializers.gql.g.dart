@@ -51,6 +51,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GCreatePostData.serializer)
       ..add(GCreatePostData_createPost.serializer)
       ..add(GCreatePostData_createPost_author.serializer)
+      ..add(GCreatePostData_createPost_comments.serializer)
+      ..add(GCreatePostData_createPost_comments_edges.serializer)
+      ..add(GCreatePostData_createPost_comments_edges_node.serializer)
       ..add(GCreatePostData_createPost_reactions.serializer)
       ..add(GCreatePostInput.serializer)
       ..add(GCreatePostReq.serializer)
@@ -153,6 +156,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GPostChangedData.serializer)
       ..add(GPostChangedData_postChanged.serializer)
       ..add(GPostChangedData_postChanged_author.serializer)
+      ..add(GPostChangedData_postChanged_comments.serializer)
+      ..add(GPostChangedData_postChanged_comments_edges.serializer)
+      ..add(GPostChangedData_postChanged_comments_edges_node.serializer)
       ..add(GPostChangedData_postChanged_reactions.serializer)
       ..add(GPostChangedReq.serializer)
       ..add(GPostChangedVars.serializer)
@@ -173,6 +179,9 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GPostSort.serializer)
       ..add(GPostSummaryData.serializer)
       ..add(GPostSummaryData_author.serializer)
+      ..add(GPostSummaryData_comments.serializer)
+      ..add(GPostSummaryData_comments_edges.serializer)
+      ..add(GPostSummaryData_comments_edges_node.serializer)
       ..add(GPostSummaryData_reactions.serializer)
       ..add(GPostSummaryReq.serializer)
       ..add(GPostSummaryVars.serializer)
@@ -183,6 +192,10 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GPostsForTagData_tag_posts_edges.serializer)
       ..add(GPostsForTagData_tag_posts_edges_node.serializer)
       ..add(GPostsForTagData_tag_posts_edges_node_author.serializer)
+      ..add(GPostsForTagData_tag_posts_edges_node_comments.serializer)
+      ..add(GPostsForTagData_tag_posts_edges_node_comments_edges.serializer)
+      ..add(
+          GPostsForTagData_tag_posts_edges_node_comments_edges_node.serializer)
       ..add(GPostsForTagData_tag_posts_edges_node_reactions.serializer)
       ..add(GPostsForTagReq.serializer)
       ..add(GPostsForTagVars.serializer)
@@ -302,6 +315,11 @@ Serializers _$serializers = (Serializers().toBuilder()
           ]),
           () => ListBuilder<GCreateCommentData_createComment_reactions>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GCreatePostData_createPost_comments_edges)
+          ]),
+          () => ListBuilder<GCreatePostData_createPost_comments_edges>())
+      ..addBuilderFactory(
           const FullType(BuiltList,
               const [const FullType(GCreatePostData_createPost_reactions)]),
           () => ListBuilder<GCreatePostData_createPost_reactions>())
@@ -314,6 +332,11 @@ Serializers _$serializers = (Serializers().toBuilder()
             const FullType(GNotificationsInboxData_notifications_edges)
           ]),
           () => ListBuilder<GNotificationsInboxData_notifications_edges>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GPostChangedData_postChanged_comments_edges)
+          ]),
+          () => ListBuilder<GPostChangedData_postChanged_comments_edges>())
       ..addBuilderFactory(
           const FullType(BuiltList,
               const [const FullType(GPostChangedData_postChanged_reactions)]),
@@ -337,6 +360,10 @@ Serializers _$serializers = (Serializers().toBuilder()
               BuiltList, const [const FullType(GPostDetailData_post_tags)]),
           () => ListBuilder<GPostDetailData_post_tags>())
       ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(GPostSummaryData_comments_edges)]),
+          () => ListBuilder<GPostSummaryData_comments_edges>())
+      ..addBuilderFactory(
           const FullType(
               BuiltList, const [const FullType(GPostSummaryData_reactions)]),
           () => ListBuilder<GPostSummaryData_reactions>())
@@ -347,6 +374,12 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList,
               const [const FullType(GPostsForTagData_tag_posts_edges)]),
           () => ListBuilder<GPostsForTagData_tag_posts_edges>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GPostsForTagData_tag_posts_edges_node_comments_edges)
+          ]),
+          () => ListBuilder<
+              GPostsForTagData_tag_posts_edges_node_comments_edges>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [
             const FullType(GPostsForTagData_tag_posts_edges_node_reactions)

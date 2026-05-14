@@ -170,6 +170,8 @@ abstract class GPostsForTagData_tag_posts_edges_node
   GPostsForTagData_tag_posts_edges_node_author get author;
   @override
   BuiltList<GPostsForTagData_tag_posts_edges_node_reactions> get reactions;
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments get comments;
   static Serializer<GPostsForTagData_tag_posts_edges_node> get serializer =>
       _$gPostsForTagDataTagPostsEdgesNodeSerializer;
 
@@ -267,6 +269,122 @@ abstract class GPostsForTagData_tag_posts_edges_node_reactions
       );
 }
 
+abstract class GPostsForTagData_tag_posts_edges_node_comments
+    implements
+        Built<GPostsForTagData_tag_posts_edges_node_comments,
+            GPostsForTagData_tag_posts_edges_node_commentsBuilder>,
+        GPostSummary_comments {
+  GPostsForTagData_tag_posts_edges_node_comments._();
+
+  factory GPostsForTagData_tag_posts_edges_node_comments(
+      [void Function(GPostsForTagData_tag_posts_edges_node_commentsBuilder b)
+          updates]) = _$GPostsForTagData_tag_posts_edges_node_comments;
+
+  static void _initializeBuilder(
+          GPostsForTagData_tag_posts_edges_node_commentsBuilder b) =>
+      b..G__typename = 'CommentConnection';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  BuiltList<GPostsForTagData_tag_posts_edges_node_comments_edges> get edges;
+  static Serializer<GPostsForTagData_tag_posts_edges_node_comments>
+      get serializer => _$gPostsForTagDataTagPostsEdgesNodeCommentsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostsForTagData_tag_posts_edges_node_comments.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostsForTagData_tag_posts_edges_node_comments? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostsForTagData_tag_posts_edges_node_comments.serializer,
+        json,
+      );
+}
+
+abstract class GPostsForTagData_tag_posts_edges_node_comments_edges
+    implements
+        Built<GPostsForTagData_tag_posts_edges_node_comments_edges,
+            GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder>,
+        GPostSummary_comments_edges {
+  GPostsForTagData_tag_posts_edges_node_comments_edges._();
+
+  factory GPostsForTagData_tag_posts_edges_node_comments_edges(
+      [void Function(
+              GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder b)
+          updates]) = _$GPostsForTagData_tag_posts_edges_node_comments_edges;
+
+  static void _initializeBuilder(
+          GPostsForTagData_tag_posts_edges_node_comments_edgesBuilder b) =>
+      b..G__typename = 'CommentEdge';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  GPostsForTagData_tag_posts_edges_node_comments_edges_node get node;
+  static Serializer<GPostsForTagData_tag_posts_edges_node_comments_edges>
+      get serializer =>
+          _$gPostsForTagDataTagPostsEdgesNodeCommentsEdgesSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostsForTagData_tag_posts_edges_node_comments_edges.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostsForTagData_tag_posts_edges_node_comments_edges? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostsForTagData_tag_posts_edges_node_comments_edges.serializer,
+        json,
+      );
+}
+
+abstract class GPostsForTagData_tag_posts_edges_node_comments_edges_node
+    implements
+        Built<GPostsForTagData_tag_posts_edges_node_comments_edges_node,
+            GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder>,
+        GPostSummary_comments_edges_node {
+  GPostsForTagData_tag_posts_edges_node_comments_edges_node._();
+
+  factory GPostsForTagData_tag_posts_edges_node_comments_edges_node(
+      [void Function(
+              GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder
+                  b)
+          updates]) = _$GPostsForTagData_tag_posts_edges_node_comments_edges_node;
+
+  static void _initializeBuilder(
+          GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder b) =>
+      b..G__typename = 'Comment';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  static Serializer<GPostsForTagData_tag_posts_edges_node_comments_edges_node>
+      get serializer =>
+          _$gPostsForTagDataTagPostsEdgesNodeCommentsEdgesNodeSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostsForTagData_tag_posts_edges_node_comments_edges_node.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostsForTagData_tag_posts_edges_node_comments_edges_node? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostsForTagData_tag_posts_edges_node_comments_edges_node.serializer,
+        json,
+      );
+}
+
 abstract class GPostDetailData
     implements Built<GPostDetailData, GPostDetailDataBuilder> {
   GPostDetailData._();
@@ -329,8 +447,8 @@ abstract class GPostDetailData_post
   GPostDetailData_post_author get author;
   @override
   BuiltList<GPostDetailData_post_reactions> get reactions;
-  BuiltList<GPostDetailData_post_tags> get tags;
   GPostDetailData_post_comments get comments;
+  BuiltList<GPostDetailData_post_tags> get tags;
   GPostDetailData_post_myPermissions get myPermissions;
   static Serializer<GPostDetailData_post> get serializer =>
       _$gPostDetailDataPostSerializer;
@@ -423,73 +541,11 @@ abstract class GPostDetailData_post_reactions
       );
 }
 
-abstract class GPostDetailData_post_tags
-    implements
-        Built<GPostDetailData_post_tags, GPostDetailData_post_tagsBuilder> {
-  GPostDetailData_post_tags._();
-
-  factory GPostDetailData_post_tags(
-          [void Function(GPostDetailData_post_tagsBuilder b) updates]) =
-      _$GPostDetailData_post_tags;
-
-  static void _initializeBuilder(GPostDetailData_post_tagsBuilder b) =>
-      b..G__typename = 'PostTag';
-
-  @BuiltValueField(wireName: '__typename')
-  String get G__typename;
-  GPostDetailData_post_tags_tag get tag;
-  static Serializer<GPostDetailData_post_tags> get serializer =>
-      _$gPostDetailDataPostTagsSerializer;
-
-  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
-        GPostDetailData_post_tags.serializer,
-        this,
-      ) as Map<String, dynamic>);
-
-  static GPostDetailData_post_tags? fromJson(Map<String, dynamic> json) =>
-      _i1.serializers.deserializeWith(
-        GPostDetailData_post_tags.serializer,
-        json,
-      );
-}
-
-abstract class GPostDetailData_post_tags_tag
-    implements
-        Built<GPostDetailData_post_tags_tag,
-            GPostDetailData_post_tags_tagBuilder> {
-  GPostDetailData_post_tags_tag._();
-
-  factory GPostDetailData_post_tags_tag(
-          [void Function(GPostDetailData_post_tags_tagBuilder b) updates]) =
-      _$GPostDetailData_post_tags_tag;
-
-  static void _initializeBuilder(GPostDetailData_post_tags_tagBuilder b) =>
-      b..G__typename = 'Tag';
-
-  @BuiltValueField(wireName: '__typename')
-  String get G__typename;
-  String get id;
-  String get slug;
-  String get displayName;
-  static Serializer<GPostDetailData_post_tags_tag> get serializer =>
-      _$gPostDetailDataPostTagsTagSerializer;
-
-  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
-        GPostDetailData_post_tags_tag.serializer,
-        this,
-      ) as Map<String, dynamic>);
-
-  static GPostDetailData_post_tags_tag? fromJson(Map<String, dynamic> json) =>
-      _i1.serializers.deserializeWith(
-        GPostDetailData_post_tags_tag.serializer,
-        json,
-      );
-}
-
 abstract class GPostDetailData_post_comments
     implements
         Built<GPostDetailData_post_comments,
-            GPostDetailData_post_commentsBuilder> {
+            GPostDetailData_post_commentsBuilder>,
+        GPostSummary_comments {
   GPostDetailData_post_comments._();
 
   factory GPostDetailData_post_comments(
@@ -499,12 +555,14 @@ abstract class GPostDetailData_post_comments
   static void _initializeBuilder(GPostDetailData_post_commentsBuilder b) =>
       b..G__typename = 'CommentConnection';
 
+  @override
   @BuiltValueField(wireName: '__typename')
   String get G__typename;
   BuiltList<GPostDetailData_post_comments_edges> get edges;
   static Serializer<GPostDetailData_post_comments> get serializer =>
       _$gPostDetailDataPostCommentsSerializer;
 
+  @override
   Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
         GPostDetailData_post_comments.serializer,
         this,
@@ -520,7 +578,8 @@ abstract class GPostDetailData_post_comments
 abstract class GPostDetailData_post_comments_edges
     implements
         Built<GPostDetailData_post_comments_edges,
-            GPostDetailData_post_comments_edgesBuilder> {
+            GPostDetailData_post_comments_edgesBuilder>,
+        GPostSummary_comments_edges {
   GPostDetailData_post_comments_edges._();
 
   factory GPostDetailData_post_comments_edges(
@@ -531,12 +590,14 @@ abstract class GPostDetailData_post_comments_edges
           GPostDetailData_post_comments_edgesBuilder b) =>
       b..G__typename = 'CommentEdge';
 
+  @override
   @BuiltValueField(wireName: '__typename')
   String get G__typename;
   GPostDetailData_post_comments_edges_node get node;
   static Serializer<GPostDetailData_post_comments_edges> get serializer =>
       _$gPostDetailDataPostCommentsEdgesSerializer;
 
+  @override
   Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
         GPostDetailData_post_comments_edges.serializer,
         this,
@@ -554,6 +615,7 @@ abstract class GPostDetailData_post_comments_edges_node
     implements
         Built<GPostDetailData_post_comments_edges_node,
             GPostDetailData_post_comments_edges_nodeBuilder>,
+        GPostSummary_comments_edges_node,
         GCommentSummary {
   GPostDetailData_post_comments_edges_node._();
 
@@ -685,6 +747,69 @@ abstract class GPostDetailData_post_comments_edges_node_reactions
       );
 }
 
+abstract class GPostDetailData_post_tags
+    implements
+        Built<GPostDetailData_post_tags, GPostDetailData_post_tagsBuilder> {
+  GPostDetailData_post_tags._();
+
+  factory GPostDetailData_post_tags(
+          [void Function(GPostDetailData_post_tagsBuilder b) updates]) =
+      _$GPostDetailData_post_tags;
+
+  static void _initializeBuilder(GPostDetailData_post_tagsBuilder b) =>
+      b..G__typename = 'PostTag';
+
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  GPostDetailData_post_tags_tag get tag;
+  static Serializer<GPostDetailData_post_tags> get serializer =>
+      _$gPostDetailDataPostTagsSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostDetailData_post_tags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostDetailData_post_tags? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostDetailData_post_tags.serializer,
+        json,
+      );
+}
+
+abstract class GPostDetailData_post_tags_tag
+    implements
+        Built<GPostDetailData_post_tags_tag,
+            GPostDetailData_post_tags_tagBuilder> {
+  GPostDetailData_post_tags_tag._();
+
+  factory GPostDetailData_post_tags_tag(
+          [void Function(GPostDetailData_post_tags_tagBuilder b) updates]) =
+      _$GPostDetailData_post_tags_tag;
+
+  static void _initializeBuilder(GPostDetailData_post_tags_tagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  String get id;
+  String get slug;
+  String get displayName;
+  static Serializer<GPostDetailData_post_tags_tag> get serializer =>
+      _$gPostDetailDataPostTagsTagSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostDetailData_post_tags_tag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostDetailData_post_tags_tag? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostDetailData_post_tags_tag.serializer,
+        json,
+      );
+}
+
 abstract class GPostDetailData_post_myPermissions
     implements
         Built<GPostDetailData_post_myPermissions,
@@ -781,6 +906,8 @@ abstract class GCreatePostData_createPost
   GCreatePostData_createPost_author get author;
   @override
   BuiltList<GCreatePostData_createPost_reactions> get reactions;
+  @override
+  GCreatePostData_createPost_comments get comments;
   static Serializer<GCreatePostData_createPost> get serializer =>
       _$gCreatePostDataCreatePostSerializer;
 
@@ -872,6 +999,117 @@ abstract class GCreatePostData_createPost_reactions
           Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GCreatePostData_createPost_reactions.serializer,
+        json,
+      );
+}
+
+abstract class GCreatePostData_createPost_comments
+    implements
+        Built<GCreatePostData_createPost_comments,
+            GCreatePostData_createPost_commentsBuilder>,
+        GPostSummary_comments {
+  GCreatePostData_createPost_comments._();
+
+  factory GCreatePostData_createPost_comments(
+      [void Function(GCreatePostData_createPost_commentsBuilder b)
+          updates]) = _$GCreatePostData_createPost_comments;
+
+  static void _initializeBuilder(
+          GCreatePostData_createPost_commentsBuilder b) =>
+      b..G__typename = 'CommentConnection';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  BuiltList<GCreatePostData_createPost_comments_edges> get edges;
+  static Serializer<GCreatePostData_createPost_comments> get serializer =>
+      _$gCreatePostDataCreatePostCommentsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCreatePostData_createPost_comments.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreatePostData_createPost_comments? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCreatePostData_createPost_comments.serializer,
+        json,
+      );
+}
+
+abstract class GCreatePostData_createPost_comments_edges
+    implements
+        Built<GCreatePostData_createPost_comments_edges,
+            GCreatePostData_createPost_comments_edgesBuilder>,
+        GPostSummary_comments_edges {
+  GCreatePostData_createPost_comments_edges._();
+
+  factory GCreatePostData_createPost_comments_edges(
+      [void Function(GCreatePostData_createPost_comments_edgesBuilder b)
+          updates]) = _$GCreatePostData_createPost_comments_edges;
+
+  static void _initializeBuilder(
+          GCreatePostData_createPost_comments_edgesBuilder b) =>
+      b..G__typename = 'CommentEdge';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  GCreatePostData_createPost_comments_edges_node get node;
+  static Serializer<GCreatePostData_createPost_comments_edges> get serializer =>
+      _$gCreatePostDataCreatePostCommentsEdgesSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCreatePostData_createPost_comments_edges.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreatePostData_createPost_comments_edges? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCreatePostData_createPost_comments_edges.serializer,
+        json,
+      );
+}
+
+abstract class GCreatePostData_createPost_comments_edges_node
+    implements
+        Built<GCreatePostData_createPost_comments_edges_node,
+            GCreatePostData_createPost_comments_edges_nodeBuilder>,
+        GPostSummary_comments_edges_node {
+  GCreatePostData_createPost_comments_edges_node._();
+
+  factory GCreatePostData_createPost_comments_edges_node(
+      [void Function(GCreatePostData_createPost_comments_edges_nodeBuilder b)
+          updates]) = _$GCreatePostData_createPost_comments_edges_node;
+
+  static void _initializeBuilder(
+          GCreatePostData_createPost_comments_edges_nodeBuilder b) =>
+      b..G__typename = 'Comment';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  static Serializer<GCreatePostData_createPost_comments_edges_node>
+      get serializer => _$gCreatePostDataCreatePostCommentsEdgesNodeSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCreatePostData_createPost_comments_edges_node.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreatePostData_createPost_comments_edges_node? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCreatePostData_createPost_comments_edges_node.serializer,
         json,
       );
 }
@@ -1292,6 +1530,8 @@ abstract class GPostChangedData_postChanged
   GPostChangedData_postChanged_author get author;
   @override
   BuiltList<GPostChangedData_postChanged_reactions> get reactions;
+  @override
+  GPostChangedData_postChanged_comments get comments;
   static Serializer<GPostChangedData_postChanged> get serializer =>
       _$gPostChangedDataPostChangedSerializer;
 
@@ -1388,6 +1628,118 @@ abstract class GPostChangedData_postChanged_reactions
       );
 }
 
+abstract class GPostChangedData_postChanged_comments
+    implements
+        Built<GPostChangedData_postChanged_comments,
+            GPostChangedData_postChanged_commentsBuilder>,
+        GPostSummary_comments {
+  GPostChangedData_postChanged_comments._();
+
+  factory GPostChangedData_postChanged_comments(
+      [void Function(GPostChangedData_postChanged_commentsBuilder b)
+          updates]) = _$GPostChangedData_postChanged_comments;
+
+  static void _initializeBuilder(
+          GPostChangedData_postChanged_commentsBuilder b) =>
+      b..G__typename = 'CommentConnection';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  BuiltList<GPostChangedData_postChanged_comments_edges> get edges;
+  static Serializer<GPostChangedData_postChanged_comments> get serializer =>
+      _$gPostChangedDataPostChangedCommentsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostChangedData_postChanged_comments.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostChangedData_postChanged_comments? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostChangedData_postChanged_comments.serializer,
+        json,
+      );
+}
+
+abstract class GPostChangedData_postChanged_comments_edges
+    implements
+        Built<GPostChangedData_postChanged_comments_edges,
+            GPostChangedData_postChanged_comments_edgesBuilder>,
+        GPostSummary_comments_edges {
+  GPostChangedData_postChanged_comments_edges._();
+
+  factory GPostChangedData_postChanged_comments_edges(
+      [void Function(GPostChangedData_postChanged_comments_edgesBuilder b)
+          updates]) = _$GPostChangedData_postChanged_comments_edges;
+
+  static void _initializeBuilder(
+          GPostChangedData_postChanged_comments_edgesBuilder b) =>
+      b..G__typename = 'CommentEdge';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  GPostChangedData_postChanged_comments_edges_node get node;
+  static Serializer<GPostChangedData_postChanged_comments_edges>
+      get serializer => _$gPostChangedDataPostChangedCommentsEdgesSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostChangedData_postChanged_comments_edges.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostChangedData_postChanged_comments_edges? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostChangedData_postChanged_comments_edges.serializer,
+        json,
+      );
+}
+
+abstract class GPostChangedData_postChanged_comments_edges_node
+    implements
+        Built<GPostChangedData_postChanged_comments_edges_node,
+            GPostChangedData_postChanged_comments_edges_nodeBuilder>,
+        GPostSummary_comments_edges_node {
+  GPostChangedData_postChanged_comments_edges_node._();
+
+  factory GPostChangedData_postChanged_comments_edges_node(
+      [void Function(GPostChangedData_postChanged_comments_edges_nodeBuilder b)
+          updates]) = _$GPostChangedData_postChanged_comments_edges_node;
+
+  static void _initializeBuilder(
+          GPostChangedData_postChanged_comments_edges_nodeBuilder b) =>
+      b..G__typename = 'Comment';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  static Serializer<GPostChangedData_postChanged_comments_edges_node>
+      get serializer =>
+          _$gPostChangedDataPostChangedCommentsEdgesNodeSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostChangedData_postChanged_comments_edges_node.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostChangedData_postChanged_comments_edges_node? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostChangedData_postChanged_comments_edges_node.serializer,
+        json,
+      );
+}
+
 abstract class GPostSummary {
   String get G__typename;
   String get id;
@@ -1399,6 +1751,7 @@ abstract class GPostSummary {
   bool get denyFlag;
   GPostSummary_author get author;
   BuiltList<GPostSummary_reactions> get reactions;
+  GPostSummary_comments get comments;
   Map<String, dynamic> toJson();
 }
 
@@ -1414,6 +1767,24 @@ abstract class GPostSummary_reactions {
   String get emoji;
   int get count;
   bool get byViewer;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GPostSummary_comments {
+  String get G__typename;
+  BuiltList<GPostSummary_comments_edges> get edges;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GPostSummary_comments_edges {
+  String get G__typename;
+  GPostSummary_comments_edges_node get node;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GPostSummary_comments_edges_node {
+  String get G__typename;
+  String get id;
   Map<String, dynamic> toJson();
 }
 
@@ -1448,6 +1819,8 @@ abstract class GPostSummaryData
   GPostSummaryData_author get author;
   @override
   BuiltList<GPostSummaryData_reactions> get reactions;
+  @override
+  GPostSummaryData_comments get comments;
   static Serializer<GPostSummaryData> get serializer =>
       _$gPostSummaryDataSerializer;
 
@@ -1534,6 +1907,112 @@ abstract class GPostSummaryData_reactions
   static GPostSummaryData_reactions? fromJson(Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GPostSummaryData_reactions.serializer,
+        json,
+      );
+}
+
+abstract class GPostSummaryData_comments
+    implements
+        Built<GPostSummaryData_comments, GPostSummaryData_commentsBuilder>,
+        GPostSummary_comments {
+  GPostSummaryData_comments._();
+
+  factory GPostSummaryData_comments(
+          [void Function(GPostSummaryData_commentsBuilder b) updates]) =
+      _$GPostSummaryData_comments;
+
+  static void _initializeBuilder(GPostSummaryData_commentsBuilder b) =>
+      b..G__typename = 'CommentConnection';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  BuiltList<GPostSummaryData_comments_edges> get edges;
+  static Serializer<GPostSummaryData_comments> get serializer =>
+      _$gPostSummaryDataCommentsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostSummaryData_comments.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostSummaryData_comments? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostSummaryData_comments.serializer,
+        json,
+      );
+}
+
+abstract class GPostSummaryData_comments_edges
+    implements
+        Built<GPostSummaryData_comments_edges,
+            GPostSummaryData_comments_edgesBuilder>,
+        GPostSummary_comments_edges {
+  GPostSummaryData_comments_edges._();
+
+  factory GPostSummaryData_comments_edges(
+          [void Function(GPostSummaryData_comments_edgesBuilder b) updates]) =
+      _$GPostSummaryData_comments_edges;
+
+  static void _initializeBuilder(GPostSummaryData_comments_edgesBuilder b) =>
+      b..G__typename = 'CommentEdge';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  GPostSummaryData_comments_edges_node get node;
+  static Serializer<GPostSummaryData_comments_edges> get serializer =>
+      _$gPostSummaryDataCommentsEdgesSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostSummaryData_comments_edges.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostSummaryData_comments_edges? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostSummaryData_comments_edges.serializer,
+        json,
+      );
+}
+
+abstract class GPostSummaryData_comments_edges_node
+    implements
+        Built<GPostSummaryData_comments_edges_node,
+            GPostSummaryData_comments_edges_nodeBuilder>,
+        GPostSummary_comments_edges_node {
+  GPostSummaryData_comments_edges_node._();
+
+  factory GPostSummaryData_comments_edges_node(
+      [void Function(GPostSummaryData_comments_edges_nodeBuilder b)
+          updates]) = _$GPostSummaryData_comments_edges_node;
+
+  static void _initializeBuilder(
+          GPostSummaryData_comments_edges_nodeBuilder b) =>
+      b..G__typename = 'Comment';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  static Serializer<GPostSummaryData_comments_edges_node> get serializer =>
+      _$gPostSummaryDataCommentsEdgesNodeSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostSummaryData_comments_edges_node.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostSummaryData_comments_edges_node? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostSummaryData_comments_edges_node.serializer,
         json,
       );
 }

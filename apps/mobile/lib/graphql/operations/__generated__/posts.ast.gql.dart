@@ -113,6 +113,42 @@ const PostSummary = _i1.FragmentDefinitionNode(
         ),
       ]),
     ),
+    _i1.FieldNode(
+      name: _i1.NameNode(value: 'comments'),
+      alias: null,
+      arguments: [
+        _i1.ArgumentNode(
+          name: _i1.NameNode(value: 'first'),
+          value: _i1.IntValueNode(value: '200'),
+        )
+      ],
+      directives: [],
+      selectionSet: _i1.SelectionSetNode(selections: [
+        _i1.FieldNode(
+          name: _i1.NameNode(value: 'edges'),
+          alias: null,
+          arguments: [],
+          directives: [],
+          selectionSet: _i1.SelectionSetNode(selections: [
+            _i1.FieldNode(
+              name: _i1.NameNode(value: 'node'),
+              alias: null,
+              arguments: [],
+              directives: [],
+              selectionSet: _i1.SelectionSetNode(selections: [
+                _i1.FieldNode(
+                  name: _i1.NameNode(value: 'id'),
+                  alias: null,
+                  arguments: [],
+                  directives: [],
+                  selectionSet: null,
+                )
+              ]),
+            )
+          ]),
+        )
+      ]),
+    ),
   ]),
 );
 const PostsForTag = _i1.OperationDefinitionNode(
