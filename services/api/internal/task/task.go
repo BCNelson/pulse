@@ -10,11 +10,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/job"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 var (
@@ -36,7 +36,7 @@ type Service struct {
 
 // TagAttachment carries the per-task role-flag overrides on a tag.
 type TagAttachment struct {
-	TagID        uuid.UUID
+	TagID        int64
 	ViewRole     bool
 	InteractRole bool
 	ModerateRole bool
@@ -46,26 +46,26 @@ type TagAttachment struct {
 // "standalone" task — visibility then depends only on creator/assignees/
 // watchers.
 type CreateInput struct {
-	CreatorID       uuid.UUID
+	CreatorID       int64
 	Title           string
 	Description     string
 	DueAt           *time.Time
 	Tags            []TagAttachment
-	Assignees       []uuid.UUID
-	LinkedPostID    *uuid.UUID
-	LinkedCommentID *uuid.UUID
+	Assignees       []int64
+	LinkedPostID    *int64
+	LinkedCommentID *int64
 }
 
 // Task is the read-side row.
 type Task struct {
-	ID              uuid.UUID
+	ID              int64
 	Title           string
 	Description     *string
 	Status          string
 	DueAt           *time.Time
-	LinkedPostID    *uuid.UUID
-	LinkedCommentID *uuid.UUID
-	CreatedBy       uuid.UUID
+	LinkedPostID    *int64
+	LinkedCommentID *int64
+	CreatedBy       int64
 	CreatedAt       time.Time
 	EditedAt        *time.Time
 	DeletedAt       *time.Time
@@ -76,8 +76,8 @@ type Task struct {
 // can wrap with notification enqueue (notification.fanout) too — but
 // since enqueue takes a Querier we don't fold it in here, keeping this
 // package job-agnostic.
-func (s *Service) Create(ctx context.Context, in CreateInput) (uuid.UUID, error) {
-	var id uuid.UUID
+func (s *Service) Create(ctx context.Context, in CreateInput) (int64, error) {
+	var id int64
 	err := s.runInTx(ctx, func(tx pgx.Tx) error {
 		row := tx.QueryRow(ctx, `
             INSERT INTO tasks (title, description, due_at, linked_post_id, linked_comment_id, created_by)
@@ -115,8 +115,8 @@ func (s *Service) Create(ctx context.Context, in CreateInput) (uuid.UUID, error)
 		// subscribers) and writes notifications + emits pg_notify.
 		if err := job.Enqueue(ctx, tx, "notification.fanout", map[string]any{
 			"source_type": "task",
-			"source_id":   id.String(),
-			"actor_id":    in.CreatorID.String(),
+			"source_id":   ids.FormatID(id),
+			"actor_id":    ids.FormatID(in.CreatorID),
 			"event":       "created",
 		}); err != nil {
 			return fmt.Errorf("enqueue notification: %w", err)
@@ -126,7 +126,7 @@ func (s *Service) Create(ctx context.Context, in CreateInput) (uuid.UUID, error)
 	return id, err
 }
 
-func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Task, error) {
+func (s *Service) Get(ctx context.Context, id int64) (*Task, error) {
 	row := s.DB.QueryRow(ctx, `
         SELECT id, title, description, status, due_at, linked_post_id, linked_comment_id,
                created_by, created_at, edited_at, deleted_at
@@ -144,7 +144,7 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Task, error) {
 }
 
 // Edit updates title/description/due_at; nil means "leave unchanged".
-func (s *Service) Edit(ctx context.Context, id uuid.UUID, title, description *string, dueAt *time.Time, clearDueAt bool) error {
+func (s *Service) Edit(ctx context.Context, id int64, title, description *string, dueAt *time.Time, clearDueAt bool) error {
 	tag, err := s.DB.Exec(ctx, `
         UPDATE tasks
            SET title       = COALESCE($2, title),
@@ -163,7 +163,7 @@ func (s *Service) Edit(ctx context.Context, id uuid.UUID, title, description *st
 }
 
 // SetStatus transitions a task. Caller is responsible for the perm check.
-func (s *Service) SetStatus(ctx context.Context, id uuid.UUID, status string) error {
+func (s *Service) SetStatus(ctx context.Context, id int64, status string) error {
 	if _, ok := validStatuses[status]; !ok {
 		return ErrInvalidStatus
 	}
@@ -181,7 +181,7 @@ func (s *Service) SetStatus(ctx context.Context, id uuid.UUID, status string) er
 }
 
 // Delete soft-deletes a task.
-func (s *Service) Delete(ctx context.Context, id uuid.UUID) error {
+func (s *Service) Delete(ctx context.Context, id int64) error {
 	tag, err := s.DB.Exec(ctx,
 		`UPDATE tasks SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
 	if err != nil {
@@ -196,7 +196,7 @@ func (s *Service) Delete(ctx context.Context, id uuid.UUID) error {
 // Assign adds a principal to task_assignees and enqueues an "assigned"
 // notification job. Idempotent on the row but enqueueing always emits
 // (the worker dedupes).
-func (s *Service) Assign(ctx context.Context, taskID, principal, assignedBy uuid.UUID) error {
+func (s *Service) Assign(ctx context.Context, taskID, principal, assignedBy int64) error {
 	return s.runInTx(ctx, func(tx pgx.Tx) error {
 		ct, err := tx.Exec(ctx, `
             INSERT INTO task_assignees (task_id, principal_id, assigned_by)
@@ -212,22 +212,22 @@ func (s *Service) Assign(ctx context.Context, taskID, principal, assignedBy uuid
 		}
 		return job.Enqueue(ctx, tx, "notification.fanout", map[string]any{
 			"source_type":  "task",
-			"source_id":    taskID.String(),
-			"actor_id":     assignedBy.String(),
+			"source_id":    ids.FormatID(taskID),
+			"actor_id":     ids.FormatID(assignedBy),
 			"event":        "assigned",
-			"recipient_id": principal.String(),
+			"recipient_id": ids.FormatID(principal),
 		})
 	})
 }
 
-func (s *Service) Unassign(ctx context.Context, taskID, principal uuid.UUID) error {
+func (s *Service) Unassign(ctx context.Context, taskID, principal int64) error {
 	_, err := s.DB.Exec(ctx, `
         DELETE FROM task_assignees WHERE task_id = $1 AND principal_id = $2
     `, taskID, principal)
 	return err
 }
 
-func (s *Service) Watch(ctx context.Context, taskID, principal uuid.UUID) error {
+func (s *Service) Watch(ctx context.Context, taskID, principal int64) error {
 	_, err := s.DB.Exec(ctx, `
         INSERT INTO task_watchers (task_id, principal_id) VALUES ($1, $2)
         ON CONFLICT DO NOTHING
@@ -235,7 +235,7 @@ func (s *Service) Watch(ctx context.Context, taskID, principal uuid.UUID) error 
 	return err
 }
 
-func (s *Service) Unwatch(ctx context.Context, taskID, principal uuid.UUID) error {
+func (s *Service) Unwatch(ctx context.Context, taskID, principal int64) error {
 	_, err := s.DB.Exec(ctx, `
         DELETE FROM task_watchers WHERE task_id = $1 AND principal_id = $2
     `, taskID, principal)
@@ -243,16 +243,16 @@ func (s *Service) Unwatch(ctx context.Context, taskID, principal uuid.UUID) erro
 }
 
 // Assignees returns principal ids currently assigned to the task.
-func (s *Service) Assignees(ctx context.Context, taskID uuid.UUID) ([]uuid.UUID, error) {
+func (s *Service) Assignees(ctx context.Context, taskID int64) ([]int64, error) {
 	rows, err := s.DB.Query(ctx,
 		`SELECT principal_id FROM task_assignees WHERE task_id = $1`, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("load assignees: %w", err)
 	}
 	defer rows.Close()
-	out := []uuid.UUID{}
+	out := []int64{}
 	for rows.Next() {
-		var p uuid.UUID
+		var p int64
 		if err := rows.Scan(&p); err != nil {
 			return nil, err
 		}
@@ -261,16 +261,16 @@ func (s *Service) Assignees(ctx context.Context, taskID uuid.UUID) ([]uuid.UUID,
 	return out, rows.Err()
 }
 
-func (s *Service) Watchers(ctx context.Context, taskID uuid.UUID) ([]uuid.UUID, error) {
+func (s *Service) Watchers(ctx context.Context, taskID int64) ([]int64, error) {
 	rows, err := s.DB.Query(ctx,
 		`SELECT principal_id FROM task_watchers WHERE task_id = $1`, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("load watchers: %w", err)
 	}
 	defer rows.Close()
-	out := []uuid.UUID{}
+	out := []int64{}
 	for rows.Next() {
-		var p uuid.UUID
+		var p int64
 		if err := rows.Scan(&p); err != nil {
 			return nil, err
 		}
@@ -281,7 +281,7 @@ func (s *Service) Watchers(ctx context.Context, taskID uuid.UUID) ([]uuid.UUID, 
 
 // TagAttachments returns the tag rows for a task. Mirror of
 // post.TagAttachments — same shape so resolvers can share helpers.
-func (s *Service) TagAttachments(ctx context.Context, id uuid.UUID) ([]TagRow, error) {
+func (s *Service) TagAttachments(ctx context.Context, id int64) ([]TagRow, error) {
 	rows, err := s.DB.Query(ctx, `
         SELECT tag_id, view_role, interact_role, moderate_role
         FROM task_tags WHERE task_id = $1
@@ -302,7 +302,7 @@ func (s *Service) TagAttachments(ctx context.Context, id uuid.UUID) ([]TagRow, e
 }
 
 type TagRow struct {
-	TagID        uuid.UUID
+	TagID        int64
 	ViewRole     bool
 	InteractRole bool
 	ModerateRole bool
@@ -310,7 +310,7 @@ type TagRow struct {
 
 // ListByTag returns tasks attached to tagID, paginated by created_at DESC.
 // Caller is responsible for visibility filtering.
-func (s *Service) ListByTag(ctx context.Context, tagID uuid.UUID, limit int, status *string) ([]*Task, error) {
+func (s *Service) ListByTag(ctx context.Context, tagID int64, limit int, status *string) ([]*Task, error) {
 	if limit <= 0 || limit > 100 {
 		limit = 50
 	}
@@ -345,21 +345,21 @@ func (s *Service) ListByTag(ctx context.Context, tagID uuid.UUID, limit int, sta
 // PromoteInput captures the fields needed to promote a post or comment
 // into a task. Exactly one of PostID/CommentID must be set.
 type PromoteInput struct {
-	PostID    *uuid.UUID
-	CommentID *uuid.UUID
-	CreatorID uuid.UUID
+	PostID    *int64
+	CommentID *int64
+	CreatorID int64
 	Title     string
 	DueAt     *time.Time
-	Assignees []uuid.UUID
+	Assignees []int64
 }
 
 // PromotePost creates a task linked to a post, copying the post's tags
 // onto the new task at default role flags. Mirrors chat.PromoteMessage.
-func (s *Service) PromotePost(ctx context.Context, in PromoteInput) (uuid.UUID, error) {
+func (s *Service) PromotePost(ctx context.Context, in PromoteInput) (int64, error) {
 	if in.PostID == nil {
-		return uuid.Nil, errors.New("task: PromotePost requires PostID")
+		return int64(0), errors.New("task: PromotePost requires PostID")
 	}
-	var taskID uuid.UUID
+	var taskID int64
 	err := s.runInTx(ctx, func(tx pgx.Tx) error {
 		// Pull post tags to copy onto the task.
 		rows, err := tx.Query(ctx, `
@@ -368,9 +368,9 @@ func (s *Service) PromotePost(ctx context.Context, in PromoteInput) (uuid.UUID, 
 		if err != nil {
 			return fmt.Errorf("load post tags: %w", err)
 		}
-		var tagIDs []uuid.UUID
+		var tagIDs []int64
 		for rows.Next() {
-			var id uuid.UUID
+			var id int64
 			if err := rows.Scan(&id); err != nil {
 				rows.Close()
 				return err
@@ -412,8 +412,8 @@ func (s *Service) PromotePost(ctx context.Context, in PromoteInput) (uuid.UUID, 
 		}
 		return job.Enqueue(ctx, tx, "notification.fanout", map[string]any{
 			"source_type": "task",
-			"source_id":   taskID.String(),
-			"actor_id":    in.CreatorID.String(),
+			"source_id":   ids.FormatID(taskID),
+			"actor_id":    ids.FormatID(in.CreatorID),
 			"event":       "created",
 		})
 	})
@@ -422,13 +422,13 @@ func (s *Service) PromotePost(ctx context.Context, in PromoteInput) (uuid.UUID, 
 
 // PromoteComment is like PromotePost but copies tags from the comment's
 // parent post.
-func (s *Service) PromoteComment(ctx context.Context, in PromoteInput) (uuid.UUID, error) {
+func (s *Service) PromoteComment(ctx context.Context, in PromoteInput) (int64, error) {
 	if in.CommentID == nil {
-		return uuid.Nil, errors.New("task: PromoteComment requires CommentID")
+		return int64(0), errors.New("task: PromoteComment requires CommentID")
 	}
-	var taskID uuid.UUID
+	var taskID int64
 	err := s.runInTx(ctx, func(tx pgx.Tx) error {
-		var postID uuid.UUID
+		var postID int64
 		if err := tx.QueryRow(ctx,
 			`SELECT post_id FROM comments WHERE id = $1`, *in.CommentID).Scan(&postID); err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
@@ -441,9 +441,9 @@ func (s *Service) PromoteComment(ctx context.Context, in PromoteInput) (uuid.UUI
 		if err != nil {
 			return fmt.Errorf("load post tags: %w", err)
 		}
-		var tagIDs []uuid.UUID
+		var tagIDs []int64
 		for rows.Next() {
-			var id uuid.UUID
+			var id int64
 			if err := rows.Scan(&id); err != nil {
 				rows.Close()
 				return err
@@ -485,8 +485,8 @@ func (s *Service) PromoteComment(ctx context.Context, in PromoteInput) (uuid.UUI
 		}
 		return job.Enqueue(ctx, tx, "notification.fanout", map[string]any{
 			"source_type": "task",
-			"source_id":   taskID.String(),
-			"actor_id":    in.CreatorID.String(),
+			"source_id":   ids.FormatID(taskID),
+			"actor_id":    ids.FormatID(in.CreatorID),
 			"event":       "created",
 		})
 	})

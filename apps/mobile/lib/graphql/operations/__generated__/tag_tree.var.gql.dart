@@ -2,6 +2,7 @@
 // ignore_for_file: type=lint
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
+import 'package:built_collection/built_collection.dart';
 import 'package:built_value/built_value.dart';
 import 'package:built_value/serializer.dart';
 import 'package:pulse/graphql/__generated__/serializers.gql.dart' as _i1;
@@ -48,6 +49,30 @@ abstract class GTagChildrenVars
   static GTagChildrenVars? fromJson(Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GTagChildrenVars.serializer,
+        json,
+      );
+}
+
+abstract class GTagBySlugPathVars
+    implements Built<GTagBySlugPathVars, GTagBySlugPathVarsBuilder> {
+  GTagBySlugPathVars._();
+
+  factory GTagBySlugPathVars(
+          [void Function(GTagBySlugPathVarsBuilder b) updates]) =
+      _$GTagBySlugPathVars;
+
+  BuiltList<String> get path;
+  static Serializer<GTagBySlugPathVars> get serializer =>
+      _$gTagBySlugPathVarsSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GTagBySlugPathVars.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GTagBySlugPathVars? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GTagBySlugPathVars.serializer,
         json,
       );
 }

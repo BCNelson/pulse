@@ -4,14 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/bootstrap"
 	"github.com/bcnelson/pulse/services/api/internal/impersonation"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 func TestImpersonationOnlyAdmins(t *testing.T) {
@@ -26,11 +25,11 @@ func TestImpersonationOnlyAdmins(t *testing.T) {
 
 	// Seed a non-admin user (no grant).
 	authSvc := &auth.Service{DB: pool}
-	contributorID := uuid.New()
+	contributorID := ids.New(ids.KindUser)
 	if _, err := pool.Exec(ctx, `
         INSERT INTO principals (id, kind, status, global_uri, display_name, email)
         VALUES ($1, 'user', 'active', $2, 'Contributor', 'c@example.com')
-    `, contributorID, "local://principals/"+contributorID.String()); err != nil {
+    `, contributorID, "local://principals/"+ids.FormatID(contributorID)); err != nil {
 		t.Fatalf("seed contributor: %v", err)
 	}
 	hash, _ := auth.HashPassword("pw-c")
@@ -41,11 +40,11 @@ func TestImpersonationOnlyAdmins(t *testing.T) {
 	}
 
 	// And a target user.
-	targetID := uuid.New()
+	targetID := ids.New(ids.KindUser)
 	if _, err := pool.Exec(ctx, `
         INSERT INTO principals (id, kind, status, global_uri, display_name, email)
         VALUES ($1, 'user', 'active', $2, 'Target', 't@example.com')
-    `, targetID, "local://principals/"+targetID.String()); err != nil {
+    `, targetID, "local://principals/"+ids.FormatID(targetID)); err != nil {
 		t.Fatalf("seed target: %v", err)
 	}
 
@@ -87,10 +86,10 @@ func TestImpersonationOnlyAdmins(t *testing.T) {
 		t.Fatalf("lookup post-impersonate: %v", err)
 	}
 	if sess.ActingID != ownerID {
-		t.Errorf("acting: got %s want %s", sess.ActingID, ownerID)
+		t.Errorf("acting: got %d want %d", sess.ActingID, ownerID)
 	}
 	if sess.EffectiveID != targetID {
-		t.Errorf("effective: got %s want %s", sess.EffectiveID, targetID)
+		t.Errorf("effective: got %d want %d", sess.EffectiveID, targetID)
 	}
 
 	// End impersonation.
@@ -102,7 +101,7 @@ func TestImpersonationOnlyAdmins(t *testing.T) {
 	}
 	sess, _ = authSvc.LookupSession(ctx, oIssued.Token)
 	if sess.EffectiveID != ownerID {
-		t.Errorf("after end, effective should be owner: got %s", sess.EffectiveID)
+		t.Errorf("after end, effective should be owner: got %d", sess.EffectiveID)
 	}
 
 	// Audit trail: begin + end events.

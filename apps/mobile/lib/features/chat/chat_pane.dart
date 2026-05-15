@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/chat_cache.dart';
 import '../../core/ferry_client.dart';
-import '../../core/selection.dart';
+import '../../core/router.dart';
 import '../../design/atoms/pulse_chat_msg.dart';
 import '../../design/atoms/pulse_day_divider.dart';
 import '../../design/atoms/pulse_page_head.dart';
@@ -21,7 +21,7 @@ class ChatPane extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
-    final roomId = ref.watch(selectedRoomIdProvider);
+    final roomId = ref.watch(currentRoomIdProvider);
     return Container(
       color: t.paper,
       child: LayoutBuilder(

@@ -9,6 +9,8 @@ part of 'tag_tree.var.gql.dart';
 Serializer<GTagTreeVars> _$gTagTreeVarsSerializer = _$GTagTreeVarsSerializer();
 Serializer<GTagChildrenVars> _$gTagChildrenVarsSerializer =
     _$GTagChildrenVarsSerializer();
+Serializer<GTagBySlugPathVars> _$gTagBySlugPathVarsSerializer =
+    _$GTagBySlugPathVarsSerializer();
 Serializer<GTagSummaryVars> _$gTagSummaryVarsSerializer =
     _$GTagSummaryVarsSerializer();
 
@@ -65,6 +67,52 @@ class _$GTagChildrenVarsSerializer
         case 'id':
           result.id = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GTagBySlugPathVarsSerializer
+    implements StructuredSerializer<GTagBySlugPathVars> {
+  @override
+  final Iterable<Type> types = const [GTagBySlugPathVars, _$GTagBySlugPathVars];
+  @override
+  final String wireName = 'GTagBySlugPathVars';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GTagBySlugPathVars object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'path',
+      serializers.serialize(object.path,
+          specifiedType:
+              const FullType(BuiltList, const [const FullType(String)])),
+    ];
+
+    return result;
+  }
+
+  @override
+  GTagBySlugPathVars deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GTagBySlugPathVarsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'path':
+          result.path.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      BuiltList, const [const FullType(String)]))!
+              as BuiltList<Object?>);
           break;
       }
     }
@@ -225,6 +273,101 @@ class GTagChildrenVarsBuilder
           id: BuiltValueNullFieldError.checkNotNull(
               id, r'GTagChildrenVars', 'id'),
         );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GTagBySlugPathVars extends GTagBySlugPathVars {
+  @override
+  final BuiltList<String> path;
+
+  factory _$GTagBySlugPathVars(
+          [void Function(GTagBySlugPathVarsBuilder)? updates]) =>
+      (GTagBySlugPathVarsBuilder()..update(updates))._build();
+
+  _$GTagBySlugPathVars._({required this.path}) : super._();
+  @override
+  GTagBySlugPathVars rebuild(
+          void Function(GTagBySlugPathVarsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GTagBySlugPathVarsBuilder toBuilder() =>
+      GTagBySlugPathVarsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GTagBySlugPathVars && path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GTagBySlugPathVars')
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GTagBySlugPathVarsBuilder
+    implements Builder<GTagBySlugPathVars, GTagBySlugPathVarsBuilder> {
+  _$GTagBySlugPathVars? _$v;
+
+  ListBuilder<String>? _path;
+  ListBuilder<String> get path => _$this._path ??= ListBuilder<String>();
+  set path(ListBuilder<String>? path) => _$this._path = path;
+
+  GTagBySlugPathVarsBuilder();
+
+  GTagBySlugPathVarsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _path = $v.path.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GTagBySlugPathVars other) {
+    _$v = other as _$GTagBySlugPathVars;
+  }
+
+  @override
+  void update(void Function(GTagBySlugPathVarsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GTagBySlugPathVars build() => _build();
+
+  _$GTagBySlugPathVars _build() {
+    _$GTagBySlugPathVars _$result;
+    try {
+      _$result = _$v ??
+          _$GTagBySlugPathVars._(
+            path: path.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'path';
+        path.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GTagBySlugPathVars', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

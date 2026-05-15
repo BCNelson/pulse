@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/ferry_client.dart';
-import '../../core/selection.dart';
 import '../../design/atoms/pulse_kbd.dart';
 import '../../design/atoms/pulse_section_head.dart';
 import '../../design/tokens.dart';
@@ -254,9 +254,10 @@ class _Results extends ConsumerWidget {
                     title: hit.tag.displayName,
                     subtitle: hit.tag.path,
                     onTap: () {
-                      ref
-                          .read(selectedTagIdProvider.notifier)
-                          .set(hit.tag.id);
+                      // Navigate by slug path, not entity id — the feed
+                      // routes match /feed/t/<slugs>/... and resolve the
+                      // tag entity from there via tagBySlugPath.
+                      context.go('/feed/t/${hit.tag.path}');
                       onClose();
                     },
                   ),
@@ -288,7 +289,7 @@ class _Results extends ConsumerWidget {
                     onTap: () {
                       final id = _idOf(edge.node);
                       if (id != null) {
-                        ref.read(selectedPostIdProvider.notifier).set(id);
+                        context.go('/feed/p/$id');
                       }
                       onClose();
                     },

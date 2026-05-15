@@ -7,8 +7,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/chat"
@@ -20,6 +18,7 @@ import (
 	"github.com/bcnelson/pulse/services/api/internal/realtime"
 	"github.com/bcnelson/pulse/services/api/internal/search"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // TestM3SubscriptionDelivers exercises the messageAdded subscription end-
@@ -68,7 +67,7 @@ func TestM3SubscriptionDelivers(t *testing.T) {
 	aliceCtx := perm.WithRequestCache(auth.WithIdentity(ctx, auth.Identity{
 		ActingID: alice, EffectiveID: alice,
 	}))
-	subCh, err := resolver.Subscription().MessageAdded(aliceCtx, roomID.String())
+	subCh, err := resolver.Subscription().MessageAdded(aliceCtx, ids.FormatID(roomID))
 	if err != nil {
 		t.Fatalf("MessageAdded: %v", err)
 	}
@@ -128,12 +127,12 @@ func TestM3SubscriptionRecheckesAuth(t *testing.T) {
 	charlieCtx := perm.WithRequestCache(auth.WithIdentity(ctx, auth.Identity{
 		ActingID: charlie, EffectiveID: charlie,
 	}))
-	if _, err := resolver.Subscription().MessageAdded(charlieCtx, roomID.String()); err == nil {
+	if _, err := resolver.Subscription().MessageAdded(charlieCtx, ids.FormatID(roomID)); err == nil {
 		t.Fatal("non-participant should be denied")
 	}
 }
 
 // shadow check: ensure mustSeedUser is the same as in M1/M2 tests.
-var _ = func() func() uuid.UUID {
-	return func() uuid.UUID { return uuid.Nil }
+var _ = func() func() int64 {
+	return func() int64 { return int64(0) }
 }

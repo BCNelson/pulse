@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/graphql/loaders"
 	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
@@ -17,7 +15,7 @@ import (
 
 // loadTask hydrates a Task with the full GraphQL representation. Returns
 // nil, nil when the viewer cannot see it; nil, err on real failures.
-func (r *Resolver) loadTask(ctx context.Context, id uuid.UUID) (*model.Task, error) {
+func (r *Resolver) loadTask(ctx context.Context, id int64) (*model.Task, error) {
 	identity := auth.FromContext(ctx)
 	if identity.IsAnonymous() {
 		return nil, nil
@@ -109,8 +107,8 @@ func (r *Resolver) loadTask(ctx context.Context, id uuid.UUID) (*model.Task, err
 	}
 
 	out := &model.Task{
-		ID:            t.ID.String(),
-		GlobalURI:     ids.URI("tasks", t.ID),
+		ID:            ids.FormatID(t.ID),
+		GlobalURI:     ids.URI(ids.KindTask, t.ID),
 		Title:         t.Title,
 		Description:   t.Description,
 		Status:        mapTaskStatusDBToGQL(t.Status),
@@ -131,7 +129,7 @@ func (r *Resolver) loadTask(ctx context.Context, id uuid.UUID) (*model.Task, err
 
 // canViewTask layers the standalone-task fallback on top of CanOnTask.
 // A task with no tags is visible only to creator/assignees/watchers.
-func (r *Resolver) canViewTask(ctx context.Context, viewer uuid.UUID, t *task.Task) (bool, error) {
+func (r *Resolver) canViewTask(ctx context.Context, viewer int64, t *task.Task) (bool, error) {
 	can, err := r.Perm.CanOnTask(ctx, viewer, perm.ActionView, t.ID)
 	if err != nil {
 		return false, err
@@ -145,7 +143,7 @@ func (r *Resolver) canViewTask(ctx context.Context, viewer uuid.UUID, t *task.Ta
 // canTaskAction checks contribute/moderate. Creator and assignees get
 // implicit contribute on standalone tasks; otherwise standard tag-role
 // gating applies.
-func (r *Resolver) canTaskAction(ctx context.Context, viewer uuid.UUID, t *task.Task, action perm.Action) (bool, error) {
+func (r *Resolver) canTaskAction(ctx context.Context, viewer int64, t *task.Task, action perm.Action) (bool, error) {
 	can, err := r.Perm.CanOnTask(ctx, viewer, action, t.ID)
 	if err != nil {
 		return false, err
@@ -162,7 +160,7 @@ func (r *Resolver) canTaskAction(ctx context.Context, viewer uuid.UUID, t *task.
 	return false, nil
 }
 
-func (r *Resolver) isInvolvedInTask(ctx context.Context, viewer uuid.UUID, t *task.Task) (bool, error) {
+func (r *Resolver) isInvolvedInTask(ctx context.Context, viewer int64, t *task.Task) (bool, error) {
 	if t.CreatedBy == viewer {
 		return true, nil
 	}
@@ -179,7 +177,7 @@ func (r *Resolver) isInvolvedInTask(ctx context.Context, viewer uuid.UUID, t *ta
 	return found, nil
 }
 
-func (r *Resolver) principalsForIDs(ctx context.Context, ids []uuid.UUID) ([]model.Principal, error) {
+func (r *Resolver) principalsForIDs(ctx context.Context, ids []int64) ([]model.Principal, error) {
 	out := make([]model.Principal, 0, len(ids))
 	for _, id := range ids {
 		p, err := r.loadPrincipalIface(ctx, id)
@@ -202,7 +200,7 @@ func (r *Resolver) principalsForIDs(ctx context.Context, ids []uuid.UUID) ([]mod
 // To stay honest we DO check the err and return nil in that case so the
 // downstream principalsForIDs call simply yields an empty slice; the real
 // error gets re-raised in callers via the surrounding service errors.
-func mustIDs(ids []uuid.UUID, err error) []uuid.UUID {
+func mustIDs(ids []int64, err error) []int64 {
 	if err != nil {
 		return nil
 	}
@@ -252,8 +250,8 @@ func (r *Resolver) primeTaskListLoaders(ctx context.Context, tasks []*task.Task)
 	if len(tasks) == 0 {
 		return
 	}
-	creatorIDs := make([]uuid.UUID, 0, len(tasks))
-	taskIDs := make([]uuid.UUID, 0, len(tasks))
+	creatorIDs := make([]int64, 0, len(tasks))
+	taskIDs := make([]int64, 0, len(tasks))
 	for _, t := range tasks {
 		creatorIDs = append(creatorIDs, t.CreatedBy)
 		taskIDs = append(taskIDs, t.ID)
@@ -262,11 +260,11 @@ func (r *Resolver) primeTaskListLoaders(ctx context.Context, tasks []*task.Task)
 
 	// Pull distinct tag ids across all tasks and prime the tag loader.
 	rows, err := r.DB.Query(ctx,
-		`SELECT DISTINCT tag_id FROM task_tags WHERE task_id = ANY($1::UUID[])`, taskIDs)
+		`SELECT DISTINCT tag_id FROM task_tags WHERE task_id = ANY($1::BIGINT[])`, taskIDs)
 	if err == nil {
-		tagIDs := []uuid.UUID{}
+		tagIDs := []int64{}
 		for rows.Next() {
-			var id uuid.UUID
+			var id int64
 			if err := rows.Scan(&id); err == nil {
 				tagIDs = append(tagIDs, id)
 			}
@@ -277,14 +275,14 @@ func (r *Resolver) primeTaskListLoaders(ctx context.Context, tasks []*task.Task)
 
 	// Pull assignees + watchers across all tasks and prime principals.
 	rows, err = r.DB.Query(ctx, `
-        SELECT DISTINCT principal_id FROM task_assignees WHERE task_id = ANY($1::UUID[])
+        SELECT DISTINCT principal_id FROM task_assignees WHERE task_id = ANY($1::BIGINT[])
         UNION
-        SELECT DISTINCT principal_id FROM task_watchers  WHERE task_id = ANY($1::UUID[])
+        SELECT DISTINCT principal_id FROM task_watchers  WHERE task_id = ANY($1::BIGINT[])
     `, taskIDs)
 	if err == nil {
-		pids := []uuid.UUID{}
+		pids := []int64{}
 		for rows.Next() {
-			var id uuid.UUID
+			var id int64
 			if err := rows.Scan(&id); err == nil {
 				pids = append(pids, id)
 			}
@@ -303,7 +301,7 @@ func emptyTaskConnection() *model.TaskConnection {
 }
 
 // loadTasksForTag is the field resolver helper for Tag.tasks.
-func (r *Resolver) loadTasksForTag(ctx context.Context, tagID uuid.UUID, limit int, status *string) (*model.TaskConnection, error) {
+func (r *Resolver) loadTasksForTag(ctx context.Context, tagID int64, limit int, status *string) (*model.TaskConnection, error) {
 	identity, err := requireIdentity(ctx)
 	if err != nil {
 		return emptyTaskConnection(), nil

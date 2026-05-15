@@ -28,6 +28,11 @@ Serializer<GTagChildrenData_tag_children>
 Serializer<GTagChildrenData_tag_children_children>
     _$gTagChildrenDataTagChildrenChildrenSerializer =
     _$GTagChildrenData_tag_children_childrenSerializer();
+Serializer<GTagBySlugPathData> _$gTagBySlugPathDataSerializer =
+    _$GTagBySlugPathDataSerializer();
+Serializer<GTagBySlugPathData_tagBySlugPath>
+    _$gTagBySlugPathDataTagBySlugPathSerializer =
+    _$GTagBySlugPathData_tagBySlugPathSerializer();
 Serializer<GTagSummaryData> _$gTagSummaryDataSerializer =
     _$GTagSummaryDataSerializer();
 
@@ -740,6 +745,152 @@ class _$GTagChildrenData_tag_children_childrenSerializer
       Serializers serializers, Iterable<Object?> serialized,
       {FullType specifiedType = FullType.unspecified}) {
     final result = GTagChildrenData_tag_children_childrenBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'rootKind':
+          result.rootKind = serializers.deserialize(value,
+                  specifiedType: const FullType(_i2.GTagRootKind))!
+              as _i2.GTagRootKind;
+          break;
+        case 'archivedAt':
+          result.archivedAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GTagBySlugPathDataSerializer
+    implements StructuredSerializer<GTagBySlugPathData> {
+  @override
+  final Iterable<Type> types = const [GTagBySlugPathData, _$GTagBySlugPathData];
+  @override
+  final String wireName = 'GTagBySlugPathData';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GTagBySlugPathData object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.tagBySlugPath;
+    if (value != null) {
+      result
+        ..add('tagBySlugPath')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(GTagBySlugPathData_tagBySlugPath)));
+    }
+    return result;
+  }
+
+  @override
+  GTagBySlugPathData deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GTagBySlugPathDataBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'tagBySlugPath':
+          result.tagBySlugPath.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GTagBySlugPathData_tagBySlugPath))!
+              as GTagBySlugPathData_tagBySlugPath);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GTagBySlugPathData_tagBySlugPathSerializer
+    implements StructuredSerializer<GTagBySlugPathData_tagBySlugPath> {
+  @override
+  final Iterable<Type> types = const [
+    GTagBySlugPathData_tagBySlugPath,
+    _$GTagBySlugPathData_tagBySlugPath
+  ];
+  @override
+  final String wireName = 'GTagBySlugPathData_tagBySlugPath';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GTagBySlugPathData_tagBySlugPath object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+      'rootKind',
+      serializers.serialize(object.rootKind,
+          specifiedType: const FullType(_i2.GTagRootKind)),
+    ];
+    Object? value;
+    value = object.archivedAt;
+    if (value != null) {
+      result
+        ..add('archivedAt')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(_i2.GTime)));
+    }
+    return result;
+  }
+
+  @override
+  GTagBySlugPathData_tagBySlugPath deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GTagBySlugPathData_tagBySlugPathBuilder();
 
     final iterator = serialized.iterator;
     while (iterator.moveNext()) {
@@ -2399,6 +2550,301 @@ class GTagChildrenData_tag_children_childrenBuilder
             r'GTagChildrenData_tag_children_children',
             _$failedField,
             e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GTagBySlugPathData extends GTagBySlugPathData {
+  @override
+  final String G__typename;
+  @override
+  final GTagBySlugPathData_tagBySlugPath? tagBySlugPath;
+
+  factory _$GTagBySlugPathData(
+          [void Function(GTagBySlugPathDataBuilder)? updates]) =>
+      (GTagBySlugPathDataBuilder()..update(updates))._build();
+
+  _$GTagBySlugPathData._({required this.G__typename, this.tagBySlugPath})
+      : super._();
+  @override
+  GTagBySlugPathData rebuild(
+          void Function(GTagBySlugPathDataBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GTagBySlugPathDataBuilder toBuilder() =>
+      GTagBySlugPathDataBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GTagBySlugPathData &&
+        G__typename == other.G__typename &&
+        tagBySlugPath == other.tagBySlugPath;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, tagBySlugPath.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GTagBySlugPathData')
+          ..add('G__typename', G__typename)
+          ..add('tagBySlugPath', tagBySlugPath))
+        .toString();
+  }
+}
+
+class GTagBySlugPathDataBuilder
+    implements Builder<GTagBySlugPathData, GTagBySlugPathDataBuilder> {
+  _$GTagBySlugPathData? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  GTagBySlugPathData_tagBySlugPathBuilder? _tagBySlugPath;
+  GTagBySlugPathData_tagBySlugPathBuilder get tagBySlugPath =>
+      _$this._tagBySlugPath ??= GTagBySlugPathData_tagBySlugPathBuilder();
+  set tagBySlugPath(GTagBySlugPathData_tagBySlugPathBuilder? tagBySlugPath) =>
+      _$this._tagBySlugPath = tagBySlugPath;
+
+  GTagBySlugPathDataBuilder() {
+    GTagBySlugPathData._initializeBuilder(this);
+  }
+
+  GTagBySlugPathDataBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _tagBySlugPath = $v.tagBySlugPath?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GTagBySlugPathData other) {
+    _$v = other as _$GTagBySlugPathData;
+  }
+
+  @override
+  void update(void Function(GTagBySlugPathDataBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GTagBySlugPathData build() => _build();
+
+  _$GTagBySlugPathData _build() {
+    _$GTagBySlugPathData _$result;
+    try {
+      _$result = _$v ??
+          _$GTagBySlugPathData._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GTagBySlugPathData', 'G__typename'),
+            tagBySlugPath: _tagBySlugPath?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'tagBySlugPath';
+        _tagBySlugPath?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GTagBySlugPathData', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GTagBySlugPathData_tagBySlugPath
+    extends GTagBySlugPathData_tagBySlugPath {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+  @override
+  final _i2.GTagRootKind rootKind;
+  @override
+  final _i2.GTime? archivedAt;
+
+  factory _$GTagBySlugPathData_tagBySlugPath(
+          [void Function(GTagBySlugPathData_tagBySlugPathBuilder)? updates]) =>
+      (GTagBySlugPathData_tagBySlugPathBuilder()..update(updates))._build();
+
+  _$GTagBySlugPathData_tagBySlugPath._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path,
+      required this.rootKind,
+      this.archivedAt})
+      : super._();
+  @override
+  GTagBySlugPathData_tagBySlugPath rebuild(
+          void Function(GTagBySlugPathData_tagBySlugPathBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GTagBySlugPathData_tagBySlugPathBuilder toBuilder() =>
+      GTagBySlugPathData_tagBySlugPathBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GTagBySlugPathData_tagBySlugPath &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path &&
+        rootKind == other.rootKind &&
+        archivedAt == other.archivedAt;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jc(_$hash, rootKind.hashCode);
+    _$hash = $jc(_$hash, archivedAt.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GTagBySlugPathData_tagBySlugPath')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path)
+          ..add('rootKind', rootKind)
+          ..add('archivedAt', archivedAt))
+        .toString();
+  }
+}
+
+class GTagBySlugPathData_tagBySlugPathBuilder
+    implements
+        Builder<GTagBySlugPathData_tagBySlugPath,
+            GTagBySlugPathData_tagBySlugPathBuilder> {
+  _$GTagBySlugPathData_tagBySlugPath? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  _i2.GTagRootKind? _rootKind;
+  _i2.GTagRootKind? get rootKind => _$this._rootKind;
+  set rootKind(_i2.GTagRootKind? rootKind) => _$this._rootKind = rootKind;
+
+  _i2.GTimeBuilder? _archivedAt;
+  _i2.GTimeBuilder get archivedAt => _$this._archivedAt ??= _i2.GTimeBuilder();
+  set archivedAt(_i2.GTimeBuilder? archivedAt) =>
+      _$this._archivedAt = archivedAt;
+
+  GTagBySlugPathData_tagBySlugPathBuilder() {
+    GTagBySlugPathData_tagBySlugPath._initializeBuilder(this);
+  }
+
+  GTagBySlugPathData_tagBySlugPathBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _rootKind = $v.rootKind;
+      _archivedAt = $v.archivedAt?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GTagBySlugPathData_tagBySlugPath other) {
+    _$v = other as _$GTagBySlugPathData_tagBySlugPath;
+  }
+
+  @override
+  void update(void Function(GTagBySlugPathData_tagBySlugPathBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GTagBySlugPathData_tagBySlugPath build() => _build();
+
+  _$GTagBySlugPathData_tagBySlugPath _build() {
+    _$GTagBySlugPathData_tagBySlugPath _$result;
+    try {
+      _$result = _$v ??
+          _$GTagBySlugPathData_tagBySlugPath._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GTagBySlugPathData_tagBySlugPath', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GTagBySlugPathData_tagBySlugPath', 'id'),
+            slug: BuiltValueNullFieldError.checkNotNull(
+                slug, r'GTagBySlugPathData_tagBySlugPath', 'slug'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GTagBySlugPathData_tagBySlugPath', 'displayName'),
+            path: BuiltValueNullFieldError.checkNotNull(
+                path, r'GTagBySlugPathData_tagBySlugPath', 'path'),
+            rootKind: BuiltValueNullFieldError.checkNotNull(
+                rootKind, r'GTagBySlugPathData_tagBySlugPath', 'rootKind'),
+            archivedAt: _archivedAt?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'archivedAt';
+        _archivedAt?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GTagBySlugPathData_tagBySlugPath', _$failedField, e.toString());
       }
       rethrow;
     }

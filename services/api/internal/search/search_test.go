@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
 	"github.com/bcnelson/pulse/services/api/internal/post"
 	"github.com/bcnelson/pulse/services/api/internal/search"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 func TestSearchFiltersByVisibility(t *testing.T) {
@@ -57,7 +57,7 @@ func TestSearchEmptyQueryRejected(t *testing.T) {
 	pool := pgtest.Pool(t)
 	srch := &search.Service{DB: pool}
 
-	if _, err := srch.Search(context.Background(), uuid.New(), "", nil, 10); err != search.ErrEmptyQuery {
+	if _, err := srch.Search(context.Background(), ids.New(ids.KindUser), "", nil, 10); err != search.ErrEmptyQuery {
 		t.Errorf("expected ErrEmptyQuery, got %v", err)
 	}
 }
@@ -83,20 +83,20 @@ func TestSearchTagsFuzzyMatch(t *testing.T) {
 
 // --- helpers ---
 
-func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, name string) uuid.UUID {
+func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, name string) int64 {
 	t.Helper()
-	id := uuid.New()
+	id := ids.New(ids.KindUser)
 	_, err := pool.Exec(context.Background(), `
         INSERT INTO principals (id, kind, status, global_uri, display_name)
         VALUES ($1, 'user', 'active', $2, $3)
-    `, id, "local://principals/"+id.String(), name)
+    `, id, "local://principals/"+ids.FormatID(id), name)
 	if err != nil {
 		t.Fatalf("insert principal: %v", err)
 	}
 	return id
 }
 
-func mustCreateRoot(t *testing.T, svc *tag.Service, slug string) uuid.UUID {
+func mustCreateRoot(t *testing.T, svc *tag.Service, slug string) int64 {
 	t.Helper()
 	id, err := svc.Create(context.Background(), tag.CreateInput{
 		Slug: slug, DisplayName: slug, RootKind: tag.RootKindOrg,
@@ -107,7 +107,7 @@ func mustCreateRoot(t *testing.T, svc *tag.Service, slug string) uuid.UUID {
 	return id
 }
 
-func mustGrant(t *testing.T, pool *pgxpool.Pool, tagID, principalID uuid.UUID, bundle string, cascade bool) {
+func mustGrant(t *testing.T, pool *pgxpool.Pool, tagID, principalID int64, bundle string, cascade bool) {
 	t.Helper()
 	_, err := pool.Exec(context.Background(), `
         INSERT INTO tag_grants (tag_id, principal_id, bundle, cascade)
@@ -118,7 +118,7 @@ func mustGrant(t *testing.T, pool *pgxpool.Pool, tagID, principalID uuid.UUID, b
 	}
 }
 
-func mustCreatePost(t *testing.T, svc *post.Service, author uuid.UUID, title, body string, tagID uuid.UUID) uuid.UUID {
+func mustCreatePost(t *testing.T, svc *post.Service, author int64, title, body string, tagID int64) int64 {
 	t.Helper()
 	id, err := svc.Create(context.Background(), post.CreateInput{
 		AuthorID: author, Title: title, Body: body,

@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 func TestWriteRecordsActingAndEffective(t *testing.T) {
@@ -19,7 +19,7 @@ func TestWriteRecordsActingAndEffective(t *testing.T) {
 
 	alice := mustCreatePrincipal(t, pool, "Alice")
 	bob := mustCreatePrincipal(t, pool, "Bob")
-	target := uuid.New()
+	target := ids.New(ids.KindUser)
 
 	ctx := auth.WithIdentity(context.Background(), auth.Identity{
 		ActingID:    alice,
@@ -36,7 +36,7 @@ func TestWriteRecordsActingAndEffective(t *testing.T) {
 		t.Fatalf("Write: %v", err)
 	}
 
-	var actingID, effectiveID uuid.UUID
+	var actingID, effectiveID int64
 	var action, targetType, reason string
 	var diff []byte
 	err = pool.QueryRow(context.Background(), `
@@ -47,10 +47,10 @@ func TestWriteRecordsActingAndEffective(t *testing.T) {
 		t.Fatalf("read back: %v", err)
 	}
 	if actingID != alice {
-		t.Errorf("acting_id: want %s got %s", alice, actingID)
+		t.Errorf("acting_id: want %d got %d", alice, actingID)
 	}
 	if effectiveID != bob {
-		t.Errorf("effective_id: want %s got %s", bob, effectiveID)
+		t.Errorf("effective_id: want %d got %d", bob, effectiveID)
 	}
 	if action != "tag.move" {
 		t.Errorf("action: %q", action)
@@ -67,20 +67,20 @@ func TestWriteAnonymousErrors(t *testing.T) {
 	err := svc.Write(context.Background(), audit.Event{
 		Action:     "tag.move",
 		TargetType: "tag",
-		TargetID:   uuid.New(),
+		TargetID:   ids.New(ids.KindUser),
 	})
 	if err != audit.ErrNoIdentity {
 		t.Fatalf("expected ErrNoIdentity, got %v", err)
 	}
 }
 
-func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, name string) uuid.UUID {
+func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, name string) int64 {
 	t.Helper()
-	id := uuid.New()
+	id := ids.New(ids.KindUser)
 	_, err := pool.Exec(context.Background(), `
         INSERT INTO principals (id, kind, status, global_uri, display_name)
         VALUES ($1, 'user', 'active', $2, $3)
-    `, id, "local://principals/"+id.String(), name)
+    `, id, "local://principals/"+ids.FormatID(id), name)
 	if err != nil {
 		t.Fatalf("insert principal: %v", err)
 	}

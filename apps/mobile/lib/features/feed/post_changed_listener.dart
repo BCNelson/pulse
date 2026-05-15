@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -21,7 +22,12 @@ final postChangedListenerProvider =
       final data = resp.data;
       if (data == null || resp.hasErrors) return;
       controller.add(data);
-      final summary = GPostSummaryData.fromJson(data.postChanged.toJson());
+      // jsonEncode/Decode trip normalizes any web-runtime JS objects
+      // back into Dart maps — see cached_tag_feed_provider for why.
+      final summary = GPostSummaryData.fromJson(
+        jsonDecode(jsonEncode(data.postChanged.toJson()))
+            as Map<String, dynamic>,
+      );
       if (summary != null) {
         // Fire-and-forget — the drift watch stream is the source of
         // truth for UI updates.

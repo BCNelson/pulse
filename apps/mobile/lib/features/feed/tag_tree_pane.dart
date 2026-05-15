@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/ferry_client.dart';
-import '../../core/selection.dart';
+import '../../core/router.dart';
 import '../../design/atoms/pulse_button.dart';
 import '../../design/atoms/pulse_section_head.dart';
 import '../../design/atoms/pulse_tag_row.dart';
@@ -12,9 +13,20 @@ import '../../graphql/__generated__/schema.schema.gql.dart';
 import '../../graphql/operations/__generated__/tag_tree.data.gql.dart';
 import '../../graphql/operations/__generated__/tag_tree.req.gql.dart';
 
-void _selectTag(WidgetRef ref, String tagId) {
-  ref.read(selectedTagIdProvider.notifier).set(tagId);
-  ref.read(selectedPostIdProvider.notifier).set(null);
+// Navigates to the feed for the tag whose hierarchical slug path is
+// [tagPath] (already in the wire form "root/child/leaf"). The current
+// route exposes the path as the selection token via
+// currentTagIdProvider; this helper just joins it into the URL.
+//
+// Empty paths fall back to /feed (the no-selection view) — otherwise we
+// would generate /feed/t/ which normalizes to /feed/t and matches no
+// route.
+void _selectTag(BuildContext context, String tagPath) {
+  if (tagPath.isEmpty) {
+    context.go('/feed');
+  } else {
+    context.go('/feed/t/$tagPath');
+  }
 }
 
 class TagTreePane extends ConsumerWidget {
@@ -99,8 +111,8 @@ class _TagNodeState extends ConsumerState<_TagNode> {
 
   @override
   Widget build(BuildContext context) {
-    final selected = ref.watch(selectedTagIdProvider);
-    final isSelected = selected == widget.node.id;
+    final selected = ref.watch(currentTagIdProvider);
+    final isSelected = selected == widget.node.path;
     final hasChildren = widget.node.children.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -132,7 +144,7 @@ class _TagNodeState extends ConsumerState<_TagNode> {
                 indent: widget.depth,
                 prefix: widget.node.rootKind == GTagRootKind.USER ? '~' : '#',
                 isActive: isSelected,
-                onTap: () => _selectTag(ref, widget.node.id),
+                onTap: () => _selectTag(context, widget.node.path),
               ),
             ),
           ],
@@ -158,8 +170,8 @@ class _RecursiveChild extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer(
       builder: (context, ref, _) {
-        final selected = ref.watch(selectedTagIdProvider);
-        final isSelected = selected == child.id;
+        final selected = ref.watch(currentTagIdProvider);
+        final isSelected = selected == child.path;
         return Padding(
           padding: const EdgeInsets.only(left: 12),
           child: PulseTagRow(
@@ -167,7 +179,7 @@ class _RecursiveChild extends StatelessWidget {
             indent: depth,
             prefix: '·',
             isActive: isSelected,
-            onTap: () => _selectTag(ref, child.id as String),
+            onTap: () => _selectTag(context, child.path as String),
           ),
         );
       },

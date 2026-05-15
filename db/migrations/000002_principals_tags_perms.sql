@@ -19,14 +19,14 @@ INSERT INTO workspace_config (id) VALUES (1) ON CONFLICT DO NOTHING;
 -- principals: every actor in the system. home_tag_id and bound_principal
 -- form a cycle with tags, so the FK is added after both tables exist.
 CREATE TABLE principals (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id            BIGINT PRIMARY KEY DEFAULT gen_id_user(),
   kind          TEXT NOT NULL CHECK (kind IN ('user', 'bot')),
-  home_tag_id   UUID,                               -- FK added below
+  home_tag_id   BIGINT,                              -- FK added below
   status        TEXT NOT NULL DEFAULT 'active'
                  CHECK (status IN ('active', 'tombstoned')),
   global_uri    TEXT NOT NULL UNIQUE,
   display_name  TEXT NOT NULL,
-  email         TEXT,                               -- users only; null for bots
+  email         TEXT,                                -- users only; null for bots
   tombstoned_at TIMESTAMPTZ,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -36,13 +36,15 @@ CREATE UNIQUE INDEX principals_email_idx ON principals (lower(email))
   WHERE email IS NOT NULL AND status = 'active';
 
 -- tags: hierarchy via adjacency list (parent_id) plus a closure table.
+-- slug is constrained to URL-safe lowercase so /feed/t/<slug-path>/ URLs
+-- can be parsed unambiguously and never collide with a typed-ID shape.
 CREATE TABLE tags (
-  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  parent_id       UUID REFERENCES tags(id),
-  slug            TEXT NOT NULL,
+  id              BIGINT PRIMARY KEY DEFAULT gen_id_tag(),
+  parent_id       BIGINT REFERENCES tags(id),
+  slug            TEXT NOT NULL CHECK (slug ~ '^[a-z0-9][a-z0-9-]*$'),
   display_name    TEXT NOT NULL,
   root_kind       TEXT NOT NULL CHECK (root_kind IN ('org', 'user')),
-  bound_principal UUID REFERENCES principals(id),    -- only for user-tag roots
+  bound_principal BIGINT REFERENCES principals(id),  -- only for user-tag roots
   defaults        JSONB NOT NULL DEFAULT '{}',
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
   archived_at     TIMESTAMPTZ,
@@ -78,9 +80,9 @@ ALTER TABLE principals
 -- triggers. Indexed both directions because permission and subscription
 -- queries traverse from descendant to ancestor.
 CREATE TABLE tag_closure (
-  ancestor_id   UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
-  descendant_id UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
-  depth         INT  NOT NULL CHECK (depth >= 0),
+  ancestor_id   BIGINT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  descendant_id BIGINT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  depth         INT    NOT NULL CHECK (depth >= 0),
   PRIMARY KEY (ancestor_id, descendant_id)
 );
 CREATE INDEX tag_closure_descendant_depth_idx
@@ -90,7 +92,7 @@ CREATE INDEX tag_closure_descendant_depth_idx
 -- principal tombstoning so admin tooling can revoke without losing
 -- attribution.
 CREATE TABLE user_credentials (
-  principal_id  UUID PRIMARY KEY REFERENCES principals(id) ON DELETE CASCADE,
+  principal_id  BIGINT PRIMARY KEY REFERENCES principals(id) ON DELETE CASCADE,
   password_hash TEXT,
   totp_secret   TEXT,
   revoked_at    TIMESTAMPTZ,
@@ -100,9 +102,9 @@ CREATE TABLE user_credentials (
 -- bot_credentials: API keys. owner_principal_id captures who owns the bot
 -- (a person), distinct from the principal_id (the bot itself).
 CREATE TABLE bot_credentials (
-  principal_id        UUID PRIMARY KEY REFERENCES principals(id) ON DELETE CASCADE,
+  principal_id        BIGINT PRIMARY KEY REFERENCES principals(id) ON DELETE CASCADE,
   api_key_hash        TEXT NOT NULL,
-  owner_principal_id  UUID REFERENCES principals(id),
+  owner_principal_id  BIGINT REFERENCES principals(id),
   revoked_at          TIMESTAMPTZ,
   created_at          TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -111,12 +113,12 @@ CREATE INDEX bot_credentials_owner_idx ON bot_credentials (owner_principal_id);
 -- tag_grants: principal -> tag membership and bundle. cascade=true means the
 -- grant applies to every descendant tag; cascade=false confines it to depth 0.
 CREATE TABLE tag_grants (
-  tag_id        UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
-  principal_id  UUID NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
+  tag_id        BIGINT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  principal_id  BIGINT NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
   bundle        TEXT NOT NULL CHECK (bundle IN ('viewer', 'contributor', 'moderator', 'owner')),
   extra_perms   TEXT[] NOT NULL DEFAULT '{}',
   cascade       BOOLEAN NOT NULL DEFAULT TRUE,
-  granted_by    UUID REFERENCES principals(id),
+  granted_by    BIGINT REFERENCES principals(id),
   granted_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (tag_id, principal_id)
 );
@@ -125,8 +127,8 @@ CREATE INDEX tag_grants_principal_idx ON tag_grants (principal_id);
 -- subscriptions: principal -> tag firehose preference. Same closure-join
 -- shape as grants for "is principal P subscribed to tag T?".
 CREATE TABLE subscriptions (
-  principal_id   UUID NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
-  tag_id         UUID NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+  principal_id   BIGINT NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
+  tag_id         BIGINT NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
   cascade        BOOLEAN NOT NULL DEFAULT TRUE,
   urgency        TEXT NOT NULL DEFAULT 'normal'
                   CHECK (urgency IN ('high', 'normal', 'low', 'mute')),
@@ -136,13 +138,15 @@ CREATE TABLE subscriptions (
 
 -- audit_events: every mutation writes here. acting_id and effective_id are
 -- the same except during impersonation. diff is action-specific JSON.
+-- target_id is a polymorphic typed-ID — its kind is implicit in the int's
+-- high bits, with target_type carrying the human label.
 CREATE TABLE audit_events (
   id            BIGSERIAL PRIMARY KEY,
-  acting_id     UUID NOT NULL REFERENCES principals(id),
-  effective_id  UUID NOT NULL REFERENCES principals(id),
+  acting_id     BIGINT NOT NULL REFERENCES principals(id),
+  effective_id  BIGINT NOT NULL REFERENCES principals(id),
   action        TEXT NOT NULL,
   target_type   TEXT NOT NULL,
-  target_id     UUID NOT NULL,
+  target_id     BIGINT NOT NULL,
   diff          JSONB,
   reason        TEXT,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()

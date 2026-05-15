@@ -5,13 +5,13 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/comment"
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
 	"github.com/bcnelson/pulse/services/api/internal/post"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 func TestCreateTopLevelAndChild(t *testing.T) {
@@ -110,20 +110,20 @@ func TestEditWritesHistory(t *testing.T) {
 
 // --- helpers ---
 
-func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, name string) uuid.UUID {
+func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, name string) int64 {
 	t.Helper()
-	id := uuid.New()
+	id := ids.New(ids.KindUser)
 	_, err := pool.Exec(context.Background(), `
         INSERT INTO principals (id, kind, status, global_uri, display_name)
         VALUES ($1, 'user', 'active', $2, $3)
-    `, id, "local://principals/"+id.String(), name)
+    `, id, "local://principals/"+ids.FormatID(id), name)
 	if err != nil {
 		t.Fatalf("insert principal: %v", err)
 	}
 	return id
 }
 
-func mustCreateRoot(t *testing.T, svc *tag.Service, slug string) uuid.UUID {
+func mustCreateRoot(t *testing.T, svc *tag.Service, slug string) int64 {
 	t.Helper()
 	id, err := svc.Create(context.Background(), tag.CreateInput{
 		Slug: slug, DisplayName: slug, RootKind: tag.RootKindOrg,

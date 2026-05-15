@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 
 	"github.com/bcnelson/pulse/services/api/internal/auth"
@@ -21,7 +21,7 @@ import (
 // including parent (single hop), direct children, computed path, viewer's
 // permissions, and subscription. Returns nil, nil when the viewer cannot
 // view it (visibility = view permission). Returns nil, error for real errors.
-func (r *Resolver) loadTag(ctx context.Context, id uuid.UUID) (*model.Tag, error) {
+func (r *Resolver) loadTag(ctx context.Context, id int64) (*model.Tag, error) {
 	identity := auth.FromContext(ctx)
 	if identity.IsAnonymous() {
 		return nil, nil
@@ -90,10 +90,73 @@ func (r *Resolver) loadTag(ctx context.Context, id uuid.UUID) (*model.Tag, error
 	return out, nil
 }
 
+// resolveTagRef accepts either a typed Crockford tag id ("T1XB7NE7X7RV")
+// or a slug path ("org/infra") and returns the int64 tag id. Empty
+// strings, malformed inputs, and unresolvable paths all return 0 and
+// nil — callers translate that into "tag not found" at the response
+// boundary. Real errors (DB failure) come back as the second return.
+//
+// Shape detection rule:
+//   - contains `/`  → slug path (multi-segment)
+//   - exactly 12 chars in the Crockford alphabet → typed id
+//   - anything else → treat as a single-segment slug path (root slug)
+//
+// This keeps the GraphQL surface stable while letting callers pass
+// human-readable paths instead of opaque ids.
+func (r *Resolver) resolveTagRef(ctx context.Context, ref string) (int64, error) {
+	if ref == "" {
+		return 0, nil
+	}
+	if strings.Contains(ref, "/") {
+		return r.resolveTagSlugPath(ctx, strings.Split(ref, "/"))
+	}
+	// Try parsing as a typed id; if that fails, fall back to treating it
+	// as a single-segment slug (root tag).
+	if id, err := ids.ParseAs(ids.KindTag, ref); err == nil {
+		return id, nil
+	}
+	return r.resolveTagSlugPath(ctx, []string{ref})
+}
+
+// resolveTagSlugPath walks the slug hierarchy in one recursive CTE and
+// returns the leaf tag id (or 0 if no tag matches the path). Empty path
+// returns 0; the resolver translates that into a nil GraphQL response.
+//
+// SQL plan: anchor against the root row (parent_id IS NULL, slug = $1[1]),
+// then recursively match each next slug against children of the prior
+// match's id. The unique-slug-per-parent index makes each hop O(log N).
+func (r *Resolver) resolveTagSlugPath(ctx context.Context, path []string) (int64, error) {
+	if len(path) == 0 {
+		return 0, nil
+	}
+	row := r.DB.QueryRow(ctx, `
+        WITH RECURSIVE walk(id, depth) AS (
+          SELECT id, 0
+          FROM tags
+          WHERE parent_id IS NULL AND slug = ($1::text[])[1]
+          UNION ALL
+          SELECT t.id, walk.depth + 1
+          FROM tags t
+          JOIN walk ON t.parent_id = walk.id
+          WHERE t.slug = ($1::text[])[walk.depth + 2]
+        )
+        SELECT id FROM walk WHERE depth = array_length($1::text[], 1) - 1
+    `, path)
+	var id int64
+	if err := row.Scan(&id); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return 0, nil
+		}
+		return 0, fmt.Errorf("resolve tag slug path: %w", err)
+	}
+	return id, nil
+}
+
 // loadTagShallow returns the model with no children/parent/permissions —
-// just the structural fields. Used for hydrating the parent pointer.
-// Goes through the per-request loader cache when available.
-func (r *Resolver) loadTagShallow(ctx context.Context, id uuid.UUID) (*model.Tag, error) {
+// just the structural fields plus the computed path. Used for hydrating
+// the parent pointer. Goes through the per-request loader cache when
+// available.
+func (r *Resolver) loadTagShallow(ctx context.Context, id int64) (*model.Tag, error) {
 	if l := loaders.FromContext(ctx); l != nil {
 		row, err := l.Tags.Get(ctx, id)
 		if err != nil {
@@ -102,7 +165,7 @@ func (r *Resolver) loadTagShallow(ctx context.Context, id uuid.UUID) (*model.Tag
 		if row == nil {
 			return nil, nil
 		}
-		return r.shallowFromLoader(row), nil
+		return r.shallowFromLoader(ctx, row)
 	}
 
 	var t tagRow
@@ -118,11 +181,14 @@ func (r *Resolver) loadTagShallow(ctx context.Context, id uuid.UUID) (*model.Tag
 	}
 	out := r.toModelTag(t)
 	out.MyPermissions = &model.TagPermissions{Extras: []string{}}
+	if out.Path, err = r.computePath(ctx, t.id); err != nil {
+		return nil, err
+	}
 	return out, nil
 }
 
 // shallowFromLoader builds a Tag model from a loaders.TagRow.
-func (r *Resolver) shallowFromLoader(row *loaders.TagRow) *model.Tag {
+func (r *Resolver) shallowFromLoader(ctx context.Context, row *loaders.TagRow) (*model.Tag, error) {
 	t := tagRow{
 		id: row.ID, parentID: row.ParentID, slug: row.Slug,
 		displayName: row.DisplayName, rootKind: row.RootKind,
@@ -130,10 +196,24 @@ func (r *Resolver) shallowFromLoader(row *loaders.TagRow) *model.Tag {
 	}
 	out := r.toModelTag(t)
 	out.MyPermissions = &model.TagPermissions{Extras: []string{}}
-	return out
+	path, err := r.computePath(ctx, t.id)
+	if err != nil {
+		return nil, err
+	}
+	out.Path = path
+	return out, nil
 }
 
-func (r *Resolver) loadVisibleChildren(ctx context.Context, parentID, viewer uuid.UUID) ([]*model.Tag, error) {
+// loadVisibleChildren returns each child of parentID that the viewer can
+// see. Path is computed inline: every child's path is `parentPath +
+// "/" + child.slug`, so one extra SELECT (for parentPath) covers the
+// whole batch rather than N separate computePath calls.
+func (r *Resolver) loadVisibleChildren(ctx context.Context, parentID, viewer int64) ([]*model.Tag, error) {
+	parentPath, err := r.computePath(ctx, parentID)
+	if err != nil {
+		return nil, err
+	}
+
 	rows, err := r.DB.Query(ctx, `
         SELECT id, parent_id, slug, display_name, root_kind, defaults, archived_at, created_at
         FROM tags
@@ -161,6 +241,11 @@ func (r *Resolver) loadVisibleChildren(ctx context.Context, parentID, viewer uui
 		}
 		m := r.toModelTag(t)
 		m.MyPermissions = &model.TagPermissions{Extras: []string{}}
+		if parentPath == "" {
+			m.Path = t.slug
+		} else {
+			m.Path = parentPath + "/" + t.slug
+		}
 		children = append(children, m)
 	}
 	if err := rows.Err(); err != nil {
@@ -172,7 +257,7 @@ func (r *Resolver) loadVisibleChildren(ctx context.Context, parentID, viewer uui
 	return children, nil
 }
 
-func (r *Resolver) computePath(ctx context.Context, leaf uuid.UUID) (string, error) {
+func (r *Resolver) computePath(ctx context.Context, leaf int64) (string, error) {
 	rows, err := r.DB.Query(ctx, `
         SELECT t.slug
         FROM tag_closure c
@@ -209,7 +294,7 @@ func joinPath(parts []string) string {
 	return out
 }
 
-func (r *Resolver) loadSubscription(ctx context.Context, principal, tagID uuid.UUID) (*model.TagSubscription, error) {
+func (r *Resolver) loadSubscription(ctx context.Context, principal, tagID int64) (*model.TagSubscription, error) {
 	var cascade bool
 	var urgency string
 	var reasonFilter []string
@@ -262,8 +347,8 @@ func hasExtra(extras []string, want string) bool {
 // --- mapping ---
 
 type tagRow struct {
-	id          uuid.UUID
-	parentID    *uuid.UUID
+	id          int64
+	parentID    *int64
 	slug        string
 	displayName string
 	rootKind    string
@@ -282,8 +367,8 @@ func (r *Resolver) toModelTag(t tagRow) *model.Tag {
 		defaults = string(t.defaults)
 	}
 	out := &model.Tag{
-		ID:          t.id.String(),
-		GlobalURI:   ids.URI("tags", t.id),
+		ID:          ids.FormatID(t.id),
+		GlobalURI:   ids.URI(ids.KindTag, t.id),
 		Slug:        t.slug,
 		DisplayName: t.displayName,
 		RootKind:    mapRootKindDBToGQL(t.rootKind),

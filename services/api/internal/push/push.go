@@ -14,7 +14,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/google/uuid"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -62,7 +62,7 @@ type Service struct {
 // Register inserts (or refreshes) a (principal, token) pair. Idempotent
 // on the unique key — re-registering bumps last_seen_at so stale-token
 // reapers can prune the long-tail.
-func (s *Service) Register(ctx context.Context, principal uuid.UUID, token, platform string) error {
+func (s *Service) Register(ctx context.Context, principal int64, token, platform string) error {
 	if token == "" {
 		return fmt.Errorf("push: token required")
 	}
@@ -82,7 +82,7 @@ func (s *Service) Register(ctx context.Context, principal uuid.UUID, token, plat
 }
 
 // Unregister removes a token. Idempotent.
-func (s *Service) Unregister(ctx context.Context, principal uuid.UUID, token string) error {
+func (s *Service) Unregister(ctx context.Context, principal int64, token string) error {
 	_, err := s.DB.Exec(ctx,
 		`DELETE FROM device_tokens WHERE principal_id = $1 AND token = $2`,
 		principal, token)
@@ -93,11 +93,11 @@ func (s *Service) Unregister(ctx context.Context, principal uuid.UUID, token str
 // token registered to its recipient. Skipped silently when no provider
 // is configured, no tokens exist, or urgency != high (the fan-out
 // worker filters before calling).
-func (s *Service) Dispatch(ctx context.Context, notificationID uuid.UUID, title, body string) error {
+func (s *Service) Dispatch(ctx context.Context, notificationID int64, title, body string) error {
 	if s.Provider == nil {
 		return nil
 	}
-	var recipient uuid.UUID
+	var recipient int64
 	if err := s.DB.QueryRow(ctx,
 		`SELECT recipient_id FROM notifications WHERE id = $1`, notificationID).
 		Scan(&recipient); err != nil {
@@ -117,7 +117,7 @@ func (s *Service) Dispatch(ctx context.Context, notificationID uuid.UUID, title,
 		msg := Message{
 			Token: token, Platform: platform,
 			Title: title, Body: body,
-			Data: map[string]string{"notification_id": notificationID.String()},
+			Data: map[string]string{"notification_id": ids.FormatID(notificationID)},
 		}
 		if err := s.Provider.Send(ctx, msg); err != nil {
 			if s.Logger != nil {

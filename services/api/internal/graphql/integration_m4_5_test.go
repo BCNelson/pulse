@@ -18,6 +18,7 @@ import (
 	"github.com/bcnelson/pulse/services/api/internal/search"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
 	"github.com/bcnelson/pulse/services/api/internal/task"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // TestM4_5BootstrapToFeed exercises the full bootstrap → login → feed
@@ -74,7 +75,7 @@ func TestM4_5BootstrapToFeed(t *testing.T) {
 		resp := gqlPost(t, ts.URL, tok, `
             mutation($t:ID!, $title:String!) {
               createPost(input:{ title:$title, body:"sample body", tags:[{tagId:$t}] }) { id }
-            }`, map[string]any{"t": res.OrgTagID.String(), "title": "post-" + string(rune('A'+i))})
+            }`, map[string]any{"t": ids.FormatID(res.OrgTagID), "title": "post-" + string(rune('A'+i))})
 		assertNoErrors(t, resp)
 	}
 
@@ -86,7 +87,7 @@ func TestM4_5BootstrapToFeed(t *testing.T) {
               edges { node { title author { displayName } reactions { emoji } tags { tag { slug } } } }
             }
           }
-        }`, map[string]any{"t": res.OrgTagID.String()})
+        }`, map[string]any{"t": ids.FormatID(res.OrgTagID)})
 	assertNoErrors(t, resp)
 
 	edges := resp.path("data", "tag", "posts", "edges").([]any)

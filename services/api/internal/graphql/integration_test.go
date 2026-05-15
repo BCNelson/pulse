@@ -12,7 +12,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/transport"
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/audit"
@@ -21,6 +20,7 @@ import (
 	"github.com/bcnelson/pulse/services/api/internal/perm"
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // TestM1EndToEnd exercises the M1 GraphQL surface end-to-end: login,
@@ -56,8 +56,8 @@ func TestM1EndToEnd(t *testing.T) {
 		t.Fatal("no token issued")
 	}
 	viewerID := loginResp.path("data", "login", "viewer", "id").(string)
-	if viewerID != alice.String() {
-		t.Errorf("viewer id: want %s got %s", alice, viewerID)
+	if viewerID != ids.FormatID(alice) {
+		t.Errorf("viewer id: want %s got %s", ids.FormatID(alice), viewerID)
 	}
 
 	// viewer query, with the token.
@@ -68,9 +68,9 @@ func TestM1EndToEnd(t *testing.T) {
 	}
 
 	// tag(id: rootID) returns the root with myPermissions.canOwn true.
-	tagResp := gqlPost(t, ts.URL, token, `query($id:ID!){ tag(id:$id){ id slug myPermissions { bundle canView canOwn } } }`, map[string]any{"id": rootID.String()})
+	tagResp := gqlPost(t, ts.URL, token, `query($id:ID!){ tag(id:$id){ id slug myPermissions { bundle canView canOwn } } }`, map[string]any{"id": ids.FormatID(rootID)})
 	assertNoErrors(t, tagResp)
-	if got := tagResp.path("data", "tag", "id"); got != rootID.String() {
+	if got := tagResp.path("data", "tag", "id"); got != ids.FormatID(rootID) {
 		t.Errorf("tag id: %v", got)
 	}
 	if got := tagResp.path("data", "tag", "myPermissions", "canOwn"); got != true {
@@ -81,7 +81,7 @@ func TestM1EndToEnd(t *testing.T) {
 	createResp := gqlPost(t, ts.URL, token, `
         mutation($parent:ID!) {
           createTag(input:{parentId:$parent, slug:"team-a", displayName:"Team A"}) { id slug }
-        }`, map[string]any{"parent": rootID.String()})
+        }`, map[string]any{"parent": ids.FormatID(rootID)})
 	assertNoErrors(t, createResp)
 	teamAID := createResp.path("data", "createTag", "id").(string)
 	if teamAID == "" {
@@ -92,7 +92,7 @@ func TestM1EndToEnd(t *testing.T) {
 	createBResp := gqlPost(t, ts.URL, token, `
         mutation($parent:ID!) {
           createTag(input:{parentId:$parent, slug:"team-b", displayName:"Team B"}) { id }
-        }`, map[string]any{"parent": rootID.String()})
+        }`, map[string]any{"parent": ids.FormatID(rootID)})
 	assertNoErrors(t, createBResp)
 	teamBID := createBResp.path("data", "createTag", "id").(string)
 
@@ -107,7 +107,7 @@ func TestM1EndToEnd(t *testing.T) {
 	err = pool.QueryRow(context.Background(), `
         SELECT COUNT(*) FROM audit_events
         WHERE action = 'tag.move' AND target_id = $1 AND reason = 'reorg'
-    `, uuid.MustParse(teamAID)).Scan(&auditCount)
+    `, ids.MustParseAs(ids.KindTag, teamAID)).Scan(&auditCount)
 	if err != nil {
 		t.Fatalf("read audit: %v", err)
 	}
@@ -194,10 +194,10 @@ func assertNoErrors(t *testing.T, r gqlResponse) {
 	}
 }
 
-func mustSeedUser(t *testing.T, pool *pgxpool.Pool, authSvc *auth.Service, email, displayName, password string) uuid.UUID {
+func mustSeedUser(t *testing.T, pool *pgxpool.Pool, authSvc *auth.Service, email, displayName, password string) int64 {
 	t.Helper()
-	id := uuid.New()
-	uri := "local://principals/" + id.String()
+	id := ids.New(ids.KindUser)
+	uri := "local://principals/" + ids.FormatID(id)
 	_, err := pool.Exec(context.Background(), `
         INSERT INTO principals (id, kind, status, global_uri, display_name, email)
         VALUES ($1, 'user', 'active', $2, $3, $4)
@@ -218,7 +218,7 @@ func mustSeedUser(t *testing.T, pool *pgxpool.Pool, authSvc *auth.Service, email
 	return id
 }
 
-func mustGrant(t *testing.T, pool *pgxpool.Pool, tagID, principalID uuid.UUID, bundle string, cascade bool) {
+func mustGrant(t *testing.T, pool *pgxpool.Pool, tagID, principalID int64, bundle string, cascade bool) {
 	t.Helper()
 	_, err := pool.Exec(context.Background(), `
         INSERT INTO tag_grants (tag_id, principal_id, bundle, cascade)

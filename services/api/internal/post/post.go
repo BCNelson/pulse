@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -28,7 +27,7 @@ type Service struct {
 // TagAttachment captures the per-post role-flag overrides on a tag. All
 // flags default to true at insertion if omitted.
 type TagAttachment struct {
-	TagID        uuid.UUID
+	TagID        int64
 	ViewRole     bool
 	InteractRole bool
 	ModerateRole bool
@@ -37,11 +36,11 @@ type TagAttachment struct {
 // CreateInput is the payload for createPost. AuthorID is the principal
 // the post will be attributed to — typically the viewer's effective id.
 type CreateInput struct {
-	AuthorID uuid.UUID
+	AuthorID int64
 	Title    string
 	Body     string
 	Tags     []TagAttachment
-	Mentions []uuid.UUID
+	Mentions []int64
 	Decision *string // 'decision' | 'answer' | nil
 	DenyFlag bool
 }
@@ -51,10 +50,10 @@ type CreateInput struct {
 // mentions are loaded separately so callers don't pay for them when not
 // requested.
 type Post struct {
-	ID             uuid.UUID
+	ID             int64
 	Title          string
 	Body           string
-	AuthorID       uuid.UUID
+	AuthorID       int64
 	DecisionStatus *string
 	DenyFlag       bool
 	CreatedAt      anyTime
@@ -66,11 +65,11 @@ type anyTime = anyTimeImpl
 
 // Create inserts a post with its tags and mentions in a single transaction.
 // At least one tag is required — a post with no tags would be invisible.
-func (s *Service) Create(ctx context.Context, in CreateInput) (uuid.UUID, error) {
+func (s *Service) Create(ctx context.Context, in CreateInput) (int64, error) {
 	if len(in.Tags) == 0 {
-		return uuid.Nil, ErrNoTags
+		return int64(0), ErrNoTags
 	}
-	var id uuid.UUID
+	var id int64
 	err := s.runInTx(ctx, func(tx pgx.Tx) error {
 		row := tx.QueryRow(ctx, `
             INSERT INTO posts (title, body, author_id, decision_status, deny_flag)
@@ -103,7 +102,7 @@ func (s *Service) Create(ctx context.Context, in CreateInput) (uuid.UUID, error)
 
 // Get returns the post by id, or ErrNotFound. Soft-deleted posts are
 // returned with DeletedAt set; callers decide whether to surface them.
-func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Post, error) {
+func (s *Service) Get(ctx context.Context, id int64) (*Post, error) {
 	row := s.DB.QueryRow(ctx, `
         SELECT id, title, body, author_id, decision_status, deny_flag, created_at, edited_at, deleted_at
         FROM posts WHERE id = $1
@@ -121,7 +120,7 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Post, error) {
 // Edit snapshots the prior title/body to post_edits and updates the row.
 // If neither field changed, returns ErrAlreadyEdited so the caller can
 // avoid a no-op audit row.
-func (s *Service) Edit(ctx context.Context, id, editor uuid.UUID, title, body string) error {
+func (s *Service) Edit(ctx context.Context, id, editor int64, title, body string) error {
 	return s.runInTx(ctx, func(tx pgx.Tx) error {
 		var prevTitle, prevBody string
 		err := tx.QueryRow(ctx,
@@ -153,7 +152,7 @@ func (s *Service) Edit(ctx context.Context, id, editor uuid.UUID, title, body st
 
 // Delete soft-deletes a post (deleted_at = now()). Comments and reactions
 // remain in place for archival; reads filter on deleted_at IS NULL.
-func (s *Service) Delete(ctx context.Context, id uuid.UUID) error {
+func (s *Service) Delete(ctx context.Context, id int64) error {
 	tag, err := s.DB.Exec(ctx,
 		`UPDATE posts SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
 	if err != nil {
@@ -165,7 +164,7 @@ func (s *Service) Delete(ctx context.Context, id uuid.UUID) error {
 	return nil
 }
 
-func (s *Service) SetDecisionStatus(ctx context.Context, id uuid.UUID, status *string) error {
+func (s *Service) SetDecisionStatus(ctx context.Context, id int64, status *string) error {
 	if status != nil && *status != "decision" && *status != "answer" {
 		return fmt.Errorf("post: invalid decision status %q", *status)
 	}
@@ -180,7 +179,7 @@ func (s *Service) SetDecisionStatus(ctx context.Context, id uuid.UUID, status *s
 	return nil
 }
 
-func (s *Service) SetDenyFlag(ctx context.Context, id uuid.UUID, deny bool) error {
+func (s *Service) SetDenyFlag(ctx context.Context, id int64, deny bool) error {
 	tag, err := s.DB.Exec(ctx,
 		`UPDATE posts SET deny_flag = $1 WHERE id = $2`, deny, id)
 	if err != nil {
@@ -193,7 +192,7 @@ func (s *Service) SetDenyFlag(ctx context.Context, id uuid.UUID, deny bool) erro
 }
 
 // React adds (or refreshes) a (post, principal, emoji) reaction. Idempotent.
-func (s *Service) React(ctx context.Context, id, principal uuid.UUID, emoji string) error {
+func (s *Service) React(ctx context.Context, id, principal int64, emoji string) error {
 	_, err := s.DB.Exec(ctx, `
         INSERT INTO post_reactions (post_id, principal_id, emoji)
         VALUES ($1, $2, $3)
@@ -203,7 +202,7 @@ func (s *Service) React(ctx context.Context, id, principal uuid.UUID, emoji stri
 }
 
 // Unreact removes a (post, principal, emoji) reaction.
-func (s *Service) Unreact(ctx context.Context, id, principal uuid.UUID, emoji string) error {
+func (s *Service) Unreact(ctx context.Context, id, principal int64, emoji string) error {
 	_, err := s.DB.Exec(ctx, `
         DELETE FROM post_reactions WHERE post_id = $1 AND principal_id = $2 AND emoji = $3
     `, id, principal, emoji)
@@ -212,7 +211,7 @@ func (s *Service) Unreact(ctx context.Context, id, principal uuid.UUID, emoji st
 
 // ReactionTally returns per-emoji counts and the viewer's own reactions
 // in a single trip. Used by the GraphQL Post.reactions field.
-func (s *Service) ReactionTally(ctx context.Context, id, viewer uuid.UUID) ([]EmojiCount, error) {
+func (s *Service) ReactionTally(ctx context.Context, id, viewer int64) ([]EmojiCount, error) {
 	rows, err := s.DB.Query(ctx, `
         SELECT emoji, COUNT(*)::INT, BOOL_OR(principal_id = $2) AS by_viewer
         FROM post_reactions
@@ -246,7 +245,7 @@ type EmojiCount struct {
 // the timestamp is the current server time. The stored value is clamped
 // with GREATEST so a stale-client timestamp or clock skew can never move
 // the read mark backwards.
-func (s *Service) MarkRead(ctx context.Context, id, principal uuid.UUID, seenAt *time.Time) error {
+func (s *Service) MarkRead(ctx context.Context, id, principal int64, seenAt *time.Time) error {
 	_, err := s.DB.Exec(ctx, `
         INSERT INTO principal_post_read (principal_id, post_id, last_read_at)
         VALUES ($1, $2, COALESCE($3, now()))
@@ -257,7 +256,7 @@ func (s *Service) MarkRead(ctx context.Context, id, principal uuid.UUID, seenAt 
 }
 
 // TagAttachments returns the post's tag rows for resolver shaping.
-func (s *Service) TagAttachments(ctx context.Context, id uuid.UUID) ([]TagRow, error) {
+func (s *Service) TagAttachments(ctx context.Context, id int64) ([]TagRow, error) {
 	rows, err := s.DB.Query(ctx, `
         SELECT tag_id, view_role, interact_role, moderate_role
         FROM post_tags WHERE post_id = $1
@@ -278,23 +277,23 @@ func (s *Service) TagAttachments(ctx context.Context, id uuid.UUID) ([]TagRow, e
 }
 
 type TagRow struct {
-	TagID        uuid.UUID
+	TagID        int64
 	ViewRole     bool
 	InteractRole bool
 	ModerateRole bool
 }
 
 // Mentions returns the principal ids mentioned in this post.
-func (s *Service) Mentions(ctx context.Context, id uuid.UUID) ([]uuid.UUID, error) {
+func (s *Service) Mentions(ctx context.Context, id int64) ([]int64, error) {
 	rows, err := s.DB.Query(ctx,
 		`SELECT principal_id FROM post_mentions WHERE post_id = $1`, id)
 	if err != nil {
 		return nil, fmt.Errorf("load mentions: %w", err)
 	}
 	defer rows.Close()
-	var out []uuid.UUID
+	var out []int64
 	for rows.Next() {
-		var p uuid.UUID
+		var p int64
 		if err := rows.Scan(&p); err != nil {
 			return nil, err
 		}
@@ -306,7 +305,7 @@ func (s *Service) Mentions(ctx context.Context, id uuid.UUID) ([]uuid.UUID, erro
 // ListByTag returns posts attached to tagID, paginated by created_at DESC.
 // The caller passes the visibility predicate as already-checked: this
 // function does *not* perform a perm check.
-func (s *Service) ListByTag(ctx context.Context, tagID uuid.UUID, limit int) ([]*Post, error) {
+func (s *Service) ListByTag(ctx context.Context, tagID int64, limit int) ([]*Post, error) {
 	if limit <= 0 || limit > 100 {
 		limit = 50
 	}
@@ -336,7 +335,7 @@ func (s *Service) ListByTag(ctx context.Context, tagID uuid.UUID, limit int) ([]
 // ExtractMentionsJSON is a debug aid for callers that want to round-trip
 // a mention list through a JSONB column for audit_events.diff. Not used
 // by the normal flow.
-func ExtractMentionsJSON(mentions []uuid.UUID) (json.RawMessage, error) {
+func ExtractMentionsJSON(mentions []int64) (json.RawMessage, error) {
 	if len(mentions) == 0 {
 		return json.RawMessage(`[]`), nil
 	}

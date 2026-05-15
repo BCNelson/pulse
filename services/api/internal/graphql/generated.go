@@ -291,6 +291,7 @@ type ComplexityRoot struct {
 		SearchTags               func(childComplexity int, query string, first *int) int
 		ServerTime               func(childComplexity int) int
 		Tag                      func(childComplexity int, id string) int
+		TagBySlugPath            func(childComplexity int, path []string) int
 		Task                     func(childComplexity int, id string) int
 		Viewer                   func(childComplexity int) int
 		ViewerImpersonationState func(childComplexity int) int
@@ -491,6 +492,7 @@ type QueryResolver interface {
 	ServerTime(ctx context.Context) (*time.Time, error)
 	Viewer(ctx context.Context) (*model.User, error)
 	Tag(ctx context.Context, id string) (*model.Tag, error)
+	TagBySlugPath(ctx context.Context, path []string) (*model.Tag, error)
 	Post(ctx context.Context, id string) (*model.Post, error)
 	Task(ctx context.Context, id string) (*model.Task, error)
 	ChatRoom(ctx context.Context, id string) (*model.ChatRoom, error)
@@ -1886,6 +1888,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.Tag(childComplexity, args["id"].(string)), true
+	case "Query.tagBySlugPath":
+		if e.ComplexityRoot.Query.TagBySlugPath == nil {
+			break
+		}
+
+		args, err := ec.field_Query_tagBySlugPath_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.TagBySlugPath(childComplexity, args["path"].([]string)), true
 	case "Query.task":
 		if e.ComplexityRoot.Query.Task == nil {
 			break
@@ -2871,6 +2884,13 @@ type Query {
   viewer: User
 
   tag(id: ID!): Tag
+  """
+  Resolve a tag by walking its slug hierarchy. path is the ordered list
+  of slugs from root to leaf (e.g. ["programming", "rust"]). Returns
+  null if no tag exists at that path. Used by the mobile client to map
+  /feed/t/<slug>/<slug>/... URLs back to a tag entity.
+  """
+  tagBySlugPath(path: [String!]!): Tag
   post(id: ID!): Post
   task(id: ID!): Task
   chatRoom(id: ID!): ChatRoom
@@ -4949,6 +4969,20 @@ func (ec *executionContext) field_Query_search_args(ctx context.Context, rawArgs
 		return nil, err
 	}
 	args["first"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_tagBySlugPath_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "path",
+		func(ctx context.Context, v any) ([]string, error) {
+			return ec.unmarshalNString2ᚕstringᚄ(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["path"] = arg0
 	return args, nil
 }
 
@@ -10515,6 +10549,50 @@ func (ec *executionContext) fieldContext_Query_tag(ctx context.Context, field gr
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_tag_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_tagBySlugPath(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_tagBySlugPath(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().TagBySlugPath(ctx, fc.Args["path"].([]string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.Tag) graphql.Marshaler {
+			return ec.marshalOTag2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐTag(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Query_tagBySlugPath(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Tag(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_tagBySlugPath_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -16722,6 +16800,25 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 					}
 				}()
 				res = ec._Query_tag(ctx, field)
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "tagBySlugPath":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_tagBySlugPath(ctx, field)
 				return res
 			}
 

@@ -1,0 +1,52 @@
+{
+  "_": "Shared codec golden vectors. Consumed by Go and Dart codec tests.",
+  "alphabet": "0123456789ABCDEFGHJKMNPQRSTVWXYZ",
+  "kinds": {
+    "attachment": 10,
+    "comment": 12,
+    "device": 13,
+    "job": 18,
+    "task": 19,
+    "impersonation": 20,
+    "notification": 21,
+    "post": 22,
+    "room": 24,
+    "session": 25,
+    "tag": 26,
+    "user": 27,
+    "workspace": 28
+  },
+  "roundTrips": [
+    { "kind": 22, "body": 0, "int": 792633534417207296, "str": "P00000000000" },
+    { "kind": 12, "body": 0, "int": 432345564227567616, "str": "C00000000000" },
+    { "kind": 26, "body": 0, "int": 936748722493063168, "str": "T00000000000" },
+    { "kind": 24, "body": 0, "int": 864691128455135232, "str": "R00000000000" },
+    { "kind": 27, "body": 0, "int": 972777519512027136, "str": "V00000000000" },
+    { "kind": 22, "body": 2158604870131483, "int": 794792139287338779, "str": "P1XB7NE7X7RV" },
+    { "kind": 22, "body": 1, "int": 792633534417207297, "str": "P00000000001" },
+    { "kind": 22, "body": 36028797018963967, "int": 828662331436171263, "str": "PZZZZZZZZZZZ" }
+  ],
+  "lowercaseEquivalents": [
+    { "canonical": "P1XB7NE7X7RV", "variant": "p1xb7ne7x7rv" }
+  ],
+  "substitutions": [
+    { "_": "I, L → 1; O → 0",
+      "canonical": "P00000000001",
+      "variants": ["P0000000000I", "P0000000000L", "p0000000000i", "p0000000000l"] },
+    { "canonical": "P00000000010",
+      "variants": ["P000000000I0", "P000000000L0", "P0000000001O"] }
+  ],
+  "rejections": [
+    { "input": "", "reason": "wrong length" },
+    { "input": "P00000000000X", "reason": "wrong length (13)" },
+    { "input": "P0000000000", "reason": "wrong length (11)" },
+    { "input": "P!0000000000", "reason": "invalid char" },
+    { "input": "PU0000000000", "reason": "Crockford-excluded U as body char" },
+    { "input": "U00000000000", "reason": "Crockford-excluded U as kind letter (rejected at decode)" }
+  ],
+  "unregisteredKinds": [
+    { "input": "X00000000000", "_": "X=29 is in Crockford alphabet but not a registered kind" },
+    { "input": "000000000000", "_": "kind 0 is reserved" },
+    { "input": "100000000000", "_": "kind 1 is reserved" }
+  ]
+}

@@ -5,10 +5,9 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
 	"github.com/bcnelson/pulse/services/api/internal/push"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // recordingProvider captures every Send call so tests can assert.
@@ -35,11 +34,11 @@ func TestRegisterAndDispatch(t *testing.T) {
 	ctx := context.Background()
 
 	// Seed a principal.
-	principalID := uuid.New()
+	principalID := ids.New(ids.KindUser)
 	if _, err := pool.Exec(ctx, `
         INSERT INTO principals (id, kind, status, global_uri, display_name, email)
         VALUES ($1, 'user', 'active', $2, 'Alice', 'a@example.com')
-    `, principalID, "local://principals/"+principalID.String()); err != nil {
+    `, principalID, "local://principals/"+ids.FormatID(principalID)); err != nil {
 		t.Fatalf("seed: %v", err)
 	}
 
@@ -55,11 +54,11 @@ func TestRegisterAndDispatch(t *testing.T) {
 	}
 
 	// Insert a notification row to dispatch against.
-	notifID := uuid.New()
+	notifID := ids.New(ids.KindUser)
 	if _, err := pool.Exec(ctx, `
         INSERT INTO notifications (id, recipient_id, reason, urgency, source_type, source_id)
         VALUES ($1, $2, 'mention', 'high', 'post', $3)
-    `, notifID, principalID, uuid.New()); err != nil {
+    `, notifID, principalID, ids.New(ids.KindUser)); err != nil {
 		t.Fatalf("insert notif: %v", err)
 	}
 	if err := svc.Dispatch(ctx, notifID, "Title", "Body"); err != nil {
@@ -100,7 +99,7 @@ func TestRegisterAndDispatch(t *testing.T) {
 func TestRegisterRejectsBadPlatform(t *testing.T) {
 	pool := pgtest.Pool(t)
 	svc := &push.Service{DB: pool}
-	if err := svc.Register(context.Background(), uuid.New(), "tok", "windows"); err == nil {
+	if err := svc.Register(context.Background(), ids.New(ids.KindUser), "tok", "windows"); err == nil {
 		t.Error("expected platform error")
 	}
 }

@@ -8,10 +8,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	graphqlModel "github.com/bcnelson/pulse/services/api/internal/graphql/model"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // errPermissionDenied is the typed error every mutation returns when the
@@ -34,7 +33,7 @@ func requireIdentity(ctx context.Context) (auth.Identity, error) {
 // tag move induces. M1 form: walks principals affected by either subtree
 // and records their current bundle. M5 sharpens this into a precise
 // before/after diff once the impersonation audit trail demands it.
-func (r *Resolver) computePermissionDiff(ctx context.Context, src, dst uuid.UUID) ([]map[string]string, []map[string]string, error) {
+func (r *Resolver) computePermissionDiff(ctx context.Context, src, dst int64) ([]map[string]string, []map[string]string, error) {
 	rows, err := r.DB.Query(ctx, `
         WITH affected_principals AS (
           SELECT DISTINCT g.principal_id
@@ -50,9 +49,9 @@ func (r *Resolver) computePermissionDiff(ctx context.Context, src, dst uuid.UUID
 		return nil, nil, err
 	}
 	defer rows.Close()
-	var principals []uuid.UUID
+	var principals []int64
 	for rows.Next() {
-		var pid uuid.UUID
+		var pid int64
 		if err := rows.Scan(&pid); err != nil {
 			return nil, nil, err
 		}
@@ -65,7 +64,7 @@ func (r *Resolver) computePermissionDiff(ctx context.Context, src, dst uuid.UUID
 		if err != nil {
 			return nil, nil, err
 		}
-		entry := map[string]string{"principal_id": pid.String(), "bundle": string(bundle)}
+		entry := map[string]string{"principal_id": ids.FormatID(pid), "bundle": string(bundle)}
 		gained = append(gained, entry)
 	}
 	return gained, lost, nil
@@ -95,7 +94,7 @@ func WithToken(ctx context.Context, token string) context.Context {
 
 type cursor struct {
 	CreatedAt time.Time `json:"t"`
-	ID        uuid.UUID `json:"i"`
+	ID        int64     `json:"i"`
 }
 
 func encodeCursor(c cursor) string {

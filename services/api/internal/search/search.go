@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -35,17 +34,17 @@ const (
 // Hit is a single search result. Title is empty for non-post hits.
 type Hit struct {
 	Kind      Kind
-	ID        uuid.UUID
+	ID        int64
 	Title     string
 	Body      string
-	AuthorID  uuid.UUID
+	AuthorID  int64
 	Score     float64
 	CreatedAt time.Time
 }
 
 // TagHit is a fuzzy tag-name match.
 type TagHit struct {
-	ID          uuid.UUID
+	ID          int64
 	Slug        string
 	DisplayName string
 	Similarity  float64
@@ -56,7 +55,7 @@ var ErrEmptyQuery = errors.New("search: query is required")
 // Search runs an FTS query across posts and comments, filtered to what
 // the viewer can see, ranked by ts_rank_cd × recency. kinds restricts
 // the output to a subset; nil/empty returns all kinds.
-func (s *Service) Search(ctx context.Context, viewer uuid.UUID, query string, kinds []Kind, limit int) ([]Hit, error) {
+func (s *Service) Search(ctx context.Context, viewer int64, query string, kinds []Kind, limit int) ([]Hit, error) {
 	query = strings.TrimSpace(query)
 	if query == "" {
 		return nil, ErrEmptyQuery
@@ -104,7 +103,7 @@ func (s *Service) Search(ctx context.Context, viewer uuid.UUID, query string, ki
 
 // SearchTags performs a trigram-similarity fuzzy match against tag slugs
 // and display names. Filtered through the viewer's tag visibility.
-func (s *Service) SearchTags(ctx context.Context, viewer uuid.UUID, query string, limit int) ([]TagHit, error) {
+func (s *Service) SearchTags(ctx context.Context, viewer int64, query string, limit int) ([]TagHit, error) {
 	query = strings.TrimSpace(query)
 	if query == "" {
 		return nil, ErrEmptyQuery

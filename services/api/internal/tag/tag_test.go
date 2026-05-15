@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
@@ -40,7 +39,7 @@ func TestCreateChildTagsAndClosure(t *testing.T) {
 	billing := mustCreateChild(t, svc, backend, "billing")
 
 	// root is ancestor of itself, backend, billing
-	wantPairs := map[[2]uuid.UUID]int{
+	wantPairs := map[[2]int64]int{
 		{root, root}:       0,
 		{backend, backend}: 0,
 		{billing, billing}: 0,
@@ -51,11 +50,11 @@ func TestCreateChildTagsAndClosure(t *testing.T) {
 	for pair, wantDepth := range wantPairs {
 		gotDepth, ok := readDepth(t, pool, pair[0], pair[1])
 		if !ok {
-			t.Errorf("missing closure edge ancestor=%s descendant=%s", pair[0], pair[1])
+			t.Errorf("missing closure edge ancestor=%d descendant=%d", pair[0], pair[1])
 			continue
 		}
 		if gotDepth != wantDepth {
-			t.Errorf("ancestor=%s descendant=%s: depth want=%d got=%d", pair[0], pair[1], wantDepth, gotDepth)
+			t.Errorf("ancestor=%d descendant=%d: depth want=%d got=%d", pair[0], pair[1], wantDepth, gotDepth)
 		}
 	}
 }
@@ -225,7 +224,7 @@ func TestStressBranchingTree(t *testing.T) {
 
 // --- helpers ---
 
-func mustCreateRoot(t *testing.T, svc *tag.Service, slug string) uuid.UUID {
+func mustCreateRoot(t *testing.T, svc *tag.Service, slug string) int64 {
 	t.Helper()
 	id, err := svc.Create(context.Background(), tag.CreateInput{
 		Slug:        slug,
@@ -238,7 +237,7 @@ func mustCreateRoot(t *testing.T, svc *tag.Service, slug string) uuid.UUID {
 	return id
 }
 
-func mustCreateChild(t *testing.T, svc *tag.Service, parent uuid.UUID, slug string) uuid.UUID {
+func mustCreateChild(t *testing.T, svc *tag.Service, parent int64, slug string) int64 {
 	t.Helper()
 	p := parent
 	id, err := svc.Create(context.Background(), tag.CreateInput{
@@ -248,12 +247,12 @@ func mustCreateChild(t *testing.T, svc *tag.Service, parent uuid.UUID, slug stri
 		RootKind:    tag.RootKindOrg,
 	})
 	if err != nil {
-		t.Fatalf("create child %q under %s: %v", slug, parent, err)
+		t.Fatalf("create child %q under %d: %v", slug, parent, err)
 	}
 	return id
 }
 
-func readDepth(t *testing.T, pool *pgxpool.Pool, ancestor, descendant uuid.UUID) (int, bool) {
+func readDepth(t *testing.T, pool *pgxpool.Pool, ancestor, descendant int64) (int, bool) {
 	t.Helper()
 	var depth int
 	err := pool.QueryRow(context.Background(),
@@ -265,7 +264,7 @@ func readDepth(t *testing.T, pool *pgxpool.Pool, ancestor, descendant uuid.UUID)
 	return depth, true
 }
 
-func isArchived(t *testing.T, pool *pgxpool.Pool, id uuid.UUID) bool {
+func isArchived(t *testing.T, pool *pgxpool.Pool, id int64) bool {
 	t.Helper()
 	var archived bool
 	if err := pool.QueryRow(context.Background(),
@@ -275,21 +274,21 @@ func isArchived(t *testing.T, pool *pgxpool.Pool, id uuid.UUID) bool {
 	return archived
 }
 
-func dumpClosure(t *testing.T, pool *pgxpool.Pool) map[[2]uuid.UUID]int {
+func dumpClosure(t *testing.T, pool *pgxpool.Pool) map[[2]int64]int {
 	t.Helper()
 	rows, err := pool.Query(context.Background(), `SELECT ancestor_id, descendant_id, depth FROM tag_closure`)
 	if err != nil {
 		t.Fatalf("dump closure: %v", err)
 	}
 	defer rows.Close()
-	out := make(map[[2]uuid.UUID]int)
+	out := make(map[[2]int64]int)
 	for rows.Next() {
-		var a, d uuid.UUID
+		var a, d int64
 		var depth int
 		if err := rows.Scan(&a, &d, &depth); err != nil {
 			t.Fatalf("scan: %v", err)
 		}
-		out[[2]uuid.UUID{a, d}] = depth
+		out[[2]int64{a, d}] = depth
 	}
 	if err := rows.Err(); err != nil {
 		t.Fatalf("rows err: %v", err)

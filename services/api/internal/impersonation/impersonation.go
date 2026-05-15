@@ -17,7 +17,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -41,7 +40,7 @@ type Service struct {
 // Begin starts impersonation for the session identified by sessionID.
 // The acting principal must hold owner on at least one root org tag.
 // Returns the new effective principal id (the target).
-func (s *Service) Begin(ctx context.Context, sessionID, target uuid.UUID, reason string) error {
+func (s *Service) Begin(ctx context.Context, sessionID, target int64, reason string) error {
 	id := auth.FromContext(ctx)
 	if id.IsAnonymous() {
 		return errors.New("impersonation: not authenticated")
@@ -81,7 +80,7 @@ func (s *Service) Begin(ctx context.Context, sessionID, target uuid.UUID, reason
 }
 
 // End clears the impersonation on the named session.
-func (s *Service) End(ctx context.Context, sessionID uuid.UUID) error {
+func (s *Service) End(ctx context.Context, sessionID int64) error {
 	id := auth.FromContext(ctx)
 	if id.IsAnonymous() {
 		return errors.New("impersonation: not authenticated")
@@ -104,7 +103,7 @@ func (s *Service) End(ctx context.Context, sessionID uuid.UUID) error {
 
 // callerIsAdmin returns true iff principal P holds owner on any root
 // org tag (parent IS NULL).
-func (s *Service) callerIsAdmin(ctx context.Context, p uuid.UUID) (bool, error) {
+func (s *Service) callerIsAdmin(ctx context.Context, p int64) (bool, error) {
 	rows, err := s.DB.Query(ctx, `
         SELECT id FROM tags WHERE parent_id IS NULL AND root_kind = 'org'
     `)
@@ -113,7 +112,7 @@ func (s *Service) callerIsAdmin(ctx context.Context, p uuid.UUID) (bool, error) 
 	}
 	defer rows.Close()
 	for rows.Next() {
-		var tagID uuid.UUID
+		var tagID int64
 		if err := rows.Scan(&tagID); err != nil {
 			return false, err
 		}

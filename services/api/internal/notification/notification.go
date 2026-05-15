@@ -20,12 +20,12 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/realtime"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // Reason values match the CHECK constraint on notifications.reason.
@@ -64,7 +64,7 @@ type Querier interface {
 // fake. The interface is declared here so the notification package
 // stays decoupled from the concrete provider.
 type Pusher interface {
-	Dispatch(ctx context.Context, notificationID uuid.UUID, title, body string) error
+	Dispatch(ctx context.Context, notificationID int64, title, body string) error
 }
 
 type Service struct {
@@ -79,27 +79,27 @@ type Service struct {
 // Recipient is the resolved target of a notification — recipient,
 // reason, urgency, and the originating tag for context.
 type Recipient struct {
-	PrincipalID uuid.UUID
+	PrincipalID int64
 	Reason      string
 	Urgency     string
-	SourceTagID *uuid.UUID
+	SourceTagID *int64
 }
 
 // Inbox returns the recipient's notifications, newest first. unreadOnly
 // constrains to read_at IS NULL; limit caps the page.
 type Notification struct {
-	ID          uuid.UUID
-	RecipientID uuid.UUID
+	ID          int64
+	RecipientID int64
 	Reason      string
 	Urgency     string
 	SourceType  string
-	SourceID    uuid.UUID
-	SourceTagID *uuid.UUID
+	SourceID    int64
+	SourceTagID *int64
 	ReadAt      *time.Time
 	CreatedAt   time.Time
 }
 
-func (s *Service) Inbox(ctx context.Context, recipient uuid.UUID, unreadOnly bool, limit int) ([]*Notification, error) {
+func (s *Service) Inbox(ctx context.Context, recipient int64, unreadOnly bool, limit int) ([]*Notification, error) {
 	if limit <= 0 || limit > 200 {
 		limit = 50
 	}
@@ -129,7 +129,7 @@ func (s *Service) Inbox(ctx context.Context, recipient uuid.UUID, unreadOnly boo
 }
 
 // MarkRead sets read_at on the named notifications belonging to recipient.
-func (s *Service) MarkRead(ctx context.Context, recipient uuid.UUID, ids []uuid.UUID) error {
+func (s *Service) MarkRead(ctx context.Context, recipient int64, ids []int64) error {
 	if len(ids) == 0 {
 		return nil
 	}
@@ -137,14 +137,14 @@ func (s *Service) MarkRead(ctx context.Context, recipient uuid.UUID, ids []uuid.
         UPDATE notifications
            SET read_at = now()
          WHERE recipient_id = $1
-           AND id = ANY($2::UUID[])
+           AND id = ANY($2::BIGINT[])
            AND read_at IS NULL
     `, recipient, ids)
 	return err
 }
 
 // MarkAllRead marks every unread notification as read for the recipient.
-func (s *Service) MarkAllRead(ctx context.Context, recipient uuid.UUID) error {
+func (s *Service) MarkAllRead(ctx context.Context, recipient int64) error {
 	_, err := s.DB.Exec(ctx, `
         UPDATE notifications SET read_at = now()
          WHERE recipient_id = $1 AND read_at IS NULL
@@ -154,7 +154,7 @@ func (s *Service) MarkAllRead(ctx context.Context, recipient uuid.UUID) error {
 
 // Get returns one notification or ErrNotFound. Used by the realtime
 // dispatcher to load a row before forwarding to a subscription.
-func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Notification, error) {
+func (s *Service) Get(ctx context.Context, id int64) (*Notification, error) {
 	var n Notification
 	row := s.DB.QueryRow(ctx, `
         SELECT id, recipient_id, reason, urgency, source_type, source_id,
@@ -182,11 +182,11 @@ func (s *Service) Handler(ctx context.Context, raw json.RawMessage) error {
 	if err := json.Unmarshal(raw, &p); err != nil {
 		return fmt.Errorf("unmarshal fanout payload: %w", err)
 	}
-	srcID, err := uuid.Parse(p.SourceID)
+	srcID, _, err := ids.ParseAny(p.SourceID)
 	if err != nil {
 		return fmt.Errorf("source_id: %w", err)
 	}
-	actorID, err := uuid.Parse(p.ActorID)
+	actorID, err := ids.ParseAs(ids.KindUser, p.ActorID)
 	if err != nil {
 		return fmt.Errorf("actor_id: %w", err)
 	}
@@ -201,7 +201,7 @@ func (s *Service) Handler(ctx context.Context, raw json.RawMessage) error {
 
 // resolveRecipients dispatches to the source-type-specific resolver. Add
 // new sources here; the rest of the fan-out is generic.
-func (s *Service) resolveRecipients(ctx context.Context, p FanoutPayload, srcID, actorID uuid.UUID) ([]Recipient, error) {
+func (s *Service) resolveRecipients(ctx context.Context, p FanoutPayload, srcID, actorID int64) ([]Recipient, error) {
 	switch p.SourceType {
 	case "task":
 		return s.taskRecipients(ctx, p, srcID, actorID)
@@ -219,9 +219,9 @@ func (s *Service) resolveRecipients(ctx context.Context, p FanoutPayload, srcID,
 // taskRecipients enumerates assignees + watchers + tag subscribers for a
 // task. If RecipientID is set on an "assigned" event, only that principal
 // is notified (the assigned-to person, with reason=assignment).
-func (s *Service) taskRecipients(ctx context.Context, p FanoutPayload, taskID, actorID uuid.UUID) ([]Recipient, error) {
+func (s *Service) taskRecipients(ctx context.Context, p FanoutPayload, taskID, actorID int64) ([]Recipient, error) {
 	if p.Event == "assigned" && p.RecipientID != nil {
-		recID, err := uuid.Parse(*p.RecipientID)
+		recID, err := ids.ParseAs(ids.KindUser, *p.RecipientID)
 		if err != nil {
 			return nil, fmt.Errorf("recipient_id: %w", err)
 		}
@@ -253,8 +253,8 @@ func (s *Service) taskRecipients(ctx context.Context, p FanoutPayload, taskID, a
 	}
 
 	out := []Recipient{}
-	seen := map[uuid.UUID]struct{}{actorID: {}}
-	add := func(p uuid.UUID, reason string, defaultUrgency string) {
+	seen := map[int64]struct{}{actorID: {}}
+	add := func(p int64, reason string, defaultUrgency string) {
 		if _, dup := seen[p]; dup {
 			return
 		}
@@ -291,7 +291,7 @@ func (s *Service) taskRecipients(ctx context.Context, p FanoutPayload, taskID, a
 }
 
 // postRecipients = mentions + tag subscribers.
-func (s *Service) postRecipients(ctx context.Context, postID, actorID uuid.UUID) ([]Recipient, error) {
+func (s *Service) postRecipients(ctx context.Context, postID, actorID int64) ([]Recipient, error) {
 	mentions, err := s.principalsFromJoin(ctx, "post_mentions", "post_id", "principal_id", postID)
 	if err != nil {
 		return nil, err
@@ -302,7 +302,7 @@ func (s *Service) postRecipients(ctx context.Context, postID, actorID uuid.UUID)
 	}
 
 	out := []Recipient{}
-	seen := map[uuid.UUID]struct{}{actorID: {}}
+	seen := map[int64]struct{}{actorID: {}}
 	for _, p := range mentions {
 		if _, dup := seen[p]; dup {
 			continue
@@ -334,8 +334,8 @@ func (s *Service) postRecipients(ctx context.Context, postID, actorID uuid.UUID)
 }
 
 // commentRecipients = comment mentions + parent post tag subscribers.
-func (s *Service) commentRecipients(ctx context.Context, commentID, actorID uuid.UUID) ([]Recipient, error) {
-	var postID uuid.UUID
+func (s *Service) commentRecipients(ctx context.Context, commentID, actorID int64) ([]Recipient, error) {
+	var postID int64
 	if err := s.DB.QueryRow(ctx,
 		`SELECT post_id FROM comments WHERE id = $1`, commentID).Scan(&postID); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -353,7 +353,7 @@ func (s *Service) commentRecipients(ctx context.Context, commentID, actorID uuid
 	}
 
 	out := []Recipient{}
-	seen := map[uuid.UUID]struct{}{actorID: {}}
+	seen := map[int64]struct{}{actorID: {}}
 	for _, p := range mentions {
 		if _, dup := seen[p]; dup {
 			continue
@@ -386,8 +386,8 @@ func (s *Service) commentRecipients(ctx context.Context, commentID, actorID uuid
 
 // messageRecipients = DM participants (reason=dm) for a DM room, or tag
 // subscribers (reason=tag_subscription) for a team room.
-func (s *Service) messageRecipients(ctx context.Context, messageID, actorID uuid.UUID) ([]Recipient, error) {
-	var roomID uuid.UUID
+func (s *Service) messageRecipients(ctx context.Context, messageID, actorID int64) ([]Recipient, error) {
+	var roomID int64
 	var isDM bool
 	if err := s.DB.QueryRow(ctx, `
         SELECT cr.id, cr.is_dm
@@ -411,7 +411,7 @@ func (s *Service) messageRecipients(ctx context.Context, messageID, actorID uuid
 		defer rows.Close()
 		out := []Recipient{}
 		for rows.Next() {
-			var p uuid.UUID
+			var p int64
 			if err := rows.Scan(&p); err != nil {
 				return nil, err
 			}
@@ -425,7 +425,7 @@ func (s *Service) messageRecipients(ctx context.Context, messageID, actorID uuid
 		return nil, err
 	}
 	out := []Recipient{}
-	seen := map[uuid.UUID]struct{}{actorID: {}}
+	seen := map[int64]struct{}{actorID: {}}
 	for _, ts := range subscribers {
 		if _, dup := seen[ts.PrincipalID]; dup {
 			continue
@@ -448,7 +448,7 @@ func (s *Service) messageRecipients(ctx context.Context, messageID, actorID uuid
 // principalsFromJoin reads principal ids from a join table (assignees,
 // watchers, mentions, etc.). Generic over the join schema as long as the
 // columns are named.
-func (s *Service) principalsFromJoin(ctx context.Context, table, sourceCol, principalCol string, sourceID uuid.UUID) ([]uuid.UUID, error) {
+func (s *Service) principalsFromJoin(ctx context.Context, table, sourceCol, principalCol string, sourceID int64) ([]int64, error) {
 	// Table/column names are constants in this package — never user input.
 	// Direct interpolation is intentional and safe here.
 	q := fmt.Sprintf(`SELECT %s FROM %s WHERE %s = $1`, principalCol, table, sourceCol)
@@ -457,9 +457,9 @@ func (s *Service) principalsFromJoin(ctx context.Context, table, sourceCol, prin
 		return nil, fmt.Errorf("query %s: %w", table, err)
 	}
 	defer rows.Close()
-	out := []uuid.UUID{}
+	out := []int64{}
 	for rows.Next() {
-		var p uuid.UUID
+		var p int64
 		if err := rows.Scan(&p); err != nil {
 			return nil, err
 		}
@@ -469,8 +469,8 @@ func (s *Service) principalsFromJoin(ctx context.Context, table, sourceCol, prin
 }
 
 type tagSubscriber struct {
-	PrincipalID uuid.UUID
-	TagID       uuid.UUID
+	PrincipalID int64
+	TagID       int64
 	Urgency     string
 	ReasonOK    bool
 }
@@ -478,7 +478,7 @@ type tagSubscriber struct {
 // tagSubscribersForTaskOrPost finds tag subscribers (cascading) of any tag
 // attached to the source. Returns one row per (principal, source-tag); the
 // caller dedupes.
-func (s *Service) tagSubscribersForTaskOrPost(ctx context.Context, tagJoinTable, sourceCol string, sourceID uuid.UUID) ([]tagSubscriber, error) {
+func (s *Service) tagSubscribersForTaskOrPost(ctx context.Context, tagJoinTable, sourceCol string, sourceID int64) ([]tagSubscriber, error) {
 	q := fmt.Sprintf(`
         SELECT DISTINCT ON (s.principal_id)
                s.principal_id, j.tag_id, s.urgency, s.reason_filter
@@ -520,7 +520,7 @@ func (s *Service) tagSubscribersForTaskOrPost(ctx context.Context, tagJoinTable,
 //
 // The reason argument is checked against reason_filter; an empty filter
 // matches all reasons.
-func (s *Service) subscriptionDecision(ctx context.Context, principal uuid.UUID, sourceType string, sourceID uuid.UUID, reason string) (string, *uuid.UUID) {
+func (s *Service) subscriptionDecision(ctx context.Context, principal int64, sourceType string, sourceID int64, reason string) (string, *int64) {
 	var joinTable, sourceCol string
 	switch sourceType {
 	case "task":
@@ -529,7 +529,7 @@ func (s *Service) subscriptionDecision(ctx context.Context, principal uuid.UUID,
 		joinTable, sourceCol = "post_tags", "post_id"
 	case "comment":
 		// Comments inherit from parent post.
-		var postID uuid.UUID
+		var postID int64
 		if err := s.DB.QueryRow(ctx,
 			`SELECT post_id FROM comments WHERE id = $1`, sourceID).Scan(&postID); err != nil {
 			return "", nil
@@ -555,7 +555,7 @@ func (s *Service) subscriptionDecision(ctx context.Context, principal uuid.UUID,
 
 	var urgency string
 	var filters []string
-	var tagID uuid.UUID
+	var tagID int64
 	if err := s.DB.QueryRow(ctx, q, sourceID, principal).Scan(&urgency, &filters, &tagID); err != nil {
 		return "", nil
 	}
@@ -569,18 +569,18 @@ func (s *Service) subscriptionDecision(ctx context.Context, principal uuid.UUID,
 // notif.<principal_id> NOTIFY per recipient. Insert and NOTIFY happen in
 // the same transaction so a recipient that observes the NOTIFY can read
 // the row. After commit, high-urgency notifications fan out to push.
-func (s *Service) writeAndNotify(ctx context.Context, sourceType string, sourceID uuid.UUID, recipients []Recipient) error {
+func (s *Service) writeAndNotify(ctx context.Context, sourceType string, sourceID int64, recipients []Recipient) error {
 	if len(recipients) == 0 {
 		return nil
 	}
 	type written struct {
-		notifID uuid.UUID
+		notifID int64
 		urgency string
 	}
 	var pushTargets []written
 	err := s.runInTx(ctx, func(tx pgx.Tx) error {
 		for _, r := range recipients {
-			var notifID uuid.UUID
+			var notifID int64
 			if err := tx.QueryRow(ctx, `
                 INSERT INTO notifications (recipient_id, reason, urgency, source_type, source_id, source_tag_id)
                 VALUES ($1, $2, $3, $4, $5, $6)
@@ -589,13 +589,13 @@ func (s *Service) writeAndNotify(ctx context.Context, sourceType string, sourceI
 				return fmt.Errorf("insert notification: %w", err)
 			}
 			payload, _ := json.Marshal(map[string]any{
-				"notification_id": notifID.String(),
+				"notification_id": ids.FormatID(notifID),
 				"reason":          r.Reason,
 				"urgency":         r.Urgency,
 				"source_type":     sourceType,
-				"source_id":       sourceID.String(),
+				"source_id":       ids.FormatID(sourceID),
 			})
-			topic := "notif." + r.PrincipalID.String()
+			topic := "notif." + ids.FormatID(r.PrincipalID)
 			notifySQL, args := realtime.NotifySQL(topic, payload)
 			if _, err := tx.Exec(ctx, notifySQL, args...); err != nil {
 				return fmt.Errorf("pg_notify: %w", err)
@@ -624,7 +624,7 @@ func (s *Service) writeAndNotify(ctx context.Context, sourceType string, sourceI
 // content (post title, message body) but that requires a perm-checked
 // fetch — for v1, a generic summary is enough so the device can show
 // "Pulse" with a "View" affordance.
-func pushSummary(sourceType string, _ uuid.UUID) (string, string) {
+func pushSummary(sourceType string, _ int64) (string, string) {
 	switch sourceType {
 	case "task":
 		return "Pulse", "You have a new task update"

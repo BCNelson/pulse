@@ -3,8 +3,6 @@ package perm
 import (
 	"context"
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 // roleColumn returns the post_tags column that gates an action against a
@@ -27,7 +25,7 @@ func roleColumn(a Action) string {
 // passes when the viewer holds the required tag-level bundle on at least
 // one tag where the corresponding role flag is set. A non-existent post
 // or one with no tags returns false.
-func (s *Service) CanOnPost(ctx context.Context, viewer uuid.UUID, action Action, postID uuid.UUID) (bool, error) {
+func (s *Service) CanOnPost(ctx context.Context, viewer int64, action Action, postID int64) (bool, error) {
 	tagIDs, err := s.postTagsForAction(ctx, postID, action)
 	if err != nil {
 		return false, err
@@ -48,7 +46,7 @@ func (s *Service) CanOnPost(ctx context.Context, viewer uuid.UUID, action Action
 // tags where the post's view_role is set, plus the union of extras. This
 // is used by clients to render which actions are available; for binary
 // authorization checks prefer CanOnPost which short-circuits.
-func (s *Service) EffectiveOnPost(ctx context.Context, viewer uuid.UUID, postID uuid.UUID) (Bundle, []string, error) {
+func (s *Service) EffectiveOnPost(ctx context.Context, viewer int64, postID int64) (Bundle, []string, error) {
 	// Visibility uses view_role; the returned bundle represents what the
 	// viewer can do on tags with that role flag. Per-action role flags
 	// can shrink the effective bundle further — clients re-check via
@@ -82,7 +80,7 @@ func (s *Service) EffectiveOnPost(ctx context.Context, viewer uuid.UUID, postID 
 // per-action role flag set to true. Cached per request: post_tags is
 // stable within an operation's lifetime and would otherwise be hit
 // multiple times when listing post fields.
-func (s *Service) postTagsForAction(ctx context.Context, postID uuid.UUID, action Action) ([]uuid.UUID, error) {
+func (s *Service) postTagsForAction(ctx context.Context, postID int64, action Action) ([]int64, error) {
 	if c, ok := cacheFromContext(ctx); ok {
 		if tags, hit := c.lookupPostTags(postID, action); hit {
 			return tags, nil
@@ -95,9 +93,9 @@ func (s *Service) postTagsForAction(ctx context.Context, postID uuid.UUID, actio
 		return nil, fmt.Errorf("query post_tags: %w", err)
 	}
 	defer rows.Close()
-	var tags []uuid.UUID
+	var tags []int64
 	for rows.Next() {
-		var id uuid.UUID
+		var id int64
 		if err := rows.Scan(&id); err != nil {
 			return nil, fmt.Errorf("scan post_tag: %w", err)
 		}

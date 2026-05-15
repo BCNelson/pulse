@@ -237,6 +237,10 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GSendMessageVars.serializer)
       ..add(GSubscribeTagInput.serializer)
       ..add(GSubscriptionUrgency.serializer)
+      ..add(GTagBySlugPathData.serializer)
+      ..add(GTagBySlugPathData_tagBySlugPath.serializer)
+      ..add(GTagBySlugPathReq.serializer)
+      ..add(GTagBySlugPathVars.serializer)
       ..add(GTagChildrenData.serializer)
       ..add(GTagChildrenData_tag.serializer)
       ..add(GTagChildrenData_tag_children.serializer)
@@ -439,6 +443,9 @@ Serializers _$serializers = (Serializers().toBuilder()
             const FullType(GUnreactToPostData_unreactToPost_reactions)
           ]),
           () => ListBuilder<GUnreactToPostData_unreactToPost_reactions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())

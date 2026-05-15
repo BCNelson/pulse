@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/router.dart';
 import '../../core/selection.dart';
 import '../../design/atoms/pulse_avatar.dart';
 import '../../design/atoms/pulse_markdown_body.dart';
@@ -74,7 +75,7 @@ class PostDetailPane extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
-    final postId = ref.watch(selectedPostIdProvider);
+    final postId = ref.watch(currentPostIdProvider);
     if (postId == null) {
       return Container(
         color: t.paper,

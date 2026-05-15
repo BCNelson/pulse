@@ -4,7 +4,7 @@
 -- ----- jobs -----
 -- Standard Postgres queue: workers claim with FOR UPDATE SKIP LOCKED.
 -- locked_at + locked_by tracked so a crash recovery sweep can release
--- abandoned in-flight jobs.
+-- abandoned in-flight jobs. Bigserial id — internal queue, not user-facing.
 CREATE TABLE jobs (
   id           BIGSERIAL PRIMARY KEY,
   kind         TEXT NOT NULL,
@@ -27,7 +27,7 @@ CREATE INDEX jobs_running_idx ON jobs (locked_at) WHERE status = 'running';
 -- a task hoisted from a post or comment retains the back-reference so
 -- the source content can show "tracked as task #..." links.
 CREATE TABLE tasks (
-  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id                BIGINT PRIMARY KEY DEFAULT gen_id_task(),
   title             TEXT NOT NULL,
   description       TEXT,
   body_tsv          tsvector GENERATED ALWAYS AS (
@@ -37,9 +37,9 @@ CREATE TABLE tasks (
   status            TEXT NOT NULL DEFAULT 'open'
                       CHECK (status IN ('open','in_progress','blocked','done','cancelled')),
   due_at            TIMESTAMPTZ,
-  linked_post_id    UUID REFERENCES posts(id),
-  linked_comment_id UUID REFERENCES comments(id),
-  created_by        UUID NOT NULL REFERENCES principals(id),
+  linked_post_id    BIGINT REFERENCES posts(id),
+  linked_comment_id BIGINT REFERENCES comments(id),
+  created_by        BIGINT NOT NULL REFERENCES principals(id),
   created_at        TIMESTAMPTZ NOT NULL DEFAULT now(),
   edited_at         TIMESTAMPTZ,
   deleted_at        TIMESTAMPTZ
@@ -54,8 +54,8 @@ CREATE INDEX tasks_creator_idx  ON tasks (created_by, created_at DESC);
 -- grants give visibility into the tag; the role booleans here decide
 -- whether a tag-bundle confers view/interact/moderate against THIS task.
 CREATE TABLE task_tags (
-  task_id        UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
-  tag_id         UUID NOT NULL REFERENCES tags(id),
+  task_id        BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+  tag_id         BIGINT NOT NULL REFERENCES tags(id),
   view_role      BOOLEAN NOT NULL DEFAULT TRUE,
   interact_role  BOOLEAN NOT NULL DEFAULT TRUE,
   moderate_role  BOOLEAN NOT NULL DEFAULT TRUE,
@@ -65,17 +65,17 @@ CREATE TABLE task_tags (
 CREATE INDEX task_tags_tag_idx ON task_tags (tag_id);
 
 CREATE TABLE task_assignees (
-  task_id      UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
-  principal_id UUID NOT NULL REFERENCES principals(id),
+  task_id      BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+  principal_id BIGINT NOT NULL REFERENCES principals(id),
   assigned_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-  assigned_by  UUID REFERENCES principals(id),
+  assigned_by  BIGINT REFERENCES principals(id),
   PRIMARY KEY (task_id, principal_id)
 );
 CREATE INDEX task_assignees_principal_idx ON task_assignees (principal_id);
 
 CREATE TABLE task_watchers (
-  task_id      UUID NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
-  principal_id UUID NOT NULL REFERENCES principals(id),
+  task_id      BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+  principal_id BIGINT NOT NULL REFERENCES principals(id),
   added_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (task_id, principal_id)
 );
@@ -85,16 +85,17 @@ CREATE INDEX task_watchers_principal_idx ON task_watchers (principal_id);
 -- Written by the notification.fanout worker, never synchronously in the
 -- request path. recipient_id + read_at partial index drives the
 -- "unread inbox" query, which is the hot path for badges.
+-- source_id is a polymorphic typed-ID — kind is implicit in the high bits.
 CREATE TABLE notifications (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  recipient_id  UUID NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
+  id            BIGINT PRIMARY KEY DEFAULT gen_id_notification(),
+  recipient_id  BIGINT NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
   reason        TEXT NOT NULL
                   CHECK (reason IN ('assignment','mention','watcher','tag_subscription','dm')),
   urgency       TEXT NOT NULL DEFAULT 'normal'
                   CHECK (urgency IN ('high','normal','low')),
   source_type   TEXT NOT NULL,
-  source_id     UUID NOT NULL,
-  source_tag_id UUID REFERENCES tags(id),
+  source_id     BIGINT NOT NULL,
+  source_tag_id BIGINT REFERENCES tags(id),
   read_at       TIMESTAMPTZ,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -154,8 +155,6 @@ CREATE OR REPLACE VIEW searchable_content AS
 -- +goose Down
 -- +goose StatementBegin
 DROP VIEW IF EXISTS searchable_content;
--- Restore the M3 view definition so a downgrade leaves searchable_content
--- consistent with whatever migration is now at head.
 CREATE OR REPLACE VIEW searchable_content AS
   SELECT 'post'::TEXT AS kind, p.id, p.body_tsv AS tsv, p.title, p.body, p.author_id, p.created_at
   FROM posts p WHERE p.deleted_at IS NULL

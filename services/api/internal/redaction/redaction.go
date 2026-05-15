@@ -14,11 +14,11 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/audit"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 var ErrAlreadyRedacted = errors.New("redaction: principal already tombstoned")
@@ -48,7 +48,7 @@ type Service struct {
 //   - Author IDs and timestamps (so the structural graph still resolves).
 //   - Reactions, mentions, perm grants — these are membership facts,
 //     not identifying content.
-func (s *Service) RedactPrincipal(ctx context.Context, target uuid.UUID, reason string) error {
+func (s *Service) RedactPrincipal(ctx context.Context, target int64, reason string) error {
 	tx, err := s.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return fmt.Errorf("begin: %w", err)
@@ -60,7 +60,7 @@ func (s *Service) RedactPrincipal(ctx context.Context, target uuid.UUID, reason 
 		`SELECT status FROM principals WHERE id = $1 FOR UPDATE`, target).
 		Scan(&status); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return fmt.Errorf("principal %s not found", target)
+			return fmt.Errorf("principal %s not found", ids.FormatID(target))
 		}
 		return err
 	}
@@ -129,7 +129,7 @@ func (s *Service) RedactPrincipal(ctx context.Context, target uuid.UUID, reason 
 	}
 
 	// Audit happens inside the same tx so a rollback un-audits cleanly.
-	diff, _ := json.Marshal(map[string]any{"redacted_principal_id": target.String()})
+	diff, _ := json.Marshal(map[string]any{"redacted_principal_id": ids.FormatID(target)})
 	if err := s.Audit.Write(ctx, audit.Event{
 		Action:     "principal.redact",
 		TargetType: "principal",

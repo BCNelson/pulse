@@ -23,7 +23,7 @@ import (
 	"github.com/bcnelson/pulse/services/api/internal/search"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
 	"github.com/bcnelson/pulse/services/api/internal/task"
-	"github.com/google/uuid"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // DownloadURL is the resolver for the downloadUrl field.
@@ -33,7 +33,7 @@ func (r *attachmentResolver) DownloadURL(ctx context.Context, obj *model.Attachm
 
 // Messages is the resolver for the messages field.
 func (r *chatRoomResolver) Messages(ctx context.Context, obj *model.ChatRoom, first *int) (*model.MessageConnection, error) {
-	rid, err := uuid.Parse(obj.ID)
+	rid, err := ids.ParseAs(ids.KindRoom, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid room id: %w", err)
 	}
@@ -46,7 +46,7 @@ func (r *chatRoomResolver) Messages(ctx context.Context, obj *model.ChatRoom, fi
 
 // Attachments is the resolver for the attachments field.
 func (r *commentResolver) Attachments(ctx context.Context, obj *model.Comment) ([]*model.Attachment, error) {
-	id, err := uuid.Parse(obj.ID)
+	id, err := ids.ParseAs(ids.KindComment, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid id: %w", err)
 	}
@@ -55,7 +55,7 @@ func (r *commentResolver) Attachments(ctx context.Context, obj *model.Comment) (
 
 // Attachments is the resolver for the attachments field.
 func (r *messageResolver) Attachments(ctx context.Context, obj *model.Message) ([]*model.Attachment, error) {
-	id, err := uuid.Parse(obj.ID)
+	id, err := ids.ParseAs(ids.KindMessage, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid id: %w", err)
 	}
@@ -108,7 +108,7 @@ func (r *mutationResolver) CreateTag(ctx context.Context, input model.CreateTagI
 	if err != nil {
 		return nil, err
 	}
-	parentID, err := uuid.Parse(input.ParentID)
+	parentID, err := r.resolveTagRef(ctx, input.ParentID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid parentId: %w", err)
 	}
@@ -140,7 +140,7 @@ func (r *mutationResolver) CreateTag(ctx context.Context, input model.CreateTagI
 		Action:     "tag.create",
 		TargetType: "tag",
 		TargetID:   id,
-		Diff:       json.RawMessage(fmt.Sprintf(`{"parent_id":"%s","slug":%q}`, parentID, input.Slug)),
+		Diff:       json.RawMessage(fmt.Sprintf(`{"parent_id":"%s","slug":%q}`, ids.FormatID(parentID), input.Slug)),
 	}); err != nil {
 		return nil, err
 	}
@@ -153,11 +153,11 @@ func (r *mutationResolver) MoveTag(ctx context.Context, tagID string, newParentI
 	if err != nil {
 		return nil, err
 	}
-	src, err := uuid.Parse(tagID)
+	src, err := r.resolveTagRef(ctx, tagID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid tagId: %w", err)
 	}
-	dst, err := uuid.Parse(newParentID)
+	dst, err := r.resolveTagRef(ctx, newParentID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid newParentId: %w", err)
 	}
@@ -203,8 +203,8 @@ func (r *mutationResolver) MoveTag(ctx context.Context, tagID string, newParentI
 		return nil, err
 	}
 	notifyPayload := json.RawMessage(fmt.Sprintf(
-		`{"kind":"moved","tag_id":"%s","new_parent_id":"%s"}`, src, dst))
-	notifySQL, notifyArgs := realtime.NotifySQL("tag."+src.String()+".structure", notifyPayload)
+		`{"kind":"moved","tag_id":"%s","new_parent_id":"%s"}`, ids.FormatID(src), ids.FormatID(dst)))
+	notifySQL, notifyArgs := realtime.NotifySQL("tag."+ids.FormatID(src)+".structure", notifyPayload)
 	if _, err := r.DB.Exec(ctx, notifySQL, notifyArgs...); err != nil {
 		return nil, err
 	}
@@ -217,7 +217,7 @@ func (r *mutationResolver) ArchiveTag(ctx context.Context, tagID string) (*model
 	if err != nil {
 		return nil, err
 	}
-	id, err := uuid.Parse(tagID)
+	id, err := r.resolveTagRef(ctx, tagID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid tagId: %w", err)
 	}
@@ -247,11 +247,11 @@ func (r *mutationResolver) GrantTag(ctx context.Context, input model.GrantTagInp
 	if err != nil {
 		return nil, err
 	}
-	tagID, err := uuid.Parse(input.TagID)
+	tagID, err := r.resolveTagRef(ctx, input.TagID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid tagId: %w", err)
 	}
-	principalID, err := uuid.Parse(input.PrincipalID)
+	principalID, err := ids.ParseAs(ids.KindUser, input.PrincipalID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid principalId: %w", err)
 	}
@@ -288,7 +288,7 @@ func (r *mutationResolver) GrantTag(ctx context.Context, input model.GrantTagInp
 		Action:     "tag.grant",
 		TargetType: "tag",
 		TargetID:   tagID,
-		Diff:       json.RawMessage(fmt.Sprintf(`{"principal_id":"%s","bundle":%q,"cascade":%t}`, principalID, bundleDB, cascade)),
+		Diff:       json.RawMessage(fmt.Sprintf(`{"principal_id":"%s","bundle":%q,"cascade":%t}`, ids.FormatID(principalID), bundleDB, cascade)),
 	}); err != nil {
 		return nil, err
 	}
@@ -301,11 +301,11 @@ func (r *mutationResolver) RevokeTagGrant(ctx context.Context, tagID string, pri
 	if err != nil {
 		return nil, err
 	}
-	tID, err := uuid.Parse(tagID)
+	tID, err := r.resolveTagRef(ctx, tagID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid tagId: %w", err)
 	}
-	pID, err := uuid.Parse(principalID)
+	pID, err := ids.ParseAs(ids.KindUser, principalID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid principalId: %w", err)
 	}
@@ -324,7 +324,7 @@ func (r *mutationResolver) RevokeTagGrant(ctx context.Context, tagID string, pri
 		Action:     "tag.revoke",
 		TargetType: "tag",
 		TargetID:   tID,
-		Diff:       json.RawMessage(fmt.Sprintf(`{"principal_id":"%s"}`, pID)),
+		Diff:       json.RawMessage(fmt.Sprintf(`{"principal_id":"%s"}`, ids.FormatID(pID))),
 	}); err != nil {
 		return nil, err
 	}
@@ -337,7 +337,7 @@ func (r *mutationResolver) SubscribeTag(ctx context.Context, input model.Subscri
 	if err != nil {
 		return nil, err
 	}
-	tagID, err := uuid.Parse(input.TagID)
+	tagID, err := r.resolveTagRef(ctx, input.TagID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid tagId: %w", err)
 	}
@@ -384,7 +384,7 @@ func (r *mutationResolver) UnsubscribeTag(ctx context.Context, tagID string) (bo
 	if err != nil {
 		return false, err
 	}
-	tID, err := uuid.Parse(tagID)
+	tID, err := r.resolveTagRef(ctx, tagID)
 	if err != nil {
 		return false, fmt.Errorf("invalid tagId: %w", err)
 	}
@@ -407,7 +407,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input model.CreatePos
 	}
 	tagAttachments := make([]post.TagAttachment, 0, len(input.Tags))
 	for _, t := range input.Tags {
-		tagID, err := uuid.Parse(t.TagID)
+		tagID, err := r.resolveTagRef(ctx, t.TagID)
 		if err != nil {
 			return nil, fmt.Errorf("invalid tagId: %w", err)
 		}
@@ -455,7 +455,7 @@ func (r *mutationResolver) EditPost(ctx context.Context, input model.EditPostInp
 	if err != nil {
 		return nil, err
 	}
-	id, err := uuid.Parse(input.PostID)
+	id, err := ids.ParseAs(ids.KindPost, input.PostID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid postId: %w", err)
 	}
@@ -486,7 +486,7 @@ func (r *mutationResolver) DeletePost(ctx context.Context, postID string) (bool,
 	if err != nil {
 		return false, err
 	}
-	id, err := uuid.Parse(postID)
+	id, err := ids.ParseAs(ids.KindPost, postID)
 	if err != nil {
 		return false, fmt.Errorf("invalid postId: %w", err)
 	}
@@ -511,7 +511,7 @@ func (r *mutationResolver) SetDecisionStatus(ctx context.Context, postID string,
 	if err != nil {
 		return nil, err
 	}
-	id, err := uuid.Parse(postID)
+	id, err := ids.ParseAs(ids.KindPost, postID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid postId: %w", err)
 	}
@@ -544,7 +544,7 @@ func (r *mutationResolver) SetDenyFlag(ctx context.Context, postID string, deny 
 	if err != nil {
 		return nil, err
 	}
-	id, err := uuid.Parse(postID)
+	id, err := ids.ParseAs(ids.KindPost, postID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid postId: %w", err)
 	}
@@ -572,7 +572,7 @@ func (r *mutationResolver) ReactToPost(ctx context.Context, postID string, emoji
 	if err != nil {
 		return nil, err
 	}
-	id, err := uuid.Parse(postID)
+	id, err := ids.ParseAs(ids.KindPost, postID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid postId: %w", err)
 	}
@@ -595,7 +595,7 @@ func (r *mutationResolver) UnreactToPost(ctx context.Context, postID string, emo
 	if err != nil {
 		return nil, err
 	}
-	id, err := uuid.Parse(postID)
+	id, err := ids.ParseAs(ids.KindPost, postID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid postId: %w", err)
 	}
@@ -611,7 +611,7 @@ func (r *mutationResolver) MarkPostRead(ctx context.Context, postID string, seen
 	if err != nil {
 		return nil, err
 	}
-	id, err := uuid.Parse(postID)
+	id, err := ids.ParseAs(ids.KindPost, postID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid postId: %w", err)
 	}
@@ -634,7 +634,7 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.Create
 	if err != nil {
 		return nil, err
 	}
-	postID, err := uuid.Parse(input.PostID)
+	postID, err := ids.ParseAs(ids.KindPost, input.PostID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid postId: %w", err)
 	}
@@ -645,9 +645,9 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.Create
 	if !can {
 		return nil, errPermissionDenied
 	}
-	var parentPtr *uuid.UUID
+	var parentPtr *int64
 	if input.ParentID != nil {
-		pid, err := uuid.Parse(*input.ParentID)
+		pid, err := ids.ParseAs(ids.KindComment, *input.ParentID)
 		if err != nil {
 			return nil, fmt.Errorf("invalid parentId: %w", err)
 		}
@@ -678,7 +678,7 @@ func (r *mutationResolver) EditComment(ctx context.Context, commentID string, bo
 	if err != nil {
 		return nil, err
 	}
-	id, err := uuid.Parse(commentID)
+	id, err := ids.ParseAs(ids.KindComment, commentID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid commentId: %w", err)
 	}
@@ -716,7 +716,7 @@ func (r *mutationResolver) DeleteComment(ctx context.Context, commentID string) 
 	if err != nil {
 		return false, err
 	}
-	id, err := uuid.Parse(commentID)
+	id, err := ids.ParseAs(ids.KindComment, commentID)
 	if err != nil {
 		return false, fmt.Errorf("invalid commentId: %w", err)
 	}
@@ -747,7 +747,7 @@ func (r *mutationResolver) ReactToComment(ctx context.Context, commentID string,
 	if err != nil {
 		return nil, err
 	}
-	id, err := uuid.Parse(commentID)
+	id, err := ids.ParseAs(ids.KindComment, commentID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid commentId: %w", err)
 	}
@@ -774,7 +774,7 @@ func (r *mutationResolver) UnreactToComment(ctx context.Context, commentID strin
 	if err != nil {
 		return nil, err
 	}
-	id, err := uuid.Parse(commentID)
+	id, err := ids.ParseAs(ids.KindComment, commentID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid commentId: %w", err)
 	}
@@ -799,7 +799,7 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.CreateTas
 		in.Description = *input.Description
 	}
 	for _, t := range input.Tags {
-		tid, err := uuid.Parse(t.TagID)
+		tid, err := r.resolveTagRef(ctx, t.TagID)
 		if err != nil {
 			return nil, fmt.Errorf("invalid tagId: %w", err)
 		}
@@ -819,7 +819,7 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.CreateTas
 		})
 	}
 	for _, a := range input.Assignees {
-		pid, err := uuid.Parse(a)
+		pid, err := ids.ParseAs(ids.KindUser, a)
 		if err != nil {
 			return nil, fmt.Errorf("invalid assignee: %w", err)
 		}
@@ -843,7 +843,7 @@ func (r *mutationResolver) EditTask(ctx context.Context, input model.EditTaskInp
 	if err != nil {
 		return nil, err
 	}
-	tid, err := uuid.Parse(input.TaskID)
+	tid, err := ids.ParseAs(ids.KindTask, input.TaskID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid taskId: %w", err)
 	}
@@ -882,7 +882,7 @@ func (r *mutationResolver) DeleteTask(ctx context.Context, taskID string) (bool,
 	if err != nil {
 		return false, err
 	}
-	tid, err := uuid.Parse(taskID)
+	tid, err := ids.ParseAs(ids.KindTask, taskID)
 	if err != nil {
 		return false, fmt.Errorf("invalid taskId: %w", err)
 	}
@@ -917,7 +917,7 @@ func (r *mutationResolver) SetTaskStatus(ctx context.Context, taskID string, sta
 	if err != nil {
 		return nil, err
 	}
-	tid, err := uuid.Parse(taskID)
+	tid, err := ids.ParseAs(ids.KindTask, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid taskId: %w", err)
 	}
@@ -952,11 +952,11 @@ func (r *mutationResolver) AssignTask(ctx context.Context, taskID string, princi
 	if err != nil {
 		return nil, err
 	}
-	tid, err := uuid.Parse(taskID)
+	tid, err := ids.ParseAs(ids.KindTask, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid taskId: %w", err)
 	}
-	pid, err := uuid.Parse(principalID)
+	pid, err := ids.ParseAs(ids.KindUser, principalID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid principalId: %w", err)
 	}
@@ -991,11 +991,11 @@ func (r *mutationResolver) UnassignTask(ctx context.Context, taskID string, prin
 	if err != nil {
 		return nil, err
 	}
-	tid, err := uuid.Parse(taskID)
+	tid, err := ids.ParseAs(ids.KindTask, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid taskId: %w", err)
 	}
-	pid, err := uuid.Parse(principalID)
+	pid, err := ids.ParseAs(ids.KindUser, principalID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid principalId: %w", err)
 	}
@@ -1030,7 +1030,7 @@ func (r *mutationResolver) WatchTask(ctx context.Context, taskID string) (*model
 	if err != nil {
 		return nil, err
 	}
-	tid, err := uuid.Parse(taskID)
+	tid, err := ids.ParseAs(ids.KindTask, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid taskId: %w", err)
 	}
@@ -1060,7 +1060,7 @@ func (r *mutationResolver) UnwatchTask(ctx context.Context, taskID string) (*mod
 	if err != nil {
 		return nil, err
 	}
-	tid, err := uuid.Parse(taskID)
+	tid, err := ids.ParseAs(ids.KindTask, taskID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid taskId: %w", err)
 	}
@@ -1076,7 +1076,7 @@ func (r *mutationResolver) PromotePostToTask(ctx context.Context, postID string,
 	if err != nil {
 		return nil, err
 	}
-	pid, err := uuid.Parse(postID)
+	pid, err := ids.ParseAs(ids.KindPost, postID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid postId: %w", err)
 	}
@@ -1094,7 +1094,7 @@ func (r *mutationResolver) PromotePostToTask(ctx context.Context, postID string,
 		DueAt:     dueAt,
 	}
 	for _, a := range assignees {
-		aid, err := uuid.Parse(a)
+		aid, err := ids.ParseAs(ids.KindUser, a)
 		if err != nil {
 			return nil, fmt.Errorf("invalid assignee: %w", err)
 		}
@@ -1118,7 +1118,7 @@ func (r *mutationResolver) PromoteCommentToTask(ctx context.Context, commentID s
 	if err != nil {
 		return nil, err
 	}
-	cid, err := uuid.Parse(commentID)
+	cid, err := ids.ParseAs(ids.KindComment, commentID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid commentId: %w", err)
 	}
@@ -1143,7 +1143,7 @@ func (r *mutationResolver) PromoteCommentToTask(ctx context.Context, commentID s
 		DueAt:     dueAt,
 	}
 	for _, a := range assignees {
-		aid, err := uuid.Parse(a)
+		aid, err := ids.ParseAs(ids.KindUser, a)
 		if err != nil {
 			return nil, fmt.Errorf("invalid assignee: %w", err)
 		}
@@ -1167,18 +1167,18 @@ func (r *mutationResolver) MarkNotificationRead(ctx context.Context, notificatio
 	if err != nil {
 		return 0, err
 	}
-	ids := make([]uuid.UUID, 0, len(notificationIds))
+	parsedIDs := make([]int64, 0, len(notificationIds))
 	for _, s := range notificationIds {
-		id, err := uuid.Parse(s)
+		id, err := ids.ParseAs(ids.KindNotification, s)
 		if err != nil {
 			return 0, fmt.Errorf("invalid notificationId: %w", err)
 		}
-		ids = append(ids, id)
+		parsedIDs = append(parsedIDs, id)
 	}
-	if err := r.Notifications.MarkRead(ctx, identity.EffectiveID, ids); err != nil {
+	if err := r.Notifications.MarkRead(ctx, identity.EffectiveID, parsedIDs); err != nil {
 		return 0, err
 	}
-	return len(ids), nil
+	return len(parsedIDs), nil
 }
 
 // MarkAllNotificationsRead is the resolver for the markAllNotificationsRead field.
@@ -1208,7 +1208,7 @@ func (r *mutationResolver) Impersonate(ctx context.Context, principalID string, 
 	if !ok {
 		return nil, fmt.Errorf("impersonate: no session attached")
 	}
-	target, err := uuid.Parse(principalID)
+	target, err := ids.ParseAs(ids.KindUser, principalID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid principalId: %w", err)
 	}
@@ -1284,9 +1284,9 @@ func (r *mutationResolver) CreateChatRoom(ctx context.Context, input model.Creat
 	if err != nil {
 		return nil, err
 	}
-	tagIDs := make([]uuid.UUID, 0, len(input.TagIds))
+	tagIDs := make([]int64, 0, len(input.TagIds))
 	for _, s := range input.TagIds {
-		tid, err := uuid.Parse(s)
+		tid, err := r.resolveTagRef(ctx, s)
 		if err != nil {
 			return nil, fmt.Errorf("invalid tagId: %w", err)
 		}
@@ -1302,7 +1302,7 @@ func (r *mutationResolver) CreateChatRoom(ctx context.Context, input model.Creat
 	}
 	parts := []chat.ParticipantInput{{PrincipalID: identity.EffectiveID, Role: "admin"}}
 	for _, s := range input.ParticipantIds {
-		pid, err := uuid.Parse(s)
+		pid, err := ids.ParseAs(ids.KindUser, s)
 		if err != nil {
 			return nil, fmt.Errorf("invalid participantId: %w", err)
 		}
@@ -1332,11 +1332,11 @@ func (r *mutationResolver) AddParticipant(ctx context.Context, roomID string, pr
 	if err != nil {
 		return nil, err
 	}
-	rid, err := uuid.Parse(roomID)
+	rid, err := ids.ParseAs(ids.KindRoom, roomID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid roomId: %w", err)
 	}
-	pid, err := uuid.Parse(principalID)
+	pid, err := ids.ParseAs(ids.KindUser, principalID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid principalId: %w", err)
 	}
@@ -1358,7 +1358,7 @@ func (r *mutationResolver) AddParticipant(ctx context.Context, roomID string, pr
 	}
 	if err := r.Audit.Write(ctx, audit.Event{
 		Action: "chatroom.add_participant", TargetType: "chat_room", TargetID: rid,
-		Diff: json.RawMessage(fmt.Sprintf(`{"principal_id":"%s","role":%q}`, pid, roleStr)),
+		Diff: json.RawMessage(fmt.Sprintf(`{"principal_id":"%s","role":%q}`, ids.FormatID(pid), roleStr)),
 	}); err != nil {
 		return nil, err
 	}
@@ -1371,11 +1371,11 @@ func (r *mutationResolver) RemoveParticipant(ctx context.Context, roomID string,
 	if err != nil {
 		return nil, err
 	}
-	rid, err := uuid.Parse(roomID)
+	rid, err := ids.ParseAs(ids.KindRoom, roomID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid roomId: %w", err)
 	}
-	pid, err := uuid.Parse(principalID)
+	pid, err := ids.ParseAs(ids.KindUser, principalID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid principalId: %w", err)
 	}
@@ -1401,11 +1401,11 @@ func (r *mutationResolver) AddRoomTag(ctx context.Context, roomID string, tagID 
 	if err != nil {
 		return nil, err
 	}
-	rid, err := uuid.Parse(roomID)
+	rid, err := ids.ParseAs(ids.KindRoom, roomID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid roomId: %w", err)
 	}
-	tid, err := uuid.Parse(tagID)
+	tid, err := r.resolveTagRef(ctx, tagID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid tagId: %w", err)
 	}
@@ -1432,11 +1432,11 @@ func (r *mutationResolver) RemoveRoomTag(ctx context.Context, roomID string, tag
 	if err != nil {
 		return nil, err
 	}
-	rid, err := uuid.Parse(roomID)
+	rid, err := ids.ParseAs(ids.KindRoom, roomID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid roomId: %w", err)
 	}
-	tid, err := uuid.Parse(tagID)
+	tid, err := r.resolveTagRef(ctx, tagID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid tagId: %w", err)
 	}
@@ -1459,7 +1459,7 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 	if err != nil {
 		return nil, err
 	}
-	rid, err := uuid.Parse(input.RoomID)
+	rid, err := ids.ParseAs(ids.KindRoom, input.RoomID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid roomId: %w", err)
 	}
@@ -1470,9 +1470,9 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 	if !can {
 		return nil, errPermissionDenied
 	}
-	var replyTo *uuid.UUID
+	var replyTo *int64
 	if input.ReplyTo != nil {
-		rt, err := uuid.Parse(*input.ReplyTo)
+		rt, err := ids.ParseAs(ids.KindMessage, *input.ReplyTo)
 		if err != nil {
 			return nil, fmt.Errorf("invalid replyTo: %w", err)
 		}
@@ -1493,7 +1493,7 @@ func (r *mutationResolver) EditMessage(ctx context.Context, messageID string, bo
 	if err != nil {
 		return nil, err
 	}
-	mid, err := uuid.Parse(messageID)
+	mid, err := ids.ParseAs(ids.KindMessage, messageID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid messageId: %w", err)
 	}
@@ -1521,7 +1521,7 @@ func (r *mutationResolver) DeleteMessage(ctx context.Context, messageID string) 
 	if err != nil {
 		return false, err
 	}
-	mid, err := uuid.Parse(messageID)
+	mid, err := ids.ParseAs(ids.KindMessage, messageID)
 	if err != nil {
 		return false, fmt.Errorf("invalid messageId: %w", err)
 	}
@@ -1544,7 +1544,7 @@ func (r *mutationResolver) PromoteMessage(ctx context.Context, messageID string)
 	if err != nil {
 		return nil, err
 	}
-	mid, err := uuid.Parse(messageID)
+	mid, err := ids.ParseAs(ids.KindMessage, messageID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid messageId: %w", err)
 	}
@@ -1565,7 +1565,7 @@ func (r *mutationResolver) PromoteMessage(ctx context.Context, messageID string)
 	}
 	if err := r.Audit.Write(ctx, audit.Event{
 		Action: "message.promote", TargetType: "message", TargetID: mid,
-		Diff: json.RawMessage(fmt.Sprintf(`{"post_id":"%s"}`, postID)),
+		Diff: json.RawMessage(fmt.Sprintf(`{"post_id":"%s"}`, ids.FormatID(postID))),
 	}); err != nil {
 		return nil, err
 	}
@@ -1574,7 +1574,7 @@ func (r *mutationResolver) PromoteMessage(ctx context.Context, messageID string)
 
 // Comments is the resolver for the comments field.
 func (r *postResolver) Comments(ctx context.Context, obj *model.Post, first *int, after *string) (*model.CommentConnection, error) {
-	postID, err := uuid.Parse(obj.ID)
+	postID, err := ids.ParseAs(ids.KindPost, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid post id: %w", err)
 	}
@@ -1591,7 +1591,7 @@ func (r *postResolver) Comments(ctx context.Context, obj *model.Post, first *int
 
 // Attachments is the resolver for the attachments field.
 func (r *postResolver) Attachments(ctx context.Context, obj *model.Post) ([]*model.Attachment, error) {
-	id, err := uuid.Parse(obj.ID)
+	id, err := ids.ParseAs(ids.KindPost, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid id: %w", err)
 	}
@@ -1626,16 +1626,28 @@ func (r *queryResolver) Viewer(ctx context.Context) (*model.User, error) {
 
 // Tag is the resolver for the tag field.
 func (r *queryResolver) Tag(ctx context.Context, id string) (*model.Tag, error) {
-	tagID, err := uuid.Parse(id)
+	tagID, err := r.resolveTagRef(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("invalid id: %w", err)
 	}
 	return r.loadTag(ctx, tagID)
 }
 
+// TagBySlugPath is the resolver for the tagBySlugPath field.
+func (r *queryResolver) TagBySlugPath(ctx context.Context, path []string) (*model.Tag, error) {
+	id, err := r.resolveTagSlugPath(ctx, path)
+	if err != nil {
+		return nil, err
+	}
+	if id == 0 {
+		return nil, nil
+	}
+	return r.loadTag(ctx, id)
+}
+
 // Post is the resolver for the post field.
 func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error) {
-	postID, err := uuid.Parse(id)
+	postID, err := ids.ParseAs(ids.KindPost, id)
 	if err != nil {
 		return nil, fmt.Errorf("invalid id: %w", err)
 	}
@@ -1644,7 +1656,7 @@ func (r *queryResolver) Post(ctx context.Context, id string) (*model.Post, error
 
 // Task is the resolver for the task field.
 func (r *queryResolver) Task(ctx context.Context, id string) (*model.Task, error) {
-	tid, err := uuid.Parse(id)
+	tid, err := ids.ParseAs(ids.KindTask, id)
 	if err != nil {
 		return nil, fmt.Errorf("invalid id: %w", err)
 	}
@@ -1653,7 +1665,7 @@ func (r *queryResolver) Task(ctx context.Context, id string) (*model.Task, error
 
 // ChatRoom is the resolver for the chatRoom field.
 func (r *queryResolver) ChatRoom(ctx context.Context, id string) (*model.ChatRoom, error) {
-	rid, err := uuid.Parse(id)
+	rid, err := ids.ParseAs(ids.KindRoom, id)
 	if err != nil {
 		return nil, fmt.Errorf("invalid id: %w", err)
 	}
@@ -1679,9 +1691,9 @@ func (r *queryResolver) MyTagRoots(ctx context.Context) ([]*model.Tag, error) {
 		return nil, fmt.Errorf("query roots: %w", err)
 	}
 	defer rows.Close()
-	var ids []uuid.UUID
+	var ids []int64
 	for rows.Next() {
-		var id uuid.UUID
+		var id int64
 		if err := rows.Scan(&id); err != nil {
 			return nil, err
 		}
@@ -1838,7 +1850,7 @@ func (r *subscriptionResolver) MessageAdded(ctx context.Context, roomID string) 
 	if err != nil {
 		return nil, err
 	}
-	rid, err := uuid.Parse(roomID)
+	rid, err := ids.ParseAs(ids.KindRoom, roomID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid roomId: %w", err)
 	}
@@ -1850,7 +1862,7 @@ func (r *subscriptionResolver) MessageAdded(ctx context.Context, roomID string) 
 		return nil, errPermissionDenied
 	}
 	out := make(chan *model.Message, 4)
-	sub := r.Realtime.Subscribe("chat.room." + rid.String())
+	sub := r.Realtime.Subscribe("chat.room." + ids.FormatID(rid))
 	go func() {
 		defer close(out)
 		defer sub.Close()
@@ -1868,7 +1880,7 @@ func (r *subscriptionResolver) MessageAdded(ctx context.Context, roomID string) 
 				if err := json.Unmarshal(ev.Payload, &p); err != nil || p.MessageID == "" {
 					continue
 				}
-				mid, err := uuid.Parse(p.MessageID)
+				mid, err := ids.ParseAs(ids.KindMessage, p.MessageID)
 				if err != nil {
 					continue
 				}
@@ -1899,7 +1911,7 @@ func (r *subscriptionResolver) PostChanged(ctx context.Context, tagID string) (<
 	if err != nil {
 		return nil, err
 	}
-	tid, err := uuid.Parse(tagID)
+	tid, err := r.resolveTagRef(ctx, tagID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid tagId: %w", err)
 	}
@@ -1911,7 +1923,7 @@ func (r *subscriptionResolver) PostChanged(ctx context.Context, tagID string) (<
 		return nil, errPermissionDenied
 	}
 	out := make(chan *model.Post, 4)
-	sub := r.Realtime.Subscribe("posts.tag." + tid.String())
+	sub := r.Realtime.Subscribe("posts.tag." + ids.FormatID(tid))
 	go func() {
 		defer close(out)
 		defer sub.Close()
@@ -1929,7 +1941,7 @@ func (r *subscriptionResolver) PostChanged(ctx context.Context, tagID string) (<
 				if err := json.Unmarshal(ev.Payload, &p); err != nil || p.PostID == "" {
 					continue
 				}
-				pid, err := uuid.Parse(p.PostID)
+				pid, err := ids.ParseAs(ids.KindPost, p.PostID)
 				if err != nil {
 					continue
 				}
@@ -1958,7 +1970,7 @@ func (r *subscriptionResolver) TagStructureChanged(ctx context.Context, tagID st
 	if err != nil {
 		return nil, err
 	}
-	tid, err := uuid.Parse(tagID)
+	tid, err := r.resolveTagRef(ctx, tagID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid tagId: %w", err)
 	}
@@ -1970,7 +1982,7 @@ func (r *subscriptionResolver) TagStructureChanged(ctx context.Context, tagID st
 		return nil, errPermissionDenied
 	}
 	out := make(chan *model.TagStructureEvent, 4)
-	sub := r.Realtime.Subscribe("tag." + tid.String() + ".structure")
+	sub := r.Realtime.Subscribe("tag." + ids.FormatID(tid) + ".structure")
 	go func() {
 		defer close(out)
 		defer sub.Close()
@@ -1990,7 +2002,7 @@ func (r *subscriptionResolver) TagStructureChanged(ctx context.Context, tagID st
 					continue
 				}
 				if p.TagID == "" {
-					p.TagID = tid.String()
+					p.TagID = ids.FormatID(tid)
 				}
 				stillCan, _ := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionView, tid)
 				if !stillCan {
@@ -2014,7 +2026,7 @@ func (r *subscriptionResolver) NotificationReceived(ctx context.Context) (<-chan
 		return nil, err
 	}
 	out := make(chan *model.Notification, 8)
-	sub := r.Realtime.Subscribe("notif." + identity.EffectiveID.String())
+	sub := r.Realtime.Subscribe("notif." + ids.FormatID(identity.EffectiveID))
 	go func() {
 		defer close(out)
 		defer sub.Close()
@@ -2032,7 +2044,7 @@ func (r *subscriptionResolver) NotificationReceived(ctx context.Context) (<-chan
 				if err := json.Unmarshal(ev.Payload, &p); err != nil || p.NotificationID == "" {
 					continue
 				}
-				nid, err := uuid.Parse(p.NotificationID)
+				nid, err := ids.ParseAs(ids.KindNotification, p.NotificationID)
 				if err != nil {
 					continue
 				}
@@ -2066,7 +2078,7 @@ func (r *tagResolver) Posts(ctx context.Context, obj *model.Tag, first *int, aft
 	if identity.IsAnonymous() {
 		return emptyPostConnection(), nil
 	}
-	tagID, err := uuid.Parse(obj.ID)
+	tagID, err := r.resolveTagRef(ctx, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid tag id: %w", err)
 	}
@@ -2120,7 +2132,7 @@ func (r *tagResolver) Posts(ctx context.Context, obj *model.Tag, first *int, aft
 
 // Tasks is the resolver for the tasks field.
 func (r *tagResolver) Tasks(ctx context.Context, obj *model.Tag, first *int, after *string, status *model.TaskStatus) (*model.TaskConnection, error) {
-	tagID, err := uuid.Parse(obj.ID)
+	tagID, err := r.resolveTagRef(ctx, obj.ID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid tag id: %w", err)
 	}

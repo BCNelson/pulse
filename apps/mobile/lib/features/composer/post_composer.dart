@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -71,7 +73,11 @@ class _PostComposerState extends ConsumerState<PostComposer> {
       // cold relaunch immediately shows it.
       final created = resp.data?.createPost;
       if (created != null) {
-        final summary = GPostSummaryData.fromJson(created.toJson());
+        // jsonEncode/Decode trip normalizes any web-runtime JS objects
+        // back into Dart maps — see cached_tag_feed_provider for why.
+        final summary = GPostSummaryData.fromJson(
+          jsonDecode(jsonEncode(created.toJson())) as Map<String, dynamic>,
+        );
         if (summary != null) {
           await ref.read(postCacheStoreProvider).prependPostToTags(
             summary: summary,

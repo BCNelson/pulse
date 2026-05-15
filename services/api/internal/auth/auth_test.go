@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 func TestLoginRoundTrip(t *testing.T) {
@@ -22,7 +22,7 @@ func TestLoginRoundTrip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Login: %v", err)
 	}
-	if issued.Token == "" || principalID == uuid.Nil {
+	if issued.Token == "" || principalID == int64(0) {
 		t.Fatal("Login should issue a non-empty token and a real principal id")
 	}
 
@@ -32,7 +32,7 @@ func TestLoginRoundTrip(t *testing.T) {
 		t.Fatalf("Lookup: %v", err)
 	}
 	if gotPrincipal != principalID {
-		t.Errorf("Lookup principal: want %s got %s", principalID, gotPrincipal)
+		t.Errorf("Lookup principal: want %d got %d", principalID, gotPrincipal)
 	}
 }
 
@@ -107,7 +107,7 @@ func TestBotKeyAuth(t *testing.T) {
 		t.Fatalf("AuthenticateBotKey: %v", err)
 	}
 	if got != bot {
-		t.Errorf("authenticated principal: want %s got %s", bot, got)
+		t.Errorf("authenticated principal: want %d got %d", bot, got)
 	}
 
 	if _, err := svc.AuthenticateBotKey(context.Background(), "wrong-key"); err != auth.ErrInvalidCredentials {
@@ -117,10 +117,10 @@ func TestBotKeyAuth(t *testing.T) {
 
 // --- helpers ---
 
-func mustCreatePrincipalWithEmail(t *testing.T, pool *pgxpool.Pool, email, displayName string) uuid.UUID {
+func mustCreatePrincipalWithEmail(t *testing.T, pool *pgxpool.Pool, email, displayName string) int64 {
 	t.Helper()
-	id := uuid.New()
-	uri := "local://principals/" + id.String()
+	id := ids.New(ids.KindUser)
+	uri := "local://principals/" + ids.FormatID(id)
 	_, err := pool.Exec(context.Background(), `
         INSERT INTO principals (id, kind, status, global_uri, display_name, email)
         VALUES ($1, 'user', 'active', $2, $3, $4)
@@ -131,10 +131,10 @@ func mustCreatePrincipalWithEmail(t *testing.T, pool *pgxpool.Pool, email, displ
 	return id
 }
 
-func mustCreateBotPrincipal(t *testing.T, pool *pgxpool.Pool, displayName string) uuid.UUID {
+func mustCreateBotPrincipal(t *testing.T, pool *pgxpool.Pool, displayName string) int64 {
 	t.Helper()
-	id := uuid.New()
-	uri := "local://principals/" + id.String()
+	id := ids.New(ids.KindUser)
+	uri := "local://principals/" + ids.FormatID(id)
 	_, err := pool.Exec(context.Background(), `
         INSERT INTO principals (id, kind, status, global_uri, display_name)
         VALUES ($1, 'bot', 'active', $2, $3)
@@ -145,7 +145,7 @@ func mustCreateBotPrincipal(t *testing.T, pool *pgxpool.Pool, displayName string
 	return id
 }
 
-func mustCreateUserWithPassword(t *testing.T, pool *pgxpool.Pool, email, displayName, password string) uuid.UUID {
+func mustCreateUserWithPassword(t *testing.T, pool *pgxpool.Pool, email, displayName, password string) int64 {
 	t.Helper()
 	id := mustCreatePrincipalWithEmail(t, pool, email, displayName)
 	hash, err := auth.HashPassword(password)

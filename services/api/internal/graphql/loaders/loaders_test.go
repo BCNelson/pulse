@@ -4,11 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/graphql/loaders"
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 func TestPrincipalLoaderBatchesAndCaches(t *testing.T) {
@@ -17,10 +16,10 @@ func TestPrincipalLoaderBatchesAndCaches(t *testing.T) {
 
 	// Seed three users.
 	authSvc := &auth.Service{DB: pool}
-	ids := []uuid.UUID{}
+	userIDs := []int64{}
 	for _, n := range []string{"alice", "bob", "charlie"} {
-		id := uuid.New()
-		uri := "local://principals/" + id.String()
+		id := ids.New(ids.KindUser)
+		uri := "local://principals/" + ids.FormatID(id)
 		if _, err := pool.Exec(ctx, `
             INSERT INTO principals (id, kind, status, global_uri, display_name, email)
             VALUES ($1, 'user', 'active', $2, $3, $4)
@@ -33,23 +32,23 @@ func TestPrincipalLoaderBatchesAndCaches(t *testing.T) {
 			id, hash); err != nil {
 			t.Fatalf("credential: %v", err)
 		}
-		ids = append(ids, id)
+		userIDs = append(userIDs, id)
 	}
 	_ = authSvc
 
 	l := loaders.New(pool)
 
 	// Prime them all in one batch.
-	if err := l.Principals.Prime(ctx, ids); err != nil {
+	if err := l.Principals.Prime(ctx, userIDs); err != nil {
 		t.Fatalf("prime: %v", err)
 	}
-	for _, id := range ids {
+	for _, id := range userIDs {
 		row, err := l.Principals.Get(ctx, id)
 		if err != nil {
 			t.Fatalf("get: %v", err)
 		}
 		if row == nil {
-			t.Errorf("got nil for %s", id)
+			t.Errorf("got nil for %d", id)
 		}
 	}
 
@@ -58,8 +57,8 @@ func TestPrincipalLoaderBatchesAndCaches(t *testing.T) {
 	// instrumenting pgx, but we can confirm the cache holds by making
 	// the row id non-existent and seeing the second call still return
 	// the cached value.
-	missing := uuid.New()
-	if err := l.Principals.Prime(ctx, []uuid.UUID{missing}); err != nil {
+	missing := ids.New(ids.KindUser)
+	if err := l.Principals.Prime(ctx, []int64{missing}); err != nil {
 		t.Fatalf("prime missing: %v", err)
 	}
 	row, err := l.Principals.Get(ctx, missing)
@@ -76,10 +75,10 @@ func TestPostReactionLoaderViewerScoped(t *testing.T) {
 	ctx := context.Background()
 
 	// Seed alice + bob, a tag, and a post by alice.
-	alice := uuid.New()
-	bob := uuid.New()
+	alice := ids.New(ids.KindUser)
+	bob := ids.New(ids.KindUser)
 	for _, p := range []struct {
-		id    uuid.UUID
+		id    int64
 		name  string
 		email string
 	}{
@@ -89,12 +88,12 @@ func TestPostReactionLoaderViewerScoped(t *testing.T) {
 		if _, err := pool.Exec(ctx, `
             INSERT INTO principals (id, kind, status, global_uri, display_name, email)
             VALUES ($1, 'user', 'active', $2, $3, $4)
-        `, p.id, "local://principals/"+p.id.String(), p.name, p.email); err != nil {
+        `, p.id, "local://principals/"+ids.FormatID(p.id), p.name, p.email); err != nil {
 			t.Fatalf("seed principal: %v", err)
 		}
 	}
 
-	tagID := uuid.New()
+	tagID := ids.New(ids.KindTag)
 	if _, err := pool.Exec(ctx, `
         INSERT INTO tags (id, parent_id, slug, display_name, root_kind, defaults)
         VALUES ($1, NULL, 'org', 'Org', 'org', '{}')
@@ -107,7 +106,7 @@ func TestPostReactionLoaderViewerScoped(t *testing.T) {
 		t.Fatalf("closure: %v", err)
 	}
 
-	postID := uuid.New()
+	postID := ids.New(ids.KindPost)
 	if _, err := pool.Exec(ctx, `
         INSERT INTO posts (id, title, body, author_id) VALUES ($1, 'hi', 'body', $2)
     `, postID, alice); err != nil {
@@ -120,7 +119,7 @@ func TestPostReactionLoaderViewerScoped(t *testing.T) {
 	}
 
 	// alice and bob both react with 👍; only bob reacts with 🚀.
-	for _, who := range []uuid.UUID{alice, bob} {
+	for _, who := range []int64{alice, bob} {
 		if _, err := pool.Exec(ctx, `
             INSERT INTO post_reactions (post_id, principal_id, emoji)
             VALUES ($1, $2, '👍')

@@ -16,12 +16,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // Input describes the seed. All fields are required.
@@ -36,8 +36,8 @@ type Input struct {
 // Result reports what was created. PrincipalID and OrgTagID are zero on
 // the no-op path (when bootstrap was already done).
 type Result struct {
-	PrincipalID uuid.UUID
-	OrgTagID    uuid.UUID
+	PrincipalID int64
+	OrgTagID    int64
 	AlreadyDone bool
 }
 
@@ -71,8 +71,8 @@ func Run(ctx context.Context, pool *pgxpool.Pool, in Input) (*Result, error) {
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
-	principalID := uuid.New()
-	uri := "local://principals/" + principalID.String()
+	principalID := ids.New(ids.KindUser)
+	uri := "local://principals/" + ids.FormatID(principalID)
 	if _, err := tx.Exec(ctx, `
         INSERT INTO principals (id, kind, status, global_uri, display_name, email)
         VALUES ($1, 'user', 'active', $2, $3, $4)
@@ -88,7 +88,7 @@ func Run(ctx context.Context, pool *pgxpool.Pool, in Input) (*Result, error) {
 	// Create the org root tag. We call straight into SQL rather than the
 	// tag.Service so the whole bootstrap stays inside one transaction —
 	// tag.Service uses its own pool tx which would split atomicity.
-	orgID := uuid.New()
+	orgID := ids.New(ids.KindTag)
 	if _, err := tx.Exec(ctx, `
         INSERT INTO tags (id, parent_id, slug, display_name, root_kind, defaults)
         VALUES ($1, NULL, $2, $3, $4, '{}')

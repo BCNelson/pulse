@@ -355,6 +355,13 @@ type Query {
   viewer: User
 
   tag(id: ID!): Tag
+  """
+  Resolve a tag by walking its slug hierarchy. path is the ordered list
+  of slugs from root to leaf (e.g. ["programming", "rust"]). Returns
+  null if no tag exists at that path. Used by the mobile client to map
+  /feed/t/<slug>/<slug>/... URLs back to a tag entity.
+  """
+  tagBySlugPath(path: [String!]!): Tag
   post(id: ID!): Post
   task(id: ID!): Task
   chatRoom(id: ID!): ChatRoom

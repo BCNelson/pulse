@@ -4,10 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
 	"github.com/bcnelson/pulse/services/api/internal/notification"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // loadNotification builds a Notification model from a service row. The
@@ -20,12 +19,12 @@ func (r *Resolver) loadNotification(ctx context.Context, n *notification.Notific
 	}
 
 	out := &model.Notification{
-		ID:         n.ID.String(),
+		ID:         ids.FormatID(n.ID),
 		Recipient:  recipient,
 		Reason:     mapReasonDBToGQL(n.Reason),
 		Urgency:    mapNotifUrgencyDBToGQL(n.Urgency),
 		SourceType: n.SourceType,
-		SourceID:   n.SourceID.String(),
+		SourceID:   ids.FormatID(n.SourceID),
 		ReadAt:     n.ReadAt,
 		CreatedAt:  n.CreatedAt,
 	}
@@ -50,7 +49,7 @@ func (r *Resolver) loadNotification(ctx context.Context, n *notification.Notific
 	return out, nil
 }
 
-func (r *Resolver) loadNotificationSource(ctx context.Context, srcType string, srcID uuid.UUID) (model.NotificationSource, error) {
+func (r *Resolver) loadNotificationSource(ctx context.Context, srcType string, srcID int64) (model.NotificationSource, error) {
 	switch srcType {
 	case "post":
 		p, err := r.loadPost(ctx, srcID)
@@ -83,7 +82,7 @@ func (r *Resolver) loadNotificationSource(ctx context.Context, srcType string, s
 // loadInbox builds a NotificationConnection for the viewer with optional
 // filter. Cursor pagination is shaped but not driven by `after` yet —
 // M5 wires that.
-func (r *Resolver) loadInbox(ctx context.Context, recipient uuid.UUID, first *int, filter *model.NotificationFilter) (*model.NotificationConnection, error) {
+func (r *Resolver) loadInbox(ctx context.Context, recipient int64, first *int, filter *model.NotificationFilter) (*model.NotificationConnection, error) {
 	limit := 50
 	if first != nil && *first > 0 && *first <= 200 {
 		limit = *first

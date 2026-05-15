@@ -3,17 +3,15 @@ package graphql
 import (
 	"context"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
 )
 
 // impersonationStateForSession reads the post-mutation session row and
 // builds the ImpersonationState model. Lives in its own file so gqlgen
 // regen doesn't strip it as orphan helper code.
-func (r *Resolver) impersonationStateForSession(ctx context.Context, sessionID uuid.UUID) (*model.ImpersonationState, error) {
-	var actingID uuid.UUID
-	var effective *uuid.UUID
+func (r *Resolver) impersonationStateForSession(ctx context.Context, sessionID int64) (*model.ImpersonationState, error) {
+	var actingID int64
+	var effective *int64
 	if err := r.DB.QueryRow(ctx,
 		`SELECT principal_id, effective_principal_id FROM sessions WHERE id = $1`,
 		sessionID).Scan(&actingID, &effective); err != nil {

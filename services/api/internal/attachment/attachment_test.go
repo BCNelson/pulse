@@ -5,12 +5,12 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
+	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/google/uuid"
 
 	"github.com/bcnelson/pulse/services/api/internal/attachment"
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // fakePresign is a stand-in for the S3 PresignClient. It records
@@ -42,16 +42,16 @@ func TestIssueUploadCreatesPendingRow(t *testing.T) {
 	ctx := context.Background()
 
 	// Seed minimum: one principal.
-	uploaderID := uuid.New()
+	uploaderID := ids.New(ids.KindUser)
 	if _, err := pool.Exec(ctx, `
         INSERT INTO principals (id, kind, status, global_uri, display_name, email)
         VALUES ($1, 'user', 'active', $2, 'Up', 'up@example.com')
-    `, uploaderID, "local://principals/"+uploaderID.String()); err != nil {
+    `, uploaderID, "local://principals/"+ids.FormatID(uploaderID)); err != nil {
 		t.Fatalf("seed: %v", err)
 	}
 
 	// Attach to a placeholder owner — we just need a UUID for the test.
-	ownerID := uuid.New()
+	ownerID := ids.New(ids.KindUser)
 
 	pres := &fakePresign{}
 	svc := &attachment.Service{
@@ -71,7 +71,7 @@ func TestIssueUploadCreatesPendingRow(t *testing.T) {
 	if err != nil {
 		t.Fatalf("issue: %v", err)
 	}
-	if res.UploadURL == "" || res.AttachmentID == uuid.Nil {
+	if res.UploadURL == "" || res.AttachmentID == int64(0) {
 		t.Fatalf("bad result: %+v", res)
 	}
 	if !strings.Contains(res.UploadURL, "image.png") {
@@ -127,8 +127,8 @@ func TestIssueUploadRejectsOversize(t *testing.T) {
 	svc := &attachment.Service{DB: pool, Presign: &fakePresign{}, Bucket: "b"}
 	_, err := svc.IssueUpload(context.Background(), attachment.IssueInput{
 		OwnerType:  "post",
-		OwnerID:    uuid.New(),
-		UploaderID: uuid.New(),
+		OwnerID:    ids.New(ids.KindUser),
+		UploaderID: ids.New(ids.KindUser),
 		Filename:   "huge.bin",
 		MimeType:   "application/octet-stream",
 		SizeBytes:  attachment.MaxSizeBytes + 1,
@@ -142,20 +142,20 @@ func TestTombstoneOnlyByUploader(t *testing.T) {
 	pool := pgtest.Pool(t)
 	ctx := context.Background()
 
-	uploader := uuid.New()
-	intruder := uuid.New()
-	for _, id := range []uuid.UUID{uploader, intruder} {
+	uploader := ids.New(ids.KindUser)
+	intruder := ids.New(ids.KindUser)
+	for _, id := range []int64{uploader, intruder} {
 		if _, err := pool.Exec(ctx, `
             INSERT INTO principals (id, kind, status, global_uri, display_name, email)
             VALUES ($1, 'user', 'active', $2, 'X', $3)
-        `, id, "local://principals/"+id.String(), id.String()+"@example.com"); err != nil {
+        `, id, "local://principals/"+ids.FormatID(id), ids.FormatID(id)+"@example.com"); err != nil {
 			t.Fatalf("seed: %v", err)
 		}
 	}
 
 	svc := &attachment.Service{DB: pool, Presign: &fakePresign{}, Bucket: "b"}
 	res, err := svc.IssueUpload(ctx, attachment.IssueInput{
-		OwnerType: "post", OwnerID: uuid.New(), UploaderID: uploader,
+		OwnerType: "post", OwnerID: ids.New(ids.KindUser), UploaderID: uploader,
 		Filename: "a.txt", MimeType: "text/plain", SizeBytes: 4,
 	})
 	if err != nil {

@@ -4,8 +4,6 @@ import (
 	"context"
 	"net/http"
 	"strings"
-
-	"github.com/google/uuid"
 )
 
 type sessionIDCtxKey struct{}
@@ -13,13 +11,13 @@ type sessionIDCtxKey struct{}
 // WithSessionID stashes the resolved session id on the context. The
 // impersonation resolvers read it back to identify which session row to
 // update — they don't get the bearer token directly.
-func WithSessionID(ctx context.Context, id uuid.UUID) context.Context {
+func WithSessionID(ctx context.Context, id int64) context.Context {
 	return context.WithValue(ctx, sessionIDCtxKey{}, id)
 }
 
 // SessionIDFromContext returns the resolved session id, if any.
-func SessionIDFromContext(ctx context.Context) (uuid.UUID, bool) {
-	v, ok := ctx.Value(sessionIDCtxKey{}).(uuid.UUID)
+func SessionIDFromContext(ctx context.Context) (int64, bool) {
+	v, ok := ctx.Value(sessionIDCtxKey{}).(int64)
 	return v, ok
 }
 
@@ -40,7 +38,7 @@ func (s *Service) HTTPMiddleware(next http.Handler) http.Handler {
 		id, sessionID, ok := s.identityFromRequest(r)
 		if ok {
 			ctx = WithIdentity(ctx, id)
-			if sessionID != uuid.Nil {
+			if sessionID != int64(0) {
 				ctx = WithSessionID(ctx, sessionID)
 			}
 		}
@@ -48,7 +46,7 @@ func (s *Service) HTTPMiddleware(next http.Handler) http.Handler {
 	})
 }
 
-func (s *Service) identityFromRequest(r *http.Request) (Identity, uuid.UUID, bool) {
+func (s *Service) identityFromRequest(r *http.Request) (Identity, int64, bool) {
 	if header := r.Header.Get("Authorization"); header != "" {
 		if id, sid, ok := s.IdentityFromAuthHeader(r.Context(), header); ok {
 			return id, sid, true
@@ -59,7 +57,7 @@ func (s *Service) identityFromRequest(r *http.Request) (Identity, uuid.UUID, boo
 			return Identity{ActingID: sess.ActingID, EffectiveID: sess.EffectiveID}, sess.SessionID, true
 		}
 	}
-	return Identity{}, uuid.Nil, false
+	return Identity{}, int64(0), false
 }
 
 // IdentityFromAuthHeader resolves a raw Authorization-style header value
@@ -67,7 +65,7 @@ func (s *Service) identityFromRequest(r *http.Request) (Identity, uuid.UUID, boo
 // unrecognized prefix, or invalid/expired tokens. Cookie-based auth is
 // HTTP-only and intentionally not handled here, so the WebSocket
 // connection_init path can reuse this helper.
-func (s *Service) IdentityFromAuthHeader(ctx context.Context, header string) (Identity, uuid.UUID, bool) {
+func (s *Service) IdentityFromAuthHeader(ctx context.Context, header string) (Identity, int64, bool) {
 	if strings.HasPrefix(header, bearerKind) {
 		token := strings.TrimPrefix(header, bearerKind)
 		if sess, err := s.LookupSession(ctx, token); err == nil {
@@ -77,10 +75,10 @@ func (s *Service) IdentityFromAuthHeader(ctx context.Context, header string) (Id
 	if strings.HasPrefix(header, botKind) {
 		key := strings.TrimPrefix(header, botKind)
 		if pid, err := s.AuthenticateBotKey(ctx, key); err == nil {
-			return Identity{ActingID: pid, EffectiveID: pid}, uuid.Nil, true
+			return Identity{ActingID: pid, EffectiveID: pid}, int64(0), true
 		}
 	}
-	return Identity{}, uuid.Nil, false
+	return Identity{}, int64(0), false
 }
 
 // SetSessionCookie writes a session cookie for browser clients. Native

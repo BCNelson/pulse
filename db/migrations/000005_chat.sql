@@ -5,7 +5,7 @@
 -- participant lives under a user-tag root and no org tag is attached.
 -- Recomputed by the chat service on participant or tag changes.
 CREATE TABLE chat_rooms (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id          BIGINT PRIMARY KEY DEFAULT gen_id_room(),
   defaults    JSONB NOT NULL DEFAULT '{}',
   is_dm       BOOLEAN NOT NULL DEFAULT FALSE,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -16,8 +16,8 @@ CREATE TABLE chat_rooms (
 -- definition. Adding a tag to an existing DM is the "DM → team space"
 -- promotion path; recompute is_dm afterward.
 CREATE TABLE chat_room_tags (
-  chat_room_id UUID NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
-  tag_id       UUID NOT NULL REFERENCES tags(id),
+  chat_room_id BIGINT NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
+  tag_id       BIGINT NOT NULL REFERENCES tags(id),
   PRIMARY KEY (chat_room_id, tag_id)
 );
 
@@ -25,8 +25,8 @@ CREATE TABLE chat_room_tags (
 -- member; setting left_at preserves historical read access (per
 -- architecture: "set = retains historical read access").
 CREATE TABLE chat_room_participants (
-  chat_room_id UUID NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
-  principal_id UUID NOT NULL REFERENCES principals(id),
+  chat_room_id BIGINT NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
+  principal_id BIGINT NOT NULL REFERENCES principals(id),
   role         TEXT NOT NULL DEFAULT 'member' CHECK (role IN ('member', 'admin')),
   joined_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   left_at      TIMESTAMPTZ,
@@ -40,18 +40,18 @@ CREATE INDEX chat_room_participants_principal_idx
 -- got hoisted into a post — preserves the link both directions for
 -- "where did this thread come from?" UI.
 CREATE TABLE messages (
-  id               UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  chat_room_id     UUID NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
-  author_id        UUID NOT NULL REFERENCES principals(id),
+  id               BIGINT PRIMARY KEY DEFAULT gen_id_message(),
+  chat_room_id     BIGINT NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
+  author_id        BIGINT NOT NULL REFERENCES principals(id),
   body             TEXT NOT NULL,
   body_tsv         tsvector GENERATED ALWAYS AS (
                      to_tsvector('english', coalesce(body, ''))
                    ) STORED,
-  reply_to         UUID REFERENCES messages(id),
+  reply_to         BIGINT REFERENCES messages(id),
   created_at       TIMESTAMPTZ NOT NULL DEFAULT now(),
   edited_at        TIMESTAMPTZ,
   deleted_at       TIMESTAMPTZ,
-  promoted_to_post UUID REFERENCES posts(id)
+  promoted_to_post BIGINT REFERENCES posts(id)
 );
 CREATE INDEX messages_room_created_idx ON messages (chat_room_id, created_at DESC);
 CREATE INDEX messages_body_tsv_idx     ON messages USING GIN (body_tsv);

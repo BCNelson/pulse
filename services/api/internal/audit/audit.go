@@ -12,7 +12,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -41,7 +40,7 @@ type Service struct {
 type Event struct {
 	Action     string
 	TargetType string
-	TargetID   uuid.UUID
+	TargetID   int64
 	Diff       json.RawMessage
 	Reason     string
 }

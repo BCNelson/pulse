@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 
 	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
@@ -14,13 +13,13 @@ import (
 
 // loadUser fetches a User principal by id. Returns nil, nil when the
 // principal isn't a user or doesn't exist.
-func (r *Resolver) loadUser(ctx context.Context, id uuid.UUID) (*model.User, error) {
+func (r *Resolver) loadUser(ctx context.Context, id int64) (*model.User, error) {
 	var (
 		kind        string
 		status      string
 		displayName string
 		email       *string
-		homeTagID   *uuid.UUID
+		homeTagID   *int64
 	)
 	err := r.DB.QueryRow(ctx, `
         SELECT kind, status, display_name, email, home_tag_id
@@ -38,8 +37,8 @@ func (r *Resolver) loadUser(ctx context.Context, id uuid.UUID) (*model.User, err
 	}
 
 	out := &model.User{
-		ID:          id.String(),
-		GlobalURI:   ids.URI("principals", id),
+		ID:          ids.FormatID(id),
+		GlobalURI:   ids.URI(ids.KindUser, id),
 		Kind:        model.PrincipalKindUser,
 		Status:      mapStatusDBToGQL(status),
 		DisplayName: displayName,

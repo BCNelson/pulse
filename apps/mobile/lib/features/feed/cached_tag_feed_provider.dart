@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:ferry/ferry.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,13 +43,26 @@ Future<void> _refetch(
     if (tag == null) return;
     final entries = <({String cursor, GPostSummaryData node})>[];
     for (final e in tag.posts.edges) {
-      final summary = GPostSummaryData.fromJson(e.node.toJson());
+      // Force a true JSON bytes round-trip rather than a same-Dart-VM
+      // Map handoff. The response's edge.node type and GPostSummaryData
+      // share a fragment shape but use distinct built_value serializers,
+      // and on Flutter web the in-memory map values can leak through as
+      // LegacyJavaScriptObject — which trips the iterator inside the
+      // other type's deserializer. Encode → decode normalizes every
+      // value to plain Dart maps/lists.
+      final summary = GPostSummaryData.fromJson(
+        jsonDecode(jsonEncode(e.node.toJson())) as Map<String, dynamic>,
+      );
       if (summary != null) {
         entries.add((cursor: e.cursor, node: summary));
       }
     }
+    // Cache-key by the input ref so watchFeed sees the write under the
+    // same key it's watching. The caller may pass either the 12-char
+    // typed id or a slug path; the backend resolves both, but the cache
+    // doesn't need to know — it just needs read and write to agree.
     await store.replaceFeed(
-      tagId: tag.id,
+      tagId: tagId,
       slug: tag.slug,
       displayName: tag.displayName,
       path: tag.path,

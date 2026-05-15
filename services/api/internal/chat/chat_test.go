@@ -4,13 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/chat"
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
 	"github.com/bcnelson/pulse/services/api/internal/post"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 func TestCreateRoomTwoUsersIsDM(t *testing.T) {
@@ -119,7 +119,7 @@ func TestPromoteMessageCreatesPost(t *testing.T) {
 	root := mustCreateTagRoot(t, tags, "engineering")
 
 	roomID, _ := svc.CreateRoom(context.Background(), chat.CreateRoomInput{
-		Tags:         []uuid.UUID{root},
+		Tags:         []int64{root},
 		Participants: []chat.ParticipantInput{{PrincipalID: alice}},
 	})
 	msgID, _ := svc.SendMessage(context.Background(), chat.SendInput{
@@ -130,13 +130,13 @@ func TestPromoteMessageCreatesPost(t *testing.T) {
 	if err != nil {
 		t.Fatalf("promote: %v", err)
 	}
-	if postID == uuid.Nil {
+	if postID == int64(0) {
 		t.Fatal("expected a post id")
 	}
 	// The message should now be linked.
 	msg, _ := svc.GetMessage(context.Background(), msgID)
 	if msg.PromotedToPost == nil || *msg.PromotedToPost != postID {
-		t.Errorf("expected promoted_to_post = %s, got %v", postID, msg.PromotedToPost)
+		t.Errorf("expected promoted_to_post = %d, got %v", postID, msg.PromotedToPost)
 	}
 	// Promoting again returns ErrAlreadyPromoted.
 	if _, err := svc.PromoteMessage(context.Background(), msgID, alice); err != chat.ErrAlreadyPromoted {
@@ -162,20 +162,20 @@ func TestPromoteRequiresTag(t *testing.T) {
 
 // --- helpers ---
 
-func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, kind, name string) uuid.UUID {
+func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, kind, name string) int64 {
 	t.Helper()
-	id := uuid.New()
+	id := ids.New(ids.KindUser)
 	_, err := pool.Exec(context.Background(), `
         INSERT INTO principals (id, kind, status, global_uri, display_name)
         VALUES ($1, $2, 'active', $3, $4)
-    `, id, kind, "local://principals/"+id.String(), name)
+    `, id, kind, "local://principals/"+ids.FormatID(id), name)
 	if err != nil {
 		t.Fatalf("insert principal: %v", err)
 	}
 	return id
 }
 
-func mustCreateTagRoot(t *testing.T, svc *tag.Service, slug string) uuid.UUID {
+func mustCreateTagRoot(t *testing.T, svc *tag.Service, slug string) int64 {
 	t.Helper()
 	id, err := svc.Create(context.Background(), tag.CreateInput{
 		Slug: slug, DisplayName: slug, RootKind: tag.RootKindOrg,

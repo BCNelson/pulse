@@ -4,12 +4,12 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/perm"
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 func TestDirectGrantConfersBundle(t *testing.T) {
@@ -47,7 +47,7 @@ func TestCascadingGrantReachesDescendants(t *testing.T) {
 
 	mustGrant(t, pool, root, alice, "moderator", true, nil)
 
-	for name, target := range map[string]uuid.UUID{
+	for name, target := range map[string]int64{
 		"root":       root,
 		"child":      child,
 		"grandchild": grandchild,
@@ -169,10 +169,10 @@ func TestRequestCacheReusesResult(t *testing.T) {
 
 // --- helpers ---
 
-func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, displayName string) uuid.UUID {
+func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, displayName string) int64 {
 	t.Helper()
-	id := uuid.New()
-	uri := "local://principals/" + id.String()
+	id := ids.New(ids.KindUser)
+	uri := "local://principals/" + ids.FormatID(id)
 	_, err := pool.Exec(context.Background(), `
         INSERT INTO principals (id, kind, status, global_uri, display_name)
         VALUES ($1, 'user', 'active', $2, $3)
@@ -183,7 +183,7 @@ func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, displayName string) u
 	return id
 }
 
-func mustCreateTagRoot(t *testing.T, svc *tag.Service, slug string) uuid.UUID {
+func mustCreateTagRoot(t *testing.T, svc *tag.Service, slug string) int64 {
 	t.Helper()
 	id, err := svc.Create(context.Background(), tag.CreateInput{
 		Slug:        slug,
@@ -196,7 +196,7 @@ func mustCreateTagRoot(t *testing.T, svc *tag.Service, slug string) uuid.UUID {
 	return id
 }
 
-func mustCreateTagChild(t *testing.T, svc *tag.Service, parent uuid.UUID, slug string) uuid.UUID {
+func mustCreateTagChild(t *testing.T, svc *tag.Service, parent int64, slug string) int64 {
 	t.Helper()
 	p := parent
 	id, err := svc.Create(context.Background(), tag.CreateInput{
@@ -211,7 +211,7 @@ func mustCreateTagChild(t *testing.T, svc *tag.Service, parent uuid.UUID, slug s
 	return id
 }
 
-func mustGrant(t *testing.T, pool *pgxpool.Pool, tag, principal uuid.UUID, bundle string, cascade bool, extras []string) {
+func mustGrant(t *testing.T, pool *pgxpool.Pool, tag, principal int64, bundle string, cascade bool, extras []string) {
 	t.Helper()
 	if extras == nil {
 		extras = []string{}
@@ -225,6 +225,6 @@ func mustGrant(t *testing.T, pool *pgxpool.Pool, tag, principal uuid.UUID, bundl
                 extra_perms = EXCLUDED.extra_perms
     `, tag, principal, bundle, cascade, extras)
 	if err != nil {
-		t.Fatalf("grant %s on tag %s to %s: %v", bundle, tag, principal, err)
+		t.Fatalf("grant %s on tag %d to %d: %v", bundle, tag, principal, err)
 	}
 }

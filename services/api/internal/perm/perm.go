@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -84,7 +83,7 @@ type Service struct {
 // EffectiveOnTag returns the maximum bundle and union of extra_perms that
 // principal P holds against tag T, considering both direct grants and
 // cascading grants from ancestors.
-func (s *Service) EffectiveOnTag(ctx context.Context, principal, tag uuid.UUID) (Bundle, []string, error) {
+func (s *Service) EffectiveOnTag(ctx context.Context, principal, tag int64) (Bundle, []string, error) {
 	if c, ok := cacheFromContext(ctx); ok {
 		if entry, hit := c.lookup(principal, tag); hit {
 			return entry.bundle, entry.extras, nil
@@ -137,7 +136,7 @@ func (s *Service) EffectiveOnTag(ctx context.Context, principal, tag uuid.UUID) 
 // Can returns true iff principal P may perform action A against tag T.
 // Bundle inclusion satisfies the action by default; extra_perms entries
 // matching the action name can substitute.
-func (s *Service) Can(ctx context.Context, principal uuid.UUID, action Action, tag uuid.UUID) (bool, error) {
+func (s *Service) Can(ctx context.Context, principal int64, action Action, tag int64) (bool, error) {
 	bundle, extras, err := s.EffectiveOnTag(ctx, principal, tag)
 	if err != nil {
 		return false, err
@@ -156,8 +155,8 @@ func (s *Service) Can(ctx context.Context, principal uuid.UUID, action Action, t
 // Filter returns the subset of tags for which principal P may perform
 // action A. M1 implementation iterates Can; M2 adds a batched-SQL form
 // once posts shovel hundreds of items per request through here.
-func (s *Service) Filter(ctx context.Context, principal uuid.UUID, action Action, tags []uuid.UUID) ([]uuid.UUID, error) {
-	out := make([]uuid.UUID, 0, len(tags))
+func (s *Service) Filter(ctx context.Context, principal int64, action Action, tags []int64) ([]int64, error) {
+	out := make([]int64, 0, len(tags))
 	for _, t := range tags {
 		ok, err := s.Can(ctx, principal, action, t)
 		if err != nil {
@@ -204,53 +203,53 @@ type cacheEntry struct {
 }
 
 type cache struct {
-	tag      map[[2]uuid.UUID]cacheEntry
-	postTags map[postTagsKey][]uuid.UUID
-	taskTags map[taskTagsKey][]uuid.UUID
+	tag      map[[2]int64]cacheEntry
+	postTags map[postTagsKey][]int64
+	taskTags map[taskTagsKey][]int64
 }
 
 type postTagsKey struct {
-	postID uuid.UUID
+	postID int64
 	action Action
 }
 
 type taskTagsKey struct {
-	taskID uuid.UUID
+	taskID int64
 	action Action
 }
 
 func newCache() *cache {
 	return &cache{
-		tag:      make(map[[2]uuid.UUID]cacheEntry),
-		postTags: make(map[postTagsKey][]uuid.UUID),
-		taskTags: make(map[taskTagsKey][]uuid.UUID),
+		tag:      make(map[[2]int64]cacheEntry),
+		postTags: make(map[postTagsKey][]int64),
+		taskTags: make(map[taskTagsKey][]int64),
 	}
 }
 
-func (c *cache) lookup(principal, tag uuid.UUID) (cacheEntry, bool) {
-	e, ok := c.tag[[2]uuid.UUID{principal, tag}]
+func (c *cache) lookup(principal, tag int64) (cacheEntry, bool) {
+	e, ok := c.tag[[2]int64{principal, tag}]
 	return e, ok
 }
 
-func (c *cache) store(principal, tag uuid.UUID, bundle Bundle, extras []string) {
-	c.tag[[2]uuid.UUID{principal, tag}] = cacheEntry{bundle: bundle, extras: extras}
+func (c *cache) store(principal, tag int64, bundle Bundle, extras []string) {
+	c.tag[[2]int64{principal, tag}] = cacheEntry{bundle: bundle, extras: extras}
 }
 
-func (c *cache) lookupPostTags(postID uuid.UUID, action Action) ([]uuid.UUID, bool) {
+func (c *cache) lookupPostTags(postID int64, action Action) ([]int64, bool) {
 	v, ok := c.postTags[postTagsKey{postID, action}]
 	return v, ok
 }
 
-func (c *cache) storePostTags(postID uuid.UUID, action Action, tags []uuid.UUID) {
+func (c *cache) storePostTags(postID int64, action Action, tags []int64) {
 	c.postTags[postTagsKey{postID, action}] = tags
 }
 
-func (c *cache) lookupTaskTags(taskID uuid.UUID, action Action) ([]uuid.UUID, bool) {
+func (c *cache) lookupTaskTags(taskID int64, action Action) ([]int64, bool) {
 	v, ok := c.taskTags[taskTagsKey{taskID, action}]
 	return v, ok
 }
 
-func (c *cache) storeTaskTags(taskID uuid.UUID, action Action, tags []uuid.UUID) {
+func (c *cache) storeTaskTags(taskID int64, action Action, tags []int64) {
 	c.taskTags[taskTagsKey{taskID, action}] = tags
 }
 

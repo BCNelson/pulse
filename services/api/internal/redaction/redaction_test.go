@@ -4,14 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/bootstrap"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
 	"github.com/bcnelson/pulse/services/api/internal/pgtest"
 	"github.com/bcnelson/pulse/services/api/internal/redaction"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 func TestRedactPrincipalSanitizesContent(t *testing.T) {
@@ -27,11 +26,11 @@ func TestRedactPrincipalSanitizesContent(t *testing.T) {
 	}
 
 	// Seed a target principal with some authored content.
-	target := uuid.New()
+	target := ids.New(ids.KindUser)
 	if _, err := pool.Exec(ctx, `
         INSERT INTO principals (id, kind, status, global_uri, display_name, email)
         VALUES ($1, 'user', 'active', $2, 'Target', 'target@example.com')
-    `, target, "local://principals/"+target.String()); err != nil {
+    `, target, "local://principals/"+ids.FormatID(target)); err != nil {
 		t.Fatalf("seed: %v", err)
 	}
 	hash, _ := auth.HashPassword("pw-target")
@@ -40,7 +39,7 @@ func TestRedactPrincipalSanitizesContent(t *testing.T) {
 		target, hash); err != nil {
 		t.Fatalf("creds: %v", err)
 	}
-	postID := uuid.New()
+	postID := ids.New(ids.KindUser)
 	if _, err := pool.Exec(ctx, `
         INSERT INTO posts (id, title, body, author_id) VALUES ($1, 'secret', 'sensitive', $2)
     `, postID, target); err != nil {

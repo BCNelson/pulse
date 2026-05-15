@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/perm"
@@ -92,9 +91,9 @@ func TestEffectiveInRoomParticipantUpgrades(t *testing.T) {
 
 // --- helpers (chat-specific) ---
 
-func mustCreateChatRoom(t *testing.T, pool *pgxpool.Pool) uuid.UUID {
+func mustCreateChatRoom(t *testing.T, pool *pgxpool.Pool) int64 {
 	t.Helper()
-	var id uuid.UUID
+	var id int64
 	if err := pool.QueryRow(context.Background(),
 		`INSERT INTO chat_rooms DEFAULT VALUES RETURNING id`).Scan(&id); err != nil {
 		t.Fatalf("create room: %v", err)
@@ -102,7 +101,7 @@ func mustCreateChatRoom(t *testing.T, pool *pgxpool.Pool) uuid.UUID {
 	return id
 }
 
-func mustAddParticipant(t *testing.T, pool *pgxpool.Pool, roomID, principalID uuid.UUID) {
+func mustAddParticipant(t *testing.T, pool *pgxpool.Pool, roomID, principalID int64) {
 	t.Helper()
 	if _, err := pool.Exec(context.Background(), `
         INSERT INTO chat_room_participants (chat_room_id, principal_id, role)
@@ -112,7 +111,7 @@ func mustAddParticipant(t *testing.T, pool *pgxpool.Pool, roomID, principalID uu
 	}
 }
 
-func mustAddRoomTag(t *testing.T, pool *pgxpool.Pool, roomID, tagID uuid.UUID) {
+func mustAddRoomTag(t *testing.T, pool *pgxpool.Pool, roomID, tagID int64) {
 	t.Helper()
 	if _, err := pool.Exec(context.Background(),
 		`INSERT INTO chat_room_tags (chat_room_id, tag_id) VALUES ($1, $2)`, roomID, tagID); err != nil {

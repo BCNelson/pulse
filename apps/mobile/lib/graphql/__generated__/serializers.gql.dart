@@ -282,6 +282,8 @@ import 'package:pulse/graphql/operations/__generated__/search.var.gql.dart'
     show GSearchTagsVars, GSearchVars;
 import 'package:pulse/graphql/operations/__generated__/tag_tree.data.gql.dart'
     show
+        GTagBySlugPathData,
+        GTagBySlugPathData_tagBySlugPath,
         GTagChildrenData,
         GTagChildrenData_tag,
         GTagChildrenData_tag_children,
@@ -293,9 +295,9 @@ import 'package:pulse/graphql/operations/__generated__/tag_tree.data.gql.dart'
         GTagTreeData_myTagRoots_children_children,
         GTagTreeData_myTagRoots_children_children_children;
 import 'package:pulse/graphql/operations/__generated__/tag_tree.req.gql.dart'
-    show GTagChildrenReq, GTagSummaryReq, GTagTreeReq;
+    show GTagBySlugPathReq, GTagChildrenReq, GTagSummaryReq, GTagTreeReq;
 import 'package:pulse/graphql/operations/__generated__/tag_tree.var.gql.dart'
-    show GTagChildrenVars, GTagSummaryVars, GTagTreeVars;
+    show GTagBySlugPathVars, GTagChildrenVars, GTagSummaryVars, GTagTreeVars;
 import 'package:pulse/graphql/operations/__generated__/viewer.data.gql.dart'
     show GViewerData, GViewerData_viewer, GViewerData_viewer_homeTag;
 import 'package:pulse/graphql/operations/__generated__/viewer.req.gql.dart'
@@ -529,6 +531,10 @@ final SerializersBuilder _serializersBuilder = _$serializers.toBuilder()
   GSendMessageVars,
   GSubscribeTagInput,
   GSubscriptionUrgency,
+  GTagBySlugPathData,
+  GTagBySlugPathData_tagBySlugPath,
+  GTagBySlugPathReq,
+  GTagBySlugPathVars,
   GTagChildrenData,
   GTagChildrenData_tag,
   GTagChildrenData_tag_children,

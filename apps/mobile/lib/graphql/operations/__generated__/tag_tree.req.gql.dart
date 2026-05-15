@@ -172,6 +172,85 @@ abstract class GTagChildrenReq
       );
 }
 
+abstract class GTagBySlugPathReq
+    implements
+        Built<GTagBySlugPathReq, GTagBySlugPathReqBuilder>,
+        _i1.OperationRequest<_i2.GTagBySlugPathData, _i3.GTagBySlugPathVars> {
+  GTagBySlugPathReq._();
+
+  factory GTagBySlugPathReq(
+          [void Function(GTagBySlugPathReqBuilder b) updates]) =
+      _$GTagBySlugPathReq;
+
+  static void _initializeBuilder(GTagBySlugPathReqBuilder b) => b
+    ..operation = _i4.Operation(
+      document: _i5.document,
+      operationName: 'TagBySlugPath',
+    )
+    ..executeOnListen = true;
+
+  @override
+  _i3.GTagBySlugPathVars get vars;
+  @override
+  _i4.Operation get operation;
+  @override
+  _i4.Request get execRequest => _i4.Request(
+        operation: operation,
+        variables: vars.toJson(),
+        context: context ?? const _i4.Context(),
+      );
+
+  @override
+  String? get requestId;
+  @override
+  @BuiltValueField(serialize: false)
+  _i2.GTagBySlugPathData? Function(
+    _i2.GTagBySlugPathData?,
+    _i2.GTagBySlugPathData?,
+  )? get updateResult;
+  @override
+  _i2.GTagBySlugPathData? get optimisticResponse;
+  @override
+  String? get updateCacheHandlerKey;
+  @override
+  Map<String, dynamic>? get updateCacheHandlerContext;
+  @override
+  _i1.FetchPolicy? get fetchPolicy;
+  @override
+  bool get executeOnListen;
+  @override
+  @BuiltValueField(serialize: false)
+  _i4.Context? get context;
+  @override
+  _i2.GTagBySlugPathData? parseData(Map<String, dynamic> json) =>
+      _i2.GTagBySlugPathData.fromJson(json);
+
+  @override
+  Map<String, dynamic> varsToJson() => vars.toJson();
+
+  @override
+  Map<String, dynamic> dataToJson(_i2.GTagBySlugPathData data) => data.toJson();
+
+  @override
+  _i1.OperationRequest<_i2.GTagBySlugPathData, _i3.GTagBySlugPathVars>
+      transformOperation(_i4.Operation Function(_i4.Operation) transform) =>
+          this.rebuild((b) => b..operation = transform(operation));
+
+  static Serializer<GTagBySlugPathReq> get serializer =>
+      _$gTagBySlugPathReqSerializer;
+
+  Map<String, dynamic> toJson() => (_i6.serializers.serializeWith(
+        GTagBySlugPathReq.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GTagBySlugPathReq? fromJson(Map<String, dynamic> json) =>
+      _i6.serializers.deserializeWith(
+        GTagBySlugPathReq.serializer,
+        json,
+      );
+}
+
 abstract class GTagSummaryReq
     implements
         Built<GTagSummaryReq, GTagSummaryReqBuilder>,

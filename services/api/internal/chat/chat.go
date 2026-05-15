@@ -12,12 +12,12 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/post"
 	"github.com/bcnelson/pulse/services/api/internal/realtime"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 var (
@@ -34,7 +34,7 @@ type Service struct {
 
 // Room is the read-side row for a chat room.
 type Room struct {
-	ID         uuid.UUID
+	ID         int64
 	IsDM       bool
 	CreatedAt  time.Time
 	ArchivedAt *time.Time
@@ -42,7 +42,7 @@ type Room struct {
 
 // Participant is a (room, principal, role) row.
 type Participant struct {
-	PrincipalID uuid.UUID
+	PrincipalID int64
 	Role        string
 	JoinedAt    time.Time
 	LeftAt      *time.Time
@@ -50,41 +50,41 @@ type Participant struct {
 
 // Message is the read-side row for a chat message.
 type Message struct {
-	ID             uuid.UUID
-	ChatRoomID     uuid.UUID
-	AuthorID       uuid.UUID
+	ID             int64
+	ChatRoomID     int64
+	AuthorID       int64
 	Body           string
-	ReplyTo        *uuid.UUID
+	ReplyTo        *int64
 	CreatedAt      time.Time
 	EditedAt       *time.Time
 	DeletedAt      *time.Time
-	PromotedToPost *uuid.UUID
+	PromotedToPost *int64
 }
 
 // CreateRoomInput is the payload for createRoom.
 type CreateRoomInput struct {
-	Tags         []uuid.UUID
+	Tags         []int64
 	Participants []ParticipantInput
 }
 
 type ParticipantInput struct {
-	PrincipalID uuid.UUID
+	PrincipalID int64
 	Role        string // 'member' | 'admin'
 }
 
 // SendInput captures a single send-message call.
 type SendInput struct {
-	RoomID   uuid.UUID
-	AuthorID uuid.UUID
+	RoomID   int64
+	AuthorID int64
 	Body     string
-	ReplyTo  *uuid.UUID
+	ReplyTo  *int64
 }
 
 // CreateRoom inserts a room with its initial tags and participants. Computes
 // is_dm before returning. Per architecture: room with no org-tag + all-user
 // participants is a DM.
-func (s *Service) CreateRoom(ctx context.Context, in CreateRoomInput) (uuid.UUID, error) {
-	var id uuid.UUID
+func (s *Service) CreateRoom(ctx context.Context, in CreateRoomInput) (int64, error) {
+	var id int64
 	err := s.runInTx(ctx, func(tx pgx.Tx) error {
 		row := tx.QueryRow(ctx, `INSERT INTO chat_rooms DEFAULT VALUES RETURNING id`)
 		if err := row.Scan(&id); err != nil {
@@ -117,7 +117,7 @@ func (s *Service) CreateRoom(ctx context.Context, in CreateRoomInput) (uuid.UUID
 // AddParticipant adds (or rejoins) a principal to a room and recomputes
 // is_dm. Idempotent: re-adding the same principal updates role and clears
 // left_at.
-func (s *Service) AddParticipant(ctx context.Context, roomID, principalID uuid.UUID, role string) error {
+func (s *Service) AddParticipant(ctx context.Context, roomID, principalID int64, role string) error {
 	if role == "" {
 		role = "member"
 	}
@@ -135,7 +135,7 @@ func (s *Service) AddParticipant(ctx context.Context, roomID, principalID uuid.U
 }
 
 // RemoveParticipant marks a participant as having left (preserves history).
-func (s *Service) RemoveParticipant(ctx context.Context, roomID, principalID uuid.UUID) error {
+func (s *Service) RemoveParticipant(ctx context.Context, roomID, principalID int64) error {
 	return s.runInTx(ctx, func(tx pgx.Tx) error {
 		tag, err := tx.Exec(ctx, `
             UPDATE chat_room_participants
@@ -154,7 +154,7 @@ func (s *Service) RemoveParticipant(ctx context.Context, roomID, principalID uui
 
 // AddTag attaches a tag to a room and recomputes is_dm. The DM → team
 // space promotion path: adding an org tag flips is_dm to false.
-func (s *Service) AddTag(ctx context.Context, roomID, tagID uuid.UUID) error {
+func (s *Service) AddTag(ctx context.Context, roomID, tagID int64) error {
 	return s.runInTx(ctx, func(tx pgx.Tx) error {
 		if _, err := tx.Exec(ctx, `
             INSERT INTO chat_room_tags (chat_room_id, tag_id) VALUES ($1, $2)
@@ -167,7 +167,7 @@ func (s *Service) AddTag(ctx context.Context, roomID, tagID uuid.UUID) error {
 }
 
 // RemoveTag detaches a tag from a room and recomputes is_dm.
-func (s *Service) RemoveTag(ctx context.Context, roomID, tagID uuid.UUID) error {
+func (s *Service) RemoveTag(ctx context.Context, roomID, tagID int64) error {
 	return s.runInTx(ctx, func(tx pgx.Tx) error {
 		if _, err := tx.Exec(ctx, `
             DELETE FROM chat_room_tags WHERE chat_room_id = $1 AND tag_id = $2
@@ -184,7 +184,7 @@ func (s *Service) RemoveTag(ctx context.Context, roomID, tagID uuid.UUID) error 
 //   - every active participant is a user (not a bot)
 //
 // Anything else falls back to false.
-func (s *Service) recomputeIsDMTx(ctx context.Context, tx pgx.Tx, roomID uuid.UUID) error {
+func (s *Service) recomputeIsDMTx(ctx context.Context, tx pgx.Tx, roomID int64) error {
 	var hasOrgTag bool
 	if err := tx.QueryRow(ctx, `
         SELECT EXISTS (
@@ -213,7 +213,7 @@ func (s *Service) recomputeIsDMTx(ctx context.Context, tx pgx.Tx, roomID uuid.UU
 }
 
 // GetRoom returns a room by id.
-func (s *Service) GetRoom(ctx context.Context, id uuid.UUID) (*Room, error) {
+func (s *Service) GetRoom(ctx context.Context, id int64) (*Room, error) {
 	var r Room
 	err := s.DB.QueryRow(ctx, `
         SELECT id, is_dm, created_at, archived_at FROM chat_rooms WHERE id = $1
@@ -228,7 +228,7 @@ func (s *Service) GetRoom(ctx context.Context, id uuid.UUID) (*Room, error) {
 }
 
 // Participants returns the active participants of a room.
-func (s *Service) Participants(ctx context.Context, roomID uuid.UUID) ([]Participant, error) {
+func (s *Service) Participants(ctx context.Context, roomID int64) ([]Participant, error) {
 	rows, err := s.DB.Query(ctx, `
         SELECT principal_id, role, joined_at, left_at
         FROM chat_room_participants
@@ -251,15 +251,15 @@ func (s *Service) Participants(ctx context.Context, roomID uuid.UUID) ([]Partici
 }
 
 // RoomTags returns the tag ids attached to a room.
-func (s *Service) RoomTags(ctx context.Context, roomID uuid.UUID) ([]uuid.UUID, error) {
+func (s *Service) RoomTags(ctx context.Context, roomID int64) ([]int64, error) {
 	rows, err := s.DB.Query(ctx, `SELECT tag_id FROM chat_room_tags WHERE chat_room_id = $1`, roomID)
 	if err != nil {
 		return nil, fmt.Errorf("list room tags: %w", err)
 	}
 	defer rows.Close()
-	var out []uuid.UUID
+	var out []int64
 	for rows.Next() {
-		var id uuid.UUID
+		var id int64
 		if err := rows.Scan(&id); err != nil {
 			return nil, err
 		}
@@ -270,8 +270,8 @@ func (s *Service) RoomTags(ctx context.Context, roomID uuid.UUID) ([]uuid.UUID, 
 
 // SendMessage inserts a chat message and emits a chat.room.<id> NOTIFY
 // in the same transaction. Subscribers receive the id and re-fetch.
-func (s *Service) SendMessage(ctx context.Context, in SendInput) (uuid.UUID, error) {
-	var id uuid.UUID
+func (s *Service) SendMessage(ctx context.Context, in SendInput) (int64, error) {
+	var id int64
 	err := s.runInTx(ctx, func(tx pgx.Tx) error {
 		row := tx.QueryRow(ctx, `
             INSERT INTO messages (chat_room_id, author_id, body, reply_to)
@@ -284,8 +284,8 @@ func (s *Service) SendMessage(ctx context.Context, in SendInput) (uuid.UUID, err
 		// subscribers re-fetch + recheck visibility before emitting.
 		payload := json.RawMessage(fmt.Sprintf(
 			`{"message_id":"%s","author_id":"%s","room_id":"%s"}`,
-			id, in.AuthorID, in.RoomID))
-		sql, args := realtime.NotifySQL("chat.room."+in.RoomID.String(), payload)
+			ids.FormatID(id), ids.FormatID(in.AuthorID), ids.FormatID(in.RoomID)))
+		sql, args := realtime.NotifySQL("chat.room."+ids.FormatID(in.RoomID), payload)
 		if _, err := tx.Exec(ctx, sql, args...); err != nil {
 			return fmt.Errorf("notify: %w", err)
 		}
@@ -295,7 +295,7 @@ func (s *Service) SendMessage(ctx context.Context, in SendInput) (uuid.UUID, err
 }
 
 // GetMessage returns a message by id.
-func (s *Service) GetMessage(ctx context.Context, id uuid.UUID) (*Message, error) {
+func (s *Service) GetMessage(ctx context.Context, id int64) (*Message, error) {
 	var m Message
 	err := s.DB.QueryRow(ctx, `
         SELECT id, chat_room_id, author_id, body, reply_to, created_at, edited_at, deleted_at, promoted_to_post
@@ -314,7 +314,7 @@ func (s *Service) GetMessage(ctx context.Context, id uuid.UUID) (*Message, error
 // snapshot prior body to a message_edits table — chat is more transient
 // than posts, and the architecture defers message-edit history to a
 // later milestone if user research demands it.
-func (s *Service) EditMessage(ctx context.Context, id, editor uuid.UUID, body string) error {
+func (s *Service) EditMessage(ctx context.Context, id, editor int64, body string) error {
 	tag, err := s.DB.Exec(ctx, `
         UPDATE messages SET body = $1, edited_at = now()
         WHERE id = $2 AND deleted_at IS NULL AND body <> $1
@@ -339,7 +339,7 @@ func (s *Service) EditMessage(ctx context.Context, id, editor uuid.UUID, body st
 }
 
 // DeleteMessage soft-deletes a message.
-func (s *Service) DeleteMessage(ctx context.Context, id uuid.UUID) error {
+func (s *Service) DeleteMessage(ctx context.Context, id int64) error {
 	tag, err := s.DB.Exec(ctx,
 		`UPDATE messages SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
 	if err != nil {
@@ -355,7 +355,7 @@ func (s *Service) DeleteMessage(ctx context.Context, id uuid.UUID) error {
 // at limit. Soft-deleted messages render as `[deleted]` placeholders;
 // for now we just exclude them — the client-side placeholder UX comes
 // when chat surfaces ship in the Flutter app (M5).
-func (s *Service) ListMessages(ctx context.Context, roomID uuid.UUID, limit int) ([]*Message, error) {
+func (s *Service) ListMessages(ctx context.Context, roomID int64, limit int) ([]*Message, error) {
 	if limit <= 0 || limit > 500 {
 		limit = 100
 	}
@@ -389,12 +389,12 @@ func (s *Service) ListMessages(ctx context.Context, roomID uuid.UUID, limit int)
 // Constraints:
 //   - room must have at least one tag (otherwise the post would be invisible)
 //   - message must not already be promoted (idempotency error)
-func (s *Service) PromoteMessage(ctx context.Context, msgID, promoter uuid.UUID) (uuid.UUID, error) {
-	var postID uuid.UUID
+func (s *Service) PromoteMessage(ctx context.Context, msgID, promoter int64) (int64, error) {
+	var postID int64
 	err := s.runInTx(ctx, func(tx pgx.Tx) error {
-		var roomID uuid.UUID
+		var roomID int64
 		var body string
-		var existing *uuid.UUID
+		var existing *int64
 		err := tx.QueryRow(ctx, `
             SELECT chat_room_id, body, promoted_to_post
             FROM messages WHERE id = $1 AND deleted_at IS NULL FOR UPDATE
@@ -415,9 +415,9 @@ func (s *Service) PromoteMessage(ctx context.Context, msgID, promoter uuid.UUID)
 		if err != nil {
 			return fmt.Errorf("load room tags: %w", err)
 		}
-		var tagIDs []uuid.UUID
+		var tagIDs []int64
 		for tagRows.Next() {
-			var t uuid.UUID
+			var t int64
 			if err := tagRows.Scan(&t); err != nil {
 				tagRows.Close()
 				return err

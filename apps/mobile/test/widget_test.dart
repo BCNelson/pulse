@@ -26,7 +26,9 @@ void main() {
       ),
     );
 
-    await tester.pump();
+    // Settle through: prefs.isLoading -> /_loading splash, prefs resolves,
+    // redirect re-fires -> /setup -> ServerUrlScreen.
+    await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
     expect(find.text('connect'), findsOneWidget);

@@ -6,8 +6,8 @@
 -- on disk. Stateful sessions (rather than JWTs) buy us logout-everywhere
 -- and let M5's impersonation flow pin a session to an acting principal.
 CREATE TABLE sessions (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  principal_id  UUID NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
+  id            BIGINT PRIMARY KEY DEFAULT gen_id_session(),
+  principal_id  BIGINT NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
   token_hash    TEXT NOT NULL UNIQUE,
   user_agent    TEXT,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),

@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 
 	"github.com/bcnelson/pulse/services/api/internal/auth"
@@ -17,7 +16,7 @@ import (
 // loadChatRoom assembles a *model.ChatRoom by id, gating on the viewer's
 // CanInRoom check. Returns nil, nil when the room is not visible (or
 // missing — visibility-confused-with-existence by design).
-func (r *Resolver) loadChatRoom(ctx context.Context, id uuid.UUID) (*model.ChatRoom, error) {
+func (r *Resolver) loadChatRoom(ctx context.Context, id int64) (*model.ChatRoom, error) {
 	identity := auth.FromContext(ctx)
 	if identity.IsAnonymous() {
 		return nil, nil
@@ -75,8 +74,8 @@ func (r *Resolver) loadChatRoom(ctx context.Context, id uuid.UUID) (*model.ChatR
 		participants = append(participants, mp)
 	}
 	return &model.ChatRoom{
-		ID:           room.ID.String(),
-		GlobalURI:    ids.URI("chat_rooms", room.ID),
+		ID:           ids.FormatID(room.ID),
+		GlobalURI:    ids.URI(ids.KindRoom, room.ID),
 		IsDm:         room.IsDM,
 		Tags:         tags,
 		Participants: participants,
@@ -87,7 +86,7 @@ func (r *Resolver) loadChatRoom(ctx context.Context, id uuid.UUID) (*model.ChatR
 
 // loadMessage assembles a *model.Message. Visibility piggybacks on the
 // room — if you can see the room, you can see its messages.
-func (r *Resolver) loadMessage(ctx context.Context, id uuid.UUID) (*model.Message, error) {
+func (r *Resolver) loadMessage(ctx context.Context, id int64) (*model.Message, error) {
 	identity := auth.FromContext(ctx)
 	if identity.IsAnonymous() {
 		return nil, nil
@@ -118,8 +117,8 @@ func (r *Resolver) loadMessage(ctx context.Context, id uuid.UUID) (*model.Messag
 		return nil, err
 	}
 	out := &model.Message{
-		ID:        msg.ID.String(),
-		GlobalURI: ids.URI("messages", msg.ID),
+		ID:        ids.FormatID(msg.ID),
+		GlobalURI: ids.URI(ids.KindMessage, msg.ID),
 		ChatRoom:  room,
 		Author:    author,
 		Body:      msg.Body,
@@ -140,8 +139,8 @@ func (r *Resolver) loadMessage(ctx context.Context, id uuid.UUID) (*model.Messag
 		if err == nil {
 			rcreated = &t
 			out.ReplyTo = &model.Message{
-				ID:        msg.ReplyTo.String(),
-				GlobalURI: ids.URI("messages", *msg.ReplyTo),
+				ID:        ids.FormatID(*msg.ReplyTo),
+				GlobalURI: ids.URI(ids.KindMessage, *msg.ReplyTo),
 				ChatRoom:  room,
 				Author:    author, // approx — re-resolve when needed
 				Body:      rb,
@@ -162,7 +161,7 @@ func (r *Resolver) loadMessage(ctx context.Context, id uuid.UUID) (*model.Messag
 	return out, nil
 }
 
-func (r *Resolver) loadMessageConnection(ctx context.Context, roomID uuid.UUID, limit int) (*model.MessageConnection, error) {
+func (r *Resolver) loadMessageConnection(ctx context.Context, roomID int64, limit int) (*model.MessageConnection, error) {
 	msgs, err := r.Chat.ListMessages(ctx, roomID, limit)
 	if err != nil {
 		return nil, err

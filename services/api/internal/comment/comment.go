@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -28,11 +28,11 @@ type Service struct {
 
 // Comment is the read-side row used by GraphQL resolvers.
 type Comment struct {
-	ID        uuid.UUID
-	PostID    uuid.UUID
-	ParentID  *uuid.UUID
+	ID        int64
+	PostID    int64
+	ParentID  *int64
 	Path      string
-	AuthorID  uuid.UUID
+	AuthorID  int64
 	Body      string
 	CreatedAt time.Time
 	EditedAt  *time.Time
@@ -40,35 +40,35 @@ type Comment struct {
 }
 
 type CreateInput struct {
-	PostID   uuid.UUID
-	ParentID *uuid.UUID // nil for top-level comments
-	AuthorID uuid.UUID
+	PostID   int64
+	ParentID *int64 // nil for top-level comments
+	AuthorID int64
 	Body     string
-	Mentions []uuid.UUID
+	Mentions []int64
 }
 
 // Create inserts a comment and writes the materialized ltree path. The
 // path label for a comment is "c" + uuid hex (no dashes), since ltree
 // labels must start with a letter.
-func (s *Service) Create(ctx context.Context, in CreateInput) (uuid.UUID, error) {
-	id := uuid.New()
+func (s *Service) Create(ctx context.Context, in CreateInput) (int64, error) {
+	id := ids.New(ids.KindComment)
 	myLabel := pathLabel(id)
 
 	var path string
 	if in.ParentID != nil {
 		var parentPath string
-		var parentPostID uuid.UUID
+		var parentPostID int64
 		err := s.DB.QueryRow(ctx,
 			`SELECT path::text, post_id FROM comments WHERE id = $1`, *in.ParentID).
 			Scan(&parentPath, &parentPostID)
 		if errors.Is(err, pgx.ErrNoRows) {
-			return uuid.Nil, ErrNotFound
+			return int64(0), ErrNotFound
 		}
 		if err != nil {
-			return uuid.Nil, fmt.Errorf("load parent: %w", err)
+			return int64(0), fmt.Errorf("load parent: %w", err)
 		}
 		if parentPostID != in.PostID {
-			return uuid.Nil, ErrParentMismatch
+			return int64(0), ErrParentMismatch
 		}
 		path = parentPath + "." + myLabel
 	} else {
@@ -96,7 +96,7 @@ func (s *Service) Create(ctx context.Context, in CreateInput) (uuid.UUID, error)
 }
 
 // Get returns a comment by id.
-func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Comment, error) {
+func (s *Service) Get(ctx context.Context, id int64) (*Comment, error) {
 	row := s.DB.QueryRow(ctx, `
         SELECT id, post_id, parent_id, path::text, author_id, body, created_at, edited_at, deleted_at
         FROM comments WHERE id = $1
@@ -112,7 +112,7 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Comment, error) {
 }
 
 // Edit appends a snapshot to comment_edits and updates the comment body.
-func (s *Service) Edit(ctx context.Context, id, editor uuid.UUID, body string) error {
+func (s *Service) Edit(ctx context.Context, id, editor int64, body string) error {
 	return s.runInTx(ctx, func(tx pgx.Tx) error {
 		var prev string
 		err := tx.QueryRow(ctx,
@@ -144,7 +144,7 @@ func (s *Service) Edit(ctx context.Context, id, editor uuid.UUID, body string) e
 
 // Delete soft-deletes a comment. Children remain — clients render
 // "[deleted]" placeholders to preserve thread structure.
-func (s *Service) Delete(ctx context.Context, id uuid.UUID) error {
+func (s *Service) Delete(ctx context.Context, id int64) error {
 	tag, err := s.DB.Exec(ctx,
 		`UPDATE comments SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
 	if err != nil {
@@ -157,7 +157,7 @@ func (s *Service) Delete(ctx context.Context, id uuid.UUID) error {
 }
 
 // React adds a (comment, principal, emoji) reaction. Idempotent.
-func (s *Service) React(ctx context.Context, id, principal uuid.UUID, emoji string) error {
+func (s *Service) React(ctx context.Context, id, principal int64, emoji string) error {
 	_, err := s.DB.Exec(ctx, `
         INSERT INTO comment_reactions (comment_id, principal_id, emoji)
         VALUES ($1, $2, $3)
@@ -166,7 +166,7 @@ func (s *Service) React(ctx context.Context, id, principal uuid.UUID, emoji stri
 	return err
 }
 
-func (s *Service) Unreact(ctx context.Context, id, principal uuid.UUID, emoji string) error {
+func (s *Service) Unreact(ctx context.Context, id, principal int64, emoji string) error {
 	_, err := s.DB.Exec(ctx, `
         DELETE FROM comment_reactions WHERE comment_id = $1 AND principal_id = $2 AND emoji = $3
     `, id, principal, emoji)
@@ -177,7 +177,7 @@ func (s *Service) Unreact(ctx context.Context, id, principal uuid.UUID, emoji st
 // groups by created_at, descendants depth-first via ltree path. The
 // returned slice is suitable for resolving a Connection where each Comment
 // carries a depth (= label count - 1) for client-side indentation.
-func (s *Service) ListByPost(ctx context.Context, postID uuid.UUID, limit int) ([]*Comment, error) {
+func (s *Service) ListByPost(ctx context.Context, postID int64, limit int) ([]*Comment, error) {
 	if limit <= 0 || limit > 1000 {
 		limit = 200
 	}
@@ -212,10 +212,10 @@ func Depth(path string) int {
 	return strings.Count(path, ".")
 }
 
-func pathLabel(id uuid.UUID) string {
-	// uuid.String() is 36 chars with dashes; strip the dashes for ltree
+func pathLabel(id int64) string {
+	// ids.FormatID(uuid) is 36 chars with dashes; strip the dashes for ltree
 	// label rules and prefix with "c" so the label starts with a letter.
-	s := id.String()
+	s := ids.FormatID(id)
 	out := make([]byte, 0, 33)
 	out = append(out, 'c')
 	for i := 0; i < len(s); i++ {

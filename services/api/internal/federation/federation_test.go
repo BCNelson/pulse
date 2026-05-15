@@ -3,14 +3,13 @@ package federation_test
 import (
 	"testing"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/federation"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 func TestParseLocal(t *testing.T) {
-	id := uuid.New()
-	ref, err := federation.Parse("local://posts/" + id.String())
+	id := ids.New(ids.KindUser)
+	ref, err := federation.Parse("local://posts/" + ids.FormatID(id))
 	if err != nil {
 		t.Fatalf("parse: %v", err)
 	}
@@ -21,13 +20,13 @@ func TestParseLocal(t *testing.T) {
 		t.Errorf("kind: %q", ref.Kind)
 	}
 	if ref.ID != id {
-		t.Errorf("id: got %s want %s", ref.ID, id)
+		t.Errorf("id: got %d want %d", ref.ID, id)
 	}
 }
 
 func TestParseRemote(t *testing.T) {
-	id := uuid.New()
-	ref, err := federation.Parse("pulse.example.com://principals/" + id.String())
+	id := ids.New(ids.KindUser)
+	ref, err := federation.Parse("pulse.example.com://principals/" + ids.FormatID(id))
 	if err != nil {
 		t.Fatalf("parse: %v", err)
 	}
@@ -46,7 +45,7 @@ func TestParseRejectsGarbage(t *testing.T) {
 		"local://posts/",
 		"local://posts/not-a-uuid",
 		"local://",
-		"://posts/" + uuid.New().String(),
+		"://posts/" + ids.FormatID(ids.New(ids.KindUser)),
 	} {
 		if _, err := federation.Parse(bad); err == nil {
 			t.Errorf("expected error for %q", bad)
@@ -55,7 +54,7 @@ func TestParseRejectsGarbage(t *testing.T) {
 }
 
 func TestFormatRoundTrip(t *testing.T) {
-	id := uuid.New()
+	id := ids.New(ids.KindUser)
 	uri := federation.Format(federation.LocalScheme, "tags", id)
 	ref, err := federation.Parse(uri)
 	if err != nil {
@@ -68,8 +67,8 @@ func TestFormatRoundTrip(t *testing.T) {
 
 func TestLocalOnlyResolverAlwaysLocal(t *testing.T) {
 	r := federation.LocalOnlyResolver{}
-	id := uuid.New()
-	ref, _ := federation.Parse("pulse.example.com://posts/" + id.String())
+	id := ids.New(ids.KindUser)
+	ref, _ := federation.Parse("pulse.example.com://posts/" + ids.FormatID(id))
 	if got := r.Resolve(ref); got != federation.LocalAuthority {
 		t.Errorf("v1 resolver should always return Local, got %v", got)
 	}

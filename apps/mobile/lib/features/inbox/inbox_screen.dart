@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../core/ferry_client.dart';
-import '../../core/selection.dart';
 import '../../design/atoms/pulse_button.dart';
 import '../../design/atoms/pulse_inbox_row.dart';
 import '../../design/atoms/pulse_page_head.dart';
@@ -265,7 +265,7 @@ class _Row extends ConsumerWidget {
       urgent: isUrgent,
       onTap: () {
         if (node.sourceType == 'post') {
-          ref.read(selectedPostIdProvider.notifier).set(node.sourceId);
+          context.go('/feed/p/${node.sourceId}');
         }
         // ignore: invalid_use_of_protected_member
         client.requestController.add(

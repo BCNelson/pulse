@@ -11,10 +11,10 @@
 -- (one join table per kind) makes "all attachments for this entity"
 -- queries miserable, and the kinds are stable.
 CREATE TABLE attachments (
-  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id            BIGINT PRIMARY KEY DEFAULT gen_id_attachment(),
   owner_type    TEXT NOT NULL CHECK (owner_type IN ('post','comment','message')),
-  owner_id      UUID NOT NULL,
-  uploader_id   UUID NOT NULL REFERENCES principals(id),
+  owner_id      BIGINT NOT NULL,
+  uploader_id   BIGINT NOT NULL REFERENCES principals(id),
   storage_key   TEXT NOT NULL UNIQUE,
   filename      TEXT NOT NULL,
   mime_type     TEXT NOT NULL,

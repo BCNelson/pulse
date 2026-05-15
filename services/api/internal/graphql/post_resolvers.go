@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 
 	"github.com/bcnelson/pulse/services/api/internal/auth"
@@ -21,7 +20,7 @@ import (
 // check, and assembles its full GraphQL representation. Returns nil, nil
 // when the viewer cannot view the post (existence-confused with
 // visibility, on purpose). Returns nil, error for hard failures.
-func (r *Resolver) loadPost(ctx context.Context, id uuid.UUID) (*model.Post, error) {
+func (r *Resolver) loadPost(ctx context.Context, id int64) (*model.Post, error) {
 	identity := auth.FromContext(ctx)
 	if identity.IsAnonymous() {
 		return nil, nil
@@ -143,8 +142,8 @@ func (r *Resolver) loadPost(ctx context.Context, id uuid.UUID) (*model.Post, err
 	}
 
 	out := &model.Post{
-		ID:            p.ID.String(),
-		GlobalURI:     ids.URI("posts", p.ID),
+		ID:            ids.FormatID(p.ID),
+		GlobalURI:     ids.URI(ids.KindPost, p.ID),
 		Title:         p.Title,
 		Body:          p.Body,
 		Author:        author,
@@ -166,7 +165,7 @@ func (r *Resolver) loadPost(ctx context.Context, id uuid.UUID) (*model.Post, err
 	return out, nil
 }
 
-func (r *Resolver) loadCommentsForPost(ctx context.Context, postID uuid.UUID, limit int) (*model.CommentConnection, error) {
+func (r *Resolver) loadCommentsForPost(ctx context.Context, postID int64, limit int) (*model.CommentConnection, error) {
 	rows, err := r.Comments.ListByPost(ctx, postID, limit)
 	if err != nil {
 		return nil, err
@@ -209,7 +208,7 @@ func (r *Resolver) commentToModel(ctx context.Context, c *comment.Comment) (*mod
 	defer mentionRows.Close()
 	var mentions []model.Principal
 	for mentionRows.Next() {
-		var pid uuid.UUID
+		var pid int64
 		if err := mentionRows.Scan(&pid); err != nil {
 			return nil, err
 		}
@@ -227,11 +226,11 @@ func (r *Resolver) commentToModel(ctx context.Context, c *comment.Comment) (*mod
 	}
 	parentID := ""
 	if c.ParentID != nil {
-		parentID = c.ParentID.String()
+		parentID = ids.FormatID(*c.ParentID)
 	}
 	return &model.Comment{
-		ID:        c.ID.String(),
-		PostID:    c.PostID.String(),
+		ID:        ids.FormatID(c.ID),
+		PostID:    ids.FormatID(c.PostID),
 		ParentID:  optString(parentID),
 		Depth:     comment.Depth(c.Path),
 		Author:    author,
@@ -244,7 +243,7 @@ func (r *Resolver) commentToModel(ctx context.Context, c *comment.Comment) (*mod
 	}, nil
 }
 
-func (r *Resolver) commentReactionTally(ctx context.Context, commentID, viewer uuid.UUID) ([]*model.ReactionSummary, error) {
+func (r *Resolver) commentReactionTally(ctx context.Context, commentID, viewer int64) ([]*model.ReactionSummary, error) {
 	rows, err := r.DB.Query(ctx, `
         SELECT emoji, COUNT(*)::INT, BOOL_OR(principal_id = $2)
         FROM comment_reactions WHERE comment_id = $1
@@ -265,7 +264,7 @@ func (r *Resolver) commentReactionTally(ctx context.Context, commentID, viewer u
 	return out, rows.Err()
 }
 
-func (r *Resolver) loadComment(ctx context.Context, id uuid.UUID) (*model.Comment, error) {
+func (r *Resolver) loadComment(ctx context.Context, id int64) (*model.Comment, error) {
 	c, err := r.Comments.Get(ctx, id)
 	if err != nil {
 		if errors.Is(err, comment.ErrNotFound) {
@@ -300,7 +299,7 @@ func (r *Resolver) loadComment(ctx context.Context, id uuid.UUID) (*model.Commen
 // Goes through the per-request loader cache when available — feed-shaped
 // resolvers should call loaders.FromContext(ctx).Principals.Prime(ids)
 // before iterating so this becomes a cache hit rather than N queries.
-func (r *Resolver) loadPrincipalIface(ctx context.Context, id uuid.UUID) (model.Principal, error) {
+func (r *Resolver) loadPrincipalIface(ctx context.Context, id int64) (model.Principal, error) {
 	if l := loaders.FromContext(ctx); l != nil {
 		row, err := l.Principals.Get(ctx, id)
 		if err != nil {
@@ -317,8 +316,8 @@ func (r *Resolver) loadPrincipalIface(ctx context.Context, id uuid.UUID) (model.
 		status      string
 		displayName string
 		email       *string
-		homeTagID   *uuid.UUID
-		ownerID     *uuid.UUID
+		homeTagID   *int64
+		ownerID     *int64
 	)
 	err := r.DB.QueryRow(ctx, `
         SELECT p.kind, p.status, p.display_name, p.email, p.home_tag_id,
@@ -355,8 +354,8 @@ func (r *Resolver) shapePrincipalFromLoader(ctx context.Context, row *loaders.Pr
 	switch row.Kind {
 	case "user":
 		return model.User{
-			ID:          row.ID.String(),
-			GlobalURI:   ids.URI("principals", row.ID),
+			ID:          ids.FormatID(row.ID),
+			GlobalURI:   ids.URI(ids.KindUser, row.ID),
 			Kind:        model.PrincipalKindUser,
 			Status:      mapStatusDBToGQL(row.Status),
 			DisplayName: row.DisplayName,
@@ -369,8 +368,8 @@ func (r *Resolver) shapePrincipalFromLoader(ctx context.Context, row *loaders.Pr
 			owner, _ = r.loadPrincipalIface(ctx, *row.BotOwnerID)
 		}
 		return model.Bot{
-			ID:             row.ID.String(),
-			GlobalURI:      ids.URI("principals", row.ID),
+			ID:             ids.FormatID(row.ID),
+			GlobalURI:      ids.URI(ids.KindUser, row.ID),
 			Kind:           model.PrincipalKindBot,
 			Status:         mapStatusDBToGQL(row.Status),
 			DisplayName:    row.DisplayName,
@@ -413,13 +412,13 @@ func optString(s string) *string {
 // primePostListLoaders pre-warms the per-request loader caches for a
 // list of posts: distinct authors, distinct attached tags, reaction
 // tallies. Three round-trips total instead of N×3.
-func (r *Resolver) primePostListLoaders(ctx context.Context, posts []*post.Post, viewer uuid.UUID) {
+func (r *Resolver) primePostListLoaders(ctx context.Context, posts []*post.Post, viewer int64) {
 	l := loaders.FromContext(ctx)
 	if l == nil {
 		return
 	}
-	authorIDs := make([]uuid.UUID, 0, len(posts))
-	postIDs := make([]uuid.UUID, 0, len(posts))
+	authorIDs := make([]int64, 0, len(posts))
+	postIDs := make([]int64, 0, len(posts))
 	for _, p := range posts {
 		authorIDs = append(authorIDs, p.AuthorID)
 		postIDs = append(postIDs, p.ID)
@@ -431,11 +430,11 @@ func (r *Resolver) primePostListLoaders(ctx context.Context, posts []*post.Post,
 	// with the distinct tag ids found.
 	if len(postIDs) > 0 {
 		rows, err := r.DB.Query(ctx,
-			`SELECT DISTINCT tag_id FROM post_tags WHERE post_id = ANY($1::UUID[])`, postIDs)
+			`SELECT DISTINCT tag_id FROM post_tags WHERE post_id = ANY($1::BIGINT[])`, postIDs)
 		if err == nil {
-			tagIDs := []uuid.UUID{}
+			tagIDs := []int64{}
 			for rows.Next() {
-				var id uuid.UUID
+				var id int64
 				if err := rows.Scan(&id); err == nil {
 					tagIDs = append(tagIDs, id)
 				}
@@ -448,7 +447,7 @@ func (r *Resolver) primePostListLoaders(ctx context.Context, posts []*post.Post,
 
 // loadPostReactions returns aggregated reaction tallies for a post via
 // the loader (cache hit for primed feed views, lazy load otherwise).
-func (r *Resolver) loadPostReactions(ctx context.Context, postID, viewer uuid.UUID) ([]*model.ReactionSummary, error) {
+func (r *Resolver) loadPostReactions(ctx context.Context, postID, viewer int64) ([]*model.ReactionSummary, error) {
 	if l := loaders.FromContext(ctx); l != nil {
 		tally, err := l.PostReactions.Get(ctx, postID, viewer)
 		if err != nil {

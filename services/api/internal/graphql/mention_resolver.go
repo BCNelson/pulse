@@ -3,8 +3,6 @@ package graphql
 import (
 	"context"
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 // resolveMentionSlugs maps @-token slugs to principal ids. M2 strategy is
@@ -12,13 +10,13 @@ import (
 // email. Slugs that match nothing are silently dropped — mention text
 // itself remains in the body. M5 introduces a proper user-handle column
 // derived from the user-tag root slug for unambiguous lookups.
-func (r *Resolver) resolveMentionSlugs(ctx context.Context, slugs []string) ([]uuid.UUID, error) {
+func (r *Resolver) resolveMentionSlugs(ctx context.Context, slugs []string) ([]int64, error) {
 	if len(slugs) == 0 {
 		return nil, nil
 	}
-	out := make([]uuid.UUID, 0, len(slugs))
+	out := make([]int64, 0, len(slugs))
 	for _, s := range slugs {
-		var id uuid.UUID
+		var id int64
 		err := r.DB.QueryRow(ctx, `
             SELECT id FROM principals
             WHERE status = 'active' AND (

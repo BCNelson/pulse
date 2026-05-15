@@ -3,8 +3,6 @@ package perm
 import (
 	"context"
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 // CanInRoom evaluates chat-room visibility. Two paths grant access:
@@ -16,7 +14,7 @@ import (
 // flags on messages aren't in v1 scope. M5 may layer admin-only mutations
 // (rename room, kick participants) on top of this check by calling
 // EffectiveInRoom.
-func (s *Service) CanInRoom(ctx context.Context, viewer, roomID uuid.UUID) (bool, error) {
+func (s *Service) CanInRoom(ctx context.Context, viewer, roomID int64) (bool, error) {
 	// Cheap path first: participant?
 	var isParticipant bool
 	if err := s.DB.QueryRow(ctx, `
@@ -53,7 +51,7 @@ func (s *Service) CanInRoom(ctx context.Context, viewer, roomID uuid.UUID) (bool
 // Direct participants get an implicit Contributor bundle (they can speak
 // even without an explicit tag grant). M5 will likely add per-room admin
 // roles (kick, rename) layered on top of this.
-func (s *Service) EffectiveInRoom(ctx context.Context, viewer, roomID uuid.UUID) (Bundle, error) {
+func (s *Service) EffectiveInRoom(ctx context.Context, viewer, roomID int64) (Bundle, error) {
 	var isParticipant bool
 	if err := s.DB.QueryRow(ctx, `
         SELECT EXISTS (
@@ -74,7 +72,7 @@ func (s *Service) EffectiveInRoom(ctx context.Context, viewer, roomID uuid.UUID)
 
 	max := BundleNone
 	for rows.Next() {
-		var tagID uuid.UUID
+		var tagID int64
 		if err := rows.Scan(&tagID); err != nil {
 			return BundleNone, err
 		}

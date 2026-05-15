@@ -2,8 +2,6 @@ package auth
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 // Identity is the principal information resolved from a request. ActingID
@@ -12,14 +10,14 @@ import (
 // M5 wires up the ActingID/EffectiveID split when impersonation lands;
 // until then both fields hold the same value.
 type Identity struct {
-	ActingID    uuid.UUID
-	EffectiveID uuid.UUID
+	ActingID    int64
+	EffectiveID int64
 }
 
 // IsAnonymous reports whether the identity is empty (no authenticated
 // principal).
 func (i Identity) IsAnonymous() bool {
-	return i.ActingID == uuid.Nil
+	return i.ActingID == int64(0)
 }
 
 type identityCtxKey struct{}

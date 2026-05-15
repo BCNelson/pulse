@@ -5,8 +5,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/comment"
@@ -15,6 +13,7 @@ import (
 	"github.com/bcnelson/pulse/services/api/internal/post"
 	"github.com/bcnelson/pulse/services/api/internal/search"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 
 	"net/http/httptest"
 
@@ -69,7 +68,7 @@ func TestM2EndToEnd(t *testing.T) {
             body:"@Bob can you review this elephant migration plan?",
             tags:[{tagId:$t}]
           }) { id title mentions { displayName } myPermissions { canView canModerate } }
-        }`, map[string]any{"t": rootID.String()})
+        }`, map[string]any{"t": ids.FormatID(rootID)})
 	assertNoErrors(t, createResp)
 	postID := createResp.path("data", "createPost", "id").(string)
 	if postID == "" {
@@ -173,7 +172,7 @@ func TestM2EndToEnd(t *testing.T) {
 	}
 	var editCount int
 	if err := pool.QueryRow(context.Background(),
-		`SELECT count(*) FROM post_edits WHERE post_id = $1`, uuid.MustParse(postID)).Scan(&editCount); err != nil {
+		`SELECT count(*) FROM post_edits WHERE post_id = $1`, ids.MustParseAs(ids.KindPost, postID)).Scan(&editCount); err != nil {
 		t.Fatalf("count post_edits: %v", err)
 	}
 	if editCount != 1 {

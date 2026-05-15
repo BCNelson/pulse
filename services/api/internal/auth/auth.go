@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"golang.org/x/crypto/bcrypt"
@@ -48,7 +47,7 @@ type Service struct {
 // Issued describes a freshly minted session. Token is the secret returned
 // to the client (cookie value or bearer); it is never stored in the DB.
 type Issued struct {
-	SessionID uuid.UUID
+	SessionID int64
 	Token     string
 	ExpiresAt time.Time
 }
@@ -56,13 +55,13 @@ type Issued struct {
 // Login authenticates a user by email + password. Returns ErrInvalidCredentials
 // for any failure mode the caller should treat uniformly (no enumeration).
 // Successful login issues a session.
-func (s *Service) Login(ctx context.Context, email, password, userAgent string) (*Issued, uuid.UUID, error) {
+func (s *Service) Login(ctx context.Context, email, password, userAgent string) (*Issued, int64, error) {
 	email = strings.ToLower(strings.TrimSpace(email))
 	if email == "" || password == "" {
-		return nil, uuid.Nil, ErrInvalidCredentials
+		return nil, int64(0), ErrInvalidCredentials
 	}
 
-	var principalID uuid.UUID
+	var principalID int64
 	var hash *string
 	err := s.DB.QueryRow(ctx, `
         SELECT p.id, c.password_hash
@@ -76,18 +75,18 @@ func (s *Service) Login(ctx context.Context, email, password, userAgent string) 
 	if errors.Is(err, pgx.ErrNoRows) || hash == nil {
 		// Run a dummy bcrypt compare so timing doesn't leak account existence.
 		_ = bcrypt.CompareHashAndPassword([]byte("$2a$12$invalidinvalidinvalidinvalidinvalidinvalidinvalidinvalidinO"), []byte(password))
-		return nil, uuid.Nil, ErrInvalidCredentials
+		return nil, int64(0), ErrInvalidCredentials
 	}
 	if err != nil {
-		return nil, uuid.Nil, fmt.Errorf("lookup credentials: %w", err)
+		return nil, int64(0), fmt.Errorf("lookup credentials: %w", err)
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(*hash), []byte(password)); err != nil {
-		return nil, uuid.Nil, ErrInvalidCredentials
+		return nil, int64(0), ErrInvalidCredentials
 	}
 
 	issued, err := s.IssueSession(ctx, principalID, userAgent, DefaultSessionLifetime)
 	if err != nil {
-		return nil, uuid.Nil, err
+		return nil, int64(0), err
 	}
 	return issued, principalID, nil
 }
@@ -95,7 +94,7 @@ func (s *Service) Login(ctx context.Context, email, password, userAgent string) 
 // IssueSession mints a fresh session for principal P with the given lifetime.
 // The Token field of the result is the secret to hand the client; only its
 // hash is persisted.
-func (s *Service) IssueSession(ctx context.Context, principal uuid.UUID, userAgent string, lifetime time.Duration) (*Issued, error) {
+func (s *Service) IssueSession(ctx context.Context, principal int64, userAgent string, lifetime time.Duration) (*Issued, error) {
 	token, err := randomToken()
 	if err != nil {
 		return nil, fmt.Errorf("generate token: %w", err)
@@ -103,7 +102,7 @@ func (s *Service) IssueSession(ctx context.Context, principal uuid.UUID, userAge
 	hash := hashToken(token)
 	expires := time.Now().Add(lifetime).UTC()
 
-	var id uuid.UUID
+	var id int64
 	err = s.DB.QueryRow(ctx, `
         INSERT INTO sessions (principal_id, token_hash, user_agent, expires_at)
         VALUES ($1, $2, NULLIF($3, ''), $4)
@@ -121,10 +120,10 @@ func (s *Service) IssueSession(ctx context.Context, principal uuid.UUID, userAge
 //
 // Deprecated: prefer LookupSession which surfaces the acting/effective
 // split; Lookup is retained for callers that only need the effective id.
-func (s *Service) Lookup(ctx context.Context, token string) (uuid.UUID, error) {
+func (s *Service) Lookup(ctx context.Context, token string) (int64, error) {
 	sess, err := s.LookupSession(ctx, token)
 	if err != nil {
-		return uuid.Nil, err
+		return int64(0), err
 	}
 	return sess.EffectiveID, nil
 }
@@ -135,9 +134,9 @@ func (s *Service) Lookup(ctx context.Context, token string) (uuid.UUID, error) {
 // one whose perms are evaluated for this request. Audit writers stamp
 // both.
 type SessionRecord struct {
-	SessionID   uuid.UUID
-	ActingID    uuid.UUID
-	EffectiveID uuid.UUID
+	SessionID   int64
+	ActingID    int64
+	EffectiveID int64
 }
 
 // LookupSession resolves a token to the full session record including
@@ -149,7 +148,7 @@ func (s *Service) LookupSession(ctx context.Context, token string) (SessionRecor
 	hash := hashToken(token)
 
 	var sess SessionRecord
-	var effective *uuid.UUID
+	var effective *int64
 	var expiresAt time.Time
 	var revokedAt *time.Time
 	err := s.DB.QueryRow(ctx, `
@@ -202,13 +201,13 @@ func HashPassword(plaintext string) (string, error) {
 
 // AuthenticateBotKey resolves a bot API key to its principal. Bot keys live
 // in bot_credentials.api_key_hash (sha256 of the issued key).
-func (s *Service) AuthenticateBotKey(ctx context.Context, key string) (uuid.UUID, error) {
+func (s *Service) AuthenticateBotKey(ctx context.Context, key string) (int64, error) {
 	if key == "" {
-		return uuid.Nil, ErrInvalidCredentials
+		return int64(0), ErrInvalidCredentials
 	}
 	hash := hashToken(key)
 
-	var principalID uuid.UUID
+	var principalID int64
 	var revokedAt *time.Time
 	err := s.DB.QueryRow(ctx, `
         SELECT bc.principal_id, bc.revoked_at
@@ -218,13 +217,13 @@ func (s *Service) AuthenticateBotKey(ctx context.Context, key string) (uuid.UUID
           AND p.status = 'active'
     `, hash).Scan(&principalID, &revokedAt)
 	if errors.Is(err, pgx.ErrNoRows) {
-		return uuid.Nil, ErrInvalidCredentials
+		return int64(0), ErrInvalidCredentials
 	}
 	if err != nil {
-		return uuid.Nil, fmt.Errorf("lookup bot key: %w", err)
+		return int64(0), fmt.Errorf("lookup bot key: %w", err)
 	}
 	if revokedAt != nil {
-		return uuid.Nil, ErrSessionRevoked
+		return int64(0), ErrSessionRevoked
 	}
 	return principalID, nil
 }
@@ -232,7 +231,7 @@ func (s *Service) AuthenticateBotKey(ctx context.Context, key string) (uuid.UUID
 // IssueBotKey provisions a fresh API key for an existing bot principal,
 // returning the plaintext key once. The caller stores it in their secret
 // vault; we keep only the hash.
-func (s *Service) IssueBotKey(ctx context.Context, principal, owner uuid.UUID) (string, error) {
+func (s *Service) IssueBotKey(ctx context.Context, principal, owner int64) (string, error) {
 	key, err := randomToken()
 	if err != nil {
 		return "", fmt.Errorf("generate key: %w", err)

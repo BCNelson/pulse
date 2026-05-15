@@ -3,19 +3,22 @@
 
 -- ltree powers comment threading: each comment carries a materialized path
 -- of comment-id labels, indexed with GIST for ancestor/descendant queries.
+-- The DAL stores comment IDs in the path as their wire-form Crockford
+-- string (12 chars, always starts with 'C') — alphanumeric and valid as
+-- ltree labels.
 CREATE EXTENSION IF NOT EXISTS ltree;
 
 -- ----- posts -----
 
 CREATE TABLE posts (
-  id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  id              BIGINT PRIMARY KEY DEFAULT gen_id_post(),
   title           TEXT NOT NULL,
   body            TEXT NOT NULL,
   body_tsv        tsvector GENERATED ALWAYS AS (
                     setweight(to_tsvector('english', coalesce(title, '')), 'A') ||
                     setweight(to_tsvector('english', coalesce(body,  '')), 'B')
                   ) STORED,
-  author_id       UUID NOT NULL REFERENCES principals(id),
+  author_id       BIGINT NOT NULL REFERENCES principals(id),
   decision_status TEXT CHECK (decision_status IN ('decision', 'answer')),
   deny_flag       BOOLEAN NOT NULL DEFAULT FALSE,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -31,8 +34,8 @@ CREATE INDEX posts_active_idx   ON posts (created_at DESC) WHERE deleted_at IS N
 -- viewer's tag-bundle confers view/interact/moderate against THIS post.
 -- Default is true on all three for compatibility with existing tag grants.
 CREATE TABLE post_tags (
-  post_id        UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  tag_id         UUID NOT NULL REFERENCES tags(id),
+  post_id        BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  tag_id         BIGINT NOT NULL REFERENCES tags(id),
   view_role      BOOLEAN NOT NULL DEFAULT TRUE,
   interact_role  BOOLEAN NOT NULL DEFAULT TRUE,
   moderate_role  BOOLEAN NOT NULL DEFAULT TRUE,
@@ -42,8 +45,8 @@ CREATE TABLE post_tags (
 CREATE INDEX post_tags_tag_idx ON post_tags (tag_id);
 
 CREATE TABLE post_mentions (
-  post_id      UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  principal_id UUID NOT NULL REFERENCES principals(id),
+  post_id      BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  principal_id BIGINT NOT NULL REFERENCES principals(id),
   PRIMARY KEY (post_id, principal_id)
 );
 
@@ -52,8 +55,8 @@ CREATE TABLE post_mentions (
 -- truncated on retention sweep — historical text is part of the record.
 CREATE TABLE post_edits (
   id          BIGSERIAL PRIMARY KEY,
-  post_id     UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  editor_id   UUID NOT NULL REFERENCES principals(id),
+  post_id     BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  editor_id   BIGINT NOT NULL REFERENCES principals(id),
   prev_title  TEXT NOT NULL,
   prev_body   TEXT NOT NULL,
   edited_at   TIMESTAMPTZ NOT NULL DEFAULT now()
@@ -63,11 +66,11 @@ CREATE INDEX post_edits_post_idx ON post_edits (post_id, edited_at DESC);
 -- ----- comments -----
 
 CREATE TABLE comments (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  post_id     UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  parent_id   UUID REFERENCES comments(id),
+  id          BIGINT PRIMARY KEY DEFAULT gen_id_comment(),
+  post_id     BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  parent_id   BIGINT REFERENCES comments(id),
   path        ltree NOT NULL,
-  author_id   UUID NOT NULL REFERENCES principals(id),
+  author_id   BIGINT NOT NULL REFERENCES principals(id),
   body        TEXT NOT NULL,
   body_tsv    tsvector GENERATED ALWAYS AS (
                 to_tsvector('english', coalesce(body, ''))
@@ -83,15 +86,15 @@ CREATE INDEX comments_active_idx   ON comments (post_id, created_at)
   WHERE deleted_at IS NULL;
 
 CREATE TABLE comment_mentions (
-  comment_id   UUID NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
-  principal_id UUID NOT NULL REFERENCES principals(id),
+  comment_id   BIGINT NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
+  principal_id BIGINT NOT NULL REFERENCES principals(id),
   PRIMARY KEY (comment_id, principal_id)
 );
 
 CREATE TABLE comment_edits (
   id          BIGSERIAL PRIMARY KEY,
-  comment_id  UUID NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
-  editor_id   UUID NOT NULL REFERENCES principals(id),
+  comment_id  BIGINT NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
+  editor_id   BIGINT NOT NULL REFERENCES principals(id),
   prev_body   TEXT NOT NULL,
   edited_at   TIMESTAMPTZ NOT NULL DEFAULT now()
 );
@@ -105,8 +108,8 @@ CREATE INDEX comment_edits_comment_idx ON comment_edits (comment_id, edited_at D
 -- read-side change because reactions are accessed via a service method.
 
 CREATE TABLE post_reactions (
-  post_id      UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
-  principal_id UUID NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
+  post_id      BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  principal_id BIGINT NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
   emoji        TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (post_id, principal_id, emoji)
@@ -114,8 +117,8 @@ CREATE TABLE post_reactions (
 CREATE INDEX post_reactions_emoji_idx ON post_reactions (post_id, emoji);
 
 CREATE TABLE comment_reactions (
-  comment_id   UUID NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
-  principal_id UUID NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
+  comment_id   BIGINT NOT NULL REFERENCES comments(id) ON DELETE CASCADE,
+  principal_id BIGINT NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
   emoji        TEXT NOT NULL,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (comment_id, principal_id, emoji)
@@ -128,8 +131,8 @@ CREATE INDEX comment_reactions_emoji_idx ON comment_reactions (comment_id, emoji
 -- becomes a hotspot.
 
 CREATE TABLE principal_post_read (
-  principal_id UUID NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
-  post_id      UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+  principal_id BIGINT NOT NULL REFERENCES principals(id) ON DELETE CASCADE,
+  post_id      BIGINT NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
   last_read_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (principal_id, post_id)
 );
@@ -138,11 +141,6 @@ CREATE TABLE principal_post_read (
 -- Unified searchable_content view across posts and comments. Messages and
 -- tasks join in M3/M4 by recreating this view; CREATE OR REPLACE makes
 -- forward migrations cheap.
---
--- Note: we expose tsv directly so callers can ts_rank against it without
--- repeating the per-source tsvector projection. tag_id is the *primary*
--- tag of the content (post's first post_tags entry, or the parent post's
--- for a comment) so visibility filters can join through tag_closure.
 
 CREATE OR REPLACE VIEW searchable_content AS
   SELECT

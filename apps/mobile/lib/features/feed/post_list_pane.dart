@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../core/selection.dart';
+import '../../core/router.dart';
 import '../../design/atoms/pulse_feed_bar.dart';
 import '../../design/atoms/pulse_page_head.dart';
 import '../../design/atoms/pulse_post_card.dart';
@@ -31,8 +32,12 @@ class PostListPane extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
-    final tagId = ref.watch(selectedTagIdProvider);
-    if (tagId == null) {
+    // The selection token is the slug path from the URL — the backend's
+    // resolvers accept either a slug path or a typed Crockford id at every
+    // tag-input site, so we can pass the path through directly to feed
+    // queries instead of resolving client-side first.
+    final tagRef = ref.watch(currentTagIdProvider);
+    if (tagRef == null) {
       return _Placeholder(
         color: t.paper,
         title: 'No tag selected',
@@ -40,15 +45,20 @@ class PostListPane extends ConsumerWidget {
       );
     }
     // Subscribe to live updates for this tag.
-    ref.listen(postChangedListenerProvider(tagId), (_, __) {});
-    return Container(color: t.paper, child: _PostList(tagId: tagId));
+    ref.listen(postChangedListenerProvider(tagRef), (_, __) {});
+    return Container(color: t.paper, child: _PostList(tagId: tagRef, tagPath: tagRef));
   }
 }
 
 class _PostList extends ConsumerWidget {
-  const _PostList({required this.tagId});
+  const _PostList({required this.tagId, required this.tagPath});
 
+  /// The resolved 12-char Crockford tag id, used for backend queries.
   final String tagId;
+
+  /// The URL-friendly slug path (e.g. "org/infra"), used when building
+  /// the post-detail link so the tab's URL stays canonical.
+  final String tagPath;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -172,7 +182,7 @@ class _PostList extends ConsumerWidget {
       itemCount: posts.length,
       itemBuilder: (context, i) {
         final node = posts[i];
-        final selected = ref.watch(selectedPostIdProvider) == node.id;
+        final selected = ref.watch(currentPostIdProvider) == node.id;
         final decision = _decisionFor(node.decisionStatus);
         return PulsePostCard(
           title: node.title,
@@ -183,7 +193,7 @@ class _PostList extends ConsumerWidget {
           whenLabel: _shortWhen(node.createdAt.value),
           comments: node.comments.edges.length,
           cursor: selected,
-          onTap: () => ref.read(selectedPostIdProvider.notifier).set(node.id),
+          onTap: () => context.go('/feed/t/$tagPath/p/${node.id}'),
         );
       },
     );

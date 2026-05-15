@@ -7,12 +7,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/attachment"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // attachmentToModel projects the service row into the GraphQL model.
@@ -24,9 +23,9 @@ func (r *Resolver) attachmentToModel(ctx context.Context, a *attachment.Attachme
 		return nil, err
 	}
 	return &model.Attachment{
-		ID:        a.ID.String(),
+		ID:        ids.FormatID(a.ID),
 		OwnerType: ownerTypeToGQL(a.OwnerType),
-		OwnerID:   a.OwnerID.String(),
+		OwnerID:   ids.FormatID(a.OwnerID),
 		Uploader:  uploader,
 		Filename:  a.Filename,
 		MimeType:  a.MimeType,
@@ -35,7 +34,7 @@ func (r *Resolver) attachmentToModel(ctx context.Context, a *attachment.Attachme
 	}, nil
 }
 
-func (r *Resolver) listAttachments(ctx context.Context, ownerType string, ownerID uuid.UUID) ([]*model.Attachment, error) {
+func (r *Resolver) listAttachments(ctx context.Context, ownerType string, ownerID int64) ([]*model.Attachment, error) {
 	rows, err := r.Attachments.ListByOwner(ctx, ownerType, ownerID)
 	if err != nil {
 		return nil, err
@@ -54,20 +53,20 @@ func (r *Resolver) listAttachments(ctx context.Context, ownerType string, ownerI
 // canViewAttachmentOwner checks the ambient perm for the parent
 // entity. Reuses the post/comment/message machinery so the attachment
 // inherits the parent's visibility.
-func (r *Resolver) canViewAttachmentOwner(ctx context.Context, viewer uuid.UUID, ownerType string, ownerID uuid.UUID) (bool, error) {
+func (r *Resolver) canViewAttachmentOwner(ctx context.Context, viewer int64, ownerType string, ownerID int64) (bool, error) {
 	switch ownerType {
 	case "post":
 		return r.Perm.CanOnPost(ctx, viewer, perm.ActionView, ownerID)
 	case "comment":
 		// Comments inherit visibility from the parent post.
-		var postID uuid.UUID
+		var postID int64
 		if err := r.DB.QueryRow(ctx,
 			`SELECT post_id FROM comments WHERE id = $1`, ownerID).Scan(&postID); err != nil {
 			return false, err
 		}
 		return r.Perm.CanOnPost(ctx, viewer, perm.ActionView, postID)
 	case "message":
-		var roomID uuid.UUID
+		var roomID int64
 		if err := r.DB.QueryRow(ctx,
 			`SELECT chat_room_id FROM messages WHERE id = $1`, ownerID).Scan(&roomID); err != nil {
 			return false, err
@@ -80,19 +79,19 @@ func (r *Resolver) canViewAttachmentOwner(ctx context.Context, viewer uuid.UUID,
 // canContributeToOwner gates the issueUpload / removeAttachment
 // mutations: caller must be able to contribute to (or moderate) the
 // parent entity.
-func (r *Resolver) canContributeToOwner(ctx context.Context, viewer uuid.UUID, ownerType string, ownerID uuid.UUID) (bool, error) {
+func (r *Resolver) canContributeToOwner(ctx context.Context, viewer int64, ownerType string, ownerID int64) (bool, error) {
 	switch ownerType {
 	case "post":
 		return r.Perm.CanOnPost(ctx, viewer, perm.ActionContribute, ownerID)
 	case "comment":
-		var postID uuid.UUID
+		var postID int64
 		if err := r.DB.QueryRow(ctx,
 			`SELECT post_id FROM comments WHERE id = $1`, ownerID).Scan(&postID); err != nil {
 			return false, err
 		}
 		return r.Perm.CanOnPost(ctx, viewer, perm.ActionContribute, postID)
 	case "message":
-		var roomID uuid.UUID
+		var roomID int64
 		if err := r.DB.QueryRow(ctx,
 			`SELECT chat_room_id FROM messages WHERE id = $1`, ownerID).Scan(&roomID); err != nil {
 			return false, err
@@ -112,7 +111,7 @@ func (r *Resolver) resolveAttachmentDownloadURL(ctx context.Context, attachmentI
 	if identity.IsAnonymous() {
 		return "", errPermissionDenied
 	}
-	id, err := uuid.Parse(attachmentID)
+	id, err := ids.ParseAs(ids.KindAttachment, attachmentID)
 	if err != nil {
 		return "", fmt.Errorf("invalid id: %w", err)
 	}
@@ -142,7 +141,7 @@ func (r *Resolver) issueAttachmentUpload(ctx context.Context, input model.IssueA
 	if err != nil {
 		return nil, err
 	}
-	ownerID, err := uuid.Parse(input.OwnerID)
+	ownerID, _, err := ids.ParseAny(input.OwnerID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid ownerId: %w", err)
 	}
@@ -166,7 +165,7 @@ func (r *Resolver) issueAttachmentUpload(ctx context.Context, input model.IssueA
 		return nil, err
 	}
 	return &model.AttachmentUploadTicket{
-		AttachmentID: res.AttachmentID.String(),
+		AttachmentID: ids.FormatID(res.AttachmentID),
 		UploadURL:    res.UploadURL,
 		Method:       res.Method,
 		ExpiresAt:    res.ExpiresAt,
@@ -179,7 +178,7 @@ func (r *Resolver) confirmAttachmentUpload(ctx context.Context, attachmentID str
 	if err != nil {
 		return nil, err
 	}
-	id, err := uuid.Parse(attachmentID)
+	id, err := ids.ParseAs(ids.KindAttachment, attachmentID)
 	if err != nil {
 		return nil, fmt.Errorf("invalid id: %w", err)
 	}
@@ -205,7 +204,7 @@ func (r *Resolver) removeAttachment(ctx context.Context, attachmentID string) (b
 	if err != nil {
 		return false, err
 	}
-	id, err := uuid.Parse(attachmentID)
+	id, err := ids.ParseAs(ids.KindAttachment, attachmentID)
 	if err != nil {
 		return false, fmt.Errorf("invalid id: %w", err)
 	}

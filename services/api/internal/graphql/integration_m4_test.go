@@ -8,8 +8,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/uuid"
-
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/chat"
@@ -24,6 +22,7 @@ import (
 	"github.com/bcnelson/pulse/services/api/internal/search"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
 	"github.com/bcnelson/pulse/services/api/internal/task"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // TestM4TaskAndNotifications exercises the M4 surface end-to-end:
@@ -89,7 +88,7 @@ func TestM4TaskAndNotifications(t *testing.T) {
             assignees { displayName }
             myPermissions { canView canContribute canModerate }
           }
-        }`, map[string]any{"t": rootID.String(), "b": bob.String()})
+        }`, map[string]any{"t": ids.FormatID(rootID), "b": ids.FormatID(bob)})
 	assertNoErrors(t, createResp)
 	taskID := createResp.path("data", "createTask", "id").(string)
 	if taskID == "" {
@@ -178,7 +177,7 @@ func TestM4TaskAndNotifications(t *testing.T) {
 	// alice queries Tag.tasks and sees the task.
 	tasksResp := gqlPost(t, ts.URL, aliceTok, `
         query($t:ID!){ tag(id:$t){ tasks(first:10) { edges { node { title status } } } } }`,
-		map[string]any{"t": rootID.String()})
+		map[string]any{"t": ids.FormatID(rootID)})
 	assertNoErrors(t, tasksResp)
 	taskEdges := tasksResp.path("data", "tag", "tasks", "edges").([]any)
 	if len(taskEdges) != 1 {
@@ -242,7 +241,7 @@ func TestM4NotificationSubscription(t *testing.T) {
 		CreatorID: alice,
 		Title:     "Pack the elephants",
 		Tags:      []task.TagAttachment{{TagID: rootID, ViewRole: true, InteractRole: true, ModerateRole: true}},
-		Assignees: []uuid.UUID{bob},
+		Assignees: []int64{bob},
 	}); err != nil {
 		t.Fatalf("create task: %v", err)
 	}

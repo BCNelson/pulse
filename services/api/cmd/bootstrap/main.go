@@ -18,6 +18,7 @@ import (
 
 	"github.com/bcnelson/pulse/services/api/internal/bootstrap"
 	pulsedb "github.com/bcnelson/pulse/services/api/internal/db"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 func main() {
@@ -58,7 +59,7 @@ func main() {
 		fmt.Println("bootstrap: already done — workspace has at least one active user.")
 		return
 	}
-	fmt.Printf("bootstrap: created principal %s and org tag %s\n", res.PrincipalID, res.OrgTagID)
+	fmt.Printf("bootstrap: created principal %s and org tag %s\n", ids.FormatID(res.PrincipalID), ids.FormatID(res.OrgTagID))
 }
 
 func envOr(key, fallback string) string {

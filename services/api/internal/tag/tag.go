@@ -11,7 +11,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -40,26 +39,26 @@ type Service struct {
 // root tag; in that case RootKind selects 'org' or 'user' and BoundPrincipal
 // must be non-nil iff RootKind == 'user'.
 type CreateInput struct {
-	ParentID       *uuid.UUID
+	ParentID       *int64
 	Slug           string
 	DisplayName    string
 	RootKind       string
-	BoundPrincipal *uuid.UUID
+	BoundPrincipal *int64
 	Defaults       json.RawMessage
 }
 
 // Create inserts a tag and the closure rows that link it to its ancestors.
 // Returns the new tag's id.
-func (s *Service) Create(ctx context.Context, in CreateInput) (uuid.UUID, error) {
+func (s *Service) Create(ctx context.Context, in CreateInput) (int64, error) {
 	if err := validateCreate(in); err != nil {
-		return uuid.Nil, err
+		return int64(0), err
 	}
 	defaults := in.Defaults
 	if len(defaults) == 0 {
 		defaults = []byte("{}")
 	}
 
-	var id uuid.UUID
+	var id int64
 	err := s.runInTx(ctx, func(tx pgx.Tx) error {
 		row := tx.QueryRow(ctx, `
             INSERT INTO tags (parent_id, slug, display_name, root_kind, bound_principal, defaults)
@@ -95,9 +94,9 @@ func (s *Service) Create(ctx context.Context, in CreateInput) (uuid.UUID, error)
 // every descendant of tagID. Caller is responsible for permission checks
 // and audit. Errors with ErrRootMove if tagID is a root, ErrCycle if the
 // move would be cyclic, ErrNotFound if tagID is unknown.
-func (s *Service) Move(ctx context.Context, tagID, newParentID uuid.UUID) error {
+func (s *Service) Move(ctx context.Context, tagID, newParentID int64) error {
 	return s.runInTx(ctx, func(tx pgx.Tx) error {
-		var srcParent *uuid.UUID
+		var srcParent *int64
 		err := tx.QueryRow(ctx,
 			`SELECT parent_id FROM tags WHERE id = $1 FOR UPDATE`,
 			tagID).Scan(&srcParent)
@@ -176,7 +175,7 @@ func (s *Service) Move(ctx context.Context, tagID, newParentID uuid.UUID) error 
 
 // Archive marks tagID and every descendant archived (idempotent — already-
 // archived rows are left untouched).
-func (s *Service) Archive(ctx context.Context, tagID uuid.UUID) error {
+func (s *Service) Archive(ctx context.Context, tagID int64) error {
 	tag, err := s.DB.Exec(ctx, `
         UPDATE tags SET archived_at = now()
         WHERE id IN (SELECT descendant_id FROM tag_closure WHERE ancestor_id = $1)

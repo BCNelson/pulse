@@ -11,10 +11,7 @@ class UiStateStorage {
 
   final SharedPreferences _prefs;
 
-  static String shellTabKey = namespacedKey('pulse.ui.shellTab');
-  static String selectedTagIdKey = namespacedKey('pulse.ui.selectedTagId');
-  static String selectedPostIdKey = namespacedKey('pulse.ui.selectedPostId');
-  static String selectedRoomIdKey = namespacedKey('pulse.ui.selectedRoomId');
+  static String lastRouteKey = namespacedKey('pulse.ui.lastRoute');
   static String cacheMaxBytesKey = namespacedKey('pulse.cache.maxBytes');
 
   /// Per-post reply target JSON. Keyed by post so reply state attaches

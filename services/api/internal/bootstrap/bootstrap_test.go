@@ -36,7 +36,7 @@ func TestRunCreatesUserAndOrgTag(t *testing.T) {
 		t.Fatalf("login: %v", err)
 	}
 	if principalID != res.PrincipalID {
-		t.Errorf("login principal: got %s want %s", principalID, res.PrincipalID)
+		t.Errorf("login principal: got %d want %d", principalID, res.PrincipalID)
 	}
 	if issued.Token == "" {
 		t.Error("expected non-empty token")

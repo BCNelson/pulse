@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	"github.com/bcnelson/pulse/services/api/internal/perm"
@@ -137,9 +136,9 @@ func TestEffectiveOnPostMaxAcrossTags(t *testing.T) {
 
 // --- helpers ---
 
-func mustCreatePost(t *testing.T, pool *pgxpool.Pool, author uuid.UUID, title, body string) uuid.UUID {
+func mustCreatePost(t *testing.T, pool *pgxpool.Pool, author int64, title, body string) int64 {
 	t.Helper()
-	var id uuid.UUID
+	var id int64
 	err := pool.QueryRow(context.Background(), `
         INSERT INTO posts (title, body, author_id) VALUES ($1, $2, $3) RETURNING id
     `, title, body, author).Scan(&id)
@@ -149,7 +148,7 @@ func mustCreatePost(t *testing.T, pool *pgxpool.Pool, author uuid.UUID, title, b
 	return id
 }
 
-func mustAttachPostTag(t *testing.T, pool *pgxpool.Pool, post, tagID uuid.UUID, viewRole, interactRole, moderateRole bool) {
+func mustAttachPostTag(t *testing.T, pool *pgxpool.Pool, post, tagID int64, viewRole, interactRole, moderateRole bool) {
 	t.Helper()
 	_, err := pool.Exec(context.Background(), `
         INSERT INTO post_tags (post_id, tag_id, view_role, interact_role, moderate_role)

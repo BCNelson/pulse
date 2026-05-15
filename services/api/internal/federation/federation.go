@@ -27,7 +27,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/uuid"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 // LocalScheme is the URI scheme used when an entity belongs to this
@@ -45,7 +45,7 @@ type Ref struct {
 	// Kind names the entity type (principals, tags, posts, ...).
 	Kind string
 	// ID is the UUID of the entity.
-	ID uuid.UUID
+	ID int64
 }
 
 // ErrInvalidURI is returned when a URI doesn't match the expected
@@ -71,9 +71,9 @@ func Parse(uri string) (*Ref, error) {
 		return nil, ErrInvalidURI
 	}
 	kind := parts[0]
-	id, err := uuid.Parse(parts[1])
+	id, _, err := ids.ParseAny(parts[1])
 	if err != nil {
-		return nil, fmt.Errorf("%w: bad uuid: %v", ErrInvalidURI, err)
+		return nil, fmt.Errorf("%w: bad id: %v", ErrInvalidURI, err)
 	}
 	if authority == "" || kind == "" {
 		return nil, ErrInvalidURI
@@ -96,8 +96,8 @@ func authoritySafe(a string) string {
 // Format produces a federation-shaped URI from its parts. Use
 // LocalScheme for local refs; pass the instance host directly for
 // remote ones.
-func Format(authority, kind string, id uuid.UUID) string {
-	return fmt.Sprintf("%s://%s/%s", authority, kind, id)
+func Format(authority, kind string, id int64) string {
+	return fmt.Sprintf("%s://%s/%s", authority, kind, ids.FormatID(id))
 }
 
 // Authority describes who can authoritatively answer perm questions

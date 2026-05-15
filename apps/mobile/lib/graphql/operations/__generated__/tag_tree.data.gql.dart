@@ -377,6 +377,81 @@ abstract class GTagChildrenData_tag_children_children
       );
 }
 
+abstract class GTagBySlugPathData
+    implements Built<GTagBySlugPathData, GTagBySlugPathDataBuilder> {
+  GTagBySlugPathData._();
+
+  factory GTagBySlugPathData(
+          [void Function(GTagBySlugPathDataBuilder b) updates]) =
+      _$GTagBySlugPathData;
+
+  static void _initializeBuilder(GTagBySlugPathDataBuilder b) =>
+      b..G__typename = 'Query';
+
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  GTagBySlugPathData_tagBySlugPath? get tagBySlugPath;
+  static Serializer<GTagBySlugPathData> get serializer =>
+      _$gTagBySlugPathDataSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GTagBySlugPathData.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GTagBySlugPathData? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GTagBySlugPathData.serializer,
+        json,
+      );
+}
+
+abstract class GTagBySlugPathData_tagBySlugPath
+    implements
+        Built<GTagBySlugPathData_tagBySlugPath,
+            GTagBySlugPathData_tagBySlugPathBuilder>,
+        GTagSummary {
+  GTagBySlugPathData_tagBySlugPath._();
+
+  factory GTagBySlugPathData_tagBySlugPath(
+          [void Function(GTagBySlugPathData_tagBySlugPathBuilder b) updates]) =
+      _$GTagBySlugPathData_tagBySlugPath;
+
+  static void _initializeBuilder(GTagBySlugPathData_tagBySlugPathBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  @override
+  _i2.GTagRootKind get rootKind;
+  @override
+  _i2.GTime? get archivedAt;
+  static Serializer<GTagBySlugPathData_tagBySlugPath> get serializer =>
+      _$gTagBySlugPathDataTagBySlugPathSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GTagBySlugPathData_tagBySlugPath.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GTagBySlugPathData_tagBySlugPath? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GTagBySlugPathData_tagBySlugPath.serializer,
+        json,
+      );
+}
+
 abstract class GTagSummary {
   String get G__typename;
   String get id;

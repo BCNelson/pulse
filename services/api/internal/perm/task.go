@@ -3,8 +3,6 @@ package perm
 import (
 	"context"
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 // CanOnTask evaluates the Q3 two-layer permission model for tasks. It
@@ -15,7 +13,7 @@ import (
 // Standalone tasks (no task_tags rows) are visible only to creators,
 // assignees, and watchers — checked separately by callers via
 // IsAssigneeOrWatcher.
-func (s *Service) CanOnTask(ctx context.Context, viewer uuid.UUID, action Action, taskID uuid.UUID) (bool, error) {
+func (s *Service) CanOnTask(ctx context.Context, viewer int64, action Action, taskID int64) (bool, error) {
 	tagIDs, err := s.taskTagsForAction(ctx, taskID, action)
 	if err != nil {
 		return false, err
@@ -34,7 +32,7 @@ func (s *Service) CanOnTask(ctx context.Context, viewer uuid.UUID, action Action
 
 // EffectiveOnTask returns the maximum bundle the viewer holds across all
 // tags where the task's view_role is set, plus the union of extras.
-func (s *Service) EffectiveOnTask(ctx context.Context, viewer uuid.UUID, taskID uuid.UUID) (Bundle, []string, error) {
+func (s *Service) EffectiveOnTask(ctx context.Context, viewer int64, taskID int64) (Bundle, []string, error) {
 	tagIDs, err := s.taskTagsForAction(ctx, taskID, ActionView)
 	if err != nil {
 		return BundleNone, nil, err
@@ -62,7 +60,7 @@ func (s *Service) EffectiveOnTask(ctx context.Context, viewer uuid.UUID, taskID 
 
 // taskTagsForAction returns the tag ids attached to taskID with the
 // per-action role flag set to true. Cached per request like postTags.
-func (s *Service) taskTagsForAction(ctx context.Context, taskID uuid.UUID, action Action) ([]uuid.UUID, error) {
+func (s *Service) taskTagsForAction(ctx context.Context, taskID int64, action Action) ([]int64, error) {
 	if c, ok := cacheFromContext(ctx); ok {
 		if tags, hit := c.lookupTaskTags(taskID, action); hit {
 			return tags, nil
@@ -75,9 +73,9 @@ func (s *Service) taskTagsForAction(ctx context.Context, taskID uuid.UUID, actio
 		return nil, fmt.Errorf("query task_tags: %w", err)
 	}
 	defer rows.Close()
-	var tags []uuid.UUID
+	var tags []int64
 	for rows.Next() {
-		var id uuid.UUID
+		var id int64
 		if err := rows.Scan(&id); err != nil {
 			return nil, fmt.Errorf("scan task_tag: %w", err)
 		}

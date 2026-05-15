@@ -33,3 +33,12 @@ query TagChildren($id: ID!) {
     }
   }
 }
+
+# Resolve a tag from a URL slug path. The Flutter router carries the path
+# as a slash-separated string; callers split it back into the list form
+# this query expects. Returns null when no tag exists at that path.
+query TagBySlugPath($path: [String!]!) {
+  tagBySlugPath(path: $path) {
+    ...TagSummary
+  }
+}

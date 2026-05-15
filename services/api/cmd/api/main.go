@@ -18,7 +18,6 @@ import (
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
-	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -204,7 +203,7 @@ func runAPIServer(ctx context.Context, cfg appConfig, logger *slog.Logger, pool 
 				return ctx, nil, nil
 			}
 			ctx = pulseauth.WithIdentity(ctx, id)
-			if sessionID != uuid.Nil {
+			if sessionID != int64(0) {
 				ctx = pulseauth.WithSessionID(ctx, sessionID)
 			}
 			return ctx, nil, nil

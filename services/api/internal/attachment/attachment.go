@@ -21,9 +21,9 @@ import (
 	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/aws/signer/v4"
+	v4 "github.com/aws/aws-sdk-go-v2/aws/signer/v4"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/google/uuid"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -62,10 +62,10 @@ type Service struct {
 
 // Attachment is the read-side row.
 type Attachment struct {
-	ID         uuid.UUID
+	ID         int64
 	OwnerType  string
-	OwnerID    uuid.UUID
-	UploaderID uuid.UUID
+	OwnerID    int64
+	UploaderID int64
 	StorageKey string
 	Filename   string
 	MimeType   string
@@ -80,8 +80,8 @@ type Attachment struct {
 // it to short-circuit obvious aborts and pre-check quotas.
 type IssueInput struct {
 	OwnerType  string
-	OwnerID    uuid.UUID
-	UploaderID uuid.UUID
+	OwnerID    int64
+	UploaderID int64
 	Filename   string
 	MimeType   string
 	SizeBytes  int64
@@ -90,7 +90,7 @@ type IssueInput struct {
 // IssueResult is what the client gets back: a presigned PUT URL and
 // the attachment id (so the eventual Confirm call has a stable handle).
 type IssueResult struct {
-	AttachmentID uuid.UUID
+	AttachmentID int64
 	UploadURL    string
 	Method       string
 	StorageKey   string
@@ -115,7 +115,7 @@ func (s *Service) IssueUpload(ctx context.Context, in IssueInput) (*IssueResult,
 		in.MimeType = "application/octet-stream"
 	}
 
-	id := uuid.New()
+	id := ids.New(ids.KindAttachment)
 	key := storageKey(in.OwnerType, in.OwnerID, id, in.Filename)
 
 	if _, err := s.DB.Exec(ctx, `
@@ -156,7 +156,7 @@ func methodOf(req *v4.PresignedHTTPRequest) string {
 // Confirm flips a pending attachment to ready. Caller must be the
 // uploader (or moderation logic at a higher layer; we just check the
 // uploader here).
-func (s *Service) Confirm(ctx context.Context, attachmentID, uploader uuid.UUID, sha256 []byte) error {
+func (s *Service) Confirm(ctx context.Context, attachmentID, uploader int64, sha256 []byte) error {
 	tag, err := s.DB.Exec(ctx, `
         UPDATE attachments
            SET state = 'ready',
@@ -179,7 +179,7 @@ func (s *Service) Confirm(ctx context.Context, attachmentID, uploader uuid.UUID,
 // caller has already been authorized to view. Authorization is the
 // caller's responsibility — perm checks live one layer up at the
 // resolver, mirroring the post/task pattern.
-func (s *Service) IssueDownload(ctx context.Context, attachmentID uuid.UUID) (string, time.Time, error) {
+func (s *Service) IssueDownload(ctx context.Context, attachmentID int64) (string, time.Time, error) {
 	a, err := s.Get(ctx, attachmentID)
 	if err != nil {
 		return "", time.Time{}, err
@@ -203,7 +203,7 @@ func (s *Service) IssueDownload(ctx context.Context, attachmentID uuid.UUID) (st
 // bucket until the retention sweep hard-deletes; the row is invisible
 // to reads immediately. Only the uploader (or a moderator at a higher
 // layer) may tombstone.
-func (s *Service) Tombstone(ctx context.Context, attachmentID, by uuid.UUID) error {
+func (s *Service) Tombstone(ctx context.Context, attachmentID, by int64) error {
 	tag, err := s.DB.Exec(ctx, `
         UPDATE attachments SET state = 'tombstoned'
          WHERE id = $1 AND state <> 'tombstoned'
@@ -221,7 +221,7 @@ func (s *Service) Tombstone(ctx context.Context, attachmentID, by uuid.UUID) err
 // Get returns the row by id. Tombstoned attachments come back with
 // State='tombstoned' so callers can filter; ErrNotFound is for "row
 // doesn't exist".
-func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Attachment, error) {
+func (s *Service) Get(ctx context.Context, id int64) (*Attachment, error) {
 	row := s.DB.QueryRow(ctx, `
         SELECT id, owner_type, owner_id, uploader_id, storage_key, filename, mime_type,
                size_bytes, state, created_at, ready_at
@@ -240,7 +240,7 @@ func (s *Service) Get(ctx context.Context, id uuid.UUID) (*Attachment, error) {
 
 // ListByOwner returns ready attachments for an owner. Tombstoned and
 // pending rows are filtered out so resolvers don't have to.
-func (s *Service) ListByOwner(ctx context.Context, ownerType string, ownerID uuid.UUID) ([]*Attachment, error) {
+func (s *Service) ListByOwner(ctx context.Context, ownerType string, ownerID int64) ([]*Attachment, error) {
 	rows, err := s.DB.Query(ctx, `
         SELECT id, owner_type, owner_id, uploader_id, storage_key, filename, mime_type,
                size_bytes, state, created_at, ready_at
@@ -275,7 +275,7 @@ func validOwnerType(t string) bool {
 // storageKey builds a deterministic bucket key. The filename is kept
 // for content-disposition niceness on download but doesn't drive the
 // id namespace — the attachment uuid does.
-func storageKey(ownerType string, ownerID, attachmentID uuid.UUID, filename string) string {
+func storageKey(ownerType string, ownerID, attachmentID int64, filename string) string {
 	safe := strings.ReplaceAll(filename, "/", "_")
-	return fmt.Sprintf("%s/%s/%s/%s", ownerType, ownerID, attachmentID, safe)
+	return fmt.Sprintf("%s/%s/%s/%s", ownerType, ids.FormatID(ownerID), ids.FormatID(attachmentID), safe)
 }

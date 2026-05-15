@@ -29,7 +29,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -86,30 +85,30 @@ func Middleware(pool *pgxpool.Pool, next http.Handler) http.Handler {
 // resolver needs. The loader returns nil for ids that don't exist; the
 // resolver decides how to surface that.
 type PrincipalRow struct {
-	ID          uuid.UUID
+	ID          int64
 	Kind        string
 	Status      string
 	DisplayName string
 	Email       *string
-	HomeTagID   *uuid.UUID
-	BotOwnerID  *uuid.UUID
+	HomeTagID   *int64
+	BotOwnerID  *int64
 }
 
 // PrincipalLoader batches principal reads.
 type PrincipalLoader struct {
 	pool  *pgxpool.Pool
 	mu    sync.Mutex
-	cache map[uuid.UUID]*PrincipalRow
+	cache map[int64]*PrincipalRow
 }
 
 func newPrincipalLoader(pool *pgxpool.Pool) *PrincipalLoader {
-	return &PrincipalLoader{pool: pool, cache: map[uuid.UUID]*PrincipalRow{}}
+	return &PrincipalLoader{pool: pool, cache: map[int64]*PrincipalRow{}}
 }
 
 // Prime loads the named ids in one SELECT and populates the cache. ids
 // that don't resolve are stored as nil so subsequent Get calls don't
 // re-query.
-func (l *PrincipalLoader) Prime(ctx context.Context, ids []uuid.UUID) error {
+func (l *PrincipalLoader) Prime(ctx context.Context, ids []int64) error {
 	missing := l.uniqueMissing(ids)
 	if len(missing) == 0 {
 		return nil
@@ -119,13 +118,13 @@ func (l *PrincipalLoader) Prime(ctx context.Context, ids []uuid.UUID) error {
                bc.owner_principal_id
         FROM principals p
         LEFT JOIN bot_credentials bc ON bc.principal_id = p.id
-        WHERE p.id = ANY($1::UUID[])
+        WHERE p.id = ANY($1::BIGINT[])
     `, missing)
 	if err != nil {
 		return fmt.Errorf("batch principals: %w", err)
 	}
 	defer rows.Close()
-	found := map[uuid.UUID]*PrincipalRow{}
+	found := map[int64]*PrincipalRow{}
 	for rows.Next() {
 		var r PrincipalRow
 		if err := rows.Scan(&r.ID, &r.Kind, &r.Status, &r.DisplayName,
@@ -146,14 +145,14 @@ func (l *PrincipalLoader) Prime(ctx context.Context, ids []uuid.UUID) error {
 }
 
 // Get returns the cached principal or loads it if not present.
-func (l *PrincipalLoader) Get(ctx context.Context, id uuid.UUID) (*PrincipalRow, error) {
+func (l *PrincipalLoader) Get(ctx context.Context, id int64) (*PrincipalRow, error) {
 	l.mu.Lock()
 	if v, ok := l.cache[id]; ok {
 		l.mu.Unlock()
 		return v, nil
 	}
 	l.mu.Unlock()
-	if err := l.Prime(ctx, []uuid.UUID{id}); err != nil {
+	if err := l.Prime(ctx, []int64{id}); err != nil {
 		return nil, err
 	}
 	l.mu.Lock()
@@ -161,11 +160,11 @@ func (l *PrincipalLoader) Get(ctx context.Context, id uuid.UUID) (*PrincipalRow,
 	return l.cache[id], nil
 }
 
-func (l *PrincipalLoader) uniqueMissing(ids []uuid.UUID) []uuid.UUID {
+func (l *PrincipalLoader) uniqueMissing(ids []int64) []int64 {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	seen := map[uuid.UUID]struct{}{}
-	out := make([]uuid.UUID, 0, len(ids))
+	seen := map[int64]struct{}{}
+	out := make([]int64, 0, len(ids))
 	for _, id := range ids {
 		if _, dup := seen[id]; dup {
 			continue
@@ -183,8 +182,8 @@ func (l *PrincipalLoader) uniqueMissing(ids []uuid.UUID) []uuid.UUID {
 // derived path is computed lazily by the resolver — keeping it out of
 // the loader so the batch query stays a single table read.
 type TagRow struct {
-	ID          uuid.UUID
-	ParentID    *uuid.UUID
+	ID          int64
+	ParentID    *int64
 	Slug        string
 	DisplayName string
 	RootKind    string
@@ -197,14 +196,14 @@ type TagRow struct {
 type TagLoader struct {
 	pool  *pgxpool.Pool
 	mu    sync.Mutex
-	cache map[uuid.UUID]*TagRow
+	cache map[int64]*TagRow
 }
 
 func newTagLoader(pool *pgxpool.Pool) *TagLoader {
-	return &TagLoader{pool: pool, cache: map[uuid.UUID]*TagRow{}}
+	return &TagLoader{pool: pool, cache: map[int64]*TagRow{}}
 }
 
-func (l *TagLoader) Prime(ctx context.Context, ids []uuid.UUID) error {
+func (l *TagLoader) Prime(ctx context.Context, ids []int64) error {
 	missing := l.uniqueMissing(ids)
 	if len(missing) == 0 {
 		return nil
@@ -212,13 +211,13 @@ func (l *TagLoader) Prime(ctx context.Context, ids []uuid.UUID) error {
 	rows, err := l.pool.Query(ctx, `
         SELECT id, parent_id, slug, display_name, root_kind, defaults, archived_at, created_at
         FROM tags
-        WHERE id = ANY($1::UUID[])
+        WHERE id = ANY($1::BIGINT[])
     `, missing)
 	if err != nil {
 		return fmt.Errorf("batch tags: %w", err)
 	}
 	defer rows.Close()
-	found := map[uuid.UUID]*TagRow{}
+	found := map[int64]*TagRow{}
 	for rows.Next() {
 		var r TagRow
 		if err := rows.Scan(&r.ID, &r.ParentID, &r.Slug, &r.DisplayName,
@@ -238,14 +237,14 @@ func (l *TagLoader) Prime(ctx context.Context, ids []uuid.UUID) error {
 	return nil
 }
 
-func (l *TagLoader) Get(ctx context.Context, id uuid.UUID) (*TagRow, error) {
+func (l *TagLoader) Get(ctx context.Context, id int64) (*TagRow, error) {
 	l.mu.Lock()
 	if v, ok := l.cache[id]; ok {
 		l.mu.Unlock()
 		return v, nil
 	}
 	l.mu.Unlock()
-	if err := l.Prime(ctx, []uuid.UUID{id}); err != nil {
+	if err := l.Prime(ctx, []int64{id}); err != nil {
 		return nil, err
 	}
 	l.mu.Lock()
@@ -253,11 +252,11 @@ func (l *TagLoader) Get(ctx context.Context, id uuid.UUID) (*TagRow, error) {
 	return l.cache[id], nil
 }
 
-func (l *TagLoader) uniqueMissing(ids []uuid.UUID) []uuid.UUID {
+func (l *TagLoader) uniqueMissing(ids []int64) []int64 {
 	l.mu.Lock()
 	defer l.mu.Unlock()
-	seen := map[uuid.UUID]struct{}{}
-	out := make([]uuid.UUID, 0, len(ids))
+	seen := map[int64]struct{}{}
+	out := make([]int64, 0, len(ids))
 	for _, id := range ids {
 		if _, dup := seen[id]; dup {
 			continue
@@ -288,8 +287,8 @@ type PostReactionLoader struct {
 }
 
 type postReactionKey struct {
-	postID uuid.UUID
-	viewer uuid.UUID
+	postID int64
+	viewer int64
 }
 
 func newPostReactionLoader(pool *pgxpool.Pool) *PostReactionLoader {
@@ -299,8 +298,8 @@ func newPostReactionLoader(pool *pgxpool.Pool) *PostReactionLoader {
 // Prime aggregates reaction tallies for each (postID, viewer) pair in
 // one query and populates the cache. Posts with no reactions are cached
 // as an empty slice so subsequent calls don't re-query.
-func (l *PostReactionLoader) Prime(ctx context.Context, postIDs []uuid.UUID, viewer uuid.UUID) error {
-	missing := []uuid.UUID{}
+func (l *PostReactionLoader) Prime(ctx context.Context, postIDs []int64, viewer int64) error {
+	missing := []int64{}
 	l.mu.Lock()
 	for _, id := range postIDs {
 		if _, has := l.cache[postReactionKey{id, viewer}]; has {
@@ -315,7 +314,7 @@ func (l *PostReactionLoader) Prime(ctx context.Context, postIDs []uuid.UUID, vie
 	rows, err := l.pool.Query(ctx, `
         SELECT post_id, emoji, COUNT(*)::INT, BOOL_OR(principal_id = $2)
         FROM post_reactions
-        WHERE post_id = ANY($1::UUID[])
+        WHERE post_id = ANY($1::BIGINT[])
         GROUP BY post_id, emoji
         ORDER BY post_id, emoji
     `, missing, viewer)
@@ -324,9 +323,9 @@ func (l *PostReactionLoader) Prime(ctx context.Context, postIDs []uuid.UUID, vie
 	}
 	defer rows.Close()
 
-	by := map[uuid.UUID][]PostReactionTally{}
+	by := map[int64][]PostReactionTally{}
 	for rows.Next() {
-		var pid uuid.UUID
+		var pid int64
 		var t PostReactionTally
 		if err := rows.Scan(&pid, &t.Emoji, &t.Count, &t.ByViewer); err != nil {
 			return fmt.Errorf("scan reaction: %w", err)
@@ -345,14 +344,14 @@ func (l *PostReactionLoader) Prime(ctx context.Context, postIDs []uuid.UUID, vie
 }
 
 // Get returns the cached tally or loads it.
-func (l *PostReactionLoader) Get(ctx context.Context, postID, viewer uuid.UUID) ([]PostReactionTally, error) {
+func (l *PostReactionLoader) Get(ctx context.Context, postID, viewer int64) ([]PostReactionTally, error) {
 	l.mu.Lock()
 	if v, ok := l.cache[postReactionKey{postID, viewer}]; ok {
 		l.mu.Unlock()
 		return v, nil
 	}
 	l.mu.Unlock()
-	if err := l.Prime(ctx, []uuid.UUID{postID}, viewer); err != nil {
+	if err := l.Prime(ctx, []int64{postID}, viewer); err != nil {
 		return nil, err
 	}
 	l.mu.Lock()

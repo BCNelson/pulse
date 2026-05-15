@@ -30,7 +30,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
-	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 
@@ -40,6 +39,7 @@ import (
 	pulsedb "github.com/bcnelson/pulse/services/api/internal/db"
 	"github.com/bcnelson/pulse/services/api/internal/post"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 )
 
 const (
@@ -604,7 +604,7 @@ func main() {
 	if bootRes.AlreadyDone {
 		fmt.Println("seed: admin already present, skipping bootstrap")
 	} else {
-		fmt.Printf("seed: created admin %s and org tag %s\n", bootRes.PrincipalID, bootRes.OrgTagID)
+		fmt.Printf("seed: created admin %s and org tag %s\n", ids.FormatID(bootRes.PrincipalID), ids.FormatID(bootRes.OrgTagID))
 	}
 
 	adminID, orgTagID, err := lookupAdminAndOrg(ctx, pool, cfg.adminEmail)
@@ -689,33 +689,33 @@ func configFromEnv() seedConfig {
 
 // ---------- domain seeding ----------
 
-func lookupAdminAndOrg(ctx context.Context, pool *pgxpool.Pool, adminEmail string) (uuid.UUID, uuid.UUID, error) {
-	var adminID uuid.UUID
+func lookupAdminAndOrg(ctx context.Context, pool *pgxpool.Pool, adminEmail string) (int64, int64, error) {
+	var adminID int64
 	if err := pool.QueryRow(ctx,
 		`SELECT id FROM principals WHERE kind = 'user' AND lower(email) = lower($1)`, adminEmail).
 		Scan(&adminID); err != nil {
-		return uuid.Nil, uuid.Nil, fmt.Errorf("find admin %q: %w", adminEmail, err)
+		return int64(0), int64(0), fmt.Errorf("find admin %q: %w", adminEmail, err)
 	}
-	var orgID uuid.UUID
+	var orgID int64
 	if err := pool.QueryRow(ctx,
 		`SELECT id FROM tags WHERE parent_id IS NULL AND root_kind = 'org' ORDER BY created_at LIMIT 1`).
 		Scan(&orgID); err != nil {
-		return uuid.Nil, uuid.Nil, fmt.Errorf("find org root: %w", err)
+		return int64(0), int64(0), fmt.Errorf("find org root: %w", err)
 	}
 	return adminID, orgID, nil
 }
 
 // ensureDemoUsers creates the demo users that are missing and returns the
 // full email->id map (covering both freshly-created and pre-existing rows).
-func ensureDemoUsers(ctx context.Context, pool *pgxpool.Pool) (map[string]uuid.UUID, error) {
+func ensureDemoUsers(ctx context.Context, pool *pgxpool.Pool) (map[string]int64, error) {
 	hash, err := auth.HashPassword(demoPassword)
 	if err != nil {
 		return nil, fmt.Errorf("hash demo password: %w", err)
 	}
 
-	out := map[string]uuid.UUID{}
+	out := map[string]int64{}
 	for _, u := range demoUsers {
-		var id uuid.UUID
+		var id int64
 		err := pool.QueryRow(ctx,
 			`SELECT id FROM principals WHERE kind = 'user' AND lower(email) = lower($1)`, u.Email).
 			Scan(&id)
@@ -736,37 +736,37 @@ func ensureDemoUsers(ctx context.Context, pool *pgxpool.Pool) (map[string]uuid.U
 	return out, nil
 }
 
-func createUser(ctx context.Context, pool *pgxpool.Pool, u demoUser, hash string) (uuid.UUID, error) {
-	id := uuid.New()
+func createUser(ctx context.Context, pool *pgxpool.Pool, u demoUser, hash string) (int64, error) {
+	id := ids.New(ids.KindUser)
 	tx, err := pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
-		return uuid.Nil, err
+		return int64(0), err
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
-	uri := "local://principals/" + id.String()
+	uri := "local://principals/" + ids.FormatID(id)
 	if _, err := tx.Exec(ctx, `
         INSERT INTO principals (id, kind, status, global_uri, display_name, email)
         VALUES ($1, 'user', 'active', $2, $3, $4)
     `, id, uri, u.DisplayName, strings.ToLower(u.Email)); err != nil {
-		return uuid.Nil, fmt.Errorf("insert principal: %w", err)
+		return int64(0), fmt.Errorf("insert principal: %w", err)
 	}
 	if _, err := tx.Exec(ctx, `
         INSERT INTO user_credentials (principal_id, password_hash) VALUES ($1, $2)
     `, id, hash); err != nil {
-		return uuid.Nil, fmt.Errorf("insert credential: %w", err)
+		return int64(0), fmt.Errorf("insert credential: %w", err)
 	}
 	if err := tx.Commit(ctx); err != nil {
-		return uuid.Nil, err
+		return int64(0), err
 	}
 	return id, nil
 }
 
 // ensureDemoTags creates the demo sub-tags (under org root) if missing and
 // returns the slug->id map. Member grants are inserted idempotently.
-func ensureDemoTags(ctx context.Context, pool *pgxpool.Pool, orgTagID uuid.UUID, users map[string]uuid.UUID) (map[string]uuid.UUID, error) {
+func ensureDemoTags(ctx context.Context, pool *pgxpool.Pool, orgTagID int64, users map[string]int64) (map[string]int64, error) {
 	tagSvc := &tag.Service{DB: pool}
-	out := map[string]uuid.UUID{}
+	out := map[string]int64{}
 	for _, t := range demoTags {
 		parentID := orgTagID
 		parentLabel := "org"
@@ -779,7 +779,7 @@ func ensureDemoTags(ctx context.Context, pool *pgxpool.Pool, orgTagID uuid.UUID,
 			parentLabel = t.ParentSlug
 		}
 
-		var id uuid.UUID
+		var id int64
 		err := pool.QueryRow(ctx,
 			`SELECT id FROM tags WHERE parent_id = $1 AND slug = $2`, parentID, t.Slug).
 			Scan(&id)
@@ -818,10 +818,10 @@ func ensureDemoTags(ctx context.Context, pool *pgxpool.Pool, orgTagID uuid.UUID,
 
 // ensureDemoPosts creates the demo posts (and their comments) if missing,
 // keyed by title within the post's tag. Returns the title->id map.
-func ensureDemoPosts(ctx context.Context, pool *pgxpool.Pool, adminID uuid.UUID, users, tags map[string]uuid.UUID) (map[string]uuid.UUID, error) {
+func ensureDemoPosts(ctx context.Context, pool *pgxpool.Pool, adminID int64, users, tags map[string]int64) (map[string]int64, error) {
 	postSvc := &post.Service{DB: pool}
 	commentSvc := &comment.Service{DB: pool}
-	out := map[string]uuid.UUID{}
+	out := map[string]int64{}
 
 	for _, p := range demoPosts {
 		tagID, ok := tags[p.TagSlug]
@@ -830,7 +830,7 @@ func ensureDemoPosts(ctx context.Context, pool *pgxpool.Pool, adminID uuid.UUID,
 		}
 		authorID := principalFor(p.Author, adminID, users)
 
-		var id uuid.UUID
+		var id int64
 		err := pool.QueryRow(ctx, `
             SELECT p.id FROM posts p
             JOIN post_tags pt ON pt.post_id = p.id
@@ -858,9 +858,9 @@ func ensureDemoPosts(ctx context.Context, pool *pgxpool.Pool, adminID uuid.UUID,
 		}
 		out[p.Title] = id
 
-		idByKey := map[string]uuid.UUID{}
+		idByKey := map[string]int64{}
 		for _, c := range p.Comments {
-			var parentID *uuid.UUID
+			var parentID *int64
 			if c.ParentKey != "" {
 				pid, ok := idByKey[c.ParentKey]
 				if !ok {
@@ -869,7 +869,7 @@ func ensureDemoPosts(ctx context.Context, pool *pgxpool.Pool, adminID uuid.UUID,
 				parentID = &pid
 			}
 
-			var existingID uuid.UUID
+			var existingID int64
 			err := pool.QueryRow(ctx,
 				`SELECT id FROM comments WHERE post_id = $1 AND body = $2 LIMIT 1`, id, c.Body).
 				Scan(&existingID)
@@ -901,7 +901,7 @@ func ensureDemoPosts(ctx context.Context, pool *pgxpool.Pool, adminID uuid.UUID,
 	return out, nil
 }
 
-func principalFor(email string, adminID uuid.UUID, users map[string]uuid.UUID) uuid.UUID {
+func principalFor(email string, adminID int64, users map[string]int64) int64 {
 	if email == "" || strings.EqualFold(email, defaultAdminEmail) {
 		return adminID
 	}
@@ -913,7 +913,7 @@ func principalFor(email string, adminID uuid.UUID, users map[string]uuid.UUID) u
 
 // ---------- attachments ----------
 
-func ensureDemoAttachment(ctx context.Context, pool *pgxpool.Pool, cfg seedConfig, adminID uuid.UUID, postIDs map[string]uuid.UUID) error {
+func ensureDemoAttachment(ctx context.Context, pool *pgxpool.Pool, cfg seedConfig, adminID int64, postIDs map[string]int64) error {
 	if len(postIDs) == 0 {
 		return nil
 	}
@@ -934,7 +934,7 @@ func ensureDemoAttachment(ctx context.Context, pool *pgxpool.Pool, cfg seedConfi
 	}
 
 	// Pick a stable post to attach to: the first demo post by title order.
-	var firstID uuid.UUID
+	var firstID int64
 	var firstTitle string
 	for _, p := range demoPosts {
 		if id, ok := postIDs[p.Title]; ok {
@@ -943,7 +943,7 @@ func ensureDemoAttachment(ctx context.Context, pool *pgxpool.Pool, cfg seedConfi
 			break
 		}
 	}
-	if firstID == uuid.Nil {
+	if firstID == int64(0) {
 		return nil
 	}
 
@@ -1003,7 +1003,7 @@ func ensureBucket(ctx context.Context, client *s3.Client, bucket string) error {
 // post_tags/post_mentions/post_reactions/post_edits/principal_post_read),
 // then attachments (no cascade from principals), then tag_grants and
 // tag_closure rows for the demo sub-tags, finally principals.
-func wipeDemo(ctx context.Context, pool *pgxpool.Pool, adminID uuid.UUID) error {
+func wipeDemo(ctx context.Context, pool *pgxpool.Pool, adminID int64) error {
 	tx, err := pool.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return err
