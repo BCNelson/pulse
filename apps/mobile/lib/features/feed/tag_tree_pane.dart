@@ -12,6 +12,7 @@ import '../../design/typography.dart';
 import '../../graphql/__generated__/schema.schema.gql.dart';
 import '../../graphql/operations/__generated__/tag_tree.data.gql.dart';
 import '../../graphql/operations/__generated__/tag_tree.req.gql.dart';
+import 'tag_tree_expansion.dart';
 
 // Navigates to the feed for the tag whose hierarchical slug path is
 // [tagPath] (already in the wire form "root/child/leaf"). The current
@@ -36,6 +37,24 @@ class TagTreePane extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
     final client = ref.watch(ferryClientProvider);
+    // Auto-expand ancestors of the currently selected tag so deep-links
+    // (and cold boots that restore via lastRouteKey) land with the right
+    // Space already open. The listen handles subsequent navigations; the
+    // initial path is applied via a post-frame callback so we don't mutate
+    // a provider during build.
+    final initialPath = ref.read(currentTagPathProvider);
+    if (initialPath != null && initialPath.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        ref
+            .read(expandedTagPathsProvider.notifier)
+            .expandAncestors(initialPath);
+      });
+    }
+    ref.listen<List<String>?>(currentTagPathProvider, (_, next) {
+      if (next != null && next.isNotEmpty) {
+        ref.read(expandedTagPathsProvider.notifier).expandAncestors(next);
+      }
+    });
     return Container(
       color: t.paper2,
       child: StreamBuilder(
@@ -95,25 +114,23 @@ class TagTreePane extends ConsumerWidget {
   }
 }
 
-/// _TagNode is recursive: expand=true shows children inline.
-class _TagNode extends ConsumerStatefulWidget {
+/// _TagNode is recursive: expand=true shows children inline. Expansion
+/// state lives in [expandedTagPathsProvider] so it survives FeedScreen
+/// remounts triggered by `context.go(...)` tag navigation.
+class _TagNode extends ConsumerWidget {
   const _TagNode({required this.node, required this.depth});
 
   final GTagTreeData_myTagRoots node;
   final int depth;
 
   @override
-  ConsumerState<_TagNode> createState() => _TagNodeState();
-}
-
-class _TagNodeState extends ConsumerState<_TagNode> {
-  bool _expanded = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final selected = ref.watch(currentTagIdProvider);
-    final isSelected = selected == widget.node.path;
-    final hasChildren = widget.node.children.isNotEmpty;
+    final isSelected = selected == node.path;
+    final expanded = ref.watch(
+      expandedTagPathsProvider.select((s) => s.contains(node.path)),
+    );
+    final hasChildren = node.children.isNotEmpty;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -123,11 +140,13 @@ class _TagNodeState extends ConsumerState<_TagNode> {
               SizedBox(
                 width: 12,
                 child: InkWell(
-                  onTap: () => setState(() => _expanded = !_expanded),
+                  onTap: () => ref
+                      .read(expandedTagPathsProvider.notifier)
+                      .toggle(node.path),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(vertical: 3),
                     child: Icon(
-                      _expanded
+                      expanded
                           ? Icons.keyboard_arrow_down
                           : Icons.chevron_right,
                       size: 14,
@@ -140,18 +159,18 @@ class _TagNodeState extends ConsumerState<_TagNode> {
               const SizedBox(width: 12),
             Expanded(
               child: PulseTagRow(
-                label: widget.node.displayName,
-                indent: widget.depth,
-                prefix: widget.node.rootKind == GTagRootKind.USER ? '~' : '#',
+                label: node.displayName,
+                indent: depth,
+                prefix: node.rootKind == GTagRootKind.USER ? '~' : '#',
                 isActive: isSelected,
-                onTap: () => _selectTag(context, widget.node.path),
+                onTap: () => _selectTag(context, node.path),
               ),
             ),
           ],
         ),
-        if (_expanded && hasChildren)
-          for (final child in widget.node.children)
-            _RecursiveChild(child: child, depth: widget.depth + 1),
+        if (expanded && hasChildren)
+          for (final child in node.children)
+            _RecursiveChild(child: child, depth: depth + 1),
       ],
     );
   }
