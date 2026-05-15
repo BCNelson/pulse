@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:pulse/design/atoms/pulse_markdown_body.dart';
@@ -28,6 +29,8 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byType(PulseMarkdownBody), findsOneWidget);
+    final markdown = tester.widget<MarkdownBody>(find.byType(MarkdownBody));
+    expect(markdown.selectable, isTrue);
   });
 
   testWidgets('composer uses an in-place rich editor in rich mode',

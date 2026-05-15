@@ -28,7 +28,7 @@ class PulseMarkdownBody extends StatelessWidget {
 
     return MarkdownBody(
       data: data,
-      selectable: false,
+      selectable: true,
       softLineBreak: true,
       styleSheet: MarkdownStyleSheet(
         p: body,

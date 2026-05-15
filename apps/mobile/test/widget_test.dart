@@ -1,30 +1,45 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:pulse/core/auth_controller.dart';
+import 'package:pulse/core/prefs_provider.dart';
+import 'package:pulse/core/server_config_controller.dart';
 import 'package:pulse/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('PulseApp does not make the whole app selectable',
+      (tester) async {
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          authControllerProvider.overrideWith(_TestAuthController.new),
+          serverConfigControllerProvider.overrideWith(
+            _TestServerConfigController.new,
+          ),
+          sharedPreferencesProvider.overrideWith((ref) async => prefs),
+        ],
+        child: const PulseApp(),
+      ),
+    );
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    expect(find.text('connect'), findsOneWidget);
+    expect(find.byType(SelectionArea), findsNothing);
   });
+}
+
+class _TestAuthController extends AuthController {
+  @override
+  AuthState build() => const AuthSignedOut();
+}
+
+class _TestServerConfigController extends ServerConfigController {
+  @override
+  ServerConfigState build() => const ServerConfigMissing();
 }
