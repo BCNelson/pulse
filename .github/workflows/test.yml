@@ -9,11 +9,10 @@ permissions:
   contents: read
 
 # Each test category produces its own coverprofile and uploads to
-# codecov tagged with two flags: the platform umbrella (server or
-# mobile) plus the type (unit / integration / e2e). Codecov unions
-# reports that share a flag, so the umbrellas auto-aggregate to the
-# full per-platform view while each <platform>-<type> flag isolates
-# that one category.
+# codecov with a single <platform>-<type> flag (server-unit,
+# mobile-integration, etc.). The repo-wide total comes from codecov's
+# automatic per-commit union of all uploads; per-platform views are a
+# UI multi-select over the matching `server-*` / `mobile-*` flags.
 
 jobs:
   go:
@@ -45,7 +44,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: services/api/coverage.unit.out
-          flags: server,server-unit
+          flags: server-unit
 
       # Testcontainer-backed integration tests: real Postgres + RustFS
       # via internal/pgtest. Includes the permission service, the
@@ -83,7 +82,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: services/api/coverage.integration.out
-          flags: server,server-integration
+          flags: server-integration
 
       # End-to-end GraphQL surface: HTTP transport -> resolver -> DB,
       # M1 through M4.5 milestones.
@@ -98,7 +97,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: services/api/coverage.e2e.out
-          flags: server,server-e2e
+          flags: server-e2e
 
       - uses: golangci/golangci-lint-action@v9
         with:
@@ -138,14 +137,14 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/mobile/coverage/unit.info
-          flags: mobile,mobile-unit
+          flags: mobile-unit
 
       # WidgetTester-driven screen + composer tests. Widget tests
       # integrate multiple components in memory (provider tree,
       # router, theme) without a real backend, so they live under the
       # `integration` type rather than `unit`. End-to-end mobile<->API
       # tests would live in apps/mobile/integration_test/ when added,
-      # uploaded with `mobile,mobile-e2e` (no such tests exist today).
+      # uploaded with `mobile-e2e` (no such tests exist today).
       - name: test (integration)
         working-directory: apps/mobile
         run: flutter test --coverage --coverage-path=coverage/integration.info test/features/ test/widget_test.dart
@@ -155,4 +154,4 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/mobile/coverage/integration.info
-          flags: mobile,mobile-integration
+          flags: mobile-integration
