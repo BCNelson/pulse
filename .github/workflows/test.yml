@@ -9,10 +9,10 @@ permissions:
   contents: read
 
 # Each test category produces its own coverprofile and uploads to
-# codecov with a single <platform>-<type> flag (server-unit,
-# mobile-integration, etc.). The repo-wide total comes from codecov's
-# automatic per-commit union of all uploads; per-platform views are a
-# UI multi-select over the matching `server-*` / `mobile-*` flags.
+# codecov with a single flag identifying how it was tested
+# (unit/integration/e2e). The platform axis (server/mobile) is encoded
+# as components in codecov.yml, partitioned by source path — codecov's
+# UI lets you slice by flag, by component, or by their intersection.
 
 jobs:
   go:
@@ -39,12 +39,12 @@ jobs:
             ./internal/federation/... \
             ./pkg/ids/...
 
-      - name: Upload server-unit coverage
+      - name: Upload unit coverage (server)
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: services/api/coverage.unit.out
-          flags: server-unit
+          flags: unit
 
       # Testcontainer-backed integration tests: real Postgres + RustFS
       # via internal/pgtest. Includes the permission service, the
@@ -77,12 +77,12 @@ jobs:
             ./internal/tag/... \
             ./internal/task/...
 
-      - name: Upload server-integration coverage
+      - name: Upload integration coverage (server)
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: services/api/coverage.integration.out
-          flags: server-integration
+          flags: integration
 
       # End-to-end GraphQL surface: HTTP transport -> resolver -> DB,
       # M1 through M4.5 milestones.
@@ -92,12 +92,12 @@ jobs:
           go test -count=1 -race -covermode=atomic -coverprofile=coverage.e2e.out \
             ./internal/graphql/
 
-      - name: Upload server-e2e coverage
+      - name: Upload e2e coverage (server)
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: services/api/coverage.e2e.out
-          flags: server-e2e
+          flags: e2e
 
       - uses: golangci/golangci-lint-action@v9
         with:
@@ -132,26 +132,27 @@ jobs:
         working-directory: apps/mobile
         run: flutter test --coverage --coverage-path=coverage/unit.info test/core/
 
-      - name: Upload mobile-unit coverage
+      - name: Upload unit coverage (mobile)
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/mobile/coverage/unit.info
-          flags: mobile-unit
+          flags: unit
 
       # WidgetTester-driven screen + composer tests. Widget tests
       # integrate multiple components in memory (provider tree,
       # router, theme) without a real backend, so they live under the
       # `integration` type rather than `unit`. End-to-end mobile<->API
       # tests would live in apps/mobile/integration_test/ when added,
-      # uploaded with `mobile-e2e` (no such tests exist today).
+      # uploaded with `flags: e2e` (no such tests exist today; the
+      # mobile slice of the e2e flag will appear when that exists).
       - name: test (integration)
         working-directory: apps/mobile
         run: flutter test --coverage --coverage-path=coverage/integration.info test/features/ test/widget_test.dart
 
-      - name: Upload mobile-integration coverage
+      - name: Upload integration coverage (mobile)
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/mobile/coverage/integration.info
-          flags: mobile-integration
+          flags: integration
