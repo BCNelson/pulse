@@ -46,7 +46,13 @@ class RetryLink extends Link {
     var attempt = 0;
     while (true) {
       try {
-        yield* next(request);
+        // `await for` is required here rather than `yield* next(request)`:
+        // a stream error from `yield*` flows out of the outer stream
+        // without ever entering the surrounding try-catch, so retries
+        // would silently never run.
+        await for (final response in next(request)) {
+          yield response;
+        }
         return;
       } on LinkException catch (e) {
         attempt += 1;
