@@ -184,6 +184,11 @@
     go test ./services/api/...
   '';
 
+  scripts.mobile-test.exec = ''
+    cd "$DEVENV_ROOT/apps/mobile"
+    flutter test --coverage "$@"
+  '';
+
   processes.api = {
     # air watches services/api/{*.go,*.graphql,*.sql}, rebuilds, and
     # restarts the binary on every save. Config in services/api/.air.toml.

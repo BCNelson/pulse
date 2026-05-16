@@ -8,6 +8,12 @@ on:
 permissions:
   contents: read
 
+# Each test category produces its own coverprofile and uploads to
+# codecov with a single flag identifying how it was tested
+# (unit/integration/e2e). The platform axis (server/mobile) is encoded
+# as components in codecov.yml, partitioned by source path — codecov's
+# UI lets you slice by flag, by component, or by their intersection.
+
 jobs:
   go:
     runs-on: ubuntu-latest
@@ -23,14 +29,80 @@ jobs:
         working-directory: services/api
         run: go build ./...
 
-      - name: Test
+      # Pure-logic packages: no Postgres, no RustFS, no GraphQL transport.
+      - name: Test (unit)
         working-directory: services/api
-        run: go test -count=1 -race ./...
+        run: |
+          go test -count=1 -race -covermode=atomic -coverprofile=coverage.unit.out \
+            ./internal/mentions/... \
+            ./internal/observability/... \
+            ./internal/federation/... \
+            ./pkg/ids/...
 
-      - uses: golangci/golangci-lint-action@v6
+      - name: Upload unit coverage (server)
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: services/api/coverage.unit.out
+          flags: unit
+
+      # Testcontainer-backed integration tests: real Postgres + RustFS
+      # via internal/pgtest. Includes the permission service, the
+      # realtime LISTEN/NOTIFY pipeline, and the in-process worker
+      # boot — everything that hits the DB but stops short of the full
+      # HTTP -> resolver roundtrip.
+      - name: Test (integration)
+        working-directory: services/api
+        run: |
+          go test -count=1 -race -covermode=atomic -coverprofile=coverage.integration.out \
+            ./cmd/api/... \
+            ./internal/attachment/... \
+            ./internal/audit/... \
+            ./internal/auth/... \
+            ./internal/bootstrap/... \
+            ./internal/chat/... \
+            ./internal/comment/... \
+            ./internal/db/... \
+            ./internal/graphql/loaders/... \
+            ./internal/impersonation/... \
+            ./internal/job/... \
+            ./internal/notification/... \
+            ./internal/perm/... \
+            ./internal/post/... \
+            ./internal/push/... \
+            ./internal/realtime/... \
+            ./internal/redaction/... \
+            ./internal/retention/... \
+            ./internal/search/... \
+            ./internal/tag/... \
+            ./internal/task/...
+
+      - name: Upload integration coverage (server)
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: services/api/coverage.integration.out
+          flags: integration
+
+      # End-to-end GraphQL surface: HTTP transport -> resolver -> DB,
+      # M1 through M4.5 milestones.
+      - name: Test (e2e)
+        working-directory: services/api
+        run: |
+          go test -count=1 -race -covermode=atomic -coverprofile=coverage.e2e.out \
+            ./internal/graphql/
+
+      - name: Upload e2e coverage (server)
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: services/api/coverage.e2e.out
+          flags: e2e
+
+      - uses: golangci/golangci-lint-action@v9
         with:
           working-directory: services/api
-          version: v1.62
+          version: v2.12.2
 
   flutter:
     runs-on: ubuntu-latest
@@ -53,3 +125,34 @@ jobs:
       - name: analyze
         working-directory: apps/mobile
         run: flutter analyze
+
+      # Pure-Dart units: caches, codecs, drift outbox, auth_storage,
+      # ferry RetryLink/AuthLink. No widget pumping.
+      - name: test (unit)
+        working-directory: apps/mobile
+        run: flutter test --coverage --coverage-path=coverage/unit.info test/core/
+
+      - name: Upload unit coverage (mobile)
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/mobile/coverage/unit.info
+          flags: unit
+
+      # WidgetTester-driven screen + composer tests. Widget tests
+      # integrate multiple components in memory (provider tree,
+      # router, theme) without a real backend, so they live under the
+      # `integration` type rather than `unit`. End-to-end mobile<->API
+      # tests would live in apps/mobile/integration_test/ when added,
+      # uploaded with `flags: e2e` (no such tests exist today; the
+      # mobile slice of the e2e flag will appear when that exists).
+      - name: test (integration)
+        working-directory: apps/mobile
+        run: flutter test --coverage --coverage-path=coverage/integration.info test/features/ test/widget_test.dart
+
+      - name: Upload integration coverage (mobile)
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: apps/mobile/coverage/integration.info
+          flags: integration

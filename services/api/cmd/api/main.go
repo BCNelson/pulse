@@ -101,9 +101,7 @@ func run(ctx context.Context, mode string, cfg appConfig, logger *slog.Logger, p
 	}
 	notifSvc := &pulsenotification.Service{DB: pool, Push: pushSvc}
 	retentionSvc := &pulseretention.Service{DB: pool, Logger: logger.With("component", "retention")}
-	registry := pulsejob.NewRegistry()
-	registry.Register("notification.fanout", notifSvc.Handler)
-	registry.Register(pulseretention.JobKind, retentionSvc.Handler)
+	registry := newJobRegistry(notifSvc, retentionSvc)
 
 	if runAPI {
 		go func() {
@@ -321,6 +319,16 @@ func buildAttachmentService(ctx context.Context, pool *pgxpool.Pool, cfg appConf
 		Bucket:   cfg.s3Bucket,
 		S3Client: s3Client,
 	}, nil
+}
+
+// newJobRegistry returns the worker registry shared by api+worker modes.
+// Both modes register the same kinds so producers and consumers agree
+// on what's recognized even though only worker mode polls.
+func newJobRegistry(notifSvc *pulsenotification.Service, retentionSvc *pulseretention.Service) *pulsejob.Registry {
+	registry := pulsejob.NewRegistry()
+	registry.Register("notification.fanout", notifSvc.Handler)
+	registry.Register(pulseretention.JobKind, retentionSvc.Handler)
+	return registry
 }
 
 func envOrDefault(key, fallback string) string {

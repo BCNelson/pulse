@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:ferry/ferry.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../graphql/__generated__/schema.schema.gql.dart';
@@ -43,7 +44,7 @@ class OutboxReplayer {
   }
 
   Future<void> _replay(
-      client, String kind, Map<String, dynamic> payload) async {
+      Client client, String kind, Map<String, dynamic> payload) async {
     switch (kind) {
       case 'createPost':
         final req = GCreatePostReq(

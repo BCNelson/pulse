@@ -26,6 +26,8 @@ class PendingMutations extends Table {
 class OutboxDatabase extends _$OutboxDatabase {
   OutboxDatabase() : super(_openConnection());
 
+  OutboxDatabase.forTesting(super.executor);
+
   @override
   int get schemaVersion => 1;
 
