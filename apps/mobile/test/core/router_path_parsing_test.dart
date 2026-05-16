@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 /// These tests exercise the go_router pattern shapes from
 /// lib/core/router.dart against the live go_router matcher. They guard
 /// the three URL shapes:
-///   /feed/t/<slugs>           -> tag-only
-///   /feed/p/<id>              -> post-only
-///   /feed/t/<slugs>/p/<id>    -> post under tag
+///   `/feed/t/<slugs>`           -> tag-only
+///   `/feed/p/<id>`              -> post-only
+///   `/feed/t/<slugs>/p/<id>`    -> post under tag
 const _idRe = r'[0-9A-HJ-NP-TV-Za-hj-np-tv-zIiLlOo]{12}';
 
 GoRouter _buildRouter() => GoRouter(
@@ -35,7 +35,7 @@ GoRouter _buildRouter() => GoRouter(
     );
 
 class _Stub extends StatelessWidget {
-  const _Stub({super.key});
+  const _Stub();
   @override
   Widget build(BuildContext context) => const Placeholder();
 }

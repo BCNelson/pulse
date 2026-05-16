@@ -67,7 +67,7 @@ class RetryLink extends Link {
   }
 }
 
-/// AuthLink stamps Authorization: Bearer <token> onto every outbound
+/// AuthLink stamps `Authorization: Bearer <token>` onto every outbound
 /// request when a token is present. The token comes from the Riverpod
 /// auth controller via a callback so we don't have to rebuild the
 /// client when login state changes.
