@@ -1,0 +1,24 @@
+query MentionHoverUser($slug: String!) {
+  userByHandle(slug: $slug) {
+    id
+    displayName
+    homeTag {
+      id
+      slug
+      path
+    }
+  }
+}
+
+query MentionHoverTag($path: [String!]!) {
+  tagBySlugPath(path: $path) {
+    id
+    slug
+    displayName
+    path
+    parent {
+      id
+      displayName
+    }
+  }
+}

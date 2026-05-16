@@ -30,6 +30,14 @@ Serializer<GSearchTagsData_searchTags> _$gSearchTagsDataSearchTagsSerializer =
 Serializer<GSearchTagsData_searchTags_tag>
     _$gSearchTagsDataSearchTagsTagSerializer =
     _$GSearchTagsData_searchTags_tagSerializer();
+Serializer<GSearchUsersData> _$gSearchUsersDataSerializer =
+    _$GSearchUsersDataSerializer();
+Serializer<GSearchUsersData_searchUsers>
+    _$gSearchUsersDataSearchUsersSerializer =
+    _$GSearchUsersData_searchUsersSerializer();
+Serializer<GSearchUsersData_searchUsers_homeTag>
+    _$gSearchUsersDataSearchUsersHomeTagSerializer =
+    _$GSearchUsersData_searchUsers_homeTagSerializer();
 
 class _$GSearchDataSerializer implements StructuredSerializer<GSearchData> {
   @override
@@ -606,6 +614,189 @@ class _$GSearchTagsData_searchTags_tagSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GSearchUsersDataSerializer
+    implements StructuredSerializer<GSearchUsersData> {
+  @override
+  final Iterable<Type> types = const [GSearchUsersData, _$GSearchUsersData];
+  @override
+  final String wireName = 'GSearchUsersData';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers, GSearchUsersData object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'searchUsers',
+      serializers.serialize(object.searchUsers,
+          specifiedType: const FullType(
+              BuiltList, const [const FullType(GSearchUsersData_searchUsers)])),
+    ];
+
+    return result;
+  }
+
+  @override
+  GSearchUsersData deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSearchUsersDataBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'searchUsers':
+          result.searchUsers.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GSearchUsersData_searchUsers)
+              ]))! as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GSearchUsersData_searchUsersSerializer
+    implements StructuredSerializer<GSearchUsersData_searchUsers> {
+  @override
+  final Iterable<Type> types = const [
+    GSearchUsersData_searchUsers,
+    _$GSearchUsersData_searchUsers
+  ];
+  @override
+  final String wireName = 'GSearchUsersData_searchUsers';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GSearchUsersData_searchUsers object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GSearchUsersData_searchUsers_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GSearchUsersData_searchUsers deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSearchUsersData_searchUsersBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GSearchUsersData_searchUsers_homeTag))!
+              as GSearchUsersData_searchUsers_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GSearchUsersData_searchUsers_homeTagSerializer
+    implements StructuredSerializer<GSearchUsersData_searchUsers_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GSearchUsersData_searchUsers_homeTag,
+    _$GSearchUsersData_searchUsers_homeTag
+  ];
+  @override
+  final String wireName = 'GSearchUsersData_searchUsers_homeTag';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GSearchUsersData_searchUsers_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GSearchUsersData_searchUsers_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSearchUsersData_searchUsers_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
         case 'path':
@@ -1827,6 +2018,378 @@ class GSearchTagsData_searchTags_tagBuilder
               displayName, r'GSearchTagsData_searchTags_tag', 'displayName'),
           path: BuiltValueNullFieldError.checkNotNull(
               path, r'GSearchTagsData_searchTags_tag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSearchUsersData extends GSearchUsersData {
+  @override
+  final String G__typename;
+  @override
+  final BuiltList<GSearchUsersData_searchUsers> searchUsers;
+
+  factory _$GSearchUsersData(
+          [void Function(GSearchUsersDataBuilder)? updates]) =>
+      (GSearchUsersDataBuilder()..update(updates))._build();
+
+  _$GSearchUsersData._({required this.G__typename, required this.searchUsers})
+      : super._();
+  @override
+  GSearchUsersData rebuild(void Function(GSearchUsersDataBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSearchUsersDataBuilder toBuilder() =>
+      GSearchUsersDataBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSearchUsersData &&
+        G__typename == other.G__typename &&
+        searchUsers == other.searchUsers;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, searchUsers.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GSearchUsersData')
+          ..add('G__typename', G__typename)
+          ..add('searchUsers', searchUsers))
+        .toString();
+  }
+}
+
+class GSearchUsersDataBuilder
+    implements Builder<GSearchUsersData, GSearchUsersDataBuilder> {
+  _$GSearchUsersData? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  ListBuilder<GSearchUsersData_searchUsers>? _searchUsers;
+  ListBuilder<GSearchUsersData_searchUsers> get searchUsers =>
+      _$this._searchUsers ??= ListBuilder<GSearchUsersData_searchUsers>();
+  set searchUsers(ListBuilder<GSearchUsersData_searchUsers>? searchUsers) =>
+      _$this._searchUsers = searchUsers;
+
+  GSearchUsersDataBuilder() {
+    GSearchUsersData._initializeBuilder(this);
+  }
+
+  GSearchUsersDataBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _searchUsers = $v.searchUsers.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSearchUsersData other) {
+    _$v = other as _$GSearchUsersData;
+  }
+
+  @override
+  void update(void Function(GSearchUsersDataBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSearchUsersData build() => _build();
+
+  _$GSearchUsersData _build() {
+    _$GSearchUsersData _$result;
+    try {
+      _$result = _$v ??
+          _$GSearchUsersData._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GSearchUsersData', 'G__typename'),
+            searchUsers: searchUsers.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'searchUsers';
+        searchUsers.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GSearchUsersData', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSearchUsersData_searchUsers extends GSearchUsersData_searchUsers {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GSearchUsersData_searchUsers_homeTag? homeTag;
+
+  factory _$GSearchUsersData_searchUsers(
+          [void Function(GSearchUsersData_searchUsersBuilder)? updates]) =>
+      (GSearchUsersData_searchUsersBuilder()..update(updates))._build();
+
+  _$GSearchUsersData_searchUsers._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GSearchUsersData_searchUsers rebuild(
+          void Function(GSearchUsersData_searchUsersBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSearchUsersData_searchUsersBuilder toBuilder() =>
+      GSearchUsersData_searchUsersBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSearchUsersData_searchUsers &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GSearchUsersData_searchUsers')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GSearchUsersData_searchUsersBuilder
+    implements
+        Builder<GSearchUsersData_searchUsers,
+            GSearchUsersData_searchUsersBuilder> {
+  _$GSearchUsersData_searchUsers? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GSearchUsersData_searchUsers_homeTagBuilder? _homeTag;
+  GSearchUsersData_searchUsers_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GSearchUsersData_searchUsers_homeTagBuilder();
+  set homeTag(GSearchUsersData_searchUsers_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GSearchUsersData_searchUsersBuilder() {
+    GSearchUsersData_searchUsers._initializeBuilder(this);
+  }
+
+  GSearchUsersData_searchUsersBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSearchUsersData_searchUsers other) {
+    _$v = other as _$GSearchUsersData_searchUsers;
+  }
+
+  @override
+  void update(void Function(GSearchUsersData_searchUsersBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSearchUsersData_searchUsers build() => _build();
+
+  _$GSearchUsersData_searchUsers _build() {
+    _$GSearchUsersData_searchUsers _$result;
+    try {
+      _$result = _$v ??
+          _$GSearchUsersData_searchUsers._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GSearchUsersData_searchUsers', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GSearchUsersData_searchUsers', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName, r'GSearchUsersData_searchUsers', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GSearchUsersData_searchUsers', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSearchUsersData_searchUsers_homeTag
+    extends GSearchUsersData_searchUsers_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GSearchUsersData_searchUsers_homeTag(
+          [void Function(GSearchUsersData_searchUsers_homeTagBuilder)?
+              updates]) =>
+      (GSearchUsersData_searchUsers_homeTagBuilder()..update(updates))._build();
+
+  _$GSearchUsersData_searchUsers_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GSearchUsersData_searchUsers_homeTag rebuild(
+          void Function(GSearchUsersData_searchUsers_homeTagBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSearchUsersData_searchUsers_homeTagBuilder toBuilder() =>
+      GSearchUsersData_searchUsers_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSearchUsersData_searchUsers_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GSearchUsersData_searchUsers_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GSearchUsersData_searchUsers_homeTagBuilder
+    implements
+        Builder<GSearchUsersData_searchUsers_homeTag,
+            GSearchUsersData_searchUsers_homeTagBuilder> {
+  _$GSearchUsersData_searchUsers_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GSearchUsersData_searchUsers_homeTagBuilder() {
+    GSearchUsersData_searchUsers_homeTag._initializeBuilder(this);
+  }
+
+  GSearchUsersData_searchUsers_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSearchUsersData_searchUsers_homeTag other) {
+    _$v = other as _$GSearchUsersData_searchUsers_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GSearchUsersData_searchUsers_homeTagBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSearchUsersData_searchUsers_homeTag build() => _build();
+
+  _$GSearchUsersData_searchUsers_homeTag _build() {
+    final _$result = _$v ??
+        _$GSearchUsersData_searchUsers_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GSearchUsersData_searchUsers_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GSearchUsersData_searchUsers_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GSearchUsersData_searchUsers_homeTag', 'path'),
         );
     replace(_$result);
     return _$result;

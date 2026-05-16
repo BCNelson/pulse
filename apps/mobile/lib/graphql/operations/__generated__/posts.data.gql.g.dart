@@ -21,6 +21,18 @@ Serializer<GPostsForTagData_tag_posts_edges_node>
 Serializer<GPostsForTagData_tag_posts_edges_node_author>
     _$gPostsForTagDataTagPostsEdgesNodeAuthorSerializer =
     _$GPostsForTagData_tag_posts_edges_node_authorSerializer();
+Serializer<GPostsForTagData_tag_posts_edges_node_author_homeTag>
+    _$gPostsForTagDataTagPostsEdgesNodeAuthorHomeTagSerializer =
+    _$GPostsForTagData_tag_posts_edges_node_author_homeTagSerializer();
+Serializer<GPostsForTagData_tag_posts_edges_node_mentions>
+    _$gPostsForTagDataTagPostsEdgesNodeMentionsSerializer =
+    _$GPostsForTagData_tag_posts_edges_node_mentionsSerializer();
+Serializer<GPostsForTagData_tag_posts_edges_node_mentions_homeTag>
+    _$gPostsForTagDataTagPostsEdgesNodeMentionsHomeTagSerializer =
+    _$GPostsForTagData_tag_posts_edges_node_mentions_homeTagSerializer();
+Serializer<GPostsForTagData_tag_posts_edges_node_referencedTags>
+    _$gPostsForTagDataTagPostsEdgesNodeReferencedTagsSerializer =
+    _$GPostsForTagData_tag_posts_edges_node_referencedTagsSerializer();
 Serializer<GPostsForTagData_tag_posts_edges_node_reactions>
     _$gPostsForTagDataTagPostsEdgesNodeReactionsSerializer =
     _$GPostsForTagData_tag_posts_edges_node_reactionsSerializer();
@@ -39,6 +51,18 @@ Serializer<GPostDetailData_post> _$gPostDetailDataPostSerializer =
     _$GPostDetailData_postSerializer();
 Serializer<GPostDetailData_post_author> _$gPostDetailDataPostAuthorSerializer =
     _$GPostDetailData_post_authorSerializer();
+Serializer<GPostDetailData_post_author_homeTag>
+    _$gPostDetailDataPostAuthorHomeTagSerializer =
+    _$GPostDetailData_post_author_homeTagSerializer();
+Serializer<GPostDetailData_post_mentions>
+    _$gPostDetailDataPostMentionsSerializer =
+    _$GPostDetailData_post_mentionsSerializer();
+Serializer<GPostDetailData_post_mentions_homeTag>
+    _$gPostDetailDataPostMentionsHomeTagSerializer =
+    _$GPostDetailData_post_mentions_homeTagSerializer();
+Serializer<GPostDetailData_post_referencedTags>
+    _$gPostDetailDataPostReferencedTagsSerializer =
+    _$GPostDetailData_post_referencedTagsSerializer();
 Serializer<GPostDetailData_post_reactions>
     _$gPostDetailDataPostReactionsSerializer =
     _$GPostDetailData_post_reactionsSerializer();
@@ -54,6 +78,18 @@ Serializer<GPostDetailData_post_comments_edges_node>
 Serializer<GPostDetailData_post_comments_edges_node_author>
     _$gPostDetailDataPostCommentsEdgesNodeAuthorSerializer =
     _$GPostDetailData_post_comments_edges_node_authorSerializer();
+Serializer<GPostDetailData_post_comments_edges_node_author_homeTag>
+    _$gPostDetailDataPostCommentsEdgesNodeAuthorHomeTagSerializer =
+    _$GPostDetailData_post_comments_edges_node_author_homeTagSerializer();
+Serializer<GPostDetailData_post_comments_edges_node_mentions>
+    _$gPostDetailDataPostCommentsEdgesNodeMentionsSerializer =
+    _$GPostDetailData_post_comments_edges_node_mentionsSerializer();
+Serializer<GPostDetailData_post_comments_edges_node_mentions_homeTag>
+    _$gPostDetailDataPostCommentsEdgesNodeMentionsHomeTagSerializer =
+    _$GPostDetailData_post_comments_edges_node_mentions_homeTagSerializer();
+Serializer<GPostDetailData_post_comments_edges_node_referencedTags>
+    _$gPostDetailDataPostCommentsEdgesNodeReferencedTagsSerializer =
+    _$GPostDetailData_post_comments_edges_node_referencedTagsSerializer();
 Serializer<GPostDetailData_post_comments_edges_node_reactions>
     _$gPostDetailDataPostCommentsEdgesNodeReactionsSerializer =
     _$GPostDetailData_post_comments_edges_node_reactionsSerializer();
@@ -72,6 +108,18 @@ Serializer<GCreatePostData_createPost> _$gCreatePostDataCreatePostSerializer =
 Serializer<GCreatePostData_createPost_author>
     _$gCreatePostDataCreatePostAuthorSerializer =
     _$GCreatePostData_createPost_authorSerializer();
+Serializer<GCreatePostData_createPost_author_homeTag>
+    _$gCreatePostDataCreatePostAuthorHomeTagSerializer =
+    _$GCreatePostData_createPost_author_homeTagSerializer();
+Serializer<GCreatePostData_createPost_mentions>
+    _$gCreatePostDataCreatePostMentionsSerializer =
+    _$GCreatePostData_createPost_mentionsSerializer();
+Serializer<GCreatePostData_createPost_mentions_homeTag>
+    _$gCreatePostDataCreatePostMentionsHomeTagSerializer =
+    _$GCreatePostData_createPost_mentions_homeTagSerializer();
+Serializer<GCreatePostData_createPost_referencedTags>
+    _$gCreatePostDataCreatePostReferencedTagsSerializer =
+    _$GCreatePostData_createPost_referencedTagsSerializer();
 Serializer<GCreatePostData_createPost_reactions>
     _$gCreatePostDataCreatePostReactionsSerializer =
     _$GCreatePostData_createPost_reactionsSerializer();
@@ -92,6 +140,18 @@ Serializer<GCreateCommentData_createComment>
 Serializer<GCreateCommentData_createComment_author>
     _$gCreateCommentDataCreateCommentAuthorSerializer =
     _$GCreateCommentData_createComment_authorSerializer();
+Serializer<GCreateCommentData_createComment_author_homeTag>
+    _$gCreateCommentDataCreateCommentAuthorHomeTagSerializer =
+    _$GCreateCommentData_createComment_author_homeTagSerializer();
+Serializer<GCreateCommentData_createComment_mentions>
+    _$gCreateCommentDataCreateCommentMentionsSerializer =
+    _$GCreateCommentData_createComment_mentionsSerializer();
+Serializer<GCreateCommentData_createComment_mentions_homeTag>
+    _$gCreateCommentDataCreateCommentMentionsHomeTagSerializer =
+    _$GCreateCommentData_createComment_mentions_homeTagSerializer();
+Serializer<GCreateCommentData_createComment_referencedTags>
+    _$gCreateCommentDataCreateCommentReferencedTagsSerializer =
+    _$GCreateCommentData_createComment_referencedTagsSerializer();
 Serializer<GCreateCommentData_createComment_reactions>
     _$gCreateCommentDataCreateCommentReactionsSerializer =
     _$GCreateCommentData_createComment_reactionsSerializer();
@@ -124,6 +184,18 @@ Serializer<GPostChangedData_postChanged>
 Serializer<GPostChangedData_postChanged_author>
     _$gPostChangedDataPostChangedAuthorSerializer =
     _$GPostChangedData_postChanged_authorSerializer();
+Serializer<GPostChangedData_postChanged_author_homeTag>
+    _$gPostChangedDataPostChangedAuthorHomeTagSerializer =
+    _$GPostChangedData_postChanged_author_homeTagSerializer();
+Serializer<GPostChangedData_postChanged_mentions>
+    _$gPostChangedDataPostChangedMentionsSerializer =
+    _$GPostChangedData_postChanged_mentionsSerializer();
+Serializer<GPostChangedData_postChanged_mentions_homeTag>
+    _$gPostChangedDataPostChangedMentionsHomeTagSerializer =
+    _$GPostChangedData_postChanged_mentions_homeTagSerializer();
+Serializer<GPostChangedData_postChanged_referencedTags>
+    _$gPostChangedDataPostChangedReferencedTagsSerializer =
+    _$GPostChangedData_postChanged_referencedTagsSerializer();
 Serializer<GPostChangedData_postChanged_reactions>
     _$gPostChangedDataPostChangedReactionsSerializer =
     _$GPostChangedData_postChanged_reactionsSerializer();
@@ -140,6 +212,17 @@ Serializer<GPostSummaryData> _$gPostSummaryDataSerializer =
     _$GPostSummaryDataSerializer();
 Serializer<GPostSummaryData_author> _$gPostSummaryDataAuthorSerializer =
     _$GPostSummaryData_authorSerializer();
+Serializer<GPostSummaryData_author_homeTag>
+    _$gPostSummaryDataAuthorHomeTagSerializer =
+    _$GPostSummaryData_author_homeTagSerializer();
+Serializer<GPostSummaryData_mentions> _$gPostSummaryDataMentionsSerializer =
+    _$GPostSummaryData_mentionsSerializer();
+Serializer<GPostSummaryData_mentions_homeTag>
+    _$gPostSummaryDataMentionsHomeTagSerializer =
+    _$GPostSummaryData_mentions_homeTagSerializer();
+Serializer<GPostSummaryData_referencedTags>
+    _$gPostSummaryDataReferencedTagsSerializer =
+    _$GPostSummaryData_referencedTagsSerializer();
 Serializer<GPostSummaryData_reactions> _$gPostSummaryDataReactionsSerializer =
     _$GPostSummaryData_reactionsSerializer();
 Serializer<GPostSummaryData_comments> _$gPostSummaryDataCommentsSerializer =
@@ -154,6 +237,18 @@ Serializer<GCommentSummaryData> _$gCommentSummaryDataSerializer =
     _$GCommentSummaryDataSerializer();
 Serializer<GCommentSummaryData_author> _$gCommentSummaryDataAuthorSerializer =
     _$GCommentSummaryData_authorSerializer();
+Serializer<GCommentSummaryData_author_homeTag>
+    _$gCommentSummaryDataAuthorHomeTagSerializer =
+    _$GCommentSummaryData_author_homeTagSerializer();
+Serializer<GCommentSummaryData_mentions>
+    _$gCommentSummaryDataMentionsSerializer =
+    _$GCommentSummaryData_mentionsSerializer();
+Serializer<GCommentSummaryData_mentions_homeTag>
+    _$gCommentSummaryDataMentionsHomeTagSerializer =
+    _$GCommentSummaryData_mentions_homeTagSerializer();
+Serializer<GCommentSummaryData_referencedTags>
+    _$gCommentSummaryDataReferencedTagsSerializer =
+    _$GCommentSummaryData_referencedTagsSerializer();
 Serializer<GCommentSummaryData_reactions>
     _$gCommentSummaryDataReactionsSerializer =
     _$GCommentSummaryData_reactionsSerializer();
@@ -444,6 +539,16 @@ class _$GPostsForTagData_tag_posts_edges_nodeSerializer
       serializers.serialize(object.author,
           specifiedType:
               const FullType(GPostsForTagData_tag_posts_edges_node_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GPostsForTagData_tag_posts_edges_node_mentions)
+          ])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GPostsForTagData_tag_posts_edges_node_referencedTags)
+          ])),
       'reactions',
       serializers.serialize(object.reactions,
           specifiedType: const FullType(BuiltList, const [
@@ -534,6 +639,19 @@ class _$GPostsForTagData_tag_posts_edges_nodeSerializer
                       GPostsForTagData_tag_posts_edges_node_author))!
               as GPostsForTagData_tag_posts_edges_node_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GPostsForTagData_tag_posts_edges_node_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(
+                    GPostsForTagData_tag_posts_edges_node_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'reactions':
           result.reactions.replace(serializers.deserialize(value,
               specifiedType: const FullType(BuiltList, const [
@@ -578,7 +696,15 @@ class _$GPostsForTagData_tag_posts_edges_node_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                GPostsForTagData_tag_posts_edges_node_author_homeTag)));
+    }
     return result;
   }
 
@@ -604,6 +730,285 @@ class _$GPostsForTagData_tag_posts_edges_node_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GPostsForTagData_tag_posts_edges_node_author_homeTag))!
+              as GPostsForTagData_tag_posts_edges_node_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_author_homeTagSerializer
+    implements
+        StructuredSerializer<
+            GPostsForTagData_tag_posts_edges_node_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GPostsForTagData_tag_posts_edges_node_author_homeTag,
+    _$GPostsForTagData_tag_posts_edges_node_author_homeTag
+  ];
+  @override
+  final String wireName =
+      'GPostsForTagData_tag_posts_edges_node_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostsForTagData_tag_posts_edges_node_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_mentionsSerializer
+    implements
+        StructuredSerializer<GPostsForTagData_tag_posts_edges_node_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GPostsForTagData_tag_posts_edges_node_mentions,
+    _$GPostsForTagData_tag_posts_edges_node_mentions
+  ];
+  @override
+  final String wireName = 'GPostsForTagData_tag_posts_edges_node_mentions';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostsForTagData_tag_posts_edges_node_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                GPostsForTagData_tag_posts_edges_node_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostsForTagData_tag_posts_edges_node_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GPostsForTagData_tag_posts_edges_node_mentions_homeTag))!
+              as GPostsForTagData_tag_posts_edges_node_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_mentions_homeTagSerializer
+    implements
+        StructuredSerializer<
+            GPostsForTagData_tag_posts_edges_node_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GPostsForTagData_tag_posts_edges_node_mentions_homeTag,
+    _$GPostsForTagData_tag_posts_edges_node_mentions_homeTag
+  ];
+  @override
+  final String wireName =
+      'GPostsForTagData_tag_posts_edges_node_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostsForTagData_tag_posts_edges_node_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_referencedTagsSerializer
+    implements
+        StructuredSerializer<
+            GPostsForTagData_tag_posts_edges_node_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GPostsForTagData_tag_posts_edges_node_referencedTags,
+    _$GPostsForTagData_tag_posts_edges_node_referencedTags
+  ];
+  @override
+  final String wireName =
+      'GPostsForTagData_tag_posts_edges_node_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostsForTagData_tag_posts_edges_node_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -943,6 +1348,14 @@ class _$GPostDetailData_postSerializer
       'author',
       serializers.serialize(object.author,
           specifiedType: const FullType(GPostDetailData_post_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(BuiltList,
+              const [const FullType(GPostDetailData_post_mentions)])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList,
+              const [const FullType(GPostDetailData_post_referencedTags)])),
       'reactions',
       serializers.serialize(object.reactions,
           specifiedType: const FullType(BuiltList,
@@ -1037,6 +1450,18 @@ class _$GPostDetailData_postSerializer
                   specifiedType: const FullType(GPostDetailData_post_author))!
               as GPostDetailData_post_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GPostDetailData_post_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GPostDetailData_post_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'reactions':
           result.reactions.replace(serializers.deserialize(value,
               specifiedType: const FullType(BuiltList, const [
@@ -1091,7 +1516,15 @@ class _$GPostDetailData_post_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GPostDetailData_post_author_homeTag)));
+    }
     return result;
   }
 
@@ -1117,6 +1550,272 @@ class _$GPostDetailData_post_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GPostDetailData_post_author_homeTag))!
+              as GPostDetailData_post_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostDetailData_post_author_homeTagSerializer
+    implements StructuredSerializer<GPostDetailData_post_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GPostDetailData_post_author_homeTag,
+    _$GPostDetailData_post_author_homeTag
+  ];
+  @override
+  final String wireName = 'GPostDetailData_post_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostDetailData_post_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostDetailData_post_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostDetailData_post_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostDetailData_post_mentionsSerializer
+    implements StructuredSerializer<GPostDetailData_post_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GPostDetailData_post_mentions,
+    _$GPostDetailData_post_mentions
+  ];
+  @override
+  final String wireName = 'GPostDetailData_post_mentions';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostDetailData_post_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GPostDetailData_post_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GPostDetailData_post_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostDetailData_post_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GPostDetailData_post_mentions_homeTag))!
+              as GPostDetailData_post_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostDetailData_post_mentions_homeTagSerializer
+    implements StructuredSerializer<GPostDetailData_post_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GPostDetailData_post_mentions_homeTag,
+    _$GPostDetailData_post_mentions_homeTag
+  ];
+  @override
+  final String wireName = 'GPostDetailData_post_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostDetailData_post_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostDetailData_post_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostDetailData_post_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostDetailData_post_referencedTagsSerializer
+    implements StructuredSerializer<GPostDetailData_post_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GPostDetailData_post_referencedTags,
+    _$GPostDetailData_post_referencedTags
+  ];
+  @override
+  final String wireName = 'GPostDetailData_post_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostDetailData_post_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostDetailData_post_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostDetailData_post_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -1338,6 +2037,17 @@ class _$GPostDetailData_post_comments_edges_nodeSerializer
       serializers.serialize(object.author,
           specifiedType:
               const FullType(GPostDetailData_post_comments_edges_node_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GPostDetailData_post_comments_edges_node_mentions)
+          ])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(
+                GPostDetailData_post_comments_edges_node_referencedTags)
+          ])),
       'reactions',
       serializers.serialize(object.reactions,
           specifiedType: const FullType(BuiltList, const [
@@ -1412,6 +2122,20 @@ class _$GPostDetailData_post_comments_edges_nodeSerializer
                       GPostDetailData_post_comments_edges_node_author))!
               as GPostDetailData_post_comments_edges_node_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(
+                    GPostDetailData_post_comments_edges_node_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(
+                    GPostDetailData_post_comments_edges_node_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'reactions':
           result.reactions.replace(serializers.deserialize(value,
               specifiedType: const FullType(BuiltList, const [
@@ -1451,7 +2175,15 @@ class _$GPostDetailData_post_comments_edges_node_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                GPostDetailData_post_comments_edges_node_author_homeTag)));
+    }
     return result;
   }
 
@@ -1477,6 +2209,286 @@ class _$GPostDetailData_post_comments_edges_node_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GPostDetailData_post_comments_edges_node_author_homeTag))!
+              as GPostDetailData_post_comments_edges_node_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostDetailData_post_comments_edges_node_author_homeTagSerializer
+    implements
+        StructuredSerializer<
+            GPostDetailData_post_comments_edges_node_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GPostDetailData_post_comments_edges_node_author_homeTag,
+    _$GPostDetailData_post_comments_edges_node_author_homeTag
+  ];
+  @override
+  final String wireName =
+      'GPostDetailData_post_comments_edges_node_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostDetailData_post_comments_edges_node_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostDetailData_post_comments_edges_node_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GPostDetailData_post_comments_edges_node_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostDetailData_post_comments_edges_node_mentionsSerializer
+    implements
+        StructuredSerializer<
+            GPostDetailData_post_comments_edges_node_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GPostDetailData_post_comments_edges_node_mentions,
+    _$GPostDetailData_post_comments_edges_node_mentions
+  ];
+  @override
+  final String wireName = 'GPostDetailData_post_comments_edges_node_mentions';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostDetailData_post_comments_edges_node_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                GPostDetailData_post_comments_edges_node_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GPostDetailData_post_comments_edges_node_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostDetailData_post_comments_edges_node_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GPostDetailData_post_comments_edges_node_mentions_homeTag))!
+              as GPostDetailData_post_comments_edges_node_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostDetailData_post_comments_edges_node_mentions_homeTagSerializer
+    implements
+        StructuredSerializer<
+            GPostDetailData_post_comments_edges_node_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GPostDetailData_post_comments_edges_node_mentions_homeTag,
+    _$GPostDetailData_post_comments_edges_node_mentions_homeTag
+  ];
+  @override
+  final String wireName =
+      'GPostDetailData_post_comments_edges_node_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostDetailData_post_comments_edges_node_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostDetailData_post_comments_edges_node_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostDetailData_post_comments_edges_node_referencedTagsSerializer
+    implements
+        StructuredSerializer<
+            GPostDetailData_post_comments_edges_node_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GPostDetailData_post_comments_edges_node_referencedTags,
+    _$GPostDetailData_post_comments_edges_node_referencedTags
+  ];
+  @override
+  final String wireName =
+      'GPostDetailData_post_comments_edges_node_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostDetailData_post_comments_edges_node_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostDetailData_post_comments_edges_node_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GPostDetailData_post_comments_edges_node_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -1824,6 +2836,15 @@ class _$GCreatePostData_createPostSerializer
       'author',
       serializers.serialize(object.author,
           specifiedType: const FullType(GCreatePostData_createPost_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(BuiltList,
+              const [const FullType(GCreatePostData_createPost_mentions)])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GCreatePostData_createPost_referencedTags)
+          ])),
       'reactions',
       serializers.serialize(object.reactions,
           specifiedType: const FullType(BuiltList,
@@ -1912,6 +2933,18 @@ class _$GCreatePostData_createPostSerializer
                       const FullType(GCreatePostData_createPost_author))!
               as GCreatePostData_createPost_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GCreatePostData_createPost_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GCreatePostData_createPost_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'reactions':
           result.reactions.replace(serializers.deserialize(value,
               specifiedType: const FullType(BuiltList, const [
@@ -1955,7 +2988,15 @@ class _$GCreatePostData_createPost_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GCreatePostData_createPost_author_homeTag)));
+    }
     return result;
   }
 
@@ -1981,6 +3022,273 @@ class _$GCreatePostData_createPost_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GCreatePostData_createPost_author_homeTag))!
+              as GCreatePostData_createPost_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreatePostData_createPost_author_homeTagSerializer
+    implements StructuredSerializer<GCreatePostData_createPost_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GCreatePostData_createPost_author_homeTag,
+    _$GCreatePostData_createPost_author_homeTag
+  ];
+  @override
+  final String wireName = 'GCreatePostData_createPost_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCreatePostData_createPost_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCreatePostData_createPost_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreatePostData_createPost_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreatePostData_createPost_mentionsSerializer
+    implements StructuredSerializer<GCreatePostData_createPost_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GCreatePostData_createPost_mentions,
+    _$GCreatePostData_createPost_mentions
+  ];
+  @override
+  final String wireName = 'GCreatePostData_createPost_mentions';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCreatePostData_createPost_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GCreatePostData_createPost_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GCreatePostData_createPost_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreatePostData_createPost_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GCreatePostData_createPost_mentions_homeTag))!
+              as GCreatePostData_createPost_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreatePostData_createPost_mentions_homeTagSerializer
+    implements
+        StructuredSerializer<GCreatePostData_createPost_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GCreatePostData_createPost_mentions_homeTag,
+    _$GCreatePostData_createPost_mentions_homeTag
+  ];
+  @override
+  final String wireName = 'GCreatePostData_createPost_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GCreatePostData_createPost_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCreatePostData_createPost_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreatePostData_createPost_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreatePostData_createPost_referencedTagsSerializer
+    implements StructuredSerializer<GCreatePostData_createPost_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GCreatePostData_createPost_referencedTags,
+    _$GCreatePostData_createPost_referencedTags
+  ];
+  @override
+  final String wireName = 'GCreatePostData_createPost_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCreatePostData_createPost_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCreatePostData_createPost_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreatePostData_createPost_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -2308,6 +3616,16 @@ class _$GCreateCommentData_createCommentSerializer
       serializers.serialize(object.author,
           specifiedType:
               const FullType(GCreateCommentData_createComment_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GCreateCommentData_createComment_mentions)
+          ])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GCreateCommentData_createComment_referencedTags)
+          ])),
       'reactions',
       serializers.serialize(object.reactions,
           specifiedType: const FullType(BuiltList, const [
@@ -2382,6 +3700,18 @@ class _$GCreateCommentData_createCommentSerializer
                       const FullType(GCreateCommentData_createComment_author))!
               as GCreateCommentData_createComment_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GCreateCommentData_createComment_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GCreateCommentData_createComment_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'reactions':
           result.reactions.replace(serializers.deserialize(value,
               specifiedType: const FullType(BuiltList, const [
@@ -2419,7 +3749,15 @@ class _$GCreateCommentData_createComment_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                GCreateCommentData_createComment_author_homeTag)));
+    }
     return result;
   }
 
@@ -2445,6 +3783,276 @@ class _$GCreateCommentData_createComment_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GCreateCommentData_createComment_author_homeTag))!
+              as GCreateCommentData_createComment_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreateCommentData_createComment_author_homeTagSerializer
+    implements
+        StructuredSerializer<GCreateCommentData_createComment_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GCreateCommentData_createComment_author_homeTag,
+    _$GCreateCommentData_createComment_author_homeTag
+  ];
+  @override
+  final String wireName = 'GCreateCommentData_createComment_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GCreateCommentData_createComment_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCreateCommentData_createComment_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreateCommentData_createComment_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreateCommentData_createComment_mentionsSerializer
+    implements StructuredSerializer<GCreateCommentData_createComment_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GCreateCommentData_createComment_mentions,
+    _$GCreateCommentData_createComment_mentions
+  ];
+  @override
+  final String wireName = 'GCreateCommentData_createComment_mentions';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCreateCommentData_createComment_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                GCreateCommentData_createComment_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GCreateCommentData_createComment_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreateCommentData_createComment_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GCreateCommentData_createComment_mentions_homeTag))!
+              as GCreateCommentData_createComment_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreateCommentData_createComment_mentions_homeTagSerializer
+    implements
+        StructuredSerializer<
+            GCreateCommentData_createComment_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GCreateCommentData_createComment_mentions_homeTag,
+    _$GCreateCommentData_createComment_mentions_homeTag
+  ];
+  @override
+  final String wireName = 'GCreateCommentData_createComment_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GCreateCommentData_createComment_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCreateCommentData_createComment_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreateCommentData_createComment_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCreateCommentData_createComment_referencedTagsSerializer
+    implements
+        StructuredSerializer<GCreateCommentData_createComment_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GCreateCommentData_createComment_referencedTags,
+    _$GCreateCommentData_createComment_referencedTags
+  ];
+  @override
+  final String wireName = 'GCreateCommentData_createComment_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GCreateCommentData_createComment_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCreateCommentData_createComment_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCreateCommentData_createComment_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -3079,6 +4687,15 @@ class _$GPostChangedData_postChangedSerializer
       'author',
       serializers.serialize(object.author,
           specifiedType: const FullType(GPostChangedData_postChanged_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(BuiltList,
+              const [const FullType(GPostChangedData_postChanged_mentions)])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GPostChangedData_postChanged_referencedTags)
+          ])),
       'reactions',
       serializers.serialize(object.reactions,
           specifiedType: const FullType(BuiltList,
@@ -3167,6 +4784,18 @@ class _$GPostChangedData_postChangedSerializer
                       const FullType(GPostChangedData_postChanged_author))!
               as GPostChangedData_postChanged_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GPostChangedData_postChanged_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GPostChangedData_postChanged_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'reactions':
           result.reactions.replace(serializers.deserialize(value,
               specifiedType: const FullType(BuiltList, const [
@@ -3210,7 +4839,15 @@ class _$GPostChangedData_postChanged_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GPostChangedData_postChanged_author_homeTag)));
+    }
     return result;
   }
 
@@ -3236,6 +4873,275 @@ class _$GPostChangedData_postChanged_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GPostChangedData_postChanged_author_homeTag))!
+              as GPostChangedData_postChanged_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostChangedData_postChanged_author_homeTagSerializer
+    implements
+        StructuredSerializer<GPostChangedData_postChanged_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GPostChangedData_postChanged_author_homeTag,
+    _$GPostChangedData_postChanged_author_homeTag
+  ];
+  @override
+  final String wireName = 'GPostChangedData_postChanged_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostChangedData_postChanged_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostChangedData_postChanged_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostChangedData_postChanged_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostChangedData_postChanged_mentionsSerializer
+    implements StructuredSerializer<GPostChangedData_postChanged_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GPostChangedData_postChanged_mentions,
+    _$GPostChangedData_postChanged_mentions
+  ];
+  @override
+  final String wireName = 'GPostChangedData_postChanged_mentions';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostChangedData_postChanged_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GPostChangedData_postChanged_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GPostChangedData_postChanged_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostChangedData_postChanged_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GPostChangedData_postChanged_mentions_homeTag))!
+              as GPostChangedData_postChanged_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostChangedData_postChanged_mentions_homeTagSerializer
+    implements
+        StructuredSerializer<GPostChangedData_postChanged_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GPostChangedData_postChanged_mentions_homeTag,
+    _$GPostChangedData_postChanged_mentions_homeTag
+  ];
+  @override
+  final String wireName = 'GPostChangedData_postChanged_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostChangedData_postChanged_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostChangedData_postChanged_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostChangedData_postChanged_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostChangedData_postChanged_referencedTagsSerializer
+    implements
+        StructuredSerializer<GPostChangedData_postChanged_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GPostChangedData_postChanged_referencedTags,
+    _$GPostChangedData_postChanged_referencedTags
+  ];
+  @override
+  final String wireName = 'GPostChangedData_postChanged_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GPostChangedData_postChanged_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostChangedData_postChanged_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostChangedData_postChanged_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -3508,6 +5414,14 @@ class _$GPostSummaryDataSerializer
       'author',
       serializers.serialize(object.author,
           specifiedType: const FullType(GPostSummaryData_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(
+              BuiltList, const [const FullType(GPostSummaryData_mentions)])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList,
+              const [const FullType(GPostSummaryData_referencedTags)])),
       'reactions',
       serializers.serialize(object.reactions,
           specifiedType: const FullType(
@@ -3595,6 +5509,18 @@ class _$GPostSummaryDataSerializer
                   specifiedType: const FullType(GPostSummaryData_author))!
               as GPostSummaryData_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GPostSummaryData_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GPostSummaryData_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'reactions':
           result.reactions.replace(serializers.deserialize(value,
               specifiedType: const FullType(BuiltList, const [
@@ -3637,7 +5563,14 @@ class _$GPostSummaryData_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(GPostSummaryData_author_homeTag)));
+    }
     return result;
   }
 
@@ -3663,6 +5596,271 @@ class _$GPostSummaryData_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GPostSummaryData_author_homeTag))!
+              as GPostSummaryData_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostSummaryData_author_homeTagSerializer
+    implements StructuredSerializer<GPostSummaryData_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GPostSummaryData_author_homeTag,
+    _$GPostSummaryData_author_homeTag
+  ];
+  @override
+  final String wireName = 'GPostSummaryData_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostSummaryData_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostSummaryData_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostSummaryData_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostSummaryData_mentionsSerializer
+    implements StructuredSerializer<GPostSummaryData_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GPostSummaryData_mentions,
+    _$GPostSummaryData_mentions
+  ];
+  @override
+  final String wireName = 'GPostSummaryData_mentions';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostSummaryData_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(GPostSummaryData_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GPostSummaryData_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostSummaryData_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GPostSummaryData_mentions_homeTag))!
+              as GPostSummaryData_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostSummaryData_mentions_homeTagSerializer
+    implements StructuredSerializer<GPostSummaryData_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GPostSummaryData_mentions_homeTag,
+    _$GPostSummaryData_mentions_homeTag
+  ];
+  @override
+  final String wireName = 'GPostSummaryData_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostSummaryData_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostSummaryData_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostSummaryData_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostSummaryData_referencedTagsSerializer
+    implements StructuredSerializer<GPostSummaryData_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GPostSummaryData_referencedTags,
+    _$GPostSummaryData_referencedTags
+  ];
+  @override
+  final String wireName = 'GPostSummaryData_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostSummaryData_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostSummaryData_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostSummaryData_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -3934,6 +6132,14 @@ class _$GCommentSummaryDataSerializer
       'author',
       serializers.serialize(object.author,
           specifiedType: const FullType(GCommentSummaryData_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(
+              BuiltList, const [const FullType(GCommentSummaryData_mentions)])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList,
+              const [const FullType(GCommentSummaryData_referencedTags)])),
       'reactions',
       serializers.serialize(object.reactions,
           specifiedType: const FullType(BuiltList,
@@ -4006,6 +6212,18 @@ class _$GCommentSummaryDataSerializer
                   specifiedType: const FullType(GCommentSummaryData_author))!
               as GCommentSummaryData_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GCommentSummaryData_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GCommentSummaryData_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'reactions':
           result.reactions.replace(serializers.deserialize(value,
               specifiedType: const FullType(BuiltList, const [
@@ -4043,7 +6261,14 @@ class _$GCommentSummaryData_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(GCommentSummaryData_author_homeTag)));
+    }
     return result;
   }
 
@@ -4069,6 +6294,272 @@ class _$GCommentSummaryData_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GCommentSummaryData_author_homeTag))!
+              as GCommentSummaryData_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCommentSummaryData_author_homeTagSerializer
+    implements StructuredSerializer<GCommentSummaryData_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GCommentSummaryData_author_homeTag,
+    _$GCommentSummaryData_author_homeTag
+  ];
+  @override
+  final String wireName = 'GCommentSummaryData_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCommentSummaryData_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCommentSummaryData_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCommentSummaryData_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCommentSummaryData_mentionsSerializer
+    implements StructuredSerializer<GCommentSummaryData_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GCommentSummaryData_mentions,
+    _$GCommentSummaryData_mentions
+  ];
+  @override
+  final String wireName = 'GCommentSummaryData_mentions';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCommentSummaryData_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GCommentSummaryData_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GCommentSummaryData_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCommentSummaryData_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GCommentSummaryData_mentions_homeTag))!
+              as GCommentSummaryData_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCommentSummaryData_mentions_homeTagSerializer
+    implements StructuredSerializer<GCommentSummaryData_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GCommentSummaryData_mentions_homeTag,
+    _$GCommentSummaryData_mentions_homeTag
+  ];
+  @override
+  final String wireName = 'GCommentSummaryData_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCommentSummaryData_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCommentSummaryData_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCommentSummaryData_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GCommentSummaryData_referencedTagsSerializer
+    implements StructuredSerializer<GCommentSummaryData_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GCommentSummaryData_referencedTags,
+    _$GCommentSummaryData_referencedTags
+  ];
+  @override
+  final String wireName = 'GCommentSummaryData_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GCommentSummaryData_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GCommentSummaryData_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GCommentSummaryData_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -4687,6 +7178,11 @@ class _$GPostsForTagData_tag_posts_edges_node
   @override
   final GPostsForTagData_tag_posts_edges_node_author author;
   @override
+  final BuiltList<GPostsForTagData_tag_posts_edges_node_mentions> mentions;
+  @override
+  final BuiltList<GPostsForTagData_tag_posts_edges_node_referencedTags>
+      referencedTags;
+  @override
   final BuiltList<GPostsForTagData_tag_posts_edges_node_reactions> reactions;
   @override
   final GPostsForTagData_tag_posts_edges_node_comments comments;
@@ -4708,6 +7204,8 @@ class _$GPostsForTagData_tag_posts_edges_node
       required this.denyFlag,
       this.lastReadAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       required this.reactions,
       required this.comments})
       : super._();
@@ -4735,6 +7233,8 @@ class _$GPostsForTagData_tag_posts_edges_node
         denyFlag == other.denyFlag &&
         lastReadAt == other.lastReadAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         reactions == other.reactions &&
         comments == other.comments;
   }
@@ -4752,6 +7252,8 @@ class _$GPostsForTagData_tag_posts_edges_node
     _$hash = $jc(_$hash, denyFlag.hashCode);
     _$hash = $jc(_$hash, lastReadAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jc(_$hash, comments.hashCode);
     _$hash = $jf(_$hash);
@@ -4772,6 +7274,8 @@ class _$GPostsForTagData_tag_posts_edges_node
           ..add('denyFlag', denyFlag)
           ..add('lastReadAt', lastReadAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('reactions', reactions)
           ..add('comments', comments))
         .toString();
@@ -4828,6 +7332,25 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
   set author(GPostsForTagData_tag_posts_edges_node_authorBuilder? author) =>
       _$this._author = author;
 
+  ListBuilder<GPostsForTagData_tag_posts_edges_node_mentions>? _mentions;
+  ListBuilder<GPostsForTagData_tag_posts_edges_node_mentions> get mentions =>
+      _$this._mentions ??=
+          ListBuilder<GPostsForTagData_tag_posts_edges_node_mentions>();
+  set mentions(
+          ListBuilder<GPostsForTagData_tag_posts_edges_node_mentions>?
+              mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GPostsForTagData_tag_posts_edges_node_referencedTags>?
+      _referencedTags;
+  ListBuilder<GPostsForTagData_tag_posts_edges_node_referencedTags>
+      get referencedTags => _$this._referencedTags ??=
+          ListBuilder<GPostsForTagData_tag_posts_edges_node_referencedTags>();
+  set referencedTags(
+          ListBuilder<GPostsForTagData_tag_posts_edges_node_referencedTags>?
+              referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   ListBuilder<GPostsForTagData_tag_posts_edges_node_reactions>? _reactions;
   ListBuilder<GPostsForTagData_tag_posts_edges_node_reactions> get reactions =>
       _$this._reactions ??=
@@ -4862,6 +7385,8 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
       _denyFlag = $v.denyFlag;
       _lastReadAt = $v.lastReadAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _comments = $v.comments.toBuilder();
       _$v = null;
@@ -4903,6 +7428,8 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
                 denyFlag, r'GPostsForTagData_tag_posts_edges_node', 'denyFlag'),
             lastReadAt: _lastReadAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             reactions: reactions.build(),
             comments: comments.build(),
           );
@@ -4918,6 +7445,10 @@ class GPostsForTagData_tag_posts_edges_nodeBuilder
         _lastReadAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'reactions';
         reactions.build();
         _$failedField = 'comments';
@@ -4943,6 +7474,8 @@ class _$GPostsForTagData_tag_posts_edges_node_author
   final String id;
   @override
   final String displayName;
+  @override
+  final GPostsForTagData_tag_posts_edges_node_author_homeTag? homeTag;
 
   factory _$GPostsForTagData_tag_posts_edges_node_author(
           [void Function(GPostsForTagData_tag_posts_edges_node_authorBuilder)?
@@ -4951,7 +7484,10 @@ class _$GPostsForTagData_tag_posts_edges_node_author
           ._build();
 
   _$GPostsForTagData_tag_posts_edges_node_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GPostsForTagData_tag_posts_edges_node_author rebuild(
@@ -4969,7 +7505,8 @@ class _$GPostsForTagData_tag_posts_edges_node_author
     return other is GPostsForTagData_tag_posts_edges_node_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -4978,6 +7515,7 @@ class _$GPostsForTagData_tag_posts_edges_node_author
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -4988,7 +7526,8 @@ class _$GPostsForTagData_tag_posts_edges_node_author
             r'GPostsForTagData_tag_posts_edges_node_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -5011,6 +7550,15 @@ class GPostsForTagData_tag_posts_edges_node_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder? _homeTag;
+  GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder get homeTag =>
+      _$this._homeTag ??=
+          GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder();
+  set homeTag(
+          GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder?
+              homeTag) =>
+      _$this._homeTag = homeTag;
+
   GPostsForTagData_tag_posts_edges_node_authorBuilder() {
     GPostsForTagData_tag_posts_edges_node_author._initializeBuilder(this);
   }
@@ -5021,6 +7569,7 @@ class GPostsForTagData_tag_posts_edges_node_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -5042,14 +7591,610 @@ class GPostsForTagData_tag_posts_edges_node_authorBuilder
   GPostsForTagData_tag_posts_edges_node_author build() => _build();
 
   _$GPostsForTagData_tag_posts_edges_node_author _build() {
+    _$GPostsForTagData_tag_posts_edges_node_author _$result;
+    try {
+      _$result = _$v ??
+          _$GPostsForTagData_tag_posts_edges_node_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GPostsForTagData_tag_posts_edges_node_author', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostsForTagData_tag_posts_edges_node_author', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GPostsForTagData_tag_posts_edges_node_author', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostsForTagData_tag_posts_edges_node_author',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_author_homeTag
+    extends GPostsForTagData_tag_posts_edges_node_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GPostsForTagData_tag_posts_edges_node_author_homeTag(
+          [void Function(
+                  GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder)?
+              updates]) =>
+      (GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GPostsForTagData_tag_posts_edges_node_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GPostsForTagData_tag_posts_edges_node_author_homeTag rebuild(
+          void Function(
+                  GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder toBuilder() =>
+      GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder()
+        ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostsForTagData_tag_posts_edges_node_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostsForTagData_tag_posts_edges_node_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder
+    implements
+        Builder<GPostsForTagData_tag_posts_edges_node_author_homeTag,
+            GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder> {
+  _$GPostsForTagData_tag_posts_edges_node_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder() {
+    GPostsForTagData_tag_posts_edges_node_author_homeTag._initializeBuilder(
+        this);
+  }
+
+  GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostsForTagData_tag_posts_edges_node_author_homeTag other) {
+    _$v = other as _$GPostsForTagData_tag_posts_edges_node_author_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(
+              GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_author_homeTag build() => _build();
+
+  _$GPostsForTagData_tag_posts_edges_node_author_homeTag _build() {
     final _$result = _$v ??
-        _$GPostsForTagData_tag_posts_edges_node_author._(
-          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
-              r'GPostsForTagData_tag_posts_edges_node_author', 'G__typename'),
-          id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GPostsForTagData_tag_posts_edges_node_author', 'id'),
-          displayName: BuiltValueNullFieldError.checkNotNull(displayName,
-              r'GPostsForTagData_tag_posts_edges_node_author', 'displayName'),
+        _$GPostsForTagData_tag_posts_edges_node_author_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GPostsForTagData_tag_posts_edges_node_author_homeTag',
+              'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(slug,
+              r'GPostsForTagData_tag_posts_edges_node_author_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(path,
+              r'GPostsForTagData_tag_posts_edges_node_author_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_mentions
+    extends GPostsForTagData_tag_posts_edges_node_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GPostsForTagData_tag_posts_edges_node_mentions_homeTag? homeTag;
+
+  factory _$GPostsForTagData_tag_posts_edges_node_mentions(
+          [void Function(GPostsForTagData_tag_posts_edges_node_mentionsBuilder)?
+              updates]) =>
+      (GPostsForTagData_tag_posts_edges_node_mentionsBuilder()..update(updates))
+          ._build();
+
+  _$GPostsForTagData_tag_posts_edges_node_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GPostsForTagData_tag_posts_edges_node_mentions rebuild(
+          void Function(GPostsForTagData_tag_posts_edges_node_mentionsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_mentionsBuilder toBuilder() =>
+      GPostsForTagData_tag_posts_edges_node_mentionsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostsForTagData_tag_posts_edges_node_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostsForTagData_tag_posts_edges_node_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GPostsForTagData_tag_posts_edges_node_mentionsBuilder
+    implements
+        Builder<GPostsForTagData_tag_posts_edges_node_mentions,
+            GPostsForTagData_tag_posts_edges_node_mentionsBuilder> {
+  _$GPostsForTagData_tag_posts_edges_node_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder? _homeTag;
+  GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder get homeTag =>
+      _$this._homeTag ??=
+          GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder();
+  set homeTag(
+          GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder?
+              homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GPostsForTagData_tag_posts_edges_node_mentionsBuilder() {
+    GPostsForTagData_tag_posts_edges_node_mentions._initializeBuilder(this);
+  }
+
+  GPostsForTagData_tag_posts_edges_node_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostsForTagData_tag_posts_edges_node_mentions other) {
+    _$v = other as _$GPostsForTagData_tag_posts_edges_node_mentions;
+  }
+
+  @override
+  void update(
+      void Function(GPostsForTagData_tag_posts_edges_node_mentionsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_mentions build() => _build();
+
+  _$GPostsForTagData_tag_posts_edges_node_mentions _build() {
+    _$GPostsForTagData_tag_posts_edges_node_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GPostsForTagData_tag_posts_edges_node_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename,
+                r'GPostsForTagData_tag_posts_edges_node_mentions',
+                'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostsForTagData_tag_posts_edges_node_mentions', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName,
+                r'GPostsForTagData_tag_posts_edges_node_mentions',
+                'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostsForTagData_tag_posts_edges_node_mentions',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_mentions_homeTag
+    extends GPostsForTagData_tag_posts_edges_node_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GPostsForTagData_tag_posts_edges_node_mentions_homeTag(
+          [void Function(
+                  GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder)?
+              updates]) =>
+      (GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GPostsForTagData_tag_posts_edges_node_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GPostsForTagData_tag_posts_edges_node_mentions_homeTag rebuild(
+          void Function(
+                  GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder toBuilder() =>
+      GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder()
+        ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostsForTagData_tag_posts_edges_node_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostsForTagData_tag_posts_edges_node_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder
+    implements
+        Builder<GPostsForTagData_tag_posts_edges_node_mentions_homeTag,
+            GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder> {
+  _$GPostsForTagData_tag_posts_edges_node_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder() {
+    GPostsForTagData_tag_posts_edges_node_mentions_homeTag._initializeBuilder(
+        this);
+  }
+
+  GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostsForTagData_tag_posts_edges_node_mentions_homeTag other) {
+    _$v = other as _$GPostsForTagData_tag_posts_edges_node_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(
+              GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_mentions_homeTag build() => _build();
+
+  _$GPostsForTagData_tag_posts_edges_node_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GPostsForTagData_tag_posts_edges_node_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GPostsForTagData_tag_posts_edges_node_mentions_homeTag',
+              'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug,
+              r'GPostsForTagData_tag_posts_edges_node_mentions_homeTag',
+              'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path,
+              r'GPostsForTagData_tag_posts_edges_node_mentions_homeTag',
+              'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostsForTagData_tag_posts_edges_node_referencedTags
+    extends GPostsForTagData_tag_posts_edges_node_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GPostsForTagData_tag_posts_edges_node_referencedTags(
+          [void Function(
+                  GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder)?
+              updates]) =>
+      (GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GPostsForTagData_tag_posts_edges_node_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GPostsForTagData_tag_posts_edges_node_referencedTags rebuild(
+          void Function(
+                  GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder toBuilder() =>
+      GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder()
+        ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostsForTagData_tag_posts_edges_node_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostsForTagData_tag_posts_edges_node_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder
+    implements
+        Builder<GPostsForTagData_tag_posts_edges_node_referencedTags,
+            GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder> {
+  _$GPostsForTagData_tag_posts_edges_node_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder() {
+    GPostsForTagData_tag_posts_edges_node_referencedTags._initializeBuilder(
+        this);
+  }
+
+  GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostsForTagData_tag_posts_edges_node_referencedTags other) {
+    _$v = other as _$GPostsForTagData_tag_posts_edges_node_referencedTags;
+  }
+
+  @override
+  void update(
+      void Function(
+              GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostsForTagData_tag_posts_edges_node_referencedTags build() => _build();
+
+  _$GPostsForTagData_tag_posts_edges_node_referencedTags _build() {
+    final _$result = _$v ??
+        _$GPostsForTagData_tag_posts_edges_node_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GPostsForTagData_tag_posts_edges_node_referencedTags',
+              'G__typename'),
+          id: BuiltValueNullFieldError.checkNotNull(id,
+              r'GPostsForTagData_tag_posts_edges_node_referencedTags', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(slug,
+              r'GPostsForTagData_tag_posts_edges_node_referencedTags', 'slug'),
+          displayName: BuiltValueNullFieldError.checkNotNull(
+              displayName,
+              r'GPostsForTagData_tag_posts_edges_node_referencedTags',
+              'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(path,
+              r'GPostsForTagData_tag_posts_edges_node_referencedTags', 'path'),
         );
     replace(_$result);
     return _$result;
@@ -5713,6 +8858,10 @@ class _$GPostDetailData_post extends GPostDetailData_post {
   @override
   final GPostDetailData_post_author author;
   @override
+  final BuiltList<GPostDetailData_post_mentions> mentions;
+  @override
+  final BuiltList<GPostDetailData_post_referencedTags> referencedTags;
+  @override
   final BuiltList<GPostDetailData_post_reactions> reactions;
   @override
   final GPostDetailData_post_comments comments;
@@ -5736,6 +8885,8 @@ class _$GPostDetailData_post extends GPostDetailData_post {
       required this.denyFlag,
       this.lastReadAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       required this.reactions,
       required this.comments,
       required this.tags,
@@ -5764,6 +8915,8 @@ class _$GPostDetailData_post extends GPostDetailData_post {
         denyFlag == other.denyFlag &&
         lastReadAt == other.lastReadAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         reactions == other.reactions &&
         comments == other.comments &&
         tags == other.tags &&
@@ -5783,6 +8936,8 @@ class _$GPostDetailData_post extends GPostDetailData_post {
     _$hash = $jc(_$hash, denyFlag.hashCode);
     _$hash = $jc(_$hash, lastReadAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jc(_$hash, comments.hashCode);
     _$hash = $jc(_$hash, tags.hashCode);
@@ -5804,6 +8959,8 @@ class _$GPostDetailData_post extends GPostDetailData_post {
           ..add('denyFlag', denyFlag)
           ..add('lastReadAt', lastReadAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('reactions', reactions)
           ..add('comments', comments)
           ..add('tags', tags)
@@ -5860,6 +9017,20 @@ class GPostDetailData_postBuilder
   set author(GPostDetailData_post_authorBuilder? author) =>
       _$this._author = author;
 
+  ListBuilder<GPostDetailData_post_mentions>? _mentions;
+  ListBuilder<GPostDetailData_post_mentions> get mentions =>
+      _$this._mentions ??= ListBuilder<GPostDetailData_post_mentions>();
+  set mentions(ListBuilder<GPostDetailData_post_mentions>? mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GPostDetailData_post_referencedTags>? _referencedTags;
+  ListBuilder<GPostDetailData_post_referencedTags> get referencedTags =>
+      _$this._referencedTags ??=
+          ListBuilder<GPostDetailData_post_referencedTags>();
+  set referencedTags(
+          ListBuilder<GPostDetailData_post_referencedTags>? referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   ListBuilder<GPostDetailData_post_reactions>? _reactions;
   ListBuilder<GPostDetailData_post_reactions> get reactions =>
       _$this._reactions ??= ListBuilder<GPostDetailData_post_reactions>();
@@ -5900,6 +9071,8 @@ class GPostDetailData_postBuilder
       _denyFlag = $v.denyFlag;
       _lastReadAt = $v.lastReadAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _comments = $v.comments.toBuilder();
       _tags = $v.tags.toBuilder();
@@ -5942,6 +9115,8 @@ class GPostDetailData_postBuilder
                 denyFlag, r'GPostDetailData_post', 'denyFlag'),
             lastReadAt: _lastReadAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             reactions: reactions.build(),
             comments: comments.build(),
             tags: tags.build(),
@@ -5959,6 +9134,10 @@ class GPostDetailData_postBuilder
         _lastReadAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'reactions';
         reactions.build();
         _$failedField = 'comments';
@@ -5985,13 +9164,18 @@ class _$GPostDetailData_post_author extends GPostDetailData_post_author {
   final String id;
   @override
   final String displayName;
+  @override
+  final GPostDetailData_post_author_homeTag? homeTag;
 
   factory _$GPostDetailData_post_author(
           [void Function(GPostDetailData_post_authorBuilder)? updates]) =>
       (GPostDetailData_post_authorBuilder()..update(updates))._build();
 
   _$GPostDetailData_post_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GPostDetailData_post_author rebuild(
@@ -6008,7 +9192,8 @@ class _$GPostDetailData_post_author extends GPostDetailData_post_author {
     return other is GPostDetailData_post_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -6017,6 +9202,7 @@ class _$GPostDetailData_post_author extends GPostDetailData_post_author {
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -6026,7 +9212,8 @@ class _$GPostDetailData_post_author extends GPostDetailData_post_author {
     return (newBuiltValueToStringHelper(r'GPostDetailData_post_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -6049,6 +9236,12 @@ class GPostDetailData_post_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GPostDetailData_post_author_homeTagBuilder? _homeTag;
+  GPostDetailData_post_author_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GPostDetailData_post_author_homeTagBuilder();
+  set homeTag(GPostDetailData_post_author_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
   GPostDetailData_post_authorBuilder() {
     GPostDetailData_post_author._initializeBuilder(this);
   }
@@ -6059,6 +9252,7 @@ class GPostDetailData_post_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -6078,14 +9272,553 @@ class GPostDetailData_post_authorBuilder
   GPostDetailData_post_author build() => _build();
 
   _$GPostDetailData_post_author _build() {
+    _$GPostDetailData_post_author _$result;
+    try {
+      _$result = _$v ??
+          _$GPostDetailData_post_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GPostDetailData_post_author', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostDetailData_post_author', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName, r'GPostDetailData_post_author', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostDetailData_post_author', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostDetailData_post_author_homeTag
+    extends GPostDetailData_post_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GPostDetailData_post_author_homeTag(
+          [void Function(GPostDetailData_post_author_homeTagBuilder)?
+              updates]) =>
+      (GPostDetailData_post_author_homeTagBuilder()..update(updates))._build();
+
+  _$GPostDetailData_post_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GPostDetailData_post_author_homeTag rebuild(
+          void Function(GPostDetailData_post_author_homeTagBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostDetailData_post_author_homeTagBuilder toBuilder() =>
+      GPostDetailData_post_author_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostDetailData_post_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostDetailData_post_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostDetailData_post_author_homeTagBuilder
+    implements
+        Builder<GPostDetailData_post_author_homeTag,
+            GPostDetailData_post_author_homeTagBuilder> {
+  _$GPostDetailData_post_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostDetailData_post_author_homeTagBuilder() {
+    GPostDetailData_post_author_homeTag._initializeBuilder(this);
+  }
+
+  GPostDetailData_post_author_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostDetailData_post_author_homeTag other) {
+    _$v = other as _$GPostDetailData_post_author_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GPostDetailData_post_author_homeTagBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostDetailData_post_author_homeTag build() => _build();
+
+  _$GPostDetailData_post_author_homeTag _build() {
     final _$result = _$v ??
-        _$GPostDetailData_post_author._(
-          G__typename: BuiltValueNullFieldError.checkNotNull(
-              G__typename, r'GPostDetailData_post_author', 'G__typename'),
+        _$GPostDetailData_post_author_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GPostDetailData_post_author_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GPostDetailData_post_author_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GPostDetailData_post_author_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostDetailData_post_mentions extends GPostDetailData_post_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GPostDetailData_post_mentions_homeTag? homeTag;
+
+  factory _$GPostDetailData_post_mentions(
+          [void Function(GPostDetailData_post_mentionsBuilder)? updates]) =>
+      (GPostDetailData_post_mentionsBuilder()..update(updates))._build();
+
+  _$GPostDetailData_post_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GPostDetailData_post_mentions rebuild(
+          void Function(GPostDetailData_post_mentionsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostDetailData_post_mentionsBuilder toBuilder() =>
+      GPostDetailData_post_mentionsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostDetailData_post_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostDetailData_post_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GPostDetailData_post_mentionsBuilder
+    implements
+        Builder<GPostDetailData_post_mentions,
+            GPostDetailData_post_mentionsBuilder> {
+  _$GPostDetailData_post_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GPostDetailData_post_mentions_homeTagBuilder? _homeTag;
+  GPostDetailData_post_mentions_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GPostDetailData_post_mentions_homeTagBuilder();
+  set homeTag(GPostDetailData_post_mentions_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GPostDetailData_post_mentionsBuilder() {
+    GPostDetailData_post_mentions._initializeBuilder(this);
+  }
+
+  GPostDetailData_post_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostDetailData_post_mentions other) {
+    _$v = other as _$GPostDetailData_post_mentions;
+  }
+
+  @override
+  void update(void Function(GPostDetailData_post_mentionsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostDetailData_post_mentions build() => _build();
+
+  _$GPostDetailData_post_mentions _build() {
+    _$GPostDetailData_post_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GPostDetailData_post_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GPostDetailData_post_mentions', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostDetailData_post_mentions', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName, r'GPostDetailData_post_mentions', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostDetailData_post_mentions', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostDetailData_post_mentions_homeTag
+    extends GPostDetailData_post_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GPostDetailData_post_mentions_homeTag(
+          [void Function(GPostDetailData_post_mentions_homeTagBuilder)?
+              updates]) =>
+      (GPostDetailData_post_mentions_homeTagBuilder()..update(updates))
+          ._build();
+
+  _$GPostDetailData_post_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GPostDetailData_post_mentions_homeTag rebuild(
+          void Function(GPostDetailData_post_mentions_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostDetailData_post_mentions_homeTagBuilder toBuilder() =>
+      GPostDetailData_post_mentions_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostDetailData_post_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostDetailData_post_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostDetailData_post_mentions_homeTagBuilder
+    implements
+        Builder<GPostDetailData_post_mentions_homeTag,
+            GPostDetailData_post_mentions_homeTagBuilder> {
+  _$GPostDetailData_post_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostDetailData_post_mentions_homeTagBuilder() {
+    GPostDetailData_post_mentions_homeTag._initializeBuilder(this);
+  }
+
+  GPostDetailData_post_mentions_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostDetailData_post_mentions_homeTag other) {
+    _$v = other as _$GPostDetailData_post_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GPostDetailData_post_mentions_homeTagBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostDetailData_post_mentions_homeTag build() => _build();
+
+  _$GPostDetailData_post_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GPostDetailData_post_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GPostDetailData_post_mentions_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GPostDetailData_post_mentions_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GPostDetailData_post_mentions_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostDetailData_post_referencedTags
+    extends GPostDetailData_post_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GPostDetailData_post_referencedTags(
+          [void Function(GPostDetailData_post_referencedTagsBuilder)?
+              updates]) =>
+      (GPostDetailData_post_referencedTagsBuilder()..update(updates))._build();
+
+  _$GPostDetailData_post_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GPostDetailData_post_referencedTags rebuild(
+          void Function(GPostDetailData_post_referencedTagsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostDetailData_post_referencedTagsBuilder toBuilder() =>
+      GPostDetailData_post_referencedTagsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostDetailData_post_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostDetailData_post_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostDetailData_post_referencedTagsBuilder
+    implements
+        Builder<GPostDetailData_post_referencedTags,
+            GPostDetailData_post_referencedTagsBuilder> {
+  _$GPostDetailData_post_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostDetailData_post_referencedTagsBuilder() {
+    GPostDetailData_post_referencedTags._initializeBuilder(this);
+  }
+
+  GPostDetailData_post_referencedTagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostDetailData_post_referencedTags other) {
+    _$v = other as _$GPostDetailData_post_referencedTags;
+  }
+
+  @override
+  void update(
+      void Function(GPostDetailData_post_referencedTagsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostDetailData_post_referencedTags build() => _build();
+
+  _$GPostDetailData_post_referencedTags _build() {
+    final _$result = _$v ??
+        _$GPostDetailData_post_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GPostDetailData_post_referencedTags', 'G__typename'),
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GPostDetailData_post_author', 'id'),
-          displayName: BuiltValueNullFieldError.checkNotNull(
-              displayName, r'GPostDetailData_post_author', 'displayName'),
+              id, r'GPostDetailData_post_referencedTags', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GPostDetailData_post_referencedTags', 'slug'),
+          displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+              r'GPostDetailData_post_referencedTags', 'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GPostDetailData_post_referencedTags', 'path'),
         );
     replace(_$result);
     return _$result;
@@ -6477,6 +10210,11 @@ class _$GPostDetailData_post_comments_edges_node
   @override
   final GPostDetailData_post_comments_edges_node_author author;
   @override
+  final BuiltList<GPostDetailData_post_comments_edges_node_mentions> mentions;
+  @override
+  final BuiltList<GPostDetailData_post_comments_edges_node_referencedTags>
+      referencedTags;
+  @override
   final BuiltList<GPostDetailData_post_comments_edges_node_reactions> reactions;
 
   factory _$GPostDetailData_post_comments_edges_node(
@@ -6495,6 +10233,8 @@ class _$GPostDetailData_post_comments_edges_node
       required this.createdAt,
       this.editedAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       required this.reactions})
       : super._();
   @override
@@ -6520,6 +10260,8 @@ class _$GPostDetailData_post_comments_edges_node
         createdAt == other.createdAt &&
         editedAt == other.editedAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         reactions == other.reactions;
   }
 
@@ -6535,6 +10277,8 @@ class _$GPostDetailData_post_comments_edges_node
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -6553,6 +10297,8 @@ class _$GPostDetailData_post_comments_edges_node
           ..add('createdAt', createdAt)
           ..add('editedAt', editedAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('reactions', reactions))
         .toString();
   }
@@ -6603,6 +10349,25 @@ class GPostDetailData_post_comments_edges_nodeBuilder
   set author(GPostDetailData_post_comments_edges_node_authorBuilder? author) =>
       _$this._author = author;
 
+  ListBuilder<GPostDetailData_post_comments_edges_node_mentions>? _mentions;
+  ListBuilder<GPostDetailData_post_comments_edges_node_mentions> get mentions =>
+      _$this._mentions ??=
+          ListBuilder<GPostDetailData_post_comments_edges_node_mentions>();
+  set mentions(
+          ListBuilder<GPostDetailData_post_comments_edges_node_mentions>?
+              mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GPostDetailData_post_comments_edges_node_referencedTags>?
+      _referencedTags;
+  ListBuilder<GPostDetailData_post_comments_edges_node_referencedTags>
+      get referencedTags => _$this._referencedTags ??= ListBuilder<
+          GPostDetailData_post_comments_edges_node_referencedTags>();
+  set referencedTags(
+          ListBuilder<GPostDetailData_post_comments_edges_node_referencedTags>?
+              referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   ListBuilder<GPostDetailData_post_comments_edges_node_reactions>? _reactions;
   ListBuilder<GPostDetailData_post_comments_edges_node_reactions>
       get reactions => _$this._reactions ??=
@@ -6628,6 +10393,8 @@ class GPostDetailData_post_comments_edges_nodeBuilder
       _createdAt = $v.createdAt.toBuilder();
       _editedAt = $v.editedAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _$v = null;
     }
@@ -6667,6 +10434,8 @@ class GPostDetailData_post_comments_edges_nodeBuilder
             createdAt: createdAt.build(),
             editedAt: _editedAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             reactions: reactions.build(),
           );
     } catch (_) {
@@ -6678,6 +10447,10 @@ class GPostDetailData_post_comments_edges_nodeBuilder
         _editedAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'reactions';
         reactions.build();
       } catch (e) {
@@ -6701,6 +10474,8 @@ class _$GPostDetailData_post_comments_edges_node_author
   final String id;
   @override
   final String displayName;
+  @override
+  final GPostDetailData_post_comments_edges_node_author_homeTag? homeTag;
 
   factory _$GPostDetailData_post_comments_edges_node_author(
           [void Function(
@@ -6711,7 +10486,10 @@ class _$GPostDetailData_post_comments_edges_node_author
           ._build();
 
   _$GPostDetailData_post_comments_edges_node_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GPostDetailData_post_comments_edges_node_author rebuild(
@@ -6729,7 +10507,8 @@ class _$GPostDetailData_post_comments_edges_node_author
     return other is GPostDetailData_post_comments_edges_node_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -6738,6 +10517,7 @@ class _$GPostDetailData_post_comments_edges_node_author
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -6748,7 +10528,8 @@ class _$GPostDetailData_post_comments_edges_node_author
             r'GPostDetailData_post_comments_edges_node_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -6771,6 +10552,15 @@ class GPostDetailData_post_comments_edges_node_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GPostDetailData_post_comments_edges_node_author_homeTagBuilder? _homeTag;
+  GPostDetailData_post_comments_edges_node_author_homeTagBuilder get homeTag =>
+      _$this._homeTag ??=
+          GPostDetailData_post_comments_edges_node_author_homeTagBuilder();
+  set homeTag(
+          GPostDetailData_post_comments_edges_node_author_homeTagBuilder?
+              homeTag) =>
+      _$this._homeTag = homeTag;
+
   GPostDetailData_post_comments_edges_node_authorBuilder() {
     GPostDetailData_post_comments_edges_node_author._initializeBuilder(this);
   }
@@ -6781,6 +10571,7 @@ class GPostDetailData_post_comments_edges_node_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -6802,18 +10593,627 @@ class GPostDetailData_post_comments_edges_node_authorBuilder
   GPostDetailData_post_comments_edges_node_author build() => _build();
 
   _$GPostDetailData_post_comments_edges_node_author _build() {
+    _$GPostDetailData_post_comments_edges_node_author _$result;
+    try {
+      _$result = _$v ??
+          _$GPostDetailData_post_comments_edges_node_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename,
+                r'GPostDetailData_post_comments_edges_node_author',
+                'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostDetailData_post_comments_edges_node_author', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName,
+                r'GPostDetailData_post_comments_edges_node_author',
+                'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostDetailData_post_comments_edges_node_author',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostDetailData_post_comments_edges_node_author_homeTag
+    extends GPostDetailData_post_comments_edges_node_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GPostDetailData_post_comments_edges_node_author_homeTag(
+          [void Function(
+                  GPostDetailData_post_comments_edges_node_author_homeTagBuilder)?
+              updates]) =>
+      (GPostDetailData_post_comments_edges_node_author_homeTagBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GPostDetailData_post_comments_edges_node_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GPostDetailData_post_comments_edges_node_author_homeTag rebuild(
+          void Function(
+                  GPostDetailData_post_comments_edges_node_author_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostDetailData_post_comments_edges_node_author_homeTagBuilder toBuilder() =>
+      GPostDetailData_post_comments_edges_node_author_homeTagBuilder()
+        ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostDetailData_post_comments_edges_node_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostDetailData_post_comments_edges_node_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostDetailData_post_comments_edges_node_author_homeTagBuilder
+    implements
+        Builder<GPostDetailData_post_comments_edges_node_author_homeTag,
+            GPostDetailData_post_comments_edges_node_author_homeTagBuilder> {
+  _$GPostDetailData_post_comments_edges_node_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostDetailData_post_comments_edges_node_author_homeTagBuilder() {
+    GPostDetailData_post_comments_edges_node_author_homeTag._initializeBuilder(
+        this);
+  }
+
+  GPostDetailData_post_comments_edges_node_author_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostDetailData_post_comments_edges_node_author_homeTag other) {
+    _$v = other as _$GPostDetailData_post_comments_edges_node_author_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(
+              GPostDetailData_post_comments_edges_node_author_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostDetailData_post_comments_edges_node_author_homeTag build() => _build();
+
+  _$GPostDetailData_post_comments_edges_node_author_homeTag _build() {
     final _$result = _$v ??
-        _$GPostDetailData_post_comments_edges_node_author._(
+        _$GPostDetailData_post_comments_edges_node_author_homeTag._(
           G__typename: BuiltValueNullFieldError.checkNotNull(
               G__typename,
-              r'GPostDetailData_post_comments_edges_node_author',
+              r'GPostDetailData_post_comments_edges_node_author_homeTag',
               'G__typename'),
-          id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GPostDetailData_post_comments_edges_node_author', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug,
+              r'GPostDetailData_post_comments_edges_node_author_homeTag',
+              'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path,
+              r'GPostDetailData_post_comments_edges_node_author_homeTag',
+              'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostDetailData_post_comments_edges_node_mentions
+    extends GPostDetailData_post_comments_edges_node_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GPostDetailData_post_comments_edges_node_mentions_homeTag? homeTag;
+
+  factory _$GPostDetailData_post_comments_edges_node_mentions(
+          [void Function(
+                  GPostDetailData_post_comments_edges_node_mentionsBuilder)?
+              updates]) =>
+      (GPostDetailData_post_comments_edges_node_mentionsBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GPostDetailData_post_comments_edges_node_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GPostDetailData_post_comments_edges_node_mentions rebuild(
+          void Function(
+                  GPostDetailData_post_comments_edges_node_mentionsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostDetailData_post_comments_edges_node_mentionsBuilder toBuilder() =>
+      GPostDetailData_post_comments_edges_node_mentionsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostDetailData_post_comments_edges_node_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostDetailData_post_comments_edges_node_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GPostDetailData_post_comments_edges_node_mentionsBuilder
+    implements
+        Builder<GPostDetailData_post_comments_edges_node_mentions,
+            GPostDetailData_post_comments_edges_node_mentionsBuilder> {
+  _$GPostDetailData_post_comments_edges_node_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder? _homeTag;
+  GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder
+      get homeTag => _$this._homeTag ??=
+          GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder();
+  set homeTag(
+          GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder?
+              homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GPostDetailData_post_comments_edges_node_mentionsBuilder() {
+    GPostDetailData_post_comments_edges_node_mentions._initializeBuilder(this);
+  }
+
+  GPostDetailData_post_comments_edges_node_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostDetailData_post_comments_edges_node_mentions other) {
+    _$v = other as _$GPostDetailData_post_comments_edges_node_mentions;
+  }
+
+  @override
+  void update(
+      void Function(GPostDetailData_post_comments_edges_node_mentionsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostDetailData_post_comments_edges_node_mentions build() => _build();
+
+  _$GPostDetailData_post_comments_edges_node_mentions _build() {
+    _$GPostDetailData_post_comments_edges_node_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GPostDetailData_post_comments_edges_node_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename,
+                r'GPostDetailData_post_comments_edges_node_mentions',
+                'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostDetailData_post_comments_edges_node_mentions', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName,
+                r'GPostDetailData_post_comments_edges_node_mentions',
+                'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostDetailData_post_comments_edges_node_mentions',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostDetailData_post_comments_edges_node_mentions_homeTag
+    extends GPostDetailData_post_comments_edges_node_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GPostDetailData_post_comments_edges_node_mentions_homeTag(
+          [void Function(
+                  GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder)?
+              updates]) =>
+      (GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GPostDetailData_post_comments_edges_node_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GPostDetailData_post_comments_edges_node_mentions_homeTag rebuild(
+          void Function(
+                  GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder
+      toBuilder() =>
+          GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder()
+            ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostDetailData_post_comments_edges_node_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostDetailData_post_comments_edges_node_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder
+    implements
+        Builder<GPostDetailData_post_comments_edges_node_mentions_homeTag,
+            GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder> {
+  _$GPostDetailData_post_comments_edges_node_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder() {
+    GPostDetailData_post_comments_edges_node_mentions_homeTag
+        ._initializeBuilder(this);
+  }
+
+  GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(
+      GPostDetailData_post_comments_edges_node_mentions_homeTag other) {
+    _$v = other as _$GPostDetailData_post_comments_edges_node_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(
+              GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostDetailData_post_comments_edges_node_mentions_homeTag build() => _build();
+
+  _$GPostDetailData_post_comments_edges_node_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GPostDetailData_post_comments_edges_node_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GPostDetailData_post_comments_edges_node_mentions_homeTag',
+              'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug,
+              r'GPostDetailData_post_comments_edges_node_mentions_homeTag',
+              'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path,
+              r'GPostDetailData_post_comments_edges_node_mentions_homeTag',
+              'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostDetailData_post_comments_edges_node_referencedTags
+    extends GPostDetailData_post_comments_edges_node_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GPostDetailData_post_comments_edges_node_referencedTags(
+          [void Function(
+                  GPostDetailData_post_comments_edges_node_referencedTagsBuilder)?
+              updates]) =>
+      (GPostDetailData_post_comments_edges_node_referencedTagsBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GPostDetailData_post_comments_edges_node_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GPostDetailData_post_comments_edges_node_referencedTags rebuild(
+          void Function(
+                  GPostDetailData_post_comments_edges_node_referencedTagsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostDetailData_post_comments_edges_node_referencedTagsBuilder toBuilder() =>
+      GPostDetailData_post_comments_edges_node_referencedTagsBuilder()
+        ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostDetailData_post_comments_edges_node_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostDetailData_post_comments_edges_node_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostDetailData_post_comments_edges_node_referencedTagsBuilder
+    implements
+        Builder<GPostDetailData_post_comments_edges_node_referencedTags,
+            GPostDetailData_post_comments_edges_node_referencedTagsBuilder> {
+  _$GPostDetailData_post_comments_edges_node_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostDetailData_post_comments_edges_node_referencedTagsBuilder() {
+    GPostDetailData_post_comments_edges_node_referencedTags._initializeBuilder(
+        this);
+  }
+
+  GPostDetailData_post_comments_edges_node_referencedTagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostDetailData_post_comments_edges_node_referencedTags other) {
+    _$v = other as _$GPostDetailData_post_comments_edges_node_referencedTags;
+  }
+
+  @override
+  void update(
+      void Function(
+              GPostDetailData_post_comments_edges_node_referencedTagsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostDetailData_post_comments_edges_node_referencedTags build() => _build();
+
+  _$GPostDetailData_post_comments_edges_node_referencedTags _build() {
+    final _$result = _$v ??
+        _$GPostDetailData_post_comments_edges_node_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GPostDetailData_post_comments_edges_node_referencedTags',
+              'G__typename'),
+          id: BuiltValueNullFieldError.checkNotNull(id,
+              r'GPostDetailData_post_comments_edges_node_referencedTags', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug,
+              r'GPostDetailData_post_comments_edges_node_referencedTags',
+              'slug'),
           displayName: BuiltValueNullFieldError.checkNotNull(
               displayName,
-              r'GPostDetailData_post_comments_edges_node_author',
+              r'GPostDetailData_post_comments_edges_node_referencedTags',
               'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path,
+              r'GPostDetailData_post_comments_edges_node_referencedTags',
+              'path'),
         );
     replace(_$result);
     return _$result;
@@ -7471,6 +11871,10 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
   @override
   final GCreatePostData_createPost_author author;
   @override
+  final BuiltList<GCreatePostData_createPost_mentions> mentions;
+  @override
+  final BuiltList<GCreatePostData_createPost_referencedTags> referencedTags;
+  @override
   final BuiltList<GCreatePostData_createPost_reactions> reactions;
   @override
   final GCreatePostData_createPost_comments comments;
@@ -7490,6 +11894,8 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
       required this.denyFlag,
       this.lastReadAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       required this.reactions,
       required this.comments})
       : super._();
@@ -7516,6 +11922,8 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
         denyFlag == other.denyFlag &&
         lastReadAt == other.lastReadAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         reactions == other.reactions &&
         comments == other.comments;
   }
@@ -7533,6 +11941,8 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
     _$hash = $jc(_$hash, denyFlag.hashCode);
     _$hash = $jc(_$hash, lastReadAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jc(_$hash, comments.hashCode);
     _$hash = $jf(_$hash);
@@ -7552,6 +11962,8 @@ class _$GCreatePostData_createPost extends GCreatePostData_createPost {
           ..add('denyFlag', denyFlag)
           ..add('lastReadAt', lastReadAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('reactions', reactions)
           ..add('comments', comments))
         .toString();
@@ -7607,6 +12019,21 @@ class GCreatePostData_createPostBuilder
   set author(GCreatePostData_createPost_authorBuilder? author) =>
       _$this._author = author;
 
+  ListBuilder<GCreatePostData_createPost_mentions>? _mentions;
+  ListBuilder<GCreatePostData_createPost_mentions> get mentions =>
+      _$this._mentions ??= ListBuilder<GCreatePostData_createPost_mentions>();
+  set mentions(ListBuilder<GCreatePostData_createPost_mentions>? mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GCreatePostData_createPost_referencedTags>? _referencedTags;
+  ListBuilder<GCreatePostData_createPost_referencedTags> get referencedTags =>
+      _$this._referencedTags ??=
+          ListBuilder<GCreatePostData_createPost_referencedTags>();
+  set referencedTags(
+          ListBuilder<GCreatePostData_createPost_referencedTags>?
+              referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   ListBuilder<GCreatePostData_createPost_reactions>? _reactions;
   ListBuilder<GCreatePostData_createPost_reactions> get reactions =>
       _$this._reactions ??= ListBuilder<GCreatePostData_createPost_reactions>();
@@ -7636,6 +12063,8 @@ class GCreatePostData_createPostBuilder
       _denyFlag = $v.denyFlag;
       _lastReadAt = $v.lastReadAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _comments = $v.comments.toBuilder();
       _$v = null;
@@ -7676,6 +12105,8 @@ class GCreatePostData_createPostBuilder
                 denyFlag, r'GCreatePostData_createPost', 'denyFlag'),
             lastReadAt: _lastReadAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             reactions: reactions.build(),
             comments: comments.build(),
           );
@@ -7691,6 +12122,10 @@ class GCreatePostData_createPostBuilder
         _lastReadAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'reactions';
         reactions.build();
         _$failedField = 'comments';
@@ -7714,13 +12149,18 @@ class _$GCreatePostData_createPost_author
   final String id;
   @override
   final String displayName;
+  @override
+  final GCreatePostData_createPost_author_homeTag? homeTag;
 
   factory _$GCreatePostData_createPost_author(
           [void Function(GCreatePostData_createPost_authorBuilder)? updates]) =>
       (GCreatePostData_createPost_authorBuilder()..update(updates))._build();
 
   _$GCreatePostData_createPost_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GCreatePostData_createPost_author rebuild(
@@ -7737,7 +12177,8 @@ class _$GCreatePostData_createPost_author
     return other is GCreatePostData_createPost_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -7746,6 +12187,7 @@ class _$GCreatePostData_createPost_author
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -7755,7 +12197,8 @@ class _$GCreatePostData_createPost_author
     return (newBuiltValueToStringHelper(r'GCreatePostData_createPost_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -7778,6 +12221,12 @@ class GCreatePostData_createPost_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GCreatePostData_createPost_author_homeTagBuilder? _homeTag;
+  GCreatePostData_createPost_author_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GCreatePostData_createPost_author_homeTagBuilder();
+  set homeTag(GCreatePostData_createPost_author_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
   GCreatePostData_createPost_authorBuilder() {
     GCreatePostData_createPost_author._initializeBuilder(this);
   }
@@ -7788,6 +12237,7 @@ class GCreatePostData_createPost_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -7808,14 +12258,565 @@ class GCreatePostData_createPost_authorBuilder
   GCreatePostData_createPost_author build() => _build();
 
   _$GCreatePostData_createPost_author _build() {
+    _$GCreatePostData_createPost_author _$result;
+    try {
+      _$result = _$v ??
+          _$GCreatePostData_createPost_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GCreatePostData_createPost_author', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GCreatePostData_createPost_author', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GCreatePostData_createPost_author', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GCreatePostData_createPost_author', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreatePostData_createPost_author_homeTag
+    extends GCreatePostData_createPost_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GCreatePostData_createPost_author_homeTag(
+          [void Function(GCreatePostData_createPost_author_homeTagBuilder)?
+              updates]) =>
+      (GCreatePostData_createPost_author_homeTagBuilder()..update(updates))
+          ._build();
+
+  _$GCreatePostData_createPost_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GCreatePostData_createPost_author_homeTag rebuild(
+          void Function(GCreatePostData_createPost_author_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreatePostData_createPost_author_homeTagBuilder toBuilder() =>
+      GCreatePostData_createPost_author_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreatePostData_createPost_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GCreatePostData_createPost_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GCreatePostData_createPost_author_homeTagBuilder
+    implements
+        Builder<GCreatePostData_createPost_author_homeTag,
+            GCreatePostData_createPost_author_homeTagBuilder> {
+  _$GCreatePostData_createPost_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GCreatePostData_createPost_author_homeTagBuilder() {
+    GCreatePostData_createPost_author_homeTag._initializeBuilder(this);
+  }
+
+  GCreatePostData_createPost_author_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreatePostData_createPost_author_homeTag other) {
+    _$v = other as _$GCreatePostData_createPost_author_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GCreatePostData_createPost_author_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreatePostData_createPost_author_homeTag build() => _build();
+
+  _$GCreatePostData_createPost_author_homeTag _build() {
     final _$result = _$v ??
-        _$GCreatePostData_createPost_author._(
-          G__typename: BuiltValueNullFieldError.checkNotNull(
-              G__typename, r'GCreatePostData_createPost_author', 'G__typename'),
+        _$GCreatePostData_createPost_author_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GCreatePostData_createPost_author_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GCreatePostData_createPost_author_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GCreatePostData_createPost_author_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreatePostData_createPost_mentions
+    extends GCreatePostData_createPost_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GCreatePostData_createPost_mentions_homeTag? homeTag;
+
+  factory _$GCreatePostData_createPost_mentions(
+          [void Function(GCreatePostData_createPost_mentionsBuilder)?
+              updates]) =>
+      (GCreatePostData_createPost_mentionsBuilder()..update(updates))._build();
+
+  _$GCreatePostData_createPost_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GCreatePostData_createPost_mentions rebuild(
+          void Function(GCreatePostData_createPost_mentionsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreatePostData_createPost_mentionsBuilder toBuilder() =>
+      GCreatePostData_createPost_mentionsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreatePostData_createPost_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GCreatePostData_createPost_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GCreatePostData_createPost_mentionsBuilder
+    implements
+        Builder<GCreatePostData_createPost_mentions,
+            GCreatePostData_createPost_mentionsBuilder> {
+  _$GCreatePostData_createPost_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GCreatePostData_createPost_mentions_homeTagBuilder? _homeTag;
+  GCreatePostData_createPost_mentions_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GCreatePostData_createPost_mentions_homeTagBuilder();
+  set homeTag(GCreatePostData_createPost_mentions_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GCreatePostData_createPost_mentionsBuilder() {
+    GCreatePostData_createPost_mentions._initializeBuilder(this);
+  }
+
+  GCreatePostData_createPost_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreatePostData_createPost_mentions other) {
+    _$v = other as _$GCreatePostData_createPost_mentions;
+  }
+
+  @override
+  void update(
+      void Function(GCreatePostData_createPost_mentionsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreatePostData_createPost_mentions build() => _build();
+
+  _$GCreatePostData_createPost_mentions _build() {
+    _$GCreatePostData_createPost_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GCreatePostData_createPost_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GCreatePostData_createPost_mentions', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GCreatePostData_createPost_mentions', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GCreatePostData_createPost_mentions', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(r'GCreatePostData_createPost_mentions',
+            _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreatePostData_createPost_mentions_homeTag
+    extends GCreatePostData_createPost_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GCreatePostData_createPost_mentions_homeTag(
+          [void Function(GCreatePostData_createPost_mentions_homeTagBuilder)?
+              updates]) =>
+      (GCreatePostData_createPost_mentions_homeTagBuilder()..update(updates))
+          ._build();
+
+  _$GCreatePostData_createPost_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GCreatePostData_createPost_mentions_homeTag rebuild(
+          void Function(GCreatePostData_createPost_mentions_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreatePostData_createPost_mentions_homeTagBuilder toBuilder() =>
+      GCreatePostData_createPost_mentions_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreatePostData_createPost_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GCreatePostData_createPost_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GCreatePostData_createPost_mentions_homeTagBuilder
+    implements
+        Builder<GCreatePostData_createPost_mentions_homeTag,
+            GCreatePostData_createPost_mentions_homeTagBuilder> {
+  _$GCreatePostData_createPost_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GCreatePostData_createPost_mentions_homeTagBuilder() {
+    GCreatePostData_createPost_mentions_homeTag._initializeBuilder(this);
+  }
+
+  GCreatePostData_createPost_mentions_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreatePostData_createPost_mentions_homeTag other) {
+    _$v = other as _$GCreatePostData_createPost_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GCreatePostData_createPost_mentions_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreatePostData_createPost_mentions_homeTag build() => _build();
+
+  _$GCreatePostData_createPost_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GCreatePostData_createPost_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GCreatePostData_createPost_mentions_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GCreatePostData_createPost_mentions_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GCreatePostData_createPost_mentions_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreatePostData_createPost_referencedTags
+    extends GCreatePostData_createPost_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GCreatePostData_createPost_referencedTags(
+          [void Function(GCreatePostData_createPost_referencedTagsBuilder)?
+              updates]) =>
+      (GCreatePostData_createPost_referencedTagsBuilder()..update(updates))
+          ._build();
+
+  _$GCreatePostData_createPost_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GCreatePostData_createPost_referencedTags rebuild(
+          void Function(GCreatePostData_createPost_referencedTagsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreatePostData_createPost_referencedTagsBuilder toBuilder() =>
+      GCreatePostData_createPost_referencedTagsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreatePostData_createPost_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GCreatePostData_createPost_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GCreatePostData_createPost_referencedTagsBuilder
+    implements
+        Builder<GCreatePostData_createPost_referencedTags,
+            GCreatePostData_createPost_referencedTagsBuilder> {
+  _$GCreatePostData_createPost_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GCreatePostData_createPost_referencedTagsBuilder() {
+    GCreatePostData_createPost_referencedTags._initializeBuilder(this);
+  }
+
+  GCreatePostData_createPost_referencedTagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreatePostData_createPost_referencedTags other) {
+    _$v = other as _$GCreatePostData_createPost_referencedTags;
+  }
+
+  @override
+  void update(
+      void Function(GCreatePostData_createPost_referencedTagsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreatePostData_createPost_referencedTags build() => _build();
+
+  _$GCreatePostData_createPost_referencedTags _build() {
+    final _$result = _$v ??
+        _$GCreatePostData_createPost_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GCreatePostData_createPost_referencedTags', 'G__typename'),
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GCreatePostData_createPost_author', 'id'),
-          displayName: BuiltValueNullFieldError.checkNotNull(
-              displayName, r'GCreatePostData_createPost_author', 'displayName'),
+              id, r'GCreatePostData_createPost_referencedTags', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GCreatePostData_createPost_referencedTags', 'slug'),
+          displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+              r'GCreatePostData_createPost_referencedTags', 'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GCreatePostData_createPost_referencedTags', 'path'),
         );
     replace(_$result);
     return _$result;
@@ -8443,6 +13444,11 @@ class _$GCreateCommentData_createComment
   @override
   final GCreateCommentData_createComment_author author;
   @override
+  final BuiltList<GCreateCommentData_createComment_mentions> mentions;
+  @override
+  final BuiltList<GCreateCommentData_createComment_referencedTags>
+      referencedTags;
+  @override
   final BuiltList<GCreateCommentData_createComment_reactions> reactions;
 
   factory _$GCreateCommentData_createComment(
@@ -8459,6 +13465,8 @@ class _$GCreateCommentData_createComment
       required this.createdAt,
       this.editedAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       required this.reactions})
       : super._();
   @override
@@ -8483,6 +13491,8 @@ class _$GCreateCommentData_createComment
         createdAt == other.createdAt &&
         editedAt == other.editedAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         reactions == other.reactions;
   }
 
@@ -8498,6 +13508,8 @@ class _$GCreateCommentData_createComment
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -8515,6 +13527,8 @@ class _$GCreateCommentData_createComment
           ..add('createdAt', createdAt)
           ..add('editedAt', editedAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('reactions', reactions))
         .toString();
   }
@@ -8564,6 +13578,23 @@ class GCreateCommentData_createCommentBuilder
   set author(GCreateCommentData_createComment_authorBuilder? author) =>
       _$this._author = author;
 
+  ListBuilder<GCreateCommentData_createComment_mentions>? _mentions;
+  ListBuilder<GCreateCommentData_createComment_mentions> get mentions =>
+      _$this._mentions ??=
+          ListBuilder<GCreateCommentData_createComment_mentions>();
+  set mentions(
+          ListBuilder<GCreateCommentData_createComment_mentions>? mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GCreateCommentData_createComment_referencedTags>? _referencedTags;
+  ListBuilder<GCreateCommentData_createComment_referencedTags>
+      get referencedTags => _$this._referencedTags ??=
+          ListBuilder<GCreateCommentData_createComment_referencedTags>();
+  set referencedTags(
+          ListBuilder<GCreateCommentData_createComment_referencedTags>?
+              referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   ListBuilder<GCreateCommentData_createComment_reactions>? _reactions;
   ListBuilder<GCreateCommentData_createComment_reactions> get reactions =>
       _$this._reactions ??=
@@ -8588,6 +13619,8 @@ class GCreateCommentData_createCommentBuilder
       _createdAt = $v.createdAt.toBuilder();
       _editedAt = $v.editedAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _$v = null;
     }
@@ -8626,6 +13659,8 @@ class GCreateCommentData_createCommentBuilder
             createdAt: createdAt.build(),
             editedAt: _editedAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             reactions: reactions.build(),
           );
     } catch (_) {
@@ -8637,6 +13672,10 @@ class GCreateCommentData_createCommentBuilder
         _editedAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'reactions';
         reactions.build();
       } catch (e) {
@@ -8658,6 +13697,8 @@ class _$GCreateCommentData_createComment_author
   final String id;
   @override
   final String displayName;
+  @override
+  final GCreateCommentData_createComment_author_homeTag? homeTag;
 
   factory _$GCreateCommentData_createComment_author(
           [void Function(GCreateCommentData_createComment_authorBuilder)?
@@ -8666,7 +13707,10 @@ class _$GCreateCommentData_createComment_author
           ._build();
 
   _$GCreateCommentData_createComment_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GCreateCommentData_createComment_author rebuild(
@@ -8684,7 +13728,8 @@ class _$GCreateCommentData_createComment_author
     return other is GCreateCommentData_createComment_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -8693,6 +13738,7 @@ class _$GCreateCommentData_createComment_author
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -8703,7 +13749,8 @@ class _$GCreateCommentData_createComment_author
             r'GCreateCommentData_createComment_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -8726,6 +13773,14 @@ class GCreateCommentData_createComment_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GCreateCommentData_createComment_author_homeTagBuilder? _homeTag;
+  GCreateCommentData_createComment_author_homeTagBuilder get homeTag =>
+      _$this._homeTag ??=
+          GCreateCommentData_createComment_author_homeTagBuilder();
+  set homeTag(
+          GCreateCommentData_createComment_author_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
   GCreateCommentData_createComment_authorBuilder() {
     GCreateCommentData_createComment_author._initializeBuilder(this);
   }
@@ -8736,6 +13791,7 @@ class GCreateCommentData_createComment_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -8756,14 +13812,590 @@ class GCreateCommentData_createComment_authorBuilder
   GCreateCommentData_createComment_author build() => _build();
 
   _$GCreateCommentData_createComment_author _build() {
+    _$GCreateCommentData_createComment_author _$result;
+    try {
+      _$result = _$v ??
+          _$GCreateCommentData_createComment_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GCreateCommentData_createComment_author', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GCreateCommentData_createComment_author', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GCreateCommentData_createComment_author', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GCreateCommentData_createComment_author',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreateCommentData_createComment_author_homeTag
+    extends GCreateCommentData_createComment_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GCreateCommentData_createComment_author_homeTag(
+          [void Function(
+                  GCreateCommentData_createComment_author_homeTagBuilder)?
+              updates]) =>
+      (GCreateCommentData_createComment_author_homeTagBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GCreateCommentData_createComment_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GCreateCommentData_createComment_author_homeTag rebuild(
+          void Function(GCreateCommentData_createComment_author_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreateCommentData_createComment_author_homeTagBuilder toBuilder() =>
+      GCreateCommentData_createComment_author_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreateCommentData_createComment_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GCreateCommentData_createComment_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GCreateCommentData_createComment_author_homeTagBuilder
+    implements
+        Builder<GCreateCommentData_createComment_author_homeTag,
+            GCreateCommentData_createComment_author_homeTagBuilder> {
+  _$GCreateCommentData_createComment_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GCreateCommentData_createComment_author_homeTagBuilder() {
+    GCreateCommentData_createComment_author_homeTag._initializeBuilder(this);
+  }
+
+  GCreateCommentData_createComment_author_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreateCommentData_createComment_author_homeTag other) {
+    _$v = other as _$GCreateCommentData_createComment_author_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GCreateCommentData_createComment_author_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreateCommentData_createComment_author_homeTag build() => _build();
+
+  _$GCreateCommentData_createComment_author_homeTag _build() {
     final _$result = _$v ??
-        _$GCreateCommentData_createComment_author._(
-          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
-              r'GCreateCommentData_createComment_author', 'G__typename'),
+        _$GCreateCommentData_createComment_author_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GCreateCommentData_createComment_author_homeTag',
+              'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GCreateCommentData_createComment_author_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GCreateCommentData_createComment_author_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreateCommentData_createComment_mentions
+    extends GCreateCommentData_createComment_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GCreateCommentData_createComment_mentions_homeTag? homeTag;
+
+  factory _$GCreateCommentData_createComment_mentions(
+          [void Function(GCreateCommentData_createComment_mentionsBuilder)?
+              updates]) =>
+      (GCreateCommentData_createComment_mentionsBuilder()..update(updates))
+          ._build();
+
+  _$GCreateCommentData_createComment_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GCreateCommentData_createComment_mentions rebuild(
+          void Function(GCreateCommentData_createComment_mentionsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreateCommentData_createComment_mentionsBuilder toBuilder() =>
+      GCreateCommentData_createComment_mentionsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreateCommentData_createComment_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GCreateCommentData_createComment_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GCreateCommentData_createComment_mentionsBuilder
+    implements
+        Builder<GCreateCommentData_createComment_mentions,
+            GCreateCommentData_createComment_mentionsBuilder> {
+  _$GCreateCommentData_createComment_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GCreateCommentData_createComment_mentions_homeTagBuilder? _homeTag;
+  GCreateCommentData_createComment_mentions_homeTagBuilder get homeTag =>
+      _$this._homeTag ??=
+          GCreateCommentData_createComment_mentions_homeTagBuilder();
+  set homeTag(
+          GCreateCommentData_createComment_mentions_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GCreateCommentData_createComment_mentionsBuilder() {
+    GCreateCommentData_createComment_mentions._initializeBuilder(this);
+  }
+
+  GCreateCommentData_createComment_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreateCommentData_createComment_mentions other) {
+    _$v = other as _$GCreateCommentData_createComment_mentions;
+  }
+
+  @override
+  void update(
+      void Function(GCreateCommentData_createComment_mentionsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreateCommentData_createComment_mentions build() => _build();
+
+  _$GCreateCommentData_createComment_mentions _build() {
+    _$GCreateCommentData_createComment_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GCreateCommentData_createComment_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GCreateCommentData_createComment_mentions', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GCreateCommentData_createComment_mentions', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GCreateCommentData_createComment_mentions', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GCreateCommentData_createComment_mentions',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreateCommentData_createComment_mentions_homeTag
+    extends GCreateCommentData_createComment_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GCreateCommentData_createComment_mentions_homeTag(
+          [void Function(
+                  GCreateCommentData_createComment_mentions_homeTagBuilder)?
+              updates]) =>
+      (GCreateCommentData_createComment_mentions_homeTagBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GCreateCommentData_createComment_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GCreateCommentData_createComment_mentions_homeTag rebuild(
+          void Function(
+                  GCreateCommentData_createComment_mentions_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreateCommentData_createComment_mentions_homeTagBuilder toBuilder() =>
+      GCreateCommentData_createComment_mentions_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreateCommentData_createComment_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GCreateCommentData_createComment_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GCreateCommentData_createComment_mentions_homeTagBuilder
+    implements
+        Builder<GCreateCommentData_createComment_mentions_homeTag,
+            GCreateCommentData_createComment_mentions_homeTagBuilder> {
+  _$GCreateCommentData_createComment_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GCreateCommentData_createComment_mentions_homeTagBuilder() {
+    GCreateCommentData_createComment_mentions_homeTag._initializeBuilder(this);
+  }
+
+  GCreateCommentData_createComment_mentions_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreateCommentData_createComment_mentions_homeTag other) {
+    _$v = other as _$GCreateCommentData_createComment_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GCreateCommentData_createComment_mentions_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreateCommentData_createComment_mentions_homeTag build() => _build();
+
+  _$GCreateCommentData_createComment_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GCreateCommentData_createComment_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GCreateCommentData_createComment_mentions_homeTag',
+              'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(slug,
+              r'GCreateCommentData_createComment_mentions_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(path,
+              r'GCreateCommentData_createComment_mentions_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCreateCommentData_createComment_referencedTags
+    extends GCreateCommentData_createComment_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GCreateCommentData_createComment_referencedTags(
+          [void Function(
+                  GCreateCommentData_createComment_referencedTagsBuilder)?
+              updates]) =>
+      (GCreateCommentData_createComment_referencedTagsBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GCreateCommentData_createComment_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GCreateCommentData_createComment_referencedTags rebuild(
+          void Function(GCreateCommentData_createComment_referencedTagsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCreateCommentData_createComment_referencedTagsBuilder toBuilder() =>
+      GCreateCommentData_createComment_referencedTagsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCreateCommentData_createComment_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GCreateCommentData_createComment_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GCreateCommentData_createComment_referencedTagsBuilder
+    implements
+        Builder<GCreateCommentData_createComment_referencedTags,
+            GCreateCommentData_createComment_referencedTagsBuilder> {
+  _$GCreateCommentData_createComment_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GCreateCommentData_createComment_referencedTagsBuilder() {
+    GCreateCommentData_createComment_referencedTags._initializeBuilder(this);
+  }
+
+  GCreateCommentData_createComment_referencedTagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCreateCommentData_createComment_referencedTags other) {
+    _$v = other as _$GCreateCommentData_createComment_referencedTags;
+  }
+
+  @override
+  void update(
+      void Function(GCreateCommentData_createComment_referencedTagsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCreateCommentData_createComment_referencedTags build() => _build();
+
+  _$GCreateCommentData_createComment_referencedTags _build() {
+    final _$result = _$v ??
+        _$GCreateCommentData_createComment_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GCreateCommentData_createComment_referencedTags',
+              'G__typename'),
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GCreateCommentData_createComment_author', 'id'),
-          displayName: BuiltValueNullFieldError.checkNotNull(displayName,
-              r'GCreateCommentData_createComment_author', 'displayName'),
+              id, r'GCreateCommentData_createComment_referencedTags', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GCreateCommentData_createComment_referencedTags', 'slug'),
+          displayName: BuiltValueNullFieldError.checkNotNull(
+              displayName,
+              r'GCreateCommentData_createComment_referencedTags',
+              'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GCreateCommentData_createComment_referencedTags', 'path'),
         );
     replace(_$result);
     return _$result;
@@ -10037,6 +15669,10 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
   @override
   final GPostChangedData_postChanged_author author;
   @override
+  final BuiltList<GPostChangedData_postChanged_mentions> mentions;
+  @override
+  final BuiltList<GPostChangedData_postChanged_referencedTags> referencedTags;
+  @override
   final BuiltList<GPostChangedData_postChanged_reactions> reactions;
   @override
   final GPostChangedData_postChanged_comments comments;
@@ -10056,6 +15692,8 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
       required this.denyFlag,
       this.lastReadAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       required this.reactions,
       required this.comments})
       : super._();
@@ -10082,6 +15720,8 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
         denyFlag == other.denyFlag &&
         lastReadAt == other.lastReadAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         reactions == other.reactions &&
         comments == other.comments;
   }
@@ -10099,6 +15739,8 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
     _$hash = $jc(_$hash, denyFlag.hashCode);
     _$hash = $jc(_$hash, lastReadAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jc(_$hash, comments.hashCode);
     _$hash = $jf(_$hash);
@@ -10118,6 +15760,8 @@ class _$GPostChangedData_postChanged extends GPostChangedData_postChanged {
           ..add('denyFlag', denyFlag)
           ..add('lastReadAt', lastReadAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('reactions', reactions)
           ..add('comments', comments))
         .toString();
@@ -10174,6 +15818,21 @@ class GPostChangedData_postChangedBuilder
   set author(GPostChangedData_postChanged_authorBuilder? author) =>
       _$this._author = author;
 
+  ListBuilder<GPostChangedData_postChanged_mentions>? _mentions;
+  ListBuilder<GPostChangedData_postChanged_mentions> get mentions =>
+      _$this._mentions ??= ListBuilder<GPostChangedData_postChanged_mentions>();
+  set mentions(ListBuilder<GPostChangedData_postChanged_mentions>? mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GPostChangedData_postChanged_referencedTags>? _referencedTags;
+  ListBuilder<GPostChangedData_postChanged_referencedTags> get referencedTags =>
+      _$this._referencedTags ??=
+          ListBuilder<GPostChangedData_postChanged_referencedTags>();
+  set referencedTags(
+          ListBuilder<GPostChangedData_postChanged_referencedTags>?
+              referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   ListBuilder<GPostChangedData_postChanged_reactions>? _reactions;
   ListBuilder<GPostChangedData_postChanged_reactions> get reactions =>
       _$this._reactions ??=
@@ -10205,6 +15864,8 @@ class GPostChangedData_postChangedBuilder
       _denyFlag = $v.denyFlag;
       _lastReadAt = $v.lastReadAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _comments = $v.comments.toBuilder();
       _$v = null;
@@ -10245,6 +15906,8 @@ class GPostChangedData_postChangedBuilder
                 denyFlag, r'GPostChangedData_postChanged', 'denyFlag'),
             lastReadAt: _lastReadAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             reactions: reactions.build(),
             comments: comments.build(),
           );
@@ -10260,6 +15923,10 @@ class GPostChangedData_postChangedBuilder
         _lastReadAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'reactions';
         reactions.build();
         _$failedField = 'comments';
@@ -10283,6 +15950,8 @@ class _$GPostChangedData_postChanged_author
   final String id;
   @override
   final String displayName;
+  @override
+  final GPostChangedData_postChanged_author_homeTag? homeTag;
 
   factory _$GPostChangedData_postChanged_author(
           [void Function(GPostChangedData_postChanged_authorBuilder)?
@@ -10290,7 +15959,10 @@ class _$GPostChangedData_postChanged_author
       (GPostChangedData_postChanged_authorBuilder()..update(updates))._build();
 
   _$GPostChangedData_postChanged_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GPostChangedData_postChanged_author rebuild(
@@ -10307,7 +15979,8 @@ class _$GPostChangedData_postChanged_author
     return other is GPostChangedData_postChanged_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -10316,6 +15989,7 @@ class _$GPostChangedData_postChanged_author
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -10325,7 +15999,8 @@ class _$GPostChangedData_postChanged_author
     return (newBuiltValueToStringHelper(r'GPostChangedData_postChanged_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -10348,6 +16023,12 @@ class GPostChangedData_postChanged_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GPostChangedData_postChanged_author_homeTagBuilder? _homeTag;
+  GPostChangedData_postChanged_author_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GPostChangedData_postChanged_author_homeTagBuilder();
+  set homeTag(GPostChangedData_postChanged_author_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
   GPostChangedData_postChanged_authorBuilder() {
     GPostChangedData_postChanged_author._initializeBuilder(this);
   }
@@ -10358,6 +16039,7 @@ class GPostChangedData_postChanged_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -10378,14 +16060,571 @@ class GPostChangedData_postChanged_authorBuilder
   GPostChangedData_postChanged_author build() => _build();
 
   _$GPostChangedData_postChanged_author _build() {
+    _$GPostChangedData_postChanged_author _$result;
+    try {
+      _$result = _$v ??
+          _$GPostChangedData_postChanged_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GPostChangedData_postChanged_author', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostChangedData_postChanged_author', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GPostChangedData_postChanged_author', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(r'GPostChangedData_postChanged_author',
+            _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostChangedData_postChanged_author_homeTag
+    extends GPostChangedData_postChanged_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GPostChangedData_postChanged_author_homeTag(
+          [void Function(GPostChangedData_postChanged_author_homeTagBuilder)?
+              updates]) =>
+      (GPostChangedData_postChanged_author_homeTagBuilder()..update(updates))
+          ._build();
+
+  _$GPostChangedData_postChanged_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GPostChangedData_postChanged_author_homeTag rebuild(
+          void Function(GPostChangedData_postChanged_author_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostChangedData_postChanged_author_homeTagBuilder toBuilder() =>
+      GPostChangedData_postChanged_author_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostChangedData_postChanged_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostChangedData_postChanged_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostChangedData_postChanged_author_homeTagBuilder
+    implements
+        Builder<GPostChangedData_postChanged_author_homeTag,
+            GPostChangedData_postChanged_author_homeTagBuilder> {
+  _$GPostChangedData_postChanged_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostChangedData_postChanged_author_homeTagBuilder() {
+    GPostChangedData_postChanged_author_homeTag._initializeBuilder(this);
+  }
+
+  GPostChangedData_postChanged_author_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostChangedData_postChanged_author_homeTag other) {
+    _$v = other as _$GPostChangedData_postChanged_author_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GPostChangedData_postChanged_author_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostChangedData_postChanged_author_homeTag build() => _build();
+
+  _$GPostChangedData_postChanged_author_homeTag _build() {
     final _$result = _$v ??
-        _$GPostChangedData_postChanged_author._(
+        _$GPostChangedData_postChanged_author_homeTag._(
           G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
-              r'GPostChangedData_postChanged_author', 'G__typename'),
+              r'GPostChangedData_postChanged_author_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GPostChangedData_postChanged_author_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GPostChangedData_postChanged_author_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostChangedData_postChanged_mentions
+    extends GPostChangedData_postChanged_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GPostChangedData_postChanged_mentions_homeTag? homeTag;
+
+  factory _$GPostChangedData_postChanged_mentions(
+          [void Function(GPostChangedData_postChanged_mentionsBuilder)?
+              updates]) =>
+      (GPostChangedData_postChanged_mentionsBuilder()..update(updates))
+          ._build();
+
+  _$GPostChangedData_postChanged_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GPostChangedData_postChanged_mentions rebuild(
+          void Function(GPostChangedData_postChanged_mentionsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostChangedData_postChanged_mentionsBuilder toBuilder() =>
+      GPostChangedData_postChanged_mentionsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostChangedData_postChanged_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostChangedData_postChanged_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GPostChangedData_postChanged_mentionsBuilder
+    implements
+        Builder<GPostChangedData_postChanged_mentions,
+            GPostChangedData_postChanged_mentionsBuilder> {
+  _$GPostChangedData_postChanged_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GPostChangedData_postChanged_mentions_homeTagBuilder? _homeTag;
+  GPostChangedData_postChanged_mentions_homeTagBuilder get homeTag =>
+      _$this._homeTag ??=
+          GPostChangedData_postChanged_mentions_homeTagBuilder();
+  set homeTag(GPostChangedData_postChanged_mentions_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GPostChangedData_postChanged_mentionsBuilder() {
+    GPostChangedData_postChanged_mentions._initializeBuilder(this);
+  }
+
+  GPostChangedData_postChanged_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostChangedData_postChanged_mentions other) {
+    _$v = other as _$GPostChangedData_postChanged_mentions;
+  }
+
+  @override
+  void update(
+      void Function(GPostChangedData_postChanged_mentionsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostChangedData_postChanged_mentions build() => _build();
+
+  _$GPostChangedData_postChanged_mentions _build() {
+    _$GPostChangedData_postChanged_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GPostChangedData_postChanged_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GPostChangedData_postChanged_mentions', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostChangedData_postChanged_mentions', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GPostChangedData_postChanged_mentions', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostChangedData_postChanged_mentions',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostChangedData_postChanged_mentions_homeTag
+    extends GPostChangedData_postChanged_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GPostChangedData_postChanged_mentions_homeTag(
+          [void Function(GPostChangedData_postChanged_mentions_homeTagBuilder)?
+              updates]) =>
+      (GPostChangedData_postChanged_mentions_homeTagBuilder()..update(updates))
+          ._build();
+
+  _$GPostChangedData_postChanged_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GPostChangedData_postChanged_mentions_homeTag rebuild(
+          void Function(GPostChangedData_postChanged_mentions_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostChangedData_postChanged_mentions_homeTagBuilder toBuilder() =>
+      GPostChangedData_postChanged_mentions_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostChangedData_postChanged_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostChangedData_postChanged_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostChangedData_postChanged_mentions_homeTagBuilder
+    implements
+        Builder<GPostChangedData_postChanged_mentions_homeTag,
+            GPostChangedData_postChanged_mentions_homeTagBuilder> {
+  _$GPostChangedData_postChanged_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostChangedData_postChanged_mentions_homeTagBuilder() {
+    GPostChangedData_postChanged_mentions_homeTag._initializeBuilder(this);
+  }
+
+  GPostChangedData_postChanged_mentions_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostChangedData_postChanged_mentions_homeTag other) {
+    _$v = other as _$GPostChangedData_postChanged_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GPostChangedData_postChanged_mentions_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostChangedData_postChanged_mentions_homeTag build() => _build();
+
+  _$GPostChangedData_postChanged_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GPostChangedData_postChanged_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GPostChangedData_postChanged_mentions_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GPostChangedData_postChanged_mentions_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GPostChangedData_postChanged_mentions_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostChangedData_postChanged_referencedTags
+    extends GPostChangedData_postChanged_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GPostChangedData_postChanged_referencedTags(
+          [void Function(GPostChangedData_postChanged_referencedTagsBuilder)?
+              updates]) =>
+      (GPostChangedData_postChanged_referencedTagsBuilder()..update(updates))
+          ._build();
+
+  _$GPostChangedData_postChanged_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GPostChangedData_postChanged_referencedTags rebuild(
+          void Function(GPostChangedData_postChanged_referencedTagsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostChangedData_postChanged_referencedTagsBuilder toBuilder() =>
+      GPostChangedData_postChanged_referencedTagsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostChangedData_postChanged_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GPostChangedData_postChanged_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostChangedData_postChanged_referencedTagsBuilder
+    implements
+        Builder<GPostChangedData_postChanged_referencedTags,
+            GPostChangedData_postChanged_referencedTagsBuilder> {
+  _$GPostChangedData_postChanged_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostChangedData_postChanged_referencedTagsBuilder() {
+    GPostChangedData_postChanged_referencedTags._initializeBuilder(this);
+  }
+
+  GPostChangedData_postChanged_referencedTagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostChangedData_postChanged_referencedTags other) {
+    _$v = other as _$GPostChangedData_postChanged_referencedTags;
+  }
+
+  @override
+  void update(
+      void Function(GPostChangedData_postChanged_referencedTagsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostChangedData_postChanged_referencedTags build() => _build();
+
+  _$GPostChangedData_postChanged_referencedTags _build() {
+    final _$result = _$v ??
+        _$GPostChangedData_postChanged_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GPostChangedData_postChanged_referencedTags', 'G__typename'),
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GPostChangedData_postChanged_author', 'id'),
+              id, r'GPostChangedData_postChanged_referencedTags', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GPostChangedData_postChanged_referencedTags', 'slug'),
           displayName: BuiltValueNullFieldError.checkNotNull(displayName,
-              r'GPostChangedData_postChanged_author', 'displayName'),
+              r'GPostChangedData_postChanged_referencedTags', 'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GPostChangedData_postChanged_referencedTags', 'path'),
         );
     replace(_$result);
     return _$result;
@@ -10913,6 +17152,10 @@ class _$GPostSummaryData extends GPostSummaryData {
   @override
   final GPostSummaryData_author author;
   @override
+  final BuiltList<GPostSummaryData_mentions> mentions;
+  @override
+  final BuiltList<GPostSummaryData_referencedTags> referencedTags;
+  @override
   final BuiltList<GPostSummaryData_reactions> reactions;
   @override
   final GPostSummaryData_comments comments;
@@ -10932,6 +17175,8 @@ class _$GPostSummaryData extends GPostSummaryData {
       required this.denyFlag,
       this.lastReadAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       required this.reactions,
       required this.comments})
       : super._();
@@ -10957,6 +17202,8 @@ class _$GPostSummaryData extends GPostSummaryData {
         denyFlag == other.denyFlag &&
         lastReadAt == other.lastReadAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         reactions == other.reactions &&
         comments == other.comments;
   }
@@ -10974,6 +17221,8 @@ class _$GPostSummaryData extends GPostSummaryData {
     _$hash = $jc(_$hash, denyFlag.hashCode);
     _$hash = $jc(_$hash, lastReadAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jc(_$hash, comments.hashCode);
     _$hash = $jf(_$hash);
@@ -10993,6 +17242,8 @@ class _$GPostSummaryData extends GPostSummaryData {
           ..add('denyFlag', denyFlag)
           ..add('lastReadAt', lastReadAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('reactions', reactions)
           ..add('comments', comments))
         .toString();
@@ -11046,6 +17297,19 @@ class GPostSummaryDataBuilder
       _$this._author ??= GPostSummaryData_authorBuilder();
   set author(GPostSummaryData_authorBuilder? author) => _$this._author = author;
 
+  ListBuilder<GPostSummaryData_mentions>? _mentions;
+  ListBuilder<GPostSummaryData_mentions> get mentions =>
+      _$this._mentions ??= ListBuilder<GPostSummaryData_mentions>();
+  set mentions(ListBuilder<GPostSummaryData_mentions>? mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GPostSummaryData_referencedTags>? _referencedTags;
+  ListBuilder<GPostSummaryData_referencedTags> get referencedTags =>
+      _$this._referencedTags ??= ListBuilder<GPostSummaryData_referencedTags>();
+  set referencedTags(
+          ListBuilder<GPostSummaryData_referencedTags>? referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   ListBuilder<GPostSummaryData_reactions>? _reactions;
   ListBuilder<GPostSummaryData_reactions> get reactions =>
       _$this._reactions ??= ListBuilder<GPostSummaryData_reactions>();
@@ -11075,6 +17339,8 @@ class GPostSummaryDataBuilder
       _denyFlag = $v.denyFlag;
       _lastReadAt = $v.lastReadAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _comments = $v.comments.toBuilder();
       _$v = null;
@@ -11115,6 +17381,8 @@ class GPostSummaryDataBuilder
                 denyFlag, r'GPostSummaryData', 'denyFlag'),
             lastReadAt: _lastReadAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             reactions: reactions.build(),
             comments: comments.build(),
           );
@@ -11130,6 +17398,10 @@ class GPostSummaryDataBuilder
         _lastReadAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'reactions';
         reactions.build();
         _$failedField = 'comments';
@@ -11152,13 +17424,18 @@ class _$GPostSummaryData_author extends GPostSummaryData_author {
   final String id;
   @override
   final String displayName;
+  @override
+  final GPostSummaryData_author_homeTag? homeTag;
 
   factory _$GPostSummaryData_author(
           [void Function(GPostSummaryData_authorBuilder)? updates]) =>
       (GPostSummaryData_authorBuilder()..update(updates))._build();
 
   _$GPostSummaryData_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GPostSummaryData_author rebuild(
@@ -11175,7 +17452,8 @@ class _$GPostSummaryData_author extends GPostSummaryData_author {
     return other is GPostSummaryData_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -11184,6 +17462,7 @@ class _$GPostSummaryData_author extends GPostSummaryData_author {
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -11193,7 +17472,8 @@ class _$GPostSummaryData_author extends GPostSummaryData_author {
     return (newBuiltValueToStringHelper(r'GPostSummaryData_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -11215,6 +17495,12 @@ class GPostSummaryData_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GPostSummaryData_author_homeTagBuilder? _homeTag;
+  GPostSummaryData_author_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GPostSummaryData_author_homeTagBuilder();
+  set homeTag(GPostSummaryData_author_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
   GPostSummaryData_authorBuilder() {
     GPostSummaryData_author._initializeBuilder(this);
   }
@@ -11225,6 +17511,7 @@ class GPostSummaryData_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -11244,14 +17531,544 @@ class GPostSummaryData_authorBuilder
   GPostSummaryData_author build() => _build();
 
   _$GPostSummaryData_author _build() {
+    _$GPostSummaryData_author _$result;
+    try {
+      _$result = _$v ??
+          _$GPostSummaryData_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GPostSummaryData_author', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostSummaryData_author', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName, r'GPostSummaryData_author', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostSummaryData_author', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostSummaryData_author_homeTag
+    extends GPostSummaryData_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GPostSummaryData_author_homeTag(
+          [void Function(GPostSummaryData_author_homeTagBuilder)? updates]) =>
+      (GPostSummaryData_author_homeTagBuilder()..update(updates))._build();
+
+  _$GPostSummaryData_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GPostSummaryData_author_homeTag rebuild(
+          void Function(GPostSummaryData_author_homeTagBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostSummaryData_author_homeTagBuilder toBuilder() =>
+      GPostSummaryData_author_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostSummaryData_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostSummaryData_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostSummaryData_author_homeTagBuilder
+    implements
+        Builder<GPostSummaryData_author_homeTag,
+            GPostSummaryData_author_homeTagBuilder> {
+  _$GPostSummaryData_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostSummaryData_author_homeTagBuilder() {
+    GPostSummaryData_author_homeTag._initializeBuilder(this);
+  }
+
+  GPostSummaryData_author_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostSummaryData_author_homeTag other) {
+    _$v = other as _$GPostSummaryData_author_homeTag;
+  }
+
+  @override
+  void update(void Function(GPostSummaryData_author_homeTagBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostSummaryData_author_homeTag build() => _build();
+
+  _$GPostSummaryData_author_homeTag _build() {
     final _$result = _$v ??
-        _$GPostSummaryData_author._(
+        _$GPostSummaryData_author_homeTag._(
           G__typename: BuiltValueNullFieldError.checkNotNull(
-              G__typename, r'GPostSummaryData_author', 'G__typename'),
+              G__typename, r'GPostSummaryData_author_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GPostSummaryData_author_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GPostSummaryData_author_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostSummaryData_mentions extends GPostSummaryData_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GPostSummaryData_mentions_homeTag? homeTag;
+
+  factory _$GPostSummaryData_mentions(
+          [void Function(GPostSummaryData_mentionsBuilder)? updates]) =>
+      (GPostSummaryData_mentionsBuilder()..update(updates))._build();
+
+  _$GPostSummaryData_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GPostSummaryData_mentions rebuild(
+          void Function(GPostSummaryData_mentionsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostSummaryData_mentionsBuilder toBuilder() =>
+      GPostSummaryData_mentionsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostSummaryData_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostSummaryData_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GPostSummaryData_mentionsBuilder
+    implements
+        Builder<GPostSummaryData_mentions, GPostSummaryData_mentionsBuilder> {
+  _$GPostSummaryData_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GPostSummaryData_mentions_homeTagBuilder? _homeTag;
+  GPostSummaryData_mentions_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GPostSummaryData_mentions_homeTagBuilder();
+  set homeTag(GPostSummaryData_mentions_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GPostSummaryData_mentionsBuilder() {
+    GPostSummaryData_mentions._initializeBuilder(this);
+  }
+
+  GPostSummaryData_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostSummaryData_mentions other) {
+    _$v = other as _$GPostSummaryData_mentions;
+  }
+
+  @override
+  void update(void Function(GPostSummaryData_mentionsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostSummaryData_mentions build() => _build();
+
+  _$GPostSummaryData_mentions _build() {
+    _$GPostSummaryData_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GPostSummaryData_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GPostSummaryData_mentions', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostSummaryData_mentions', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName, r'GPostSummaryData_mentions', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostSummaryData_mentions', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostSummaryData_mentions_homeTag
+    extends GPostSummaryData_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GPostSummaryData_mentions_homeTag(
+          [void Function(GPostSummaryData_mentions_homeTagBuilder)? updates]) =>
+      (GPostSummaryData_mentions_homeTagBuilder()..update(updates))._build();
+
+  _$GPostSummaryData_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GPostSummaryData_mentions_homeTag rebuild(
+          void Function(GPostSummaryData_mentions_homeTagBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostSummaryData_mentions_homeTagBuilder toBuilder() =>
+      GPostSummaryData_mentions_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostSummaryData_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostSummaryData_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostSummaryData_mentions_homeTagBuilder
+    implements
+        Builder<GPostSummaryData_mentions_homeTag,
+            GPostSummaryData_mentions_homeTagBuilder> {
+  _$GPostSummaryData_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostSummaryData_mentions_homeTagBuilder() {
+    GPostSummaryData_mentions_homeTag._initializeBuilder(this);
+  }
+
+  GPostSummaryData_mentions_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostSummaryData_mentions_homeTag other) {
+    _$v = other as _$GPostSummaryData_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GPostSummaryData_mentions_homeTagBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostSummaryData_mentions_homeTag build() => _build();
+
+  _$GPostSummaryData_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GPostSummaryData_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename, r'GPostSummaryData_mentions_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GPostSummaryData_mentions_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GPostSummaryData_mentions_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostSummaryData_referencedTags
+    extends GPostSummaryData_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GPostSummaryData_referencedTags(
+          [void Function(GPostSummaryData_referencedTagsBuilder)? updates]) =>
+      (GPostSummaryData_referencedTagsBuilder()..update(updates))._build();
+
+  _$GPostSummaryData_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GPostSummaryData_referencedTags rebuild(
+          void Function(GPostSummaryData_referencedTagsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostSummaryData_referencedTagsBuilder toBuilder() =>
+      GPostSummaryData_referencedTagsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostSummaryData_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostSummaryData_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GPostSummaryData_referencedTagsBuilder
+    implements
+        Builder<GPostSummaryData_referencedTags,
+            GPostSummaryData_referencedTagsBuilder> {
+  _$GPostSummaryData_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GPostSummaryData_referencedTagsBuilder() {
+    GPostSummaryData_referencedTags._initializeBuilder(this);
+  }
+
+  GPostSummaryData_referencedTagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostSummaryData_referencedTags other) {
+    _$v = other as _$GPostSummaryData_referencedTags;
+  }
+
+  @override
+  void update(void Function(GPostSummaryData_referencedTagsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostSummaryData_referencedTags build() => _build();
+
+  _$GPostSummaryData_referencedTags _build() {
+    final _$result = _$v ??
+        _$GPostSummaryData_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename, r'GPostSummaryData_referencedTags', 'G__typename'),
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GPostSummaryData_author', 'id'),
+              id, r'GPostSummaryData_referencedTags', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GPostSummaryData_referencedTags', 'slug'),
           displayName: BuiltValueNullFieldError.checkNotNull(
-              displayName, r'GPostSummaryData_author', 'displayName'),
+              displayName, r'GPostSummaryData_referencedTags', 'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GPostSummaryData_referencedTags', 'path'),
         );
     replace(_$result);
     return _$result;
@@ -11743,6 +18560,10 @@ class _$GCommentSummaryData extends GCommentSummaryData {
   @override
   final GCommentSummaryData_author author;
   @override
+  final BuiltList<GCommentSummaryData_mentions> mentions;
+  @override
+  final BuiltList<GCommentSummaryData_referencedTags> referencedTags;
+  @override
   final BuiltList<GCommentSummaryData_reactions> reactions;
 
   factory _$GCommentSummaryData(
@@ -11759,6 +18580,8 @@ class _$GCommentSummaryData extends GCommentSummaryData {
       required this.createdAt,
       this.editedAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       required this.reactions})
       : super._();
   @override
@@ -11783,6 +18606,8 @@ class _$GCommentSummaryData extends GCommentSummaryData {
         createdAt == other.createdAt &&
         editedAt == other.editedAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         reactions == other.reactions;
   }
 
@@ -11798,6 +18623,8 @@ class _$GCommentSummaryData extends GCommentSummaryData {
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, reactions.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -11815,6 +18642,8 @@ class _$GCommentSummaryData extends GCommentSummaryData {
           ..add('createdAt', createdAt)
           ..add('editedAt', editedAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('reactions', reactions))
         .toString();
   }
@@ -11862,6 +18691,20 @@ class GCommentSummaryDataBuilder
   set author(GCommentSummaryData_authorBuilder? author) =>
       _$this._author = author;
 
+  ListBuilder<GCommentSummaryData_mentions>? _mentions;
+  ListBuilder<GCommentSummaryData_mentions> get mentions =>
+      _$this._mentions ??= ListBuilder<GCommentSummaryData_mentions>();
+  set mentions(ListBuilder<GCommentSummaryData_mentions>? mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GCommentSummaryData_referencedTags>? _referencedTags;
+  ListBuilder<GCommentSummaryData_referencedTags> get referencedTags =>
+      _$this._referencedTags ??=
+          ListBuilder<GCommentSummaryData_referencedTags>();
+  set referencedTags(
+          ListBuilder<GCommentSummaryData_referencedTags>? referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   ListBuilder<GCommentSummaryData_reactions>? _reactions;
   ListBuilder<GCommentSummaryData_reactions> get reactions =>
       _$this._reactions ??= ListBuilder<GCommentSummaryData_reactions>();
@@ -11884,6 +18727,8 @@ class GCommentSummaryDataBuilder
       _createdAt = $v.createdAt.toBuilder();
       _editedAt = $v.editedAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _reactions = $v.reactions.toBuilder();
       _$v = null;
     }
@@ -11922,6 +18767,8 @@ class GCommentSummaryDataBuilder
             createdAt: createdAt.build(),
             editedAt: _editedAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             reactions: reactions.build(),
           );
     } catch (_) {
@@ -11933,6 +18780,10 @@ class GCommentSummaryDataBuilder
         _editedAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'reactions';
         reactions.build();
       } catch (e) {
@@ -11953,13 +18804,18 @@ class _$GCommentSummaryData_author extends GCommentSummaryData_author {
   final String id;
   @override
   final String displayName;
+  @override
+  final GCommentSummaryData_author_homeTag? homeTag;
 
   factory _$GCommentSummaryData_author(
           [void Function(GCommentSummaryData_authorBuilder)? updates]) =>
       (GCommentSummaryData_authorBuilder()..update(updates))._build();
 
   _$GCommentSummaryData_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GCommentSummaryData_author rebuild(
@@ -11976,7 +18832,8 @@ class _$GCommentSummaryData_author extends GCommentSummaryData_author {
     return other is GCommentSummaryData_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -11985,6 +18842,7 @@ class _$GCommentSummaryData_author extends GCommentSummaryData_author {
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -11994,7 +18852,8 @@ class _$GCommentSummaryData_author extends GCommentSummaryData_author {
     return (newBuiltValueToStringHelper(r'GCommentSummaryData_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -12016,6 +18875,12 @@ class GCommentSummaryData_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GCommentSummaryData_author_homeTagBuilder? _homeTag;
+  GCommentSummaryData_author_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GCommentSummaryData_author_homeTagBuilder();
+  set homeTag(GCommentSummaryData_author_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
   GCommentSummaryData_authorBuilder() {
     GCommentSummaryData_author._initializeBuilder(this);
   }
@@ -12026,6 +18891,7 @@ class GCommentSummaryData_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -12045,14 +18911,550 @@ class GCommentSummaryData_authorBuilder
   GCommentSummaryData_author build() => _build();
 
   _$GCommentSummaryData_author _build() {
+    _$GCommentSummaryData_author _$result;
+    try {
+      _$result = _$v ??
+          _$GCommentSummaryData_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GCommentSummaryData_author', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GCommentSummaryData_author', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName, r'GCommentSummaryData_author', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GCommentSummaryData_author', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCommentSummaryData_author_homeTag
+    extends GCommentSummaryData_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GCommentSummaryData_author_homeTag(
+          [void Function(GCommentSummaryData_author_homeTagBuilder)?
+              updates]) =>
+      (GCommentSummaryData_author_homeTagBuilder()..update(updates))._build();
+
+  _$GCommentSummaryData_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GCommentSummaryData_author_homeTag rebuild(
+          void Function(GCommentSummaryData_author_homeTagBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCommentSummaryData_author_homeTagBuilder toBuilder() =>
+      GCommentSummaryData_author_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCommentSummaryData_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GCommentSummaryData_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GCommentSummaryData_author_homeTagBuilder
+    implements
+        Builder<GCommentSummaryData_author_homeTag,
+            GCommentSummaryData_author_homeTagBuilder> {
+  _$GCommentSummaryData_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GCommentSummaryData_author_homeTagBuilder() {
+    GCommentSummaryData_author_homeTag._initializeBuilder(this);
+  }
+
+  GCommentSummaryData_author_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCommentSummaryData_author_homeTag other) {
+    _$v = other as _$GCommentSummaryData_author_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GCommentSummaryData_author_homeTagBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCommentSummaryData_author_homeTag build() => _build();
+
+  _$GCommentSummaryData_author_homeTag _build() {
     final _$result = _$v ??
-        _$GCommentSummaryData_author._(
-          G__typename: BuiltValueNullFieldError.checkNotNull(
-              G__typename, r'GCommentSummaryData_author', 'G__typename'),
+        _$GCommentSummaryData_author_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GCommentSummaryData_author_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GCommentSummaryData_author_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GCommentSummaryData_author_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCommentSummaryData_mentions extends GCommentSummaryData_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GCommentSummaryData_mentions_homeTag? homeTag;
+
+  factory _$GCommentSummaryData_mentions(
+          [void Function(GCommentSummaryData_mentionsBuilder)? updates]) =>
+      (GCommentSummaryData_mentionsBuilder()..update(updates))._build();
+
+  _$GCommentSummaryData_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GCommentSummaryData_mentions rebuild(
+          void Function(GCommentSummaryData_mentionsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCommentSummaryData_mentionsBuilder toBuilder() =>
+      GCommentSummaryData_mentionsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCommentSummaryData_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GCommentSummaryData_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GCommentSummaryData_mentionsBuilder
+    implements
+        Builder<GCommentSummaryData_mentions,
+            GCommentSummaryData_mentionsBuilder> {
+  _$GCommentSummaryData_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GCommentSummaryData_mentions_homeTagBuilder? _homeTag;
+  GCommentSummaryData_mentions_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GCommentSummaryData_mentions_homeTagBuilder();
+  set homeTag(GCommentSummaryData_mentions_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GCommentSummaryData_mentionsBuilder() {
+    GCommentSummaryData_mentions._initializeBuilder(this);
+  }
+
+  GCommentSummaryData_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCommentSummaryData_mentions other) {
+    _$v = other as _$GCommentSummaryData_mentions;
+  }
+
+  @override
+  void update(void Function(GCommentSummaryData_mentionsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCommentSummaryData_mentions build() => _build();
+
+  _$GCommentSummaryData_mentions _build() {
+    _$GCommentSummaryData_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GCommentSummaryData_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GCommentSummaryData_mentions', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GCommentSummaryData_mentions', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName, r'GCommentSummaryData_mentions', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GCommentSummaryData_mentions', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCommentSummaryData_mentions_homeTag
+    extends GCommentSummaryData_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GCommentSummaryData_mentions_homeTag(
+          [void Function(GCommentSummaryData_mentions_homeTagBuilder)?
+              updates]) =>
+      (GCommentSummaryData_mentions_homeTagBuilder()..update(updates))._build();
+
+  _$GCommentSummaryData_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GCommentSummaryData_mentions_homeTag rebuild(
+          void Function(GCommentSummaryData_mentions_homeTagBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCommentSummaryData_mentions_homeTagBuilder toBuilder() =>
+      GCommentSummaryData_mentions_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCommentSummaryData_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GCommentSummaryData_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GCommentSummaryData_mentions_homeTagBuilder
+    implements
+        Builder<GCommentSummaryData_mentions_homeTag,
+            GCommentSummaryData_mentions_homeTagBuilder> {
+  _$GCommentSummaryData_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GCommentSummaryData_mentions_homeTagBuilder() {
+    GCommentSummaryData_mentions_homeTag._initializeBuilder(this);
+  }
+
+  GCommentSummaryData_mentions_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCommentSummaryData_mentions_homeTag other) {
+    _$v = other as _$GCommentSummaryData_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GCommentSummaryData_mentions_homeTagBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCommentSummaryData_mentions_homeTag build() => _build();
+
+  _$GCommentSummaryData_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GCommentSummaryData_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GCommentSummaryData_mentions_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GCommentSummaryData_mentions_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GCommentSummaryData_mentions_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GCommentSummaryData_referencedTags
+    extends GCommentSummaryData_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GCommentSummaryData_referencedTags(
+          [void Function(GCommentSummaryData_referencedTagsBuilder)?
+              updates]) =>
+      (GCommentSummaryData_referencedTagsBuilder()..update(updates))._build();
+
+  _$GCommentSummaryData_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GCommentSummaryData_referencedTags rebuild(
+          void Function(GCommentSummaryData_referencedTagsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GCommentSummaryData_referencedTagsBuilder toBuilder() =>
+      GCommentSummaryData_referencedTagsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GCommentSummaryData_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GCommentSummaryData_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GCommentSummaryData_referencedTagsBuilder
+    implements
+        Builder<GCommentSummaryData_referencedTags,
+            GCommentSummaryData_referencedTagsBuilder> {
+  _$GCommentSummaryData_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GCommentSummaryData_referencedTagsBuilder() {
+    GCommentSummaryData_referencedTags._initializeBuilder(this);
+  }
+
+  GCommentSummaryData_referencedTagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GCommentSummaryData_referencedTags other) {
+    _$v = other as _$GCommentSummaryData_referencedTags;
+  }
+
+  @override
+  void update(
+      void Function(GCommentSummaryData_referencedTagsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GCommentSummaryData_referencedTags build() => _build();
+
+  _$GCommentSummaryData_referencedTags _build() {
+    final _$result = _$v ??
+        _$GCommentSummaryData_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GCommentSummaryData_referencedTags', 'G__typename'),
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GCommentSummaryData_author', 'id'),
-          displayName: BuiltValueNullFieldError.checkNotNull(
-              displayName, r'GCommentSummaryData_author', 'displayName'),
+              id, r'GCommentSummaryData_referencedTags', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GCommentSummaryData_referencedTags', 'slug'),
+          displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+              r'GCommentSummaryData_referencedTags', 'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GCommentSummaryData_referencedTags', 'path'),
         );
     replace(_$result);
     return _$result;

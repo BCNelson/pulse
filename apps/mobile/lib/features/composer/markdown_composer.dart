@@ -6,6 +6,7 @@ import 'package:markdown_quill/markdown_quill.dart';
 
 import '../../design/atoms/pulse_segmented.dart';
 import '../../design/tokens.dart';
+import 'mention_overlay.dart';
 
 enum MarkdownComposerMode { markdown, rich }
 
@@ -44,9 +45,16 @@ class _MarkdownComposerState extends State<MarkdownComposer> {
   late final QuillController _richController;
   late final FocusNode _richFocusNode;
   late final ScrollController _richScrollController;
+  // Owned FocusNode used for the markdown TextField when the caller did
+  // not provide one. The mention typeahead overlay attaches to whichever
+  // node ends up driving the TextField, so we always need one available.
+  FocusNode? _ownedMarkdownFocusNode;
   late String _richMarkdown;
   bool _syncingFromRich = false;
   bool _syncingRichFromMarkdown = false;
+
+  FocusNode get _markdownFocusNode =>
+      widget.focusNode ?? (_ownedMarkdownFocusNode ??= FocusNode());
 
   @override
   void initState() {
@@ -76,6 +84,7 @@ class _MarkdownComposerState extends State<MarkdownComposer> {
     _richController.dispose();
     _richFocusNode.dispose();
     _richScrollController.dispose();
+    _ownedMarkdownFocusNode?.dispose();
     super.dispose();
   }
 
@@ -150,23 +159,28 @@ class _MarkdownComposerState extends State<MarkdownComposer> {
   }
 
   Widget _buildTextField(PulseTokens t) {
-    return TextField(
+    final focusNode = _markdownFocusNode;
+    return MentionOverlay(
       controller: widget.controller,
-      focusNode: widget.focusNode,
-      autofocus: widget.autofocus,
-      style: widget.textStyle ?? TextStyle(fontSize: 12, color: t.ink),
-      expands: true,
-      minLines: null,
-      maxLines: null,
-      keyboardType: TextInputType.multiline,
-      textInputAction: TextInputAction.newline,
-      textAlignVertical: TextAlignVertical.top,
-      decoration: InputDecoration(
-        hintText: widget.hintText,
-        hintStyle: TextStyle(color: t.ink3, fontSize: 12),
-        isCollapsed: true,
-        border: InputBorder.none,
-        contentPadding: widget.contentPadding,
+      focusNode: focusNode,
+      child: TextField(
+        controller: widget.controller,
+        focusNode: focusNode,
+        autofocus: widget.autofocus,
+        style: widget.textStyle ?? TextStyle(fontSize: 12, color: t.ink),
+        expands: true,
+        minLines: null,
+        maxLines: null,
+        keyboardType: TextInputType.multiline,
+        textInputAction: TextInputAction.newline,
+        textAlignVertical: TextAlignVertical.top,
+        decoration: InputDecoration(
+          hintText: widget.hintText,
+          hintStyle: TextStyle(color: t.ink3, fontSize: 12),
+          isCollapsed: true,
+          border: InputBorder.none,
+          contentPadding: widget.contentPadding,
+        ),
       ),
     );
   }

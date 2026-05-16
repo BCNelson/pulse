@@ -6,6 +6,24 @@ fragment MessageSummary on Message {
   author {
     id
     displayName
+    homeTag {
+      slug
+      path
+    }
+  }
+  mentions {
+    id
+    displayName
+    homeTag {
+      slug
+      path
+    }
+  }
+  referencedTags {
+    id
+    slug
+    displayName
+    path
   }
   replyTo {
     id

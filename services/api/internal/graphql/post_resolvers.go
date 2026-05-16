@@ -88,6 +88,22 @@ func (r *Resolver) loadPost(ctx context.Context, id int64) (*model.Post, error) 
 		}
 	}
 
+	// Tag refs (link-only references parsed from body).
+	tagRefIDs, err := r.Posts.TagRefs(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	referencedTags := make([]*model.Tag, 0, len(tagRefIDs))
+	for _, tid := range tagRefIDs {
+		t, err := r.loadTagShallow(ctx, tid)
+		if err != nil {
+			return nil, err
+		}
+		if t != nil {
+			referencedTags = append(referencedTags, t)
+		}
+	}
+
 	// Reactions (aggregated). Goes through the loader so a feed view
 	// that already primed the cache hits in O(1); single-post lookups
 	// fall through to a one-row query.
@@ -142,21 +158,22 @@ func (r *Resolver) loadPost(ctx context.Context, id int64) (*model.Post, error) 
 	}
 
 	out := &model.Post{
-		ID:            ids.FormatID(p.ID),
-		GlobalURI:     ids.URI(ids.KindPost, p.ID),
-		Title:         p.Title,
-		Body:          p.Body,
-		Author:        author,
-		Tags:          postTags,
-		Mentions:      mentions,
-		Comments:      comments,
-		Reactions:     reactions,
-		DenyFlag:      p.DenyFlag,
-		MyPermissions: myPerms,
-		CreatedAt:     p.CreatedAt,
-		EditedAt:      p.EditedAt,
-		DeletedAt:     p.DeletedAt,
-		LastReadAt:    lastRead,
+		ID:             ids.FormatID(p.ID),
+		GlobalURI:      ids.URI(ids.KindPost, p.ID),
+		Title:          p.Title,
+		Body:           p.Body,
+		Author:         author,
+		Tags:           postTags,
+		Mentions:       mentions,
+		ReferencedTags: referencedTags,
+		Comments:       comments,
+		Reactions:      reactions,
+		DenyFlag:       p.DenyFlag,
+		MyPermissions:  myPerms,
+		CreatedAt:      p.CreatedAt,
+		EditedAt:       p.EditedAt,
+		DeletedAt:      p.DeletedAt,
+		LastReadAt:     lastRead,
 	}
 	if p.DecisionStatus != nil {
 		ds := mapDecisionDBToGQL(*p.DecisionStatus)
@@ -220,6 +237,26 @@ func (r *Resolver) commentToModel(ctx context.Context, c *comment.Comment) (*mod
 			mentions = append(mentions, mp)
 		}
 	}
+	tagRefRows, err := r.DB.Query(ctx,
+		`SELECT tag_id FROM comment_tag_refs WHERE comment_id = $1`, c.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer tagRefRows.Close()
+	var referencedTags []*model.Tag
+	for tagRefRows.Next() {
+		var tid int64
+		if err := tagRefRows.Scan(&tid); err != nil {
+			return nil, err
+		}
+		t, err := r.loadTagShallow(ctx, tid)
+		if err != nil {
+			return nil, err
+		}
+		if t != nil {
+			referencedTags = append(referencedTags, t)
+		}
+	}
 	tally, err := r.commentReactionTally(ctx, c.ID, identity.EffectiveID)
 	if err != nil {
 		return nil, err
@@ -229,17 +266,18 @@ func (r *Resolver) commentToModel(ctx context.Context, c *comment.Comment) (*mod
 		parentID = ids.FormatID(*c.ParentID)
 	}
 	return &model.Comment{
-		ID:        ids.FormatID(c.ID),
-		PostID:    ids.FormatID(c.PostID),
-		ParentID:  optString(parentID),
-		Depth:     comment.Depth(c.Path),
-		Author:    author,
-		Body:      c.Body,
-		Mentions:  mentions,
-		Reactions: tally,
-		CreatedAt: c.CreatedAt,
-		EditedAt:  c.EditedAt,
-		DeletedAt: c.DeletedAt,
+		ID:             ids.FormatID(c.ID),
+		PostID:         ids.FormatID(c.PostID),
+		ParentID:       optString(parentID),
+		Depth:          comment.Depth(c.Path),
+		Author:         author,
+		Body:           c.Body,
+		Mentions:       mentions,
+		ReferencedTags: referencedTags,
+		Reactions:      tally,
+		CreatedAt:      c.CreatedAt,
+		EditedAt:       c.EditedAt,
+		DeletedAt:      c.DeletedAt,
 	}, nil
 }
 

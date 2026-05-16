@@ -359,3 +359,98 @@ abstract class GSearchTagsData_searchTags_tag
         json,
       );
 }
+
+abstract class GSearchUsersData
+    implements Built<GSearchUsersData, GSearchUsersDataBuilder> {
+  GSearchUsersData._();
+
+  factory GSearchUsersData([void Function(GSearchUsersDataBuilder b) updates]) =
+      _$GSearchUsersData;
+
+  static void _initializeBuilder(GSearchUsersDataBuilder b) =>
+      b..G__typename = 'Query';
+
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  BuiltList<GSearchUsersData_searchUsers> get searchUsers;
+  static Serializer<GSearchUsersData> get serializer =>
+      _$gSearchUsersDataSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GSearchUsersData.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSearchUsersData? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GSearchUsersData.serializer,
+        json,
+      );
+}
+
+abstract class GSearchUsersData_searchUsers
+    implements
+        Built<GSearchUsersData_searchUsers,
+            GSearchUsersData_searchUsersBuilder> {
+  GSearchUsersData_searchUsers._();
+
+  factory GSearchUsersData_searchUsers(
+          [void Function(GSearchUsersData_searchUsersBuilder b) updates]) =
+      _$GSearchUsersData_searchUsers;
+
+  static void _initializeBuilder(GSearchUsersData_searchUsersBuilder b) =>
+      b..G__typename = 'User';
+
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  String get id;
+  String get displayName;
+  GSearchUsersData_searchUsers_homeTag? get homeTag;
+  static Serializer<GSearchUsersData_searchUsers> get serializer =>
+      _$gSearchUsersDataSearchUsersSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GSearchUsersData_searchUsers.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSearchUsersData_searchUsers? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GSearchUsersData_searchUsers.serializer,
+        json,
+      );
+}
+
+abstract class GSearchUsersData_searchUsers_homeTag
+    implements
+        Built<GSearchUsersData_searchUsers_homeTag,
+            GSearchUsersData_searchUsers_homeTagBuilder> {
+  GSearchUsersData_searchUsers_homeTag._();
+
+  factory GSearchUsersData_searchUsers_homeTag(
+      [void Function(GSearchUsersData_searchUsers_homeTagBuilder b)
+          updates]) = _$GSearchUsersData_searchUsers_homeTag;
+
+  static void _initializeBuilder(
+          GSearchUsersData_searchUsers_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  String get slug;
+  String get path;
+  static Serializer<GSearchUsersData_searchUsers_homeTag> get serializer =>
+      _$gSearchUsersDataSearchUsersHomeTagSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GSearchUsersData_searchUsers_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSearchUsersData_searchUsers_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GSearchUsersData_searchUsers_homeTag.serializer,
+        json,
+      );
+}

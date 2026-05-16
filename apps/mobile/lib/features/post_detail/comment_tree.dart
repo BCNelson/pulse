@@ -14,6 +14,7 @@ class CommentSummary {
     required this.isOptimistic,
     required this.body,
     required this.authorDisplayName,
+    this.authorSlug,
     required this.createdAtIso,
   });
 
@@ -23,6 +24,10 @@ class CommentSummary {
   final bool isOptimistic;
   final String body;
   final String authorDisplayName;
+
+  /// User-tag slug of the comment author, when available. Drives the
+  /// hover-card affordance on the author byline.
+  final String? authorSlug;
   final String createdAtIso;
 }
 

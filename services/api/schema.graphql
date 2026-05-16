@@ -122,6 +122,13 @@ type User implements Principal {
   displayName: String!
   homeTag: Tag
   email: String
+  """
+  Latest posts authored by this user that the viewer can see. Used by
+  the mention-preview panel to show a quick profile snapshot. Visibility
+  is checked per post; soft-deleted posts are skipped. Default first=5,
+  cap 25.
+  """
+  recentPosts(first: Int): [Post!]!
 }
 
 type Bot implements Principal {
@@ -199,6 +206,12 @@ type Post {
   author: Principal!
   tags: [PostTag!]!
   mentions: [Principal!]!
+  """
+  Tags referenced inline from this post's body via the canonical
+  [#path](pulse-tag:path) link form. Link-only — distinct from `tags`,
+  which carries ACL semantics.
+  """
+  referencedTags: [Tag!]!
   comments(first: Int, after: String): CommentConnection!
   reactions: [ReactionSummary!]!
   attachments: [Attachment!]!
@@ -231,6 +244,11 @@ type Comment {
   author: Principal!
   body: String!
   mentions: [Principal!]!
+  """
+  Tags referenced inline from this comment's body via the canonical
+  [#path](pulse-tag:path) link form. Link-only; no ACL impact.
+  """
+  referencedTags: [Tag!]!
   reactions: [ReactionSummary!]!
   attachments: [Attachment!]!
   createdAt: Time!
@@ -383,6 +401,19 @@ type Query {
 
   search(query: String!, kinds: [SearchKind!], first: Int): SearchConnection!
   searchTags(query: String!, first: Int): [TagSearchHit!]!
+  """
+  Prefix-match active users for the composer's @-mention typeahead. The
+  primary signal is the user-tag root slug; display name is a secondary
+  fuzzy fallback. Returns at most `first` (default 10, cap 25) hits.
+  """
+  searchUsers(query: String!, first: Int): [User!]!
+  """
+  Resolve a user by their handle — the slug of their user-tag root.
+  Used by the mention-preview panel to fetch a profile from a `[@slug]`
+  link target without a fuzzy search. Returns null when no active user
+  owns that slug.
+  """
+  userByHandle(slug: String!): User
 }
 
 type ImpersonationState {
@@ -512,6 +543,16 @@ type Message {
   chatRoom: ChatRoom!
   author: Principal!
   body: String!
+  """
+  Principals mentioned in the body via canonical [@slug](pulse-user:slug) links.
+  Drives chat-mention notifications.
+  """
+  mentions: [Principal!]!
+  """
+  Tags referenced inline from this message's body via canonical
+  [#path](pulse-tag:path) links. Link-only; no ACL impact.
+  """
+  referencedTags: [Tag!]!
   replyTo: Message
   attachments: [Attachment!]!
   createdAt: Time!

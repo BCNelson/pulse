@@ -171,6 +171,11 @@ abstract class GPostsForTagData_tag_posts_edges_node
   @override
   GPostsForTagData_tag_posts_edges_node_author get author;
   @override
+  BuiltList<GPostsForTagData_tag_posts_edges_node_mentions> get mentions;
+  @override
+  BuiltList<GPostsForTagData_tag_posts_edges_node_referencedTags>
+      get referencedTags;
+  @override
   BuiltList<GPostsForTagData_tag_posts_edges_node_reactions> get reactions;
   @override
   GPostsForTagData_tag_posts_edges_node_comments get comments;
@@ -213,6 +218,8 @@ abstract class GPostsForTagData_tag_posts_edges_node_author
   String get id;
   @override
   String get displayName;
+  @override
+  GPostsForTagData_tag_posts_edges_node_author_homeTag? get homeTag;
   static Serializer<GPostsForTagData_tag_posts_edges_node_author>
       get serializer => _$gPostsForTagDataTagPostsEdgesNodeAuthorSerializer;
 
@@ -226,6 +233,174 @@ abstract class GPostsForTagData_tag_posts_edges_node_author
           Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GPostsForTagData_tag_posts_edges_node_author.serializer,
+        json,
+      );
+}
+
+abstract class GPostsForTagData_tag_posts_edges_node_author_homeTag
+    implements
+        Built<GPostsForTagData_tag_posts_edges_node_author_homeTag,
+            GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder>,
+        GPostSummary_author_homeTag {
+  GPostsForTagData_tag_posts_edges_node_author_homeTag._();
+
+  factory GPostsForTagData_tag_posts_edges_node_author_homeTag(
+      [void Function(
+              GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder b)
+          updates]) = _$GPostsForTagData_tag_posts_edges_node_author_homeTag;
+
+  static void _initializeBuilder(
+          GPostsForTagData_tag_posts_edges_node_author_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GPostsForTagData_tag_posts_edges_node_author_homeTag>
+      get serializer =>
+          _$gPostsForTagDataTagPostsEdgesNodeAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostsForTagData_tag_posts_edges_node_author_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostsForTagData_tag_posts_edges_node_author_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostsForTagData_tag_posts_edges_node_author_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GPostsForTagData_tag_posts_edges_node_mentions
+    implements
+        Built<GPostsForTagData_tag_posts_edges_node_mentions,
+            GPostsForTagData_tag_posts_edges_node_mentionsBuilder>,
+        GPostSummary_mentions {
+  GPostsForTagData_tag_posts_edges_node_mentions._();
+
+  factory GPostsForTagData_tag_posts_edges_node_mentions(
+      [void Function(GPostsForTagData_tag_posts_edges_node_mentionsBuilder b)
+          updates]) = _$GPostsForTagData_tag_posts_edges_node_mentions;
+
+  static void _initializeBuilder(
+          GPostsForTagData_tag_posts_edges_node_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GPostsForTagData_tag_posts_edges_node_mentions_homeTag? get homeTag;
+  static Serializer<GPostsForTagData_tag_posts_edges_node_mentions>
+      get serializer => _$gPostsForTagDataTagPostsEdgesNodeMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostsForTagData_tag_posts_edges_node_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostsForTagData_tag_posts_edges_node_mentions? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostsForTagData_tag_posts_edges_node_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GPostsForTagData_tag_posts_edges_node_mentions_homeTag
+    implements
+        Built<GPostsForTagData_tag_posts_edges_node_mentions_homeTag,
+            GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder>,
+        GPostSummary_mentions_homeTag {
+  GPostsForTagData_tag_posts_edges_node_mentions_homeTag._();
+
+  factory GPostsForTagData_tag_posts_edges_node_mentions_homeTag(
+      [void Function(
+              GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder b)
+          updates]) = _$GPostsForTagData_tag_posts_edges_node_mentions_homeTag;
+
+  static void _initializeBuilder(
+          GPostsForTagData_tag_posts_edges_node_mentions_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GPostsForTagData_tag_posts_edges_node_mentions_homeTag>
+      get serializer =>
+          _$gPostsForTagDataTagPostsEdgesNodeMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostsForTagData_tag_posts_edges_node_mentions_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostsForTagData_tag_posts_edges_node_mentions_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostsForTagData_tag_posts_edges_node_mentions_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GPostsForTagData_tag_posts_edges_node_referencedTags
+    implements
+        Built<GPostsForTagData_tag_posts_edges_node_referencedTags,
+            GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder>,
+        GPostSummary_referencedTags {
+  GPostsForTagData_tag_posts_edges_node_referencedTags._();
+
+  factory GPostsForTagData_tag_posts_edges_node_referencedTags(
+      [void Function(
+              GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder b)
+          updates]) = _$GPostsForTagData_tag_posts_edges_node_referencedTags;
+
+  static void _initializeBuilder(
+          GPostsForTagData_tag_posts_edges_node_referencedTagsBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<GPostsForTagData_tag_posts_edges_node_referencedTags>
+      get serializer =>
+          _$gPostsForTagDataTagPostsEdgesNodeReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostsForTagData_tag_posts_edges_node_referencedTags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostsForTagData_tag_posts_edges_node_referencedTags? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostsForTagData_tag_posts_edges_node_referencedTags.serializer,
         json,
       );
 }
@@ -450,6 +625,10 @@ abstract class GPostDetailData_post
   @override
   GPostDetailData_post_author get author;
   @override
+  BuiltList<GPostDetailData_post_mentions> get mentions;
+  @override
+  BuiltList<GPostDetailData_post_referencedTags> get referencedTags;
+  @override
   BuiltList<GPostDetailData_post_reactions> get reactions;
   GPostDetailData_post_comments get comments;
   BuiltList<GPostDetailData_post_tags> get tags;
@@ -490,6 +669,8 @@ abstract class GPostDetailData_post_author
   String get id;
   @override
   String get displayName;
+  @override
+  GPostDetailData_post_author_homeTag? get homeTag;
   static Serializer<GPostDetailData_post_author> get serializer =>
       _$gPostDetailDataPostAuthorSerializer;
 
@@ -502,6 +683,166 @@ abstract class GPostDetailData_post_author
   static GPostDetailData_post_author? fromJson(Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GPostDetailData_post_author.serializer,
+        json,
+      );
+}
+
+abstract class GPostDetailData_post_author_homeTag
+    implements
+        Built<GPostDetailData_post_author_homeTag,
+            GPostDetailData_post_author_homeTagBuilder>,
+        GPostSummary_author_homeTag {
+  GPostDetailData_post_author_homeTag._();
+
+  factory GPostDetailData_post_author_homeTag(
+      [void Function(GPostDetailData_post_author_homeTagBuilder b)
+          updates]) = _$GPostDetailData_post_author_homeTag;
+
+  static void _initializeBuilder(
+          GPostDetailData_post_author_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GPostDetailData_post_author_homeTag> get serializer =>
+      _$gPostDetailDataPostAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostDetailData_post_author_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostDetailData_post_author_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostDetailData_post_author_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GPostDetailData_post_mentions
+    implements
+        Built<GPostDetailData_post_mentions,
+            GPostDetailData_post_mentionsBuilder>,
+        GPostSummary_mentions {
+  GPostDetailData_post_mentions._();
+
+  factory GPostDetailData_post_mentions(
+          [void Function(GPostDetailData_post_mentionsBuilder b) updates]) =
+      _$GPostDetailData_post_mentions;
+
+  static void _initializeBuilder(GPostDetailData_post_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GPostDetailData_post_mentions_homeTag? get homeTag;
+  static Serializer<GPostDetailData_post_mentions> get serializer =>
+      _$gPostDetailDataPostMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostDetailData_post_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostDetailData_post_mentions? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostDetailData_post_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GPostDetailData_post_mentions_homeTag
+    implements
+        Built<GPostDetailData_post_mentions_homeTag,
+            GPostDetailData_post_mentions_homeTagBuilder>,
+        GPostSummary_mentions_homeTag {
+  GPostDetailData_post_mentions_homeTag._();
+
+  factory GPostDetailData_post_mentions_homeTag(
+      [void Function(GPostDetailData_post_mentions_homeTagBuilder b)
+          updates]) = _$GPostDetailData_post_mentions_homeTag;
+
+  static void _initializeBuilder(
+          GPostDetailData_post_mentions_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GPostDetailData_post_mentions_homeTag> get serializer =>
+      _$gPostDetailDataPostMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostDetailData_post_mentions_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostDetailData_post_mentions_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostDetailData_post_mentions_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GPostDetailData_post_referencedTags
+    implements
+        Built<GPostDetailData_post_referencedTags,
+            GPostDetailData_post_referencedTagsBuilder>,
+        GPostSummary_referencedTags {
+  GPostDetailData_post_referencedTags._();
+
+  factory GPostDetailData_post_referencedTags(
+      [void Function(GPostDetailData_post_referencedTagsBuilder b)
+          updates]) = _$GPostDetailData_post_referencedTags;
+
+  static void _initializeBuilder(
+          GPostDetailData_post_referencedTagsBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<GPostDetailData_post_referencedTags> get serializer =>
+      _$gPostDetailDataPostReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostDetailData_post_referencedTags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostDetailData_post_referencedTags? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostDetailData_post_referencedTags.serializer,
         json,
       );
 }
@@ -651,6 +992,11 @@ abstract class GPostDetailData_post_comments_edges_node
   @override
   GPostDetailData_post_comments_edges_node_author get author;
   @override
+  BuiltList<GPostDetailData_post_comments_edges_node_mentions> get mentions;
+  @override
+  BuiltList<GPostDetailData_post_comments_edges_node_referencedTags>
+      get referencedTags;
+  @override
   BuiltList<GPostDetailData_post_comments_edges_node_reactions> get reactions;
   static Serializer<GPostDetailData_post_comments_edges_node> get serializer =>
       _$gPostDetailDataPostCommentsEdgesNodeSerializer;
@@ -691,6 +1037,8 @@ abstract class GPostDetailData_post_comments_edges_node_author
   String get id;
   @override
   String get displayName;
+  @override
+  GPostDetailData_post_comments_edges_node_author_homeTag? get homeTag;
   static Serializer<GPostDetailData_post_comments_edges_node_author>
       get serializer => _$gPostDetailDataPostCommentsEdgesNodeAuthorSerializer;
 
@@ -704,6 +1052,176 @@ abstract class GPostDetailData_post_comments_edges_node_author
           Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GPostDetailData_post_comments_edges_node_author.serializer,
+        json,
+      );
+}
+
+abstract class GPostDetailData_post_comments_edges_node_author_homeTag
+    implements
+        Built<GPostDetailData_post_comments_edges_node_author_homeTag,
+            GPostDetailData_post_comments_edges_node_author_homeTagBuilder>,
+        GCommentSummary_author_homeTag {
+  GPostDetailData_post_comments_edges_node_author_homeTag._();
+
+  factory GPostDetailData_post_comments_edges_node_author_homeTag(
+      [void Function(
+              GPostDetailData_post_comments_edges_node_author_homeTagBuilder b)
+          updates]) = _$GPostDetailData_post_comments_edges_node_author_homeTag;
+
+  static void _initializeBuilder(
+          GPostDetailData_post_comments_edges_node_author_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GPostDetailData_post_comments_edges_node_author_homeTag>
+      get serializer =>
+          _$gPostDetailDataPostCommentsEdgesNodeAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostDetailData_post_comments_edges_node_author_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostDetailData_post_comments_edges_node_author_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostDetailData_post_comments_edges_node_author_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GPostDetailData_post_comments_edges_node_mentions
+    implements
+        Built<GPostDetailData_post_comments_edges_node_mentions,
+            GPostDetailData_post_comments_edges_node_mentionsBuilder>,
+        GCommentSummary_mentions {
+  GPostDetailData_post_comments_edges_node_mentions._();
+
+  factory GPostDetailData_post_comments_edges_node_mentions(
+      [void Function(GPostDetailData_post_comments_edges_node_mentionsBuilder b)
+          updates]) = _$GPostDetailData_post_comments_edges_node_mentions;
+
+  static void _initializeBuilder(
+          GPostDetailData_post_comments_edges_node_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GPostDetailData_post_comments_edges_node_mentions_homeTag? get homeTag;
+  static Serializer<GPostDetailData_post_comments_edges_node_mentions>
+      get serializer =>
+          _$gPostDetailDataPostCommentsEdgesNodeMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostDetailData_post_comments_edges_node_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostDetailData_post_comments_edges_node_mentions? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostDetailData_post_comments_edges_node_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GPostDetailData_post_comments_edges_node_mentions_homeTag
+    implements
+        Built<GPostDetailData_post_comments_edges_node_mentions_homeTag,
+            GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder>,
+        GCommentSummary_mentions_homeTag {
+  GPostDetailData_post_comments_edges_node_mentions_homeTag._();
+
+  factory GPostDetailData_post_comments_edges_node_mentions_homeTag(
+      [void Function(
+              GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder
+                  b)
+          updates]) = _$GPostDetailData_post_comments_edges_node_mentions_homeTag;
+
+  static void _initializeBuilder(
+          GPostDetailData_post_comments_edges_node_mentions_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GPostDetailData_post_comments_edges_node_mentions_homeTag>
+      get serializer =>
+          _$gPostDetailDataPostCommentsEdgesNodeMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostDetailData_post_comments_edges_node_mentions_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostDetailData_post_comments_edges_node_mentions_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostDetailData_post_comments_edges_node_mentions_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GPostDetailData_post_comments_edges_node_referencedTags
+    implements
+        Built<GPostDetailData_post_comments_edges_node_referencedTags,
+            GPostDetailData_post_comments_edges_node_referencedTagsBuilder>,
+        GCommentSummary_referencedTags {
+  GPostDetailData_post_comments_edges_node_referencedTags._();
+
+  factory GPostDetailData_post_comments_edges_node_referencedTags(
+      [void Function(
+              GPostDetailData_post_comments_edges_node_referencedTagsBuilder b)
+          updates]) = _$GPostDetailData_post_comments_edges_node_referencedTags;
+
+  static void _initializeBuilder(
+          GPostDetailData_post_comments_edges_node_referencedTagsBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<GPostDetailData_post_comments_edges_node_referencedTags>
+      get serializer =>
+          _$gPostDetailDataPostCommentsEdgesNodeReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostDetailData_post_comments_edges_node_referencedTags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostDetailData_post_comments_edges_node_referencedTags? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostDetailData_post_comments_edges_node_referencedTags.serializer,
         json,
       );
 }
@@ -911,6 +1429,10 @@ abstract class GCreatePostData_createPost
   @override
   GCreatePostData_createPost_author get author;
   @override
+  BuiltList<GCreatePostData_createPost_mentions> get mentions;
+  @override
+  BuiltList<GCreatePostData_createPost_referencedTags> get referencedTags;
+  @override
   BuiltList<GCreatePostData_createPost_reactions> get reactions;
   @override
   GCreatePostData_createPost_comments get comments;
@@ -951,6 +1473,8 @@ abstract class GCreatePostData_createPost_author
   String get id;
   @override
   String get displayName;
+  @override
+  GCreatePostData_createPost_author_homeTag? get homeTag;
   static Serializer<GCreatePostData_createPost_author> get serializer =>
       _$gCreatePostDataCreatePostAuthorSerializer;
 
@@ -964,6 +1488,168 @@ abstract class GCreatePostData_createPost_author
           Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GCreatePostData_createPost_author.serializer,
+        json,
+      );
+}
+
+abstract class GCreatePostData_createPost_author_homeTag
+    implements
+        Built<GCreatePostData_createPost_author_homeTag,
+            GCreatePostData_createPost_author_homeTagBuilder>,
+        GPostSummary_author_homeTag {
+  GCreatePostData_createPost_author_homeTag._();
+
+  factory GCreatePostData_createPost_author_homeTag(
+      [void Function(GCreatePostData_createPost_author_homeTagBuilder b)
+          updates]) = _$GCreatePostData_createPost_author_homeTag;
+
+  static void _initializeBuilder(
+          GCreatePostData_createPost_author_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GCreatePostData_createPost_author_homeTag> get serializer =>
+      _$gCreatePostDataCreatePostAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCreatePostData_createPost_author_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreatePostData_createPost_author_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCreatePostData_createPost_author_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GCreatePostData_createPost_mentions
+    implements
+        Built<GCreatePostData_createPost_mentions,
+            GCreatePostData_createPost_mentionsBuilder>,
+        GPostSummary_mentions {
+  GCreatePostData_createPost_mentions._();
+
+  factory GCreatePostData_createPost_mentions(
+      [void Function(GCreatePostData_createPost_mentionsBuilder b)
+          updates]) = _$GCreatePostData_createPost_mentions;
+
+  static void _initializeBuilder(
+          GCreatePostData_createPost_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GCreatePostData_createPost_mentions_homeTag? get homeTag;
+  static Serializer<GCreatePostData_createPost_mentions> get serializer =>
+      _$gCreatePostDataCreatePostMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCreatePostData_createPost_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreatePostData_createPost_mentions? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCreatePostData_createPost_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GCreatePostData_createPost_mentions_homeTag
+    implements
+        Built<GCreatePostData_createPost_mentions_homeTag,
+            GCreatePostData_createPost_mentions_homeTagBuilder>,
+        GPostSummary_mentions_homeTag {
+  GCreatePostData_createPost_mentions_homeTag._();
+
+  factory GCreatePostData_createPost_mentions_homeTag(
+      [void Function(GCreatePostData_createPost_mentions_homeTagBuilder b)
+          updates]) = _$GCreatePostData_createPost_mentions_homeTag;
+
+  static void _initializeBuilder(
+          GCreatePostData_createPost_mentions_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GCreatePostData_createPost_mentions_homeTag>
+      get serializer => _$gCreatePostDataCreatePostMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCreatePostData_createPost_mentions_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreatePostData_createPost_mentions_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCreatePostData_createPost_mentions_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GCreatePostData_createPost_referencedTags
+    implements
+        Built<GCreatePostData_createPost_referencedTags,
+            GCreatePostData_createPost_referencedTagsBuilder>,
+        GPostSummary_referencedTags {
+  GCreatePostData_createPost_referencedTags._();
+
+  factory GCreatePostData_createPost_referencedTags(
+      [void Function(GCreatePostData_createPost_referencedTagsBuilder b)
+          updates]) = _$GCreatePostData_createPost_referencedTags;
+
+  static void _initializeBuilder(
+          GCreatePostData_createPost_referencedTagsBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<GCreatePostData_createPost_referencedTags> get serializer =>
+      _$gCreatePostDataCreatePostReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCreatePostData_createPost_referencedTags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreatePostData_createPost_referencedTags? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCreatePostData_createPost_referencedTags.serializer,
         json,
       );
 }
@@ -1183,6 +1869,10 @@ abstract class GCreateCommentData_createComment
   @override
   GCreateCommentData_createComment_author get author;
   @override
+  BuiltList<GCreateCommentData_createComment_mentions> get mentions;
+  @override
+  BuiltList<GCreateCommentData_createComment_referencedTags> get referencedTags;
+  @override
   BuiltList<GCreateCommentData_createComment_reactions> get reactions;
   static Serializer<GCreateCommentData_createComment> get serializer =>
       _$gCreateCommentDataCreateCommentSerializer;
@@ -1223,6 +1913,8 @@ abstract class GCreateCommentData_createComment_author
   String get id;
   @override
   String get displayName;
+  @override
+  GCreateCommentData_createComment_author_homeTag? get homeTag;
   static Serializer<GCreateCommentData_createComment_author> get serializer =>
       _$gCreateCommentDataCreateCommentAuthorSerializer;
 
@@ -1236,6 +1928,171 @@ abstract class GCreateCommentData_createComment_author
           Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GCreateCommentData_createComment_author.serializer,
+        json,
+      );
+}
+
+abstract class GCreateCommentData_createComment_author_homeTag
+    implements
+        Built<GCreateCommentData_createComment_author_homeTag,
+            GCreateCommentData_createComment_author_homeTagBuilder>,
+        GCommentSummary_author_homeTag {
+  GCreateCommentData_createComment_author_homeTag._();
+
+  factory GCreateCommentData_createComment_author_homeTag(
+      [void Function(GCreateCommentData_createComment_author_homeTagBuilder b)
+          updates]) = _$GCreateCommentData_createComment_author_homeTag;
+
+  static void _initializeBuilder(
+          GCreateCommentData_createComment_author_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GCreateCommentData_createComment_author_homeTag>
+      get serializer =>
+          _$gCreateCommentDataCreateCommentAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCreateCommentData_createComment_author_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreateCommentData_createComment_author_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCreateCommentData_createComment_author_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GCreateCommentData_createComment_mentions
+    implements
+        Built<GCreateCommentData_createComment_mentions,
+            GCreateCommentData_createComment_mentionsBuilder>,
+        GCommentSummary_mentions {
+  GCreateCommentData_createComment_mentions._();
+
+  factory GCreateCommentData_createComment_mentions(
+      [void Function(GCreateCommentData_createComment_mentionsBuilder b)
+          updates]) = _$GCreateCommentData_createComment_mentions;
+
+  static void _initializeBuilder(
+          GCreateCommentData_createComment_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GCreateCommentData_createComment_mentions_homeTag? get homeTag;
+  static Serializer<GCreateCommentData_createComment_mentions> get serializer =>
+      _$gCreateCommentDataCreateCommentMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCreateCommentData_createComment_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreateCommentData_createComment_mentions? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCreateCommentData_createComment_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GCreateCommentData_createComment_mentions_homeTag
+    implements
+        Built<GCreateCommentData_createComment_mentions_homeTag,
+            GCreateCommentData_createComment_mentions_homeTagBuilder>,
+        GCommentSummary_mentions_homeTag {
+  GCreateCommentData_createComment_mentions_homeTag._();
+
+  factory GCreateCommentData_createComment_mentions_homeTag(
+      [void Function(GCreateCommentData_createComment_mentions_homeTagBuilder b)
+          updates]) = _$GCreateCommentData_createComment_mentions_homeTag;
+
+  static void _initializeBuilder(
+          GCreateCommentData_createComment_mentions_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GCreateCommentData_createComment_mentions_homeTag>
+      get serializer =>
+          _$gCreateCommentDataCreateCommentMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCreateCommentData_createComment_mentions_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreateCommentData_createComment_mentions_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCreateCommentData_createComment_mentions_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GCreateCommentData_createComment_referencedTags
+    implements
+        Built<GCreateCommentData_createComment_referencedTags,
+            GCreateCommentData_createComment_referencedTagsBuilder>,
+        GCommentSummary_referencedTags {
+  GCreateCommentData_createComment_referencedTags._();
+
+  factory GCreateCommentData_createComment_referencedTags(
+      [void Function(GCreateCommentData_createComment_referencedTagsBuilder b)
+          updates]) = _$GCreateCommentData_createComment_referencedTags;
+
+  static void _initializeBuilder(
+          GCreateCommentData_createComment_referencedTagsBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<GCreateCommentData_createComment_referencedTags>
+      get serializer =>
+          _$gCreateCommentDataCreateCommentReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCreateCommentData_createComment_referencedTags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCreateCommentData_createComment_referencedTags? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCreateCommentData_createComment_referencedTags.serializer,
         json,
       );
 }
@@ -1598,6 +2455,10 @@ abstract class GPostChangedData_postChanged
   @override
   GPostChangedData_postChanged_author get author;
   @override
+  BuiltList<GPostChangedData_postChanged_mentions> get mentions;
+  @override
+  BuiltList<GPostChangedData_postChanged_referencedTags> get referencedTags;
+  @override
   BuiltList<GPostChangedData_postChanged_reactions> get reactions;
   @override
   GPostChangedData_postChanged_comments get comments;
@@ -1639,6 +2500,8 @@ abstract class GPostChangedData_postChanged_author
   String get id;
   @override
   String get displayName;
+  @override
+  GPostChangedData_postChanged_author_homeTag? get homeTag;
   static Serializer<GPostChangedData_postChanged_author> get serializer =>
       _$gPostChangedDataPostChangedAuthorSerializer;
 
@@ -1652,6 +2515,168 @@ abstract class GPostChangedData_postChanged_author
           Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GPostChangedData_postChanged_author.serializer,
+        json,
+      );
+}
+
+abstract class GPostChangedData_postChanged_author_homeTag
+    implements
+        Built<GPostChangedData_postChanged_author_homeTag,
+            GPostChangedData_postChanged_author_homeTagBuilder>,
+        GPostSummary_author_homeTag {
+  GPostChangedData_postChanged_author_homeTag._();
+
+  factory GPostChangedData_postChanged_author_homeTag(
+      [void Function(GPostChangedData_postChanged_author_homeTagBuilder b)
+          updates]) = _$GPostChangedData_postChanged_author_homeTag;
+
+  static void _initializeBuilder(
+          GPostChangedData_postChanged_author_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GPostChangedData_postChanged_author_homeTag>
+      get serializer => _$gPostChangedDataPostChangedAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostChangedData_postChanged_author_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostChangedData_postChanged_author_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostChangedData_postChanged_author_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GPostChangedData_postChanged_mentions
+    implements
+        Built<GPostChangedData_postChanged_mentions,
+            GPostChangedData_postChanged_mentionsBuilder>,
+        GPostSummary_mentions {
+  GPostChangedData_postChanged_mentions._();
+
+  factory GPostChangedData_postChanged_mentions(
+      [void Function(GPostChangedData_postChanged_mentionsBuilder b)
+          updates]) = _$GPostChangedData_postChanged_mentions;
+
+  static void _initializeBuilder(
+          GPostChangedData_postChanged_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GPostChangedData_postChanged_mentions_homeTag? get homeTag;
+  static Serializer<GPostChangedData_postChanged_mentions> get serializer =>
+      _$gPostChangedDataPostChangedMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostChangedData_postChanged_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostChangedData_postChanged_mentions? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostChangedData_postChanged_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GPostChangedData_postChanged_mentions_homeTag
+    implements
+        Built<GPostChangedData_postChanged_mentions_homeTag,
+            GPostChangedData_postChanged_mentions_homeTagBuilder>,
+        GPostSummary_mentions_homeTag {
+  GPostChangedData_postChanged_mentions_homeTag._();
+
+  factory GPostChangedData_postChanged_mentions_homeTag(
+      [void Function(GPostChangedData_postChanged_mentions_homeTagBuilder b)
+          updates]) = _$GPostChangedData_postChanged_mentions_homeTag;
+
+  static void _initializeBuilder(
+          GPostChangedData_postChanged_mentions_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GPostChangedData_postChanged_mentions_homeTag>
+      get serializer => _$gPostChangedDataPostChangedMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostChangedData_postChanged_mentions_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostChangedData_postChanged_mentions_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostChangedData_postChanged_mentions_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GPostChangedData_postChanged_referencedTags
+    implements
+        Built<GPostChangedData_postChanged_referencedTags,
+            GPostChangedData_postChanged_referencedTagsBuilder>,
+        GPostSummary_referencedTags {
+  GPostChangedData_postChanged_referencedTags._();
+
+  factory GPostChangedData_postChanged_referencedTags(
+      [void Function(GPostChangedData_postChanged_referencedTagsBuilder b)
+          updates]) = _$GPostChangedData_postChanged_referencedTags;
+
+  static void _initializeBuilder(
+          GPostChangedData_postChanged_referencedTagsBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<GPostChangedData_postChanged_referencedTags>
+      get serializer => _$gPostChangedDataPostChangedReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostChangedData_postChanged_referencedTags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostChangedData_postChanged_referencedTags? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostChangedData_postChanged_referencedTags.serializer,
         json,
       );
 }
@@ -1820,6 +2845,8 @@ abstract class GPostSummary {
   bool get denyFlag;
   _i2.GTime? get lastReadAt;
   GPostSummary_author get author;
+  BuiltList<GPostSummary_mentions> get mentions;
+  BuiltList<GPostSummary_referencedTags> get referencedTags;
   BuiltList<GPostSummary_reactions> get reactions;
   GPostSummary_comments get comments;
   Map<String, dynamic> toJson();
@@ -1829,6 +2856,38 @@ abstract class GPostSummary_author {
   String get G__typename;
   String get id;
   String get displayName;
+  GPostSummary_author_homeTag? get homeTag;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GPostSummary_author_homeTag {
+  String get G__typename;
+  String get slug;
+  String get path;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GPostSummary_mentions {
+  String get G__typename;
+  String get id;
+  String get displayName;
+  GPostSummary_mentions_homeTag? get homeTag;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GPostSummary_mentions_homeTag {
+  String get G__typename;
+  String get slug;
+  String get path;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GPostSummary_referencedTags {
+  String get G__typename;
+  String get id;
+  String get slug;
+  String get displayName;
+  String get path;
   Map<String, dynamic> toJson();
 }
 
@@ -1890,6 +2949,10 @@ abstract class GPostSummaryData
   @override
   GPostSummaryData_author get author;
   @override
+  BuiltList<GPostSummaryData_mentions> get mentions;
+  @override
+  BuiltList<GPostSummaryData_referencedTags> get referencedTags;
+  @override
   BuiltList<GPostSummaryData_reactions> get reactions;
   @override
   GPostSummaryData_comments get comments;
@@ -1929,6 +2992,8 @@ abstract class GPostSummaryData_author
   String get id;
   @override
   String get displayName;
+  @override
+  GPostSummaryData_author_homeTag? get homeTag;
   static Serializer<GPostSummaryData_author> get serializer =>
       _$gPostSummaryDataAuthorSerializer;
 
@@ -1941,6 +3006,160 @@ abstract class GPostSummaryData_author
   static GPostSummaryData_author? fromJson(Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GPostSummaryData_author.serializer,
+        json,
+      );
+}
+
+abstract class GPostSummaryData_author_homeTag
+    implements
+        Built<GPostSummaryData_author_homeTag,
+            GPostSummaryData_author_homeTagBuilder>,
+        GPostSummary_author_homeTag {
+  GPostSummaryData_author_homeTag._();
+
+  factory GPostSummaryData_author_homeTag(
+          [void Function(GPostSummaryData_author_homeTagBuilder b) updates]) =
+      _$GPostSummaryData_author_homeTag;
+
+  static void _initializeBuilder(GPostSummaryData_author_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GPostSummaryData_author_homeTag> get serializer =>
+      _$gPostSummaryDataAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostSummaryData_author_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostSummaryData_author_homeTag? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostSummaryData_author_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GPostSummaryData_mentions
+    implements
+        Built<GPostSummaryData_mentions, GPostSummaryData_mentionsBuilder>,
+        GPostSummary_mentions {
+  GPostSummaryData_mentions._();
+
+  factory GPostSummaryData_mentions(
+          [void Function(GPostSummaryData_mentionsBuilder b) updates]) =
+      _$GPostSummaryData_mentions;
+
+  static void _initializeBuilder(GPostSummaryData_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GPostSummaryData_mentions_homeTag? get homeTag;
+  static Serializer<GPostSummaryData_mentions> get serializer =>
+      _$gPostSummaryDataMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostSummaryData_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostSummaryData_mentions? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostSummaryData_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GPostSummaryData_mentions_homeTag
+    implements
+        Built<GPostSummaryData_mentions_homeTag,
+            GPostSummaryData_mentions_homeTagBuilder>,
+        GPostSummary_mentions_homeTag {
+  GPostSummaryData_mentions_homeTag._();
+
+  factory GPostSummaryData_mentions_homeTag(
+          [void Function(GPostSummaryData_mentions_homeTagBuilder b) updates]) =
+      _$GPostSummaryData_mentions_homeTag;
+
+  static void _initializeBuilder(GPostSummaryData_mentions_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GPostSummaryData_mentions_homeTag> get serializer =>
+      _$gPostSummaryDataMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostSummaryData_mentions_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostSummaryData_mentions_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostSummaryData_mentions_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GPostSummaryData_referencedTags
+    implements
+        Built<GPostSummaryData_referencedTags,
+            GPostSummaryData_referencedTagsBuilder>,
+        GPostSummary_referencedTags {
+  GPostSummaryData_referencedTags._();
+
+  factory GPostSummaryData_referencedTags(
+          [void Function(GPostSummaryData_referencedTagsBuilder b) updates]) =
+      _$GPostSummaryData_referencedTags;
+
+  static void _initializeBuilder(GPostSummaryData_referencedTagsBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<GPostSummaryData_referencedTags> get serializer =>
+      _$gPostSummaryDataReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostSummaryData_referencedTags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostSummaryData_referencedTags? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostSummaryData_referencedTags.serializer,
         json,
       );
 }
@@ -2099,6 +3318,8 @@ abstract class GCommentSummary {
   _i2.GTime get createdAt;
   _i2.GTime? get editedAt;
   GCommentSummary_author get author;
+  BuiltList<GCommentSummary_mentions> get mentions;
+  BuiltList<GCommentSummary_referencedTags> get referencedTags;
   BuiltList<GCommentSummary_reactions> get reactions;
   Map<String, dynamic> toJson();
 }
@@ -2107,6 +3328,38 @@ abstract class GCommentSummary_author {
   String get G__typename;
   String get id;
   String get displayName;
+  GCommentSummary_author_homeTag? get homeTag;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GCommentSummary_author_homeTag {
+  String get G__typename;
+  String get slug;
+  String get path;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GCommentSummary_mentions {
+  String get G__typename;
+  String get id;
+  String get displayName;
+  GCommentSummary_mentions_homeTag? get homeTag;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GCommentSummary_mentions_homeTag {
+  String get G__typename;
+  String get slug;
+  String get path;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GCommentSummary_referencedTags {
+  String get G__typename;
+  String get id;
+  String get slug;
+  String get displayName;
+  String get path;
   Map<String, dynamic> toJson();
 }
 
@@ -2151,6 +3404,10 @@ abstract class GCommentSummaryData
   @override
   GCommentSummaryData_author get author;
   @override
+  BuiltList<GCommentSummaryData_mentions> get mentions;
+  @override
+  BuiltList<GCommentSummaryData_referencedTags> get referencedTags;
+  @override
   BuiltList<GCommentSummaryData_reactions> get reactions;
   static Serializer<GCommentSummaryData> get serializer =>
       _$gCommentSummaryDataSerializer;
@@ -2188,6 +3445,8 @@ abstract class GCommentSummaryData_author
   String get id;
   @override
   String get displayName;
+  @override
+  GCommentSummaryData_author_homeTag? get homeTag;
   static Serializer<GCommentSummaryData_author> get serializer =>
       _$gCommentSummaryDataAuthorSerializer;
 
@@ -2200,6 +3459,164 @@ abstract class GCommentSummaryData_author
   static GCommentSummaryData_author? fromJson(Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GCommentSummaryData_author.serializer,
+        json,
+      );
+}
+
+abstract class GCommentSummaryData_author_homeTag
+    implements
+        Built<GCommentSummaryData_author_homeTag,
+            GCommentSummaryData_author_homeTagBuilder>,
+        GCommentSummary_author_homeTag {
+  GCommentSummaryData_author_homeTag._();
+
+  factory GCommentSummaryData_author_homeTag(
+      [void Function(GCommentSummaryData_author_homeTagBuilder b)
+          updates]) = _$GCommentSummaryData_author_homeTag;
+
+  static void _initializeBuilder(GCommentSummaryData_author_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GCommentSummaryData_author_homeTag> get serializer =>
+      _$gCommentSummaryDataAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCommentSummaryData_author_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCommentSummaryData_author_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCommentSummaryData_author_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GCommentSummaryData_mentions
+    implements
+        Built<GCommentSummaryData_mentions,
+            GCommentSummaryData_mentionsBuilder>,
+        GCommentSummary_mentions {
+  GCommentSummaryData_mentions._();
+
+  factory GCommentSummaryData_mentions(
+          [void Function(GCommentSummaryData_mentionsBuilder b) updates]) =
+      _$GCommentSummaryData_mentions;
+
+  static void _initializeBuilder(GCommentSummaryData_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GCommentSummaryData_mentions_homeTag? get homeTag;
+  static Serializer<GCommentSummaryData_mentions> get serializer =>
+      _$gCommentSummaryDataMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCommentSummaryData_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCommentSummaryData_mentions? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCommentSummaryData_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GCommentSummaryData_mentions_homeTag
+    implements
+        Built<GCommentSummaryData_mentions_homeTag,
+            GCommentSummaryData_mentions_homeTagBuilder>,
+        GCommentSummary_mentions_homeTag {
+  GCommentSummaryData_mentions_homeTag._();
+
+  factory GCommentSummaryData_mentions_homeTag(
+      [void Function(GCommentSummaryData_mentions_homeTagBuilder b)
+          updates]) = _$GCommentSummaryData_mentions_homeTag;
+
+  static void _initializeBuilder(
+          GCommentSummaryData_mentions_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GCommentSummaryData_mentions_homeTag> get serializer =>
+      _$gCommentSummaryDataMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCommentSummaryData_mentions_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCommentSummaryData_mentions_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCommentSummaryData_mentions_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GCommentSummaryData_referencedTags
+    implements
+        Built<GCommentSummaryData_referencedTags,
+            GCommentSummaryData_referencedTagsBuilder>,
+        GCommentSummary_referencedTags {
+  GCommentSummaryData_referencedTags._();
+
+  factory GCommentSummaryData_referencedTags(
+      [void Function(GCommentSummaryData_referencedTagsBuilder b)
+          updates]) = _$GCommentSummaryData_referencedTags;
+
+  static void _initializeBuilder(GCommentSummaryData_referencedTagsBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<GCommentSummaryData_referencedTags> get serializer =>
+      _$gCommentSummaryDataReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GCommentSummaryData_referencedTags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GCommentSummaryData_referencedTags? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GCommentSummaryData_referencedTags.serializer,
         json,
       );
 }

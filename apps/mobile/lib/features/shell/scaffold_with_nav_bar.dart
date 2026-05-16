@@ -7,6 +7,7 @@ import '../../design/atoms/pulse_status_bar.dart';
 import '../../design/tokens.dart';
 import '../../design/typography.dart';
 import '../impersonation/impersonation_banner.dart';
+import '../mention_preview/mention_preview_overlay.dart';
 import '../palette/command_palette_overlay.dart';
 import 'outbox_indicator.dart';
 
@@ -30,24 +31,27 @@ class ScaffoldWithNavBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return CommandPaletteOverlay(
-      child: Scaffold(
-        appBar: const _PulseAppBar(),
-        body: Column(
-          children: [
-            const ImpersonationBanner(),
-            Expanded(
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  if (constraints.maxWidth >= _wideBreakpoint) {
-                    return _WideChrome(navigationShell: navigationShell);
-                  }
-                  return navigationShell;
-                },
+      child: MentionPreviewOverlay(
+        child: Scaffold(
+          appBar: const _PulseAppBar(),
+          body: Column(
+            children: [
+              const ImpersonationBanner(),
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth >= _wideBreakpoint) {
+                      return _WideChrome(navigationShell: navigationShell);
+                    }
+                    return navigationShell;
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
+          bottomNavigationBar:
+              _MaybeBottomNav(navigationShell: navigationShell),
         ),
-        bottomNavigationBar: _MaybeBottomNav(navigationShell: navigationShell),
       ),
     );
   }

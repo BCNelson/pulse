@@ -32,6 +32,18 @@ Serializer<GChatRoomDetailData_chatRoom_messages_edges_node>
 Serializer<GChatRoomDetailData_chatRoom_messages_edges_node_author>
     _$gChatRoomDetailDataChatRoomMessagesEdgesNodeAuthorSerializer =
     _$GChatRoomDetailData_chatRoom_messages_edges_node_authorSerializer();
+Serializer<GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag>
+    _$gChatRoomDetailDataChatRoomMessagesEdgesNodeAuthorHomeTagSerializer =
+    _$GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagSerializer();
+Serializer<GChatRoomDetailData_chatRoom_messages_edges_node_mentions>
+    _$gChatRoomDetailDataChatRoomMessagesEdgesNodeMentionsSerializer =
+    _$GChatRoomDetailData_chatRoom_messages_edges_node_mentionsSerializer();
+Serializer<GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag>
+    _$gChatRoomDetailDataChatRoomMessagesEdgesNodeMentionsHomeTagSerializer =
+    _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagSerializer();
+Serializer<GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags>
+    _$gChatRoomDetailDataChatRoomMessagesEdgesNodeReferencedTagsSerializer =
+    _$GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsSerializer();
 Serializer<GChatRoomDetailData_chatRoom_messages_edges_node_replyTo>
     _$gChatRoomDetailDataChatRoomMessagesEdgesNodeReplyToSerializer =
     _$GChatRoomDetailData_chatRoom_messages_edges_node_replyToSerializer();
@@ -43,6 +55,18 @@ Serializer<GSendMessageData_sendMessage>
 Serializer<GSendMessageData_sendMessage_author>
     _$gSendMessageDataSendMessageAuthorSerializer =
     _$GSendMessageData_sendMessage_authorSerializer();
+Serializer<GSendMessageData_sendMessage_author_homeTag>
+    _$gSendMessageDataSendMessageAuthorHomeTagSerializer =
+    _$GSendMessageData_sendMessage_author_homeTagSerializer();
+Serializer<GSendMessageData_sendMessage_mentions>
+    _$gSendMessageDataSendMessageMentionsSerializer =
+    _$GSendMessageData_sendMessage_mentionsSerializer();
+Serializer<GSendMessageData_sendMessage_mentions_homeTag>
+    _$gSendMessageDataSendMessageMentionsHomeTagSerializer =
+    _$GSendMessageData_sendMessage_mentions_homeTagSerializer();
+Serializer<GSendMessageData_sendMessage_referencedTags>
+    _$gSendMessageDataSendMessageReferencedTagsSerializer =
+    _$GSendMessageData_sendMessage_referencedTagsSerializer();
 Serializer<GSendMessageData_sendMessage_replyTo>
     _$gSendMessageDataSendMessageReplyToSerializer =
     _$GSendMessageData_sendMessage_replyToSerializer();
@@ -68,6 +92,18 @@ Serializer<GMessageAddedData_messageAdded>
 Serializer<GMessageAddedData_messageAdded_author>
     _$gMessageAddedDataMessageAddedAuthorSerializer =
     _$GMessageAddedData_messageAdded_authorSerializer();
+Serializer<GMessageAddedData_messageAdded_author_homeTag>
+    _$gMessageAddedDataMessageAddedAuthorHomeTagSerializer =
+    _$GMessageAddedData_messageAdded_author_homeTagSerializer();
+Serializer<GMessageAddedData_messageAdded_mentions>
+    _$gMessageAddedDataMessageAddedMentionsSerializer =
+    _$GMessageAddedData_messageAdded_mentionsSerializer();
+Serializer<GMessageAddedData_messageAdded_mentions_homeTag>
+    _$gMessageAddedDataMessageAddedMentionsHomeTagSerializer =
+    _$GMessageAddedData_messageAdded_mentions_homeTagSerializer();
+Serializer<GMessageAddedData_messageAdded_referencedTags>
+    _$gMessageAddedDataMessageAddedReferencedTagsSerializer =
+    _$GMessageAddedData_messageAdded_referencedTagsSerializer();
 Serializer<GMessageAddedData_messageAdded_replyTo>
     _$gMessageAddedDataMessageAddedReplyToSerializer =
     _$GMessageAddedData_messageAdded_replyToSerializer();
@@ -75,6 +111,18 @@ Serializer<GMessageSummaryData> _$gMessageSummaryDataSerializer =
     _$GMessageSummaryDataSerializer();
 Serializer<GMessageSummaryData_author> _$gMessageSummaryDataAuthorSerializer =
     _$GMessageSummaryData_authorSerializer();
+Serializer<GMessageSummaryData_author_homeTag>
+    _$gMessageSummaryDataAuthorHomeTagSerializer =
+    _$GMessageSummaryData_author_homeTagSerializer();
+Serializer<GMessageSummaryData_mentions>
+    _$gMessageSummaryDataMentionsSerializer =
+    _$GMessageSummaryData_mentionsSerializer();
+Serializer<GMessageSummaryData_mentions_homeTag>
+    _$gMessageSummaryDataMentionsHomeTagSerializer =
+    _$GMessageSummaryData_mentions_homeTagSerializer();
+Serializer<GMessageSummaryData_referencedTags>
+    _$gMessageSummaryDataReferencedTagsSerializer =
+    _$GMessageSummaryData_referencedTagsSerializer();
 Serializer<GMessageSummaryData_replyTo> _$gMessageSummaryDataReplyToSerializer =
     _$GMessageSummaryData_replyToSerializer();
 Serializer<GChatRoomSummaryData> _$gChatRoomSummaryDataSerializer =
@@ -585,6 +633,18 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_nodeSerializer
       serializers.serialize(object.author,
           specifiedType: const FullType(
               GChatRoomDetailData_chatRoom_messages_edges_node_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(
+                GChatRoomDetailData_chatRoom_messages_edges_node_mentions)
+          ])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(
+                GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags)
+          ])),
     ];
     Object? value;
     value = object.editedAt;
@@ -643,6 +703,20 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_nodeSerializer
                       GChatRoomDetailData_chatRoom_messages_edges_node_author))!
               as GChatRoomDetailData_chatRoom_messages_edges_node_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(
+                    GChatRoomDetailData_chatRoom_messages_edges_node_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(
+                    GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'replyTo':
           result.replyTo.replace(serializers.deserialize(value,
                   specifiedType: const FullType(
@@ -683,7 +757,15 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag)));
+    }
     return result;
   }
 
@@ -710,6 +792,288 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag))!
+              as GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagSerializer
+    implements
+        StructuredSerializer<
+            GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag,
+    _$GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag
+  ];
+  @override
+  final String wireName =
+      'GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GChatRoomDetailData_chatRoom_messages_edges_node_mentionsSerializer
+    implements
+        StructuredSerializer<
+            GChatRoomDetailData_chatRoom_messages_edges_node_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GChatRoomDetailData_chatRoom_messages_edges_node_mentions,
+    _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions
+  ];
+  @override
+  final String wireName =
+      'GChatRoomDetailData_chatRoom_messages_edges_node_mentions';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GChatRoomDetailData_chatRoom_messages_edges_node_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag))!
+              as GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagSerializer
+    implements
+        StructuredSerializer<
+            GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag,
+    _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag
+  ];
+  @override
+  final String wireName =
+      'GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsSerializer
+    implements
+        StructuredSerializer<
+            GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags,
+    _$GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags
+  ];
+  @override
+  final String wireName =
+      'GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result =
+        GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -859,6 +1223,15 @@ class _$GSendMessageData_sendMessageSerializer
       'author',
       serializers.serialize(object.author,
           specifiedType: const FullType(GSendMessageData_sendMessage_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(BuiltList,
+              const [const FullType(GSendMessageData_sendMessage_mentions)])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GSendMessageData_sendMessage_referencedTags)
+          ])),
     ];
     Object? value;
     value = object.editedAt;
@@ -917,6 +1290,18 @@ class _$GSendMessageData_sendMessageSerializer
                       const FullType(GSendMessageData_sendMessage_author))!
               as GSendMessageData_sendMessage_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GSendMessageData_sendMessage_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GSendMessageData_sendMessage_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'replyTo':
           result.replyTo.replace(serializers.deserialize(value,
                   specifiedType:
@@ -954,7 +1339,15 @@ class _$GSendMessageData_sendMessage_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GSendMessageData_sendMessage_author_homeTag)));
+    }
     return result;
   }
 
@@ -980,6 +1373,275 @@ class _$GSendMessageData_sendMessage_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GSendMessageData_sendMessage_author_homeTag))!
+              as GSendMessageData_sendMessage_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GSendMessageData_sendMessage_author_homeTagSerializer
+    implements
+        StructuredSerializer<GSendMessageData_sendMessage_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GSendMessageData_sendMessage_author_homeTag,
+    _$GSendMessageData_sendMessage_author_homeTag
+  ];
+  @override
+  final String wireName = 'GSendMessageData_sendMessage_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GSendMessageData_sendMessage_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GSendMessageData_sendMessage_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSendMessageData_sendMessage_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GSendMessageData_sendMessage_mentionsSerializer
+    implements StructuredSerializer<GSendMessageData_sendMessage_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GSendMessageData_sendMessage_mentions,
+    _$GSendMessageData_sendMessage_mentions
+  ];
+  @override
+  final String wireName = 'GSendMessageData_sendMessage_mentions';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GSendMessageData_sendMessage_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GSendMessageData_sendMessage_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GSendMessageData_sendMessage_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSendMessageData_sendMessage_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GSendMessageData_sendMessage_mentions_homeTag))!
+              as GSendMessageData_sendMessage_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GSendMessageData_sendMessage_mentions_homeTagSerializer
+    implements
+        StructuredSerializer<GSendMessageData_sendMessage_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GSendMessageData_sendMessage_mentions_homeTag,
+    _$GSendMessageData_sendMessage_mentions_homeTag
+  ];
+  @override
+  final String wireName = 'GSendMessageData_sendMessage_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GSendMessageData_sendMessage_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GSendMessageData_sendMessage_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSendMessageData_sendMessage_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GSendMessageData_sendMessage_referencedTagsSerializer
+    implements
+        StructuredSerializer<GSendMessageData_sendMessage_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GSendMessageData_sendMessage_referencedTags,
+    _$GSendMessageData_sendMessage_referencedTags
+  ];
+  @override
+  final String wireName = 'GSendMessageData_sendMessage_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GSendMessageData_sendMessage_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GSendMessageData_sendMessage_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSendMessageData_sendMessage_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -1463,6 +2125,15 @@ class _$GMessageAddedData_messageAddedSerializer
       'author',
       serializers.serialize(object.author,
           specifiedType: const FullType(GMessageAddedData_messageAdded_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(BuiltList,
+              const [const FullType(GMessageAddedData_messageAdded_mentions)])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GMessageAddedData_messageAdded_referencedTags)
+          ])),
     ];
     Object? value;
     value = object.editedAt;
@@ -1521,6 +2192,18 @@ class _$GMessageAddedData_messageAddedSerializer
                       const FullType(GMessageAddedData_messageAdded_author))!
               as GMessageAddedData_messageAdded_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GMessageAddedData_messageAdded_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GMessageAddedData_messageAdded_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'replyTo':
           result.replyTo.replace(serializers.deserialize(value,
                   specifiedType:
@@ -1558,7 +2241,15 @@ class _$GMessageAddedData_messageAdded_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GMessageAddedData_messageAdded_author_homeTag)));
+    }
     return result;
   }
 
@@ -1584,6 +2275,275 @@ class _$GMessageAddedData_messageAdded_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GMessageAddedData_messageAdded_author_homeTag))!
+              as GMessageAddedData_messageAdded_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GMessageAddedData_messageAdded_author_homeTagSerializer
+    implements
+        StructuredSerializer<GMessageAddedData_messageAdded_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GMessageAddedData_messageAdded_author_homeTag,
+    _$GMessageAddedData_messageAdded_author_homeTag
+  ];
+  @override
+  final String wireName = 'GMessageAddedData_messageAdded_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GMessageAddedData_messageAdded_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GMessageAddedData_messageAdded_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GMessageAddedData_messageAdded_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GMessageAddedData_messageAdded_mentionsSerializer
+    implements StructuredSerializer<GMessageAddedData_messageAdded_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GMessageAddedData_messageAdded_mentions,
+    _$GMessageAddedData_messageAdded_mentions
+  ];
+  @override
+  final String wireName = 'GMessageAddedData_messageAdded_mentions';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GMessageAddedData_messageAdded_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(
+                GMessageAddedData_messageAdded_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GMessageAddedData_messageAdded_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GMessageAddedData_messageAdded_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GMessageAddedData_messageAdded_mentions_homeTag))!
+              as GMessageAddedData_messageAdded_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GMessageAddedData_messageAdded_mentions_homeTagSerializer
+    implements
+        StructuredSerializer<GMessageAddedData_messageAdded_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GMessageAddedData_messageAdded_mentions_homeTag,
+    _$GMessageAddedData_messageAdded_mentions_homeTag
+  ];
+  @override
+  final String wireName = 'GMessageAddedData_messageAdded_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GMessageAddedData_messageAdded_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GMessageAddedData_messageAdded_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GMessageAddedData_messageAdded_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GMessageAddedData_messageAdded_referencedTagsSerializer
+    implements
+        StructuredSerializer<GMessageAddedData_messageAdded_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GMessageAddedData_messageAdded_referencedTags,
+    _$GMessageAddedData_messageAdded_referencedTags
+  ];
+  @override
+  final String wireName = 'GMessageAddedData_messageAdded_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GMessageAddedData_messageAdded_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GMessageAddedData_messageAdded_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GMessageAddedData_messageAdded_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -1679,6 +2639,14 @@ class _$GMessageSummaryDataSerializer
       'author',
       serializers.serialize(object.author,
           specifiedType: const FullType(GMessageSummaryData_author)),
+      'mentions',
+      serializers.serialize(object.mentions,
+          specifiedType: const FullType(
+              BuiltList, const [const FullType(GMessageSummaryData_mentions)])),
+      'referencedTags',
+      serializers.serialize(object.referencedTags,
+          specifiedType: const FullType(BuiltList,
+              const [const FullType(GMessageSummaryData_referencedTags)])),
     ];
     Object? value;
     value = object.editedAt;
@@ -1735,6 +2703,18 @@ class _$GMessageSummaryDataSerializer
                   specifiedType: const FullType(GMessageSummaryData_author))!
               as GMessageSummaryData_author);
           break;
+        case 'mentions':
+          result.mentions.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GMessageSummaryData_mentions)
+              ]))! as BuiltList<Object?>);
+          break;
+        case 'referencedTags':
+          result.referencedTags.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GMessageSummaryData_referencedTags)
+              ]))! as BuiltList<Object?>);
+          break;
         case 'replyTo':
           result.replyTo.replace(serializers.deserialize(value,
                   specifiedType: const FullType(GMessageSummaryData_replyTo))!
@@ -1771,7 +2751,14 @@ class _$GMessageSummaryData_authorSerializer
       serializers.serialize(object.displayName,
           specifiedType: const FullType(String)),
     ];
-
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(GMessageSummaryData_author_homeTag)));
+    }
     return result;
   }
 
@@ -1797,6 +2784,272 @@ class _$GMessageSummaryData_authorSerializer
           break;
         case 'displayName':
           result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GMessageSummaryData_author_homeTag))!
+              as GMessageSummaryData_author_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GMessageSummaryData_author_homeTagSerializer
+    implements StructuredSerializer<GMessageSummaryData_author_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GMessageSummaryData_author_homeTag,
+    _$GMessageSummaryData_author_homeTag
+  ];
+  @override
+  final String wireName = 'GMessageSummaryData_author_homeTag';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GMessageSummaryData_author_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GMessageSummaryData_author_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GMessageSummaryData_author_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GMessageSummaryData_mentionsSerializer
+    implements StructuredSerializer<GMessageSummaryData_mentions> {
+  @override
+  final Iterable<Type> types = const [
+    GMessageSummaryData_mentions,
+    _$GMessageSummaryData_mentions
+  ];
+  @override
+  final String wireName = 'GMessageSummaryData_mentions';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GMessageSummaryData_mentions object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+    ];
+    Object? value;
+    value = object.homeTag;
+    if (value != null) {
+      result
+        ..add('homeTag')
+        ..add(serializers.serialize(value,
+            specifiedType:
+                const FullType(GMessageSummaryData_mentions_homeTag)));
+    }
+    return result;
+  }
+
+  @override
+  GMessageSummaryData_mentions deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GMessageSummaryData_mentionsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'homeTag':
+          result.homeTag.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GMessageSummaryData_mentions_homeTag))!
+              as GMessageSummaryData_mentions_homeTag);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GMessageSummaryData_mentions_homeTagSerializer
+    implements StructuredSerializer<GMessageSummaryData_mentions_homeTag> {
+  @override
+  final Iterable<Type> types = const [
+    GMessageSummaryData_mentions_homeTag,
+    _$GMessageSummaryData_mentions_homeTag
+  ];
+  @override
+  final String wireName = 'GMessageSummaryData_mentions_homeTag';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GMessageSummaryData_mentions_homeTag object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GMessageSummaryData_mentions_homeTag deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GMessageSummaryData_mentions_homeTagBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GMessageSummaryData_referencedTagsSerializer
+    implements StructuredSerializer<GMessageSummaryData_referencedTags> {
+  @override
+  final Iterable<Type> types = const [
+    GMessageSummaryData_referencedTags,
+    _$GMessageSummaryData_referencedTags
+  ];
+  @override
+  final String wireName = 'GMessageSummaryData_referencedTags';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GMessageSummaryData_referencedTags object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GMessageSummaryData_referencedTags deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GMessageSummaryData_referencedTagsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
       }
@@ -3128,6 +4381,13 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node
   @override
   final GChatRoomDetailData_chatRoom_messages_edges_node_author author;
   @override
+  final BuiltList<GChatRoomDetailData_chatRoom_messages_edges_node_mentions>
+      mentions;
+  @override
+  final BuiltList<
+          GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags>
+      referencedTags;
+  @override
   final GChatRoomDetailData_chatRoom_messages_edges_node_replyTo? replyTo;
 
   factory _$GChatRoomDetailData_chatRoom_messages_edges_node(
@@ -3145,6 +4405,8 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node
       required this.createdAt,
       this.editedAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       this.replyTo})
       : super._();
   @override
@@ -3167,6 +4429,8 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node
         createdAt == other.createdAt &&
         editedAt == other.editedAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         replyTo == other.replyTo;
   }
 
@@ -3179,6 +4443,8 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, replyTo.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -3194,6 +4460,8 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node
           ..add('createdAt', createdAt)
           ..add('editedAt', editedAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('replyTo', replyTo))
         .toString();
   }
@@ -3234,6 +4502,28 @@ class GChatRoomDetailData_chatRoom_messages_edges_nodeBuilder
               author) =>
       _$this._author = author;
 
+  ListBuilder<GChatRoomDetailData_chatRoom_messages_edges_node_mentions>?
+      _mentions;
+  ListBuilder<GChatRoomDetailData_chatRoom_messages_edges_node_mentions>
+      get mentions => _$this._mentions ??= ListBuilder<
+          GChatRoomDetailData_chatRoom_messages_edges_node_mentions>();
+  set mentions(
+          ListBuilder<
+                  GChatRoomDetailData_chatRoom_messages_edges_node_mentions>?
+              mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags>?
+      _referencedTags;
+  ListBuilder<GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags>
+      get referencedTags => _$this._referencedTags ??= ListBuilder<
+          GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags>();
+  set referencedTags(
+          ListBuilder<
+                  GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags>?
+              referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   GChatRoomDetailData_chatRoom_messages_edges_node_replyToBuilder? _replyTo;
   GChatRoomDetailData_chatRoom_messages_edges_node_replyToBuilder get replyTo =>
       _$this._replyTo ??=
@@ -3256,6 +4546,8 @@ class GChatRoomDetailData_chatRoom_messages_edges_nodeBuilder
       _createdAt = $v.createdAt.toBuilder();
       _editedAt = $v.editedAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _replyTo = $v.replyTo?.toBuilder();
       _$v = null;
     }
@@ -3293,6 +4585,8 @@ class GChatRoomDetailData_chatRoom_messages_edges_nodeBuilder
             createdAt: createdAt.build(),
             editedAt: _editedAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             replyTo: _replyTo?.build(),
           );
     } catch (_) {
@@ -3304,6 +4598,10 @@ class GChatRoomDetailData_chatRoom_messages_edges_nodeBuilder
         _editedAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'replyTo';
         _replyTo?.build();
       } catch (e) {
@@ -3327,6 +4625,9 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node_author
   final String id;
   @override
   final String displayName;
+  @override
+  final GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag?
+      homeTag;
 
   factory _$GChatRoomDetailData_chatRoom_messages_edges_node_author(
           [void Function(
@@ -3337,7 +4638,10 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node_author
           ._build();
 
   _$GChatRoomDetailData_chatRoom_messages_edges_node_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GChatRoomDetailData_chatRoom_messages_edges_node_author rebuild(
@@ -3357,7 +4661,8 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node_author
     return other is GChatRoomDetailData_chatRoom_messages_edges_node_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -3366,6 +4671,7 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node_author
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -3376,7 +4682,8 @@ class _$GChatRoomDetailData_chatRoom_messages_edges_node_author
             r'GChatRoomDetailData_chatRoom_messages_edges_node_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -3399,6 +4706,16 @@ class GChatRoomDetailData_chatRoom_messages_edges_node_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder?
+      _homeTag;
+  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder
+      get homeTag => _$this._homeTag ??=
+          GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder();
+  set homeTag(
+          GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder?
+              homeTag) =>
+      _$this._homeTag = homeTag;
+
   GChatRoomDetailData_chatRoom_messages_edges_node_authorBuilder() {
     GChatRoomDetailData_chatRoom_messages_edges_node_author._initializeBuilder(
         this);
@@ -3410,6 +4727,7 @@ class GChatRoomDetailData_chatRoom_messages_edges_node_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -3432,18 +4750,657 @@ class GChatRoomDetailData_chatRoom_messages_edges_node_authorBuilder
   GChatRoomDetailData_chatRoom_messages_edges_node_author build() => _build();
 
   _$GChatRoomDetailData_chatRoom_messages_edges_node_author _build() {
+    _$GChatRoomDetailData_chatRoom_messages_edges_node_author _$result;
+    try {
+      _$result = _$v ??
+          _$GChatRoomDetailData_chatRoom_messages_edges_node_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename,
+                r'GChatRoomDetailData_chatRoom_messages_edges_node_author',
+                'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id,
+                r'GChatRoomDetailData_chatRoom_messages_edges_node_author',
+                'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName,
+                r'GChatRoomDetailData_chatRoom_messages_edges_node_author',
+                'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GChatRoomDetailData_chatRoom_messages_edges_node_author',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag
+    extends GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag(
+          [void Function(
+                  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder)?
+              updates]) =>
+      (GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag rebuild(
+          void Function(
+                  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder
+      toBuilder() =>
+          GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder()
+            ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other
+            is GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder
+    implements
+        Builder<GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag,
+            GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder> {
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder() {
+    GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag
+        ._initializeBuilder(this);
+  }
+
+  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder
+      get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(
+      GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag other) {
+    _$v = other
+        as _$GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(
+              GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag build() =>
+      _build();
+
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag _build() {
     final _$result = _$v ??
-        _$GChatRoomDetailData_chatRoom_messages_edges_node_author._(
+        _$GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag._(
           G__typename: BuiltValueNullFieldError.checkNotNull(
               G__typename,
-              r'GChatRoomDetailData_chatRoom_messages_edges_node_author',
+              r'GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag',
               'G__typename'),
-          id: BuiltValueNullFieldError.checkNotNull(id,
-              r'GChatRoomDetailData_chatRoom_messages_edges_node_author', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug,
+              r'GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag',
+              'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path,
+              r'GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag',
+              'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions
+    extends GChatRoomDetailData_chatRoom_messages_edges_node_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag?
+      homeTag;
+
+  factory _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions(
+          [void Function(
+                  GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder)?
+              updates]) =>
+      (GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions rebuild(
+          void Function(
+                  GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder
+      toBuilder() =>
+          GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder()
+            ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GChatRoomDetailData_chatRoom_messages_edges_node_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GChatRoomDetailData_chatRoom_messages_edges_node_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder
+    implements
+        Builder<GChatRoomDetailData_chatRoom_messages_edges_node_mentions,
+            GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder> {
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder?
+      _homeTag;
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder
+      get homeTag => _$this._homeTag ??=
+          GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder();
+  set homeTag(
+          GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder?
+              homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder() {
+    GChatRoomDetailData_chatRoom_messages_edges_node_mentions
+        ._initializeBuilder(this);
+  }
+
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(
+      GChatRoomDetailData_chatRoom_messages_edges_node_mentions other) {
+    _$v = other as _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions;
+  }
+
+  @override
+  void update(
+      void Function(
+              GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions build() => _build();
+
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions _build() {
+    _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename,
+                r'GChatRoomDetailData_chatRoom_messages_edges_node_mentions',
+                'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id,
+                r'GChatRoomDetailData_chatRoom_messages_edges_node_mentions',
+                'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName,
+                r'GChatRoomDetailData_chatRoom_messages_edges_node_mentions',
+                'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GChatRoomDetailData_chatRoom_messages_edges_node_mentions',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag
+    extends GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag(
+          [void Function(
+                  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder)?
+              updates]) =>
+      (GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag rebuild(
+          void Function(
+                  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder
+      toBuilder() =>
+          GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder()
+            ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other
+            is GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder
+    implements
+        Builder<
+            GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag,
+            GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder> {
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder() {
+    GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag
+        ._initializeBuilder(this);
+  }
+
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder
+      get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(
+      GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag other) {
+    _$v = other
+        as _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(
+              GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag build() =>
+      _build();
+
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag',
+              'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug,
+              r'GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag',
+              'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path,
+              r'GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag',
+              'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags
+    extends GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags(
+          [void Function(
+                  GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder)?
+              updates]) =>
+      (GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags rebuild(
+          void Function(
+                  GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder
+      toBuilder() =>
+          GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder()
+            ..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other
+            is GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder
+    implements
+        Builder<GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags,
+            GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder> {
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder() {
+    GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags
+        ._initializeBuilder(this);
+  }
+
+  GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder
+      get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(
+      GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags other) {
+    _$v = other
+        as _$GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags;
+  }
+
+  @override
+  void update(
+      void Function(
+              GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags build() =>
+      _build();
+
+  _$GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags _build() {
+    final _$result = _$v ??
+        _$GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags',
+              'G__typename'),
+          id: BuiltValueNullFieldError.checkNotNull(
+              id,
+              r'GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags',
+              'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug,
+              r'GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags',
+              'slug'),
           displayName: BuiltValueNullFieldError.checkNotNull(
               displayName,
-              r'GChatRoomDetailData_chatRoom_messages_edges_node_author',
+              r'GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags',
               'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path,
+              r'GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags',
+              'path'),
         );
     replace(_$result);
     return _$result;
@@ -3709,6 +5666,10 @@ class _$GSendMessageData_sendMessage extends GSendMessageData_sendMessage {
   @override
   final GSendMessageData_sendMessage_author author;
   @override
+  final BuiltList<GSendMessageData_sendMessage_mentions> mentions;
+  @override
+  final BuiltList<GSendMessageData_sendMessage_referencedTags> referencedTags;
+  @override
   final GSendMessageData_sendMessage_replyTo? replyTo;
 
   factory _$GSendMessageData_sendMessage(
@@ -3722,6 +5683,8 @@ class _$GSendMessageData_sendMessage extends GSendMessageData_sendMessage {
       required this.createdAt,
       this.editedAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       this.replyTo})
       : super._();
   @override
@@ -3743,6 +5706,8 @@ class _$GSendMessageData_sendMessage extends GSendMessageData_sendMessage {
         createdAt == other.createdAt &&
         editedAt == other.editedAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         replyTo == other.replyTo;
   }
 
@@ -3755,6 +5720,8 @@ class _$GSendMessageData_sendMessage extends GSendMessageData_sendMessage {
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, replyTo.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -3769,6 +5736,8 @@ class _$GSendMessageData_sendMessage extends GSendMessageData_sendMessage {
           ..add('createdAt', createdAt)
           ..add('editedAt', editedAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('replyTo', replyTo))
         .toString();
   }
@@ -3806,6 +5775,21 @@ class GSendMessageData_sendMessageBuilder
   set author(GSendMessageData_sendMessage_authorBuilder? author) =>
       _$this._author = author;
 
+  ListBuilder<GSendMessageData_sendMessage_mentions>? _mentions;
+  ListBuilder<GSendMessageData_sendMessage_mentions> get mentions =>
+      _$this._mentions ??= ListBuilder<GSendMessageData_sendMessage_mentions>();
+  set mentions(ListBuilder<GSendMessageData_sendMessage_mentions>? mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GSendMessageData_sendMessage_referencedTags>? _referencedTags;
+  ListBuilder<GSendMessageData_sendMessage_referencedTags> get referencedTags =>
+      _$this._referencedTags ??=
+          ListBuilder<GSendMessageData_sendMessage_referencedTags>();
+  set referencedTags(
+          ListBuilder<GSendMessageData_sendMessage_referencedTags>?
+              referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   GSendMessageData_sendMessage_replyToBuilder? _replyTo;
   GSendMessageData_sendMessage_replyToBuilder get replyTo =>
       _$this._replyTo ??= GSendMessageData_sendMessage_replyToBuilder();
@@ -3825,6 +5809,8 @@ class GSendMessageData_sendMessageBuilder
       _createdAt = $v.createdAt.toBuilder();
       _editedAt = $v.editedAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _replyTo = $v.replyTo?.toBuilder();
       _$v = null;
     }
@@ -3858,6 +5844,8 @@ class GSendMessageData_sendMessageBuilder
             createdAt: createdAt.build(),
             editedAt: _editedAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             replyTo: _replyTo?.build(),
           );
     } catch (_) {
@@ -3869,6 +5857,10 @@ class GSendMessageData_sendMessageBuilder
         _editedAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'replyTo';
         _replyTo?.build();
       } catch (e) {
@@ -3890,6 +5882,8 @@ class _$GSendMessageData_sendMessage_author
   final String id;
   @override
   final String displayName;
+  @override
+  final GSendMessageData_sendMessage_author_homeTag? homeTag;
 
   factory _$GSendMessageData_sendMessage_author(
           [void Function(GSendMessageData_sendMessage_authorBuilder)?
@@ -3897,7 +5891,10 @@ class _$GSendMessageData_sendMessage_author
       (GSendMessageData_sendMessage_authorBuilder()..update(updates))._build();
 
   _$GSendMessageData_sendMessage_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GSendMessageData_sendMessage_author rebuild(
@@ -3914,7 +5911,8 @@ class _$GSendMessageData_sendMessage_author
     return other is GSendMessageData_sendMessage_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -3923,6 +5921,7 @@ class _$GSendMessageData_sendMessage_author
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -3932,7 +5931,8 @@ class _$GSendMessageData_sendMessage_author
     return (newBuiltValueToStringHelper(r'GSendMessageData_sendMessage_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -3955,6 +5955,12 @@ class GSendMessageData_sendMessage_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GSendMessageData_sendMessage_author_homeTagBuilder? _homeTag;
+  GSendMessageData_sendMessage_author_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GSendMessageData_sendMessage_author_homeTagBuilder();
+  set homeTag(GSendMessageData_sendMessage_author_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
   GSendMessageData_sendMessage_authorBuilder() {
     GSendMessageData_sendMessage_author._initializeBuilder(this);
   }
@@ -3965,6 +5971,7 @@ class GSendMessageData_sendMessage_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -3985,14 +5992,571 @@ class GSendMessageData_sendMessage_authorBuilder
   GSendMessageData_sendMessage_author build() => _build();
 
   _$GSendMessageData_sendMessage_author _build() {
+    _$GSendMessageData_sendMessage_author _$result;
+    try {
+      _$result = _$v ??
+          _$GSendMessageData_sendMessage_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GSendMessageData_sendMessage_author', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GSendMessageData_sendMessage_author', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GSendMessageData_sendMessage_author', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(r'GSendMessageData_sendMessage_author',
+            _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSendMessageData_sendMessage_author_homeTag
+    extends GSendMessageData_sendMessage_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GSendMessageData_sendMessage_author_homeTag(
+          [void Function(GSendMessageData_sendMessage_author_homeTagBuilder)?
+              updates]) =>
+      (GSendMessageData_sendMessage_author_homeTagBuilder()..update(updates))
+          ._build();
+
+  _$GSendMessageData_sendMessage_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GSendMessageData_sendMessage_author_homeTag rebuild(
+          void Function(GSendMessageData_sendMessage_author_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSendMessageData_sendMessage_author_homeTagBuilder toBuilder() =>
+      GSendMessageData_sendMessage_author_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSendMessageData_sendMessage_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GSendMessageData_sendMessage_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GSendMessageData_sendMessage_author_homeTagBuilder
+    implements
+        Builder<GSendMessageData_sendMessage_author_homeTag,
+            GSendMessageData_sendMessage_author_homeTagBuilder> {
+  _$GSendMessageData_sendMessage_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GSendMessageData_sendMessage_author_homeTagBuilder() {
+    GSendMessageData_sendMessage_author_homeTag._initializeBuilder(this);
+  }
+
+  GSendMessageData_sendMessage_author_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSendMessageData_sendMessage_author_homeTag other) {
+    _$v = other as _$GSendMessageData_sendMessage_author_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GSendMessageData_sendMessage_author_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSendMessageData_sendMessage_author_homeTag build() => _build();
+
+  _$GSendMessageData_sendMessage_author_homeTag _build() {
     final _$result = _$v ??
-        _$GSendMessageData_sendMessage_author._(
+        _$GSendMessageData_sendMessage_author_homeTag._(
           G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
-              r'GSendMessageData_sendMessage_author', 'G__typename'),
+              r'GSendMessageData_sendMessage_author_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GSendMessageData_sendMessage_author_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GSendMessageData_sendMessage_author_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSendMessageData_sendMessage_mentions
+    extends GSendMessageData_sendMessage_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GSendMessageData_sendMessage_mentions_homeTag? homeTag;
+
+  factory _$GSendMessageData_sendMessage_mentions(
+          [void Function(GSendMessageData_sendMessage_mentionsBuilder)?
+              updates]) =>
+      (GSendMessageData_sendMessage_mentionsBuilder()..update(updates))
+          ._build();
+
+  _$GSendMessageData_sendMessage_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GSendMessageData_sendMessage_mentions rebuild(
+          void Function(GSendMessageData_sendMessage_mentionsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSendMessageData_sendMessage_mentionsBuilder toBuilder() =>
+      GSendMessageData_sendMessage_mentionsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSendMessageData_sendMessage_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GSendMessageData_sendMessage_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GSendMessageData_sendMessage_mentionsBuilder
+    implements
+        Builder<GSendMessageData_sendMessage_mentions,
+            GSendMessageData_sendMessage_mentionsBuilder> {
+  _$GSendMessageData_sendMessage_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GSendMessageData_sendMessage_mentions_homeTagBuilder? _homeTag;
+  GSendMessageData_sendMessage_mentions_homeTagBuilder get homeTag =>
+      _$this._homeTag ??=
+          GSendMessageData_sendMessage_mentions_homeTagBuilder();
+  set homeTag(GSendMessageData_sendMessage_mentions_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GSendMessageData_sendMessage_mentionsBuilder() {
+    GSendMessageData_sendMessage_mentions._initializeBuilder(this);
+  }
+
+  GSendMessageData_sendMessage_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSendMessageData_sendMessage_mentions other) {
+    _$v = other as _$GSendMessageData_sendMessage_mentions;
+  }
+
+  @override
+  void update(
+      void Function(GSendMessageData_sendMessage_mentionsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSendMessageData_sendMessage_mentions build() => _build();
+
+  _$GSendMessageData_sendMessage_mentions _build() {
+    _$GSendMessageData_sendMessage_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GSendMessageData_sendMessage_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GSendMessageData_sendMessage_mentions', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GSendMessageData_sendMessage_mentions', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GSendMessageData_sendMessage_mentions', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GSendMessageData_sendMessage_mentions',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSendMessageData_sendMessage_mentions_homeTag
+    extends GSendMessageData_sendMessage_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GSendMessageData_sendMessage_mentions_homeTag(
+          [void Function(GSendMessageData_sendMessage_mentions_homeTagBuilder)?
+              updates]) =>
+      (GSendMessageData_sendMessage_mentions_homeTagBuilder()..update(updates))
+          ._build();
+
+  _$GSendMessageData_sendMessage_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GSendMessageData_sendMessage_mentions_homeTag rebuild(
+          void Function(GSendMessageData_sendMessage_mentions_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSendMessageData_sendMessage_mentions_homeTagBuilder toBuilder() =>
+      GSendMessageData_sendMessage_mentions_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSendMessageData_sendMessage_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GSendMessageData_sendMessage_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GSendMessageData_sendMessage_mentions_homeTagBuilder
+    implements
+        Builder<GSendMessageData_sendMessage_mentions_homeTag,
+            GSendMessageData_sendMessage_mentions_homeTagBuilder> {
+  _$GSendMessageData_sendMessage_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GSendMessageData_sendMessage_mentions_homeTagBuilder() {
+    GSendMessageData_sendMessage_mentions_homeTag._initializeBuilder(this);
+  }
+
+  GSendMessageData_sendMessage_mentions_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSendMessageData_sendMessage_mentions_homeTag other) {
+    _$v = other as _$GSendMessageData_sendMessage_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GSendMessageData_sendMessage_mentions_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSendMessageData_sendMessage_mentions_homeTag build() => _build();
+
+  _$GSendMessageData_sendMessage_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GSendMessageData_sendMessage_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GSendMessageData_sendMessage_mentions_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GSendMessageData_sendMessage_mentions_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GSendMessageData_sendMessage_mentions_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSendMessageData_sendMessage_referencedTags
+    extends GSendMessageData_sendMessage_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GSendMessageData_sendMessage_referencedTags(
+          [void Function(GSendMessageData_sendMessage_referencedTagsBuilder)?
+              updates]) =>
+      (GSendMessageData_sendMessage_referencedTagsBuilder()..update(updates))
+          ._build();
+
+  _$GSendMessageData_sendMessage_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GSendMessageData_sendMessage_referencedTags rebuild(
+          void Function(GSendMessageData_sendMessage_referencedTagsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSendMessageData_sendMessage_referencedTagsBuilder toBuilder() =>
+      GSendMessageData_sendMessage_referencedTagsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSendMessageData_sendMessage_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GSendMessageData_sendMessage_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GSendMessageData_sendMessage_referencedTagsBuilder
+    implements
+        Builder<GSendMessageData_sendMessage_referencedTags,
+            GSendMessageData_sendMessage_referencedTagsBuilder> {
+  _$GSendMessageData_sendMessage_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GSendMessageData_sendMessage_referencedTagsBuilder() {
+    GSendMessageData_sendMessage_referencedTags._initializeBuilder(this);
+  }
+
+  GSendMessageData_sendMessage_referencedTagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSendMessageData_sendMessage_referencedTags other) {
+    _$v = other as _$GSendMessageData_sendMessage_referencedTags;
+  }
+
+  @override
+  void update(
+      void Function(GSendMessageData_sendMessage_referencedTagsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSendMessageData_sendMessage_referencedTags build() => _build();
+
+  _$GSendMessageData_sendMessage_referencedTags _build() {
+    final _$result = _$v ??
+        _$GSendMessageData_sendMessage_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GSendMessageData_sendMessage_referencedTags', 'G__typename'),
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GSendMessageData_sendMessage_author', 'id'),
+              id, r'GSendMessageData_sendMessage_referencedTags', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GSendMessageData_sendMessage_referencedTags', 'slug'),
           displayName: BuiltValueNullFieldError.checkNotNull(displayName,
-              r'GSendMessageData_sendMessage_author', 'displayName'),
+              r'GSendMessageData_sendMessage_referencedTags', 'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GSendMessageData_sendMessage_referencedTags', 'path'),
         );
     replace(_$result);
     return _$result;
@@ -4953,6 +7517,10 @@ class _$GMessageAddedData_messageAdded extends GMessageAddedData_messageAdded {
   @override
   final GMessageAddedData_messageAdded_author author;
   @override
+  final BuiltList<GMessageAddedData_messageAdded_mentions> mentions;
+  @override
+  final BuiltList<GMessageAddedData_messageAdded_referencedTags> referencedTags;
+  @override
   final GMessageAddedData_messageAdded_replyTo? replyTo;
 
   factory _$GMessageAddedData_messageAdded(
@@ -4966,6 +7534,8 @@ class _$GMessageAddedData_messageAdded extends GMessageAddedData_messageAdded {
       required this.createdAt,
       this.editedAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       this.replyTo})
       : super._();
   @override
@@ -4987,6 +7557,8 @@ class _$GMessageAddedData_messageAdded extends GMessageAddedData_messageAdded {
         createdAt == other.createdAt &&
         editedAt == other.editedAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         replyTo == other.replyTo;
   }
 
@@ -4999,6 +7571,8 @@ class _$GMessageAddedData_messageAdded extends GMessageAddedData_messageAdded {
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, replyTo.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -5013,6 +7587,8 @@ class _$GMessageAddedData_messageAdded extends GMessageAddedData_messageAdded {
           ..add('createdAt', createdAt)
           ..add('editedAt', editedAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('replyTo', replyTo))
         .toString();
   }
@@ -5050,6 +7626,23 @@ class GMessageAddedData_messageAddedBuilder
   set author(GMessageAddedData_messageAdded_authorBuilder? author) =>
       _$this._author = author;
 
+  ListBuilder<GMessageAddedData_messageAdded_mentions>? _mentions;
+  ListBuilder<GMessageAddedData_messageAdded_mentions> get mentions =>
+      _$this._mentions ??=
+          ListBuilder<GMessageAddedData_messageAdded_mentions>();
+  set mentions(
+          ListBuilder<GMessageAddedData_messageAdded_mentions>? mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GMessageAddedData_messageAdded_referencedTags>? _referencedTags;
+  ListBuilder<GMessageAddedData_messageAdded_referencedTags>
+      get referencedTags => _$this._referencedTags ??=
+          ListBuilder<GMessageAddedData_messageAdded_referencedTags>();
+  set referencedTags(
+          ListBuilder<GMessageAddedData_messageAdded_referencedTags>?
+              referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   GMessageAddedData_messageAdded_replyToBuilder? _replyTo;
   GMessageAddedData_messageAdded_replyToBuilder get replyTo =>
       _$this._replyTo ??= GMessageAddedData_messageAdded_replyToBuilder();
@@ -5069,6 +7662,8 @@ class GMessageAddedData_messageAddedBuilder
       _createdAt = $v.createdAt.toBuilder();
       _editedAt = $v.editedAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _replyTo = $v.replyTo?.toBuilder();
       _$v = null;
     }
@@ -5102,6 +7697,8 @@ class GMessageAddedData_messageAddedBuilder
             createdAt: createdAt.build(),
             editedAt: _editedAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             replyTo: _replyTo?.build(),
           );
     } catch (_) {
@@ -5113,6 +7710,10 @@ class GMessageAddedData_messageAddedBuilder
         _editedAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'replyTo';
         _replyTo?.build();
       } catch (e) {
@@ -5134,6 +7735,8 @@ class _$GMessageAddedData_messageAdded_author
   final String id;
   @override
   final String displayName;
+  @override
+  final GMessageAddedData_messageAdded_author_homeTag? homeTag;
 
   factory _$GMessageAddedData_messageAdded_author(
           [void Function(GMessageAddedData_messageAdded_authorBuilder)?
@@ -5142,7 +7745,10 @@ class _$GMessageAddedData_messageAdded_author
           ._build();
 
   _$GMessageAddedData_messageAdded_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GMessageAddedData_messageAdded_author rebuild(
@@ -5160,7 +7766,8 @@ class _$GMessageAddedData_messageAdded_author
     return other is GMessageAddedData_messageAdded_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -5169,6 +7776,7 @@ class _$GMessageAddedData_messageAdded_author
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -5179,7 +7787,8 @@ class _$GMessageAddedData_messageAdded_author
             r'GMessageAddedData_messageAdded_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -5202,6 +7811,13 @@ class GMessageAddedData_messageAdded_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GMessageAddedData_messageAdded_author_homeTagBuilder? _homeTag;
+  GMessageAddedData_messageAdded_author_homeTagBuilder get homeTag =>
+      _$this._homeTag ??=
+          GMessageAddedData_messageAdded_author_homeTagBuilder();
+  set homeTag(GMessageAddedData_messageAdded_author_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
   GMessageAddedData_messageAdded_authorBuilder() {
     GMessageAddedData_messageAdded_author._initializeBuilder(this);
   }
@@ -5212,6 +7828,7 @@ class GMessageAddedData_messageAdded_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -5232,14 +7849,578 @@ class GMessageAddedData_messageAdded_authorBuilder
   GMessageAddedData_messageAdded_author build() => _build();
 
   _$GMessageAddedData_messageAdded_author _build() {
+    _$GMessageAddedData_messageAdded_author _$result;
+    try {
+      _$result = _$v ??
+          _$GMessageAddedData_messageAdded_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GMessageAddedData_messageAdded_author', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GMessageAddedData_messageAdded_author', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GMessageAddedData_messageAdded_author', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GMessageAddedData_messageAdded_author',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GMessageAddedData_messageAdded_author_homeTag
+    extends GMessageAddedData_messageAdded_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GMessageAddedData_messageAdded_author_homeTag(
+          [void Function(GMessageAddedData_messageAdded_author_homeTagBuilder)?
+              updates]) =>
+      (GMessageAddedData_messageAdded_author_homeTagBuilder()..update(updates))
+          ._build();
+
+  _$GMessageAddedData_messageAdded_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GMessageAddedData_messageAdded_author_homeTag rebuild(
+          void Function(GMessageAddedData_messageAdded_author_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GMessageAddedData_messageAdded_author_homeTagBuilder toBuilder() =>
+      GMessageAddedData_messageAdded_author_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GMessageAddedData_messageAdded_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GMessageAddedData_messageAdded_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GMessageAddedData_messageAdded_author_homeTagBuilder
+    implements
+        Builder<GMessageAddedData_messageAdded_author_homeTag,
+            GMessageAddedData_messageAdded_author_homeTagBuilder> {
+  _$GMessageAddedData_messageAdded_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GMessageAddedData_messageAdded_author_homeTagBuilder() {
+    GMessageAddedData_messageAdded_author_homeTag._initializeBuilder(this);
+  }
+
+  GMessageAddedData_messageAdded_author_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GMessageAddedData_messageAdded_author_homeTag other) {
+    _$v = other as _$GMessageAddedData_messageAdded_author_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GMessageAddedData_messageAdded_author_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GMessageAddedData_messageAdded_author_homeTag build() => _build();
+
+  _$GMessageAddedData_messageAdded_author_homeTag _build() {
     final _$result = _$v ??
-        _$GMessageAddedData_messageAdded_author._(
+        _$GMessageAddedData_messageAdded_author_homeTag._(
           G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
-              r'GMessageAddedData_messageAdded_author', 'G__typename'),
+              r'GMessageAddedData_messageAdded_author_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GMessageAddedData_messageAdded_author_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GMessageAddedData_messageAdded_author_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GMessageAddedData_messageAdded_mentions
+    extends GMessageAddedData_messageAdded_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GMessageAddedData_messageAdded_mentions_homeTag? homeTag;
+
+  factory _$GMessageAddedData_messageAdded_mentions(
+          [void Function(GMessageAddedData_messageAdded_mentionsBuilder)?
+              updates]) =>
+      (GMessageAddedData_messageAdded_mentionsBuilder()..update(updates))
+          ._build();
+
+  _$GMessageAddedData_messageAdded_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GMessageAddedData_messageAdded_mentions rebuild(
+          void Function(GMessageAddedData_messageAdded_mentionsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GMessageAddedData_messageAdded_mentionsBuilder toBuilder() =>
+      GMessageAddedData_messageAdded_mentionsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GMessageAddedData_messageAdded_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GMessageAddedData_messageAdded_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GMessageAddedData_messageAdded_mentionsBuilder
+    implements
+        Builder<GMessageAddedData_messageAdded_mentions,
+            GMessageAddedData_messageAdded_mentionsBuilder> {
+  _$GMessageAddedData_messageAdded_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GMessageAddedData_messageAdded_mentions_homeTagBuilder? _homeTag;
+  GMessageAddedData_messageAdded_mentions_homeTagBuilder get homeTag =>
+      _$this._homeTag ??=
+          GMessageAddedData_messageAdded_mentions_homeTagBuilder();
+  set homeTag(
+          GMessageAddedData_messageAdded_mentions_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GMessageAddedData_messageAdded_mentionsBuilder() {
+    GMessageAddedData_messageAdded_mentions._initializeBuilder(this);
+  }
+
+  GMessageAddedData_messageAdded_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GMessageAddedData_messageAdded_mentions other) {
+    _$v = other as _$GMessageAddedData_messageAdded_mentions;
+  }
+
+  @override
+  void update(
+      void Function(GMessageAddedData_messageAdded_mentionsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GMessageAddedData_messageAdded_mentions build() => _build();
+
+  _$GMessageAddedData_messageAdded_mentions _build() {
+    _$GMessageAddedData_messageAdded_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GMessageAddedData_messageAdded_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GMessageAddedData_messageAdded_mentions', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GMessageAddedData_messageAdded_mentions', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+                r'GMessageAddedData_messageAdded_mentions', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GMessageAddedData_messageAdded_mentions',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GMessageAddedData_messageAdded_mentions_homeTag
+    extends GMessageAddedData_messageAdded_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GMessageAddedData_messageAdded_mentions_homeTag(
+          [void Function(
+                  GMessageAddedData_messageAdded_mentions_homeTagBuilder)?
+              updates]) =>
+      (GMessageAddedData_messageAdded_mentions_homeTagBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GMessageAddedData_messageAdded_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GMessageAddedData_messageAdded_mentions_homeTag rebuild(
+          void Function(GMessageAddedData_messageAdded_mentions_homeTagBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GMessageAddedData_messageAdded_mentions_homeTagBuilder toBuilder() =>
+      GMessageAddedData_messageAdded_mentions_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GMessageAddedData_messageAdded_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GMessageAddedData_messageAdded_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GMessageAddedData_messageAdded_mentions_homeTagBuilder
+    implements
+        Builder<GMessageAddedData_messageAdded_mentions_homeTag,
+            GMessageAddedData_messageAdded_mentions_homeTagBuilder> {
+  _$GMessageAddedData_messageAdded_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GMessageAddedData_messageAdded_mentions_homeTagBuilder() {
+    GMessageAddedData_messageAdded_mentions_homeTag._initializeBuilder(this);
+  }
+
+  GMessageAddedData_messageAdded_mentions_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GMessageAddedData_messageAdded_mentions_homeTag other) {
+    _$v = other as _$GMessageAddedData_messageAdded_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GMessageAddedData_messageAdded_mentions_homeTagBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GMessageAddedData_messageAdded_mentions_homeTag build() => _build();
+
+  _$GMessageAddedData_messageAdded_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GMessageAddedData_messageAdded_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(
+              G__typename,
+              r'GMessageAddedData_messageAdded_mentions_homeTag',
+              'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GMessageAddedData_messageAdded_mentions_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GMessageAddedData_messageAdded_mentions_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GMessageAddedData_messageAdded_referencedTags
+    extends GMessageAddedData_messageAdded_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GMessageAddedData_messageAdded_referencedTags(
+          [void Function(GMessageAddedData_messageAdded_referencedTagsBuilder)?
+              updates]) =>
+      (GMessageAddedData_messageAdded_referencedTagsBuilder()..update(updates))
+          ._build();
+
+  _$GMessageAddedData_messageAdded_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GMessageAddedData_messageAdded_referencedTags rebuild(
+          void Function(GMessageAddedData_messageAdded_referencedTagsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GMessageAddedData_messageAdded_referencedTagsBuilder toBuilder() =>
+      GMessageAddedData_messageAdded_referencedTagsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GMessageAddedData_messageAdded_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GMessageAddedData_messageAdded_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GMessageAddedData_messageAdded_referencedTagsBuilder
+    implements
+        Builder<GMessageAddedData_messageAdded_referencedTags,
+            GMessageAddedData_messageAdded_referencedTagsBuilder> {
+  _$GMessageAddedData_messageAdded_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GMessageAddedData_messageAdded_referencedTagsBuilder() {
+    GMessageAddedData_messageAdded_referencedTags._initializeBuilder(this);
+  }
+
+  GMessageAddedData_messageAdded_referencedTagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GMessageAddedData_messageAdded_referencedTags other) {
+    _$v = other as _$GMessageAddedData_messageAdded_referencedTags;
+  }
+
+  @override
+  void update(
+      void Function(GMessageAddedData_messageAdded_referencedTagsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GMessageAddedData_messageAdded_referencedTags build() => _build();
+
+  _$GMessageAddedData_messageAdded_referencedTags _build() {
+    final _$result = _$v ??
+        _$GMessageAddedData_messageAdded_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GMessageAddedData_messageAdded_referencedTags', 'G__typename'),
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GMessageAddedData_messageAdded_author', 'id'),
+              id, r'GMessageAddedData_messageAdded_referencedTags', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GMessageAddedData_messageAdded_referencedTags', 'slug'),
           displayName: BuiltValueNullFieldError.checkNotNull(displayName,
-              r'GMessageAddedData_messageAdded_author', 'displayName'),
+              r'GMessageAddedData_messageAdded_referencedTags', 'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GMessageAddedData_messageAdded_referencedTags', 'path'),
         );
     replace(_$result);
     return _$result;
@@ -5380,6 +8561,10 @@ class _$GMessageSummaryData extends GMessageSummaryData {
   @override
   final GMessageSummaryData_author author;
   @override
+  final BuiltList<GMessageSummaryData_mentions> mentions;
+  @override
+  final BuiltList<GMessageSummaryData_referencedTags> referencedTags;
+  @override
   final GMessageSummaryData_replyTo? replyTo;
 
   factory _$GMessageSummaryData(
@@ -5393,6 +8578,8 @@ class _$GMessageSummaryData extends GMessageSummaryData {
       required this.createdAt,
       this.editedAt,
       required this.author,
+      required this.mentions,
+      required this.referencedTags,
       this.replyTo})
       : super._();
   @override
@@ -5414,6 +8601,8 @@ class _$GMessageSummaryData extends GMessageSummaryData {
         createdAt == other.createdAt &&
         editedAt == other.editedAt &&
         author == other.author &&
+        mentions == other.mentions &&
+        referencedTags == other.referencedTags &&
         replyTo == other.replyTo;
   }
 
@@ -5426,6 +8615,8 @@ class _$GMessageSummaryData extends GMessageSummaryData {
     _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
+    _$hash = $jc(_$hash, mentions.hashCode);
+    _$hash = $jc(_$hash, referencedTags.hashCode);
     _$hash = $jc(_$hash, replyTo.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -5440,6 +8631,8 @@ class _$GMessageSummaryData extends GMessageSummaryData {
           ..add('createdAt', createdAt)
           ..add('editedAt', editedAt)
           ..add('author', author)
+          ..add('mentions', mentions)
+          ..add('referencedTags', referencedTags)
           ..add('replyTo', replyTo))
         .toString();
   }
@@ -5475,6 +8668,20 @@ class GMessageSummaryDataBuilder
   set author(GMessageSummaryData_authorBuilder? author) =>
       _$this._author = author;
 
+  ListBuilder<GMessageSummaryData_mentions>? _mentions;
+  ListBuilder<GMessageSummaryData_mentions> get mentions =>
+      _$this._mentions ??= ListBuilder<GMessageSummaryData_mentions>();
+  set mentions(ListBuilder<GMessageSummaryData_mentions>? mentions) =>
+      _$this._mentions = mentions;
+
+  ListBuilder<GMessageSummaryData_referencedTags>? _referencedTags;
+  ListBuilder<GMessageSummaryData_referencedTags> get referencedTags =>
+      _$this._referencedTags ??=
+          ListBuilder<GMessageSummaryData_referencedTags>();
+  set referencedTags(
+          ListBuilder<GMessageSummaryData_referencedTags>? referencedTags) =>
+      _$this._referencedTags = referencedTags;
+
   GMessageSummaryData_replyToBuilder? _replyTo;
   GMessageSummaryData_replyToBuilder get replyTo =>
       _$this._replyTo ??= GMessageSummaryData_replyToBuilder();
@@ -5494,6 +8701,8 @@ class GMessageSummaryDataBuilder
       _createdAt = $v.createdAt.toBuilder();
       _editedAt = $v.editedAt?.toBuilder();
       _author = $v.author.toBuilder();
+      _mentions = $v.mentions.toBuilder();
+      _referencedTags = $v.referencedTags.toBuilder();
       _replyTo = $v.replyTo?.toBuilder();
       _$v = null;
     }
@@ -5527,6 +8736,8 @@ class GMessageSummaryDataBuilder
             createdAt: createdAt.build(),
             editedAt: _editedAt?.build(),
             author: author.build(),
+            mentions: mentions.build(),
+            referencedTags: referencedTags.build(),
             replyTo: _replyTo?.build(),
           );
     } catch (_) {
@@ -5538,6 +8749,10 @@ class GMessageSummaryDataBuilder
         _editedAt?.build();
         _$failedField = 'author';
         author.build();
+        _$failedField = 'mentions';
+        mentions.build();
+        _$failedField = 'referencedTags';
+        referencedTags.build();
         _$failedField = 'replyTo';
         _replyTo?.build();
       } catch (e) {
@@ -5558,13 +8773,18 @@ class _$GMessageSummaryData_author extends GMessageSummaryData_author {
   final String id;
   @override
   final String displayName;
+  @override
+  final GMessageSummaryData_author_homeTag? homeTag;
 
   factory _$GMessageSummaryData_author(
           [void Function(GMessageSummaryData_authorBuilder)? updates]) =>
       (GMessageSummaryData_authorBuilder()..update(updates))._build();
 
   _$GMessageSummaryData_author._(
-      {required this.G__typename, required this.id, required this.displayName})
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
       : super._();
   @override
   GMessageSummaryData_author rebuild(
@@ -5581,7 +8801,8 @@ class _$GMessageSummaryData_author extends GMessageSummaryData_author {
     return other is GMessageSummaryData_author &&
         G__typename == other.G__typename &&
         id == other.id &&
-        displayName == other.displayName;
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
   }
 
   @override
@@ -5590,6 +8811,7 @@ class _$GMessageSummaryData_author extends GMessageSummaryData_author {
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -5599,7 +8821,8 @@ class _$GMessageSummaryData_author extends GMessageSummaryData_author {
     return (newBuiltValueToStringHelper(r'GMessageSummaryData_author')
           ..add('G__typename', G__typename)
           ..add('id', id)
-          ..add('displayName', displayName))
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
         .toString();
   }
 }
@@ -5621,6 +8844,12 @@ class GMessageSummaryData_authorBuilder
   String? get displayName => _$this._displayName;
   set displayName(String? displayName) => _$this._displayName = displayName;
 
+  GMessageSummaryData_author_homeTagBuilder? _homeTag;
+  GMessageSummaryData_author_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GMessageSummaryData_author_homeTagBuilder();
+  set homeTag(GMessageSummaryData_author_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
   GMessageSummaryData_authorBuilder() {
     GMessageSummaryData_author._initializeBuilder(this);
   }
@@ -5631,6 +8860,7 @@ class GMessageSummaryData_authorBuilder
       _G__typename = $v.G__typename;
       _id = $v.id;
       _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
       _$v = null;
     }
     return this;
@@ -5650,14 +8880,550 @@ class GMessageSummaryData_authorBuilder
   GMessageSummaryData_author build() => _build();
 
   _$GMessageSummaryData_author _build() {
+    _$GMessageSummaryData_author _$result;
+    try {
+      _$result = _$v ??
+          _$GMessageSummaryData_author._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GMessageSummaryData_author', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GMessageSummaryData_author', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName, r'GMessageSummaryData_author', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GMessageSummaryData_author', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GMessageSummaryData_author_homeTag
+    extends GMessageSummaryData_author_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GMessageSummaryData_author_homeTag(
+          [void Function(GMessageSummaryData_author_homeTagBuilder)?
+              updates]) =>
+      (GMessageSummaryData_author_homeTagBuilder()..update(updates))._build();
+
+  _$GMessageSummaryData_author_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GMessageSummaryData_author_homeTag rebuild(
+          void Function(GMessageSummaryData_author_homeTagBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GMessageSummaryData_author_homeTagBuilder toBuilder() =>
+      GMessageSummaryData_author_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GMessageSummaryData_author_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GMessageSummaryData_author_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GMessageSummaryData_author_homeTagBuilder
+    implements
+        Builder<GMessageSummaryData_author_homeTag,
+            GMessageSummaryData_author_homeTagBuilder> {
+  _$GMessageSummaryData_author_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GMessageSummaryData_author_homeTagBuilder() {
+    GMessageSummaryData_author_homeTag._initializeBuilder(this);
+  }
+
+  GMessageSummaryData_author_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GMessageSummaryData_author_homeTag other) {
+    _$v = other as _$GMessageSummaryData_author_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GMessageSummaryData_author_homeTagBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GMessageSummaryData_author_homeTag build() => _build();
+
+  _$GMessageSummaryData_author_homeTag _build() {
     final _$result = _$v ??
-        _$GMessageSummaryData_author._(
-          G__typename: BuiltValueNullFieldError.checkNotNull(
-              G__typename, r'GMessageSummaryData_author', 'G__typename'),
+        _$GMessageSummaryData_author_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GMessageSummaryData_author_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GMessageSummaryData_author_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GMessageSummaryData_author_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GMessageSummaryData_mentions extends GMessageSummaryData_mentions {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String displayName;
+  @override
+  final GMessageSummaryData_mentions_homeTag? homeTag;
+
+  factory _$GMessageSummaryData_mentions(
+          [void Function(GMessageSummaryData_mentionsBuilder)? updates]) =>
+      (GMessageSummaryData_mentionsBuilder()..update(updates))._build();
+
+  _$GMessageSummaryData_mentions._(
+      {required this.G__typename,
+      required this.id,
+      required this.displayName,
+      this.homeTag})
+      : super._();
+  @override
+  GMessageSummaryData_mentions rebuild(
+          void Function(GMessageSummaryData_mentionsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GMessageSummaryData_mentionsBuilder toBuilder() =>
+      GMessageSummaryData_mentionsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GMessageSummaryData_mentions &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        displayName == other.displayName &&
+        homeTag == other.homeTag;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, homeTag.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GMessageSummaryData_mentions')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('displayName', displayName)
+          ..add('homeTag', homeTag))
+        .toString();
+  }
+}
+
+class GMessageSummaryData_mentionsBuilder
+    implements
+        Builder<GMessageSummaryData_mentions,
+            GMessageSummaryData_mentionsBuilder> {
+  _$GMessageSummaryData_mentions? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  GMessageSummaryData_mentions_homeTagBuilder? _homeTag;
+  GMessageSummaryData_mentions_homeTagBuilder get homeTag =>
+      _$this._homeTag ??= GMessageSummaryData_mentions_homeTagBuilder();
+  set homeTag(GMessageSummaryData_mentions_homeTagBuilder? homeTag) =>
+      _$this._homeTag = homeTag;
+
+  GMessageSummaryData_mentionsBuilder() {
+    GMessageSummaryData_mentions._initializeBuilder(this);
+  }
+
+  GMessageSummaryData_mentionsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _displayName = $v.displayName;
+      _homeTag = $v.homeTag?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GMessageSummaryData_mentions other) {
+    _$v = other as _$GMessageSummaryData_mentions;
+  }
+
+  @override
+  void update(void Function(GMessageSummaryData_mentionsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GMessageSummaryData_mentions build() => _build();
+
+  _$GMessageSummaryData_mentions _build() {
+    _$GMessageSummaryData_mentions _$result;
+    try {
+      _$result = _$v ??
+          _$GMessageSummaryData_mentions._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GMessageSummaryData_mentions', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GMessageSummaryData_mentions', 'id'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName, r'GMessageSummaryData_mentions', 'displayName'),
+            homeTag: _homeTag?.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'homeTag';
+        _homeTag?.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GMessageSummaryData_mentions', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GMessageSummaryData_mentions_homeTag
+    extends GMessageSummaryData_mentions_homeTag {
+  @override
+  final String G__typename;
+  @override
+  final String slug;
+  @override
+  final String path;
+
+  factory _$GMessageSummaryData_mentions_homeTag(
+          [void Function(GMessageSummaryData_mentions_homeTagBuilder)?
+              updates]) =>
+      (GMessageSummaryData_mentions_homeTagBuilder()..update(updates))._build();
+
+  _$GMessageSummaryData_mentions_homeTag._(
+      {required this.G__typename, required this.slug, required this.path})
+      : super._();
+  @override
+  GMessageSummaryData_mentions_homeTag rebuild(
+          void Function(GMessageSummaryData_mentions_homeTagBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GMessageSummaryData_mentions_homeTagBuilder toBuilder() =>
+      GMessageSummaryData_mentions_homeTagBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GMessageSummaryData_mentions_homeTag &&
+        G__typename == other.G__typename &&
+        slug == other.slug &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GMessageSummaryData_mentions_homeTag')
+          ..add('G__typename', G__typename)
+          ..add('slug', slug)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GMessageSummaryData_mentions_homeTagBuilder
+    implements
+        Builder<GMessageSummaryData_mentions_homeTag,
+            GMessageSummaryData_mentions_homeTagBuilder> {
+  _$GMessageSummaryData_mentions_homeTag? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GMessageSummaryData_mentions_homeTagBuilder() {
+    GMessageSummaryData_mentions_homeTag._initializeBuilder(this);
+  }
+
+  GMessageSummaryData_mentions_homeTagBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _slug = $v.slug;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GMessageSummaryData_mentions_homeTag other) {
+    _$v = other as _$GMessageSummaryData_mentions_homeTag;
+  }
+
+  @override
+  void update(
+      void Function(GMessageSummaryData_mentions_homeTagBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GMessageSummaryData_mentions_homeTag build() => _build();
+
+  _$GMessageSummaryData_mentions_homeTag _build() {
+    final _$result = _$v ??
+        _$GMessageSummaryData_mentions_homeTag._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GMessageSummaryData_mentions_homeTag', 'G__typename'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GMessageSummaryData_mentions_homeTag', 'slug'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GMessageSummaryData_mentions_homeTag', 'path'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GMessageSummaryData_referencedTags
+    extends GMessageSummaryData_referencedTags {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+
+  factory _$GMessageSummaryData_referencedTags(
+          [void Function(GMessageSummaryData_referencedTagsBuilder)?
+              updates]) =>
+      (GMessageSummaryData_referencedTagsBuilder()..update(updates))._build();
+
+  _$GMessageSummaryData_referencedTags._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path})
+      : super._();
+  @override
+  GMessageSummaryData_referencedTags rebuild(
+          void Function(GMessageSummaryData_referencedTagsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GMessageSummaryData_referencedTagsBuilder toBuilder() =>
+      GMessageSummaryData_referencedTagsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GMessageSummaryData_referencedTags &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GMessageSummaryData_referencedTags')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path))
+        .toString();
+  }
+}
+
+class GMessageSummaryData_referencedTagsBuilder
+    implements
+        Builder<GMessageSummaryData_referencedTags,
+            GMessageSummaryData_referencedTagsBuilder> {
+  _$GMessageSummaryData_referencedTags? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  GMessageSummaryData_referencedTagsBuilder() {
+    GMessageSummaryData_referencedTags._initializeBuilder(this);
+  }
+
+  GMessageSummaryData_referencedTagsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GMessageSummaryData_referencedTags other) {
+    _$v = other as _$GMessageSummaryData_referencedTags;
+  }
+
+  @override
+  void update(
+      void Function(GMessageSummaryData_referencedTagsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GMessageSummaryData_referencedTags build() => _build();
+
+  _$GMessageSummaryData_referencedTags _build() {
+    final _$result = _$v ??
+        _$GMessageSummaryData_referencedTags._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GMessageSummaryData_referencedTags', 'G__typename'),
           id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GMessageSummaryData_author', 'id'),
-          displayName: BuiltValueNullFieldError.checkNotNull(
-              displayName, r'GMessageSummaryData_author', 'displayName'),
+              id, r'GMessageSummaryData_referencedTags', 'id'),
+          slug: BuiltValueNullFieldError.checkNotNull(
+              slug, r'GMessageSummaryData_referencedTags', 'slug'),
+          displayName: BuiltValueNullFieldError.checkNotNull(displayName,
+              r'GMessageSummaryData_referencedTags', 'displayName'),
+          path: BuiltValueNullFieldError.checkNotNull(
+              path, r'GMessageSummaryData_referencedTags', 'path'),
         );
     replace(_$result);
     return _$result;

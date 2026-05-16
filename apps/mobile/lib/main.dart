@@ -40,6 +40,7 @@ class PulseApp extends ConsumerWidget {
     final router = ref.watch(goRouterProvider);
     return MaterialApp.router(
       title: 'Pulse',
+      debugShowCheckedModeBanner: false,
       theme: pulseTheme(themeKey),
       localizationsDelegates: const [
         FlutterQuillLocalizations.delegate,

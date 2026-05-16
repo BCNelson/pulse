@@ -53,3 +53,27 @@ abstract class GSearchTagsVars
         json,
       );
 }
+
+abstract class GSearchUsersVars
+    implements Built<GSearchUsersVars, GSearchUsersVarsBuilder> {
+  GSearchUsersVars._();
+
+  factory GSearchUsersVars([void Function(GSearchUsersVarsBuilder b) updates]) =
+      _$GSearchUsersVars;
+
+  String get query;
+  int? get first;
+  static Serializer<GSearchUsersVars> get serializer =>
+      _$gSearchUsersVarsSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GSearchUsersVars.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSearchUsersVars? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GSearchUsersVars.serializer,
+        json,
+      );
+}

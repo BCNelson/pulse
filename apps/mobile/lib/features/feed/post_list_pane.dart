@@ -190,6 +190,7 @@ class _PostList extends ConsumerWidget {
           decision: decision,
           authorInitials: _initials(node.author.displayName),
           authorName: node.author.displayName,
+          authorSlug: node.author.homeTag?.slug,
           whenLabel: _shortWhen(node.createdAt.value),
           comments: node.comments.edges.length,
           cursor: selected,

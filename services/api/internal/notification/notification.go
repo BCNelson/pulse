@@ -384,8 +384,10 @@ func (s *Service) commentRecipients(ctx context.Context, commentID, actorID int6
 	return out, nil
 }
 
-// messageRecipients = DM participants (reason=dm) for a DM room, or tag
-// subscribers (reason=tag_subscription) for a team room.
+// messageRecipients = mentions (reason=mention, urgency=high) layered on
+// top of DM participants (reason=dm) for a DM room, or tag subscribers
+// (reason=tag_subscription) for a team room. Mentions take precedence and
+// dedupe everything below them.
 func (s *Service) messageRecipients(ctx context.Context, messageID, actorID int64) ([]Recipient, error) {
 	var roomID int64
 	var isDM bool
@@ -400,6 +402,21 @@ func (s *Service) messageRecipients(ctx context.Context, messageID, actorID int6
 		return nil, err
 	}
 
+	mentions, err := s.principalsFromJoin(ctx, "message_mentions", "message_id", "principal_id", messageID)
+	if err != nil {
+		return nil, err
+	}
+
+	out := []Recipient{}
+	seen := map[int64]struct{}{actorID: {}}
+	for _, p := range mentions {
+		if _, dup := seen[p]; dup {
+			continue
+		}
+		out = append(out, Recipient{PrincipalID: p, Reason: ReasonMention, Urgency: UrgencyHigh})
+		seen[p] = struct{}{}
+	}
+
 	if isDM {
 		rows, err := s.DB.Query(ctx, `
             SELECT principal_id FROM chat_room_participants
@@ -409,13 +426,16 @@ func (s *Service) messageRecipients(ctx context.Context, messageID, actorID int6
 			return nil, err
 		}
 		defer rows.Close()
-		out := []Recipient{}
 		for rows.Next() {
 			var p int64
 			if err := rows.Scan(&p); err != nil {
 				return nil, err
 			}
+			if _, dup := seen[p]; dup {
+				continue
+			}
 			out = append(out, Recipient{PrincipalID: p, Reason: ReasonDM, Urgency: UrgencyHigh})
+			seen[p] = struct{}{}
 		}
 		return out, rows.Err()
 	}
@@ -424,8 +444,6 @@ func (s *Service) messageRecipients(ctx context.Context, messageID, actorID int6
 	if err != nil {
 		return nil, err
 	}
-	out := []Recipient{}
-	seen := map[int64]struct{}{actorID: {}}
 	for _, ts := range subscribers {
 		if _, dup := seen[ts.PrincipalID]; dup {
 			continue

@@ -116,15 +116,45 @@ func (r *Resolver) loadMessage(ctx context.Context, id int64) (*model.Message, e
 	if err != nil {
 		return nil, err
 	}
+	mentionIDs, err := r.Chat.MessageMentions(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	mentions := make([]model.Principal, 0, len(mentionIDs))
+	for _, mid := range mentionIDs {
+		mp, err := r.loadPrincipalIface(ctx, mid)
+		if err != nil {
+			return nil, err
+		}
+		if mp != nil {
+			mentions = append(mentions, mp)
+		}
+	}
+	tagRefIDs, err := r.Chat.MessageTagRefs(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	referencedTags := make([]*model.Tag, 0, len(tagRefIDs))
+	for _, tid := range tagRefIDs {
+		t, err := r.loadTagShallow(ctx, tid)
+		if err != nil {
+			return nil, err
+		}
+		if t != nil {
+			referencedTags = append(referencedTags, t)
+		}
+	}
 	out := &model.Message{
-		ID:        ids.FormatID(msg.ID),
-		GlobalURI: ids.URI(ids.KindMessage, msg.ID),
-		ChatRoom:  room,
-		Author:    author,
-		Body:      msg.Body,
-		CreatedAt: msg.CreatedAt,
-		EditedAt:  msg.EditedAt,
-		DeletedAt: msg.DeletedAt,
+		ID:             ids.FormatID(msg.ID),
+		GlobalURI:      ids.URI(ids.KindMessage, msg.ID),
+		ChatRoom:       room,
+		Author:         author,
+		Body:           msg.Body,
+		Mentions:       mentions,
+		ReferencedTags: referencedTags,
+		CreatedAt:      msg.CreatedAt,
+		EditedAt:       msg.EditedAt,
+		DeletedAt:      msg.DeletedAt,
 	}
 	if msg.ReplyTo != nil {
 		// Avoid recursive loadMessage — populate just the id+body slice.

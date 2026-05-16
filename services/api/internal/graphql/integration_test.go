@@ -199,11 +199,31 @@ func mustSeedUser(t *testing.T, pool *pgxpool.Pool, authSvc *auth.Service, email
 	id := ids.New(ids.KindUser)
 	uri := "local://principals/" + ids.FormatID(id)
 	_, err := pool.Exec(context.Background(), `
-        INSERT INTO principals (id, kind, status, global_uri, display_name, email)
-        VALUES ($1, 'user', 'active', $2, $3, $4)
-    `, id, uri, displayName, email)
+        INSERT INTO principals (id, kind, status, global_uri, display_name)
+        VALUES ($1, 'user', 'active', $2, $3)
+    `, id, uri, displayName)
 	if err != nil {
 		t.Fatalf("insert principal: %v", err)
+	}
+	// User-tag root: required for @-mention resolution and home-tag-driven UI.
+	slug := strings.ToLower(displayName)
+	var tagID int64
+	if err := pool.QueryRow(context.Background(), `
+        INSERT INTO tags (parent_id, slug, display_name, root_kind, bound_principal, defaults)
+        VALUES (NULL, $1, $2, 'user', $3, '{}')
+        RETURNING id
+    `, slug, displayName, id).Scan(&tagID); err != nil {
+		t.Fatalf("create user-tag root for %s: %v", displayName, err)
+	}
+	if _, err := pool.Exec(context.Background(),
+		`INSERT INTO tag_closure (ancestor_id, descendant_id, depth) VALUES ($1, $1, 0)`,
+		tagID); err != nil {
+		t.Fatalf("seed tag closure: %v", err)
+	}
+	if _, err := pool.Exec(context.Background(),
+		`UPDATE principals SET email = $1, home_tag_id = $2 WHERE id = $3`,
+		email, tagID, id); err != nil {
+		t.Fatalf("link home_tag: %v", err)
 	}
 	hash, err := auth.HashPassword(password)
 	if err != nil {

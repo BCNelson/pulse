@@ -91,18 +91,21 @@ type ChatRoomParticipant struct {
 }
 
 type Comment struct {
-	ID          string             `json:"id"`
-	PostID      string             `json:"postId"`
-	ParentID    *string            `json:"parentId,omitempty"`
-	Depth       int                `json:"depth"`
-	Author      Principal          `json:"author"`
-	Body        string             `json:"body"`
-	Mentions    []Principal        `json:"mentions"`
-	Reactions   []*ReactionSummary `json:"reactions"`
-	Attachments []*Attachment      `json:"attachments"`
-	CreatedAt   time.Time          `json:"createdAt"`
-	EditedAt    *time.Time         `json:"editedAt,omitempty"`
-	DeletedAt   *time.Time         `json:"deletedAt,omitempty"`
+	ID       string      `json:"id"`
+	PostID   string      `json:"postId"`
+	ParentID *string     `json:"parentId,omitempty"`
+	Depth    int         `json:"depth"`
+	Author   Principal   `json:"author"`
+	Body     string      `json:"body"`
+	Mentions []Principal `json:"mentions"`
+	// Tags referenced inline from this comment's body via the canonical
+	// [#path](pulse-tag:path) link form. Link-only; no ACL impact.
+	ReferencedTags []*Tag             `json:"referencedTags"`
+	Reactions      []*ReactionSummary `json:"reactions"`
+	Attachments    []*Attachment      `json:"attachments"`
+	CreatedAt      time.Time          `json:"createdAt"`
+	EditedAt       *time.Time         `json:"editedAt,omitempty"`
+	DeletedAt      *time.Time         `json:"deletedAt,omitempty"`
 }
 
 func (Comment) IsSearchResult() {}
@@ -194,11 +197,17 @@ type LoginPayload struct {
 }
 
 type Message struct {
-	ID             string        `json:"id"`
-	GlobalURI      string        `json:"globalUri"`
-	ChatRoom       *ChatRoom     `json:"chatRoom"`
-	Author         Principal     `json:"author"`
-	Body           string        `json:"body"`
+	ID        string    `json:"id"`
+	GlobalURI string    `json:"globalUri"`
+	ChatRoom  *ChatRoom `json:"chatRoom"`
+	Author    Principal `json:"author"`
+	Body      string    `json:"body"`
+	// Principals mentioned in the body via canonical [@slug](pulse-user:slug) links.
+	// Drives chat-mention notifications.
+	Mentions []Principal `json:"mentions"`
+	// Tags referenced inline from this message's body via canonical
+	// [#path](pulse-tag:path) links. Link-only; no ACL impact.
+	ReferencedTags []*Tag        `json:"referencedTags"`
 	ReplyTo        *Message      `json:"replyTo,omitempty"`
 	Attachments    []*Attachment `json:"attachments"`
 	CreatedAt      time.Time     `json:"createdAt"`
@@ -259,13 +268,17 @@ type PageInfo struct {
 }
 
 type Post struct {
-	ID             string             `json:"id"`
-	GlobalURI      string             `json:"globalUri"`
-	Title          string             `json:"title"`
-	Body           string             `json:"body"`
-	Author         Principal          `json:"author"`
-	Tags           []*PostTag         `json:"tags"`
-	Mentions       []Principal        `json:"mentions"`
+	ID        string      `json:"id"`
+	GlobalURI string      `json:"globalUri"`
+	Title     string      `json:"title"`
+	Body      string      `json:"body"`
+	Author    Principal   `json:"author"`
+	Tags      []*PostTag  `json:"tags"`
+	Mentions  []Principal `json:"mentions"`
+	// Tags referenced inline from this post's body via the canonical
+	// [#path](pulse-tag:path) link form. Link-only — distinct from `tags`,
+	// which carries ACL semantics.
+	ReferencedTags []*Tag             `json:"referencedTags"`
 	Comments       *CommentConnection `json:"comments"`
 	Reactions      []*ReactionSummary `json:"reactions"`
 	Attachments    []*Attachment      `json:"attachments"`
@@ -452,6 +465,11 @@ type User struct {
 	DisplayName string          `json:"displayName"`
 	HomeTag     *Tag            `json:"homeTag,omitempty"`
 	Email       *string         `json:"email,omitempty"`
+	// Latest posts authored by this user that the viewer can see. Used by
+	// the mention-preview panel to show a quick profile snapshot. Visibility
+	// is checked per post; soft-deleted posts are skipped. Default first=5,
+	// cap 25.
+	RecentPosts []*Post `json:"recentPosts"`
 }
 
 func (User) IsPrincipal()                    {}

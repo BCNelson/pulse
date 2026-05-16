@@ -60,12 +60,13 @@ func TestM2EndToEnd(t *testing.T) {
 	bobTok := loginAs(t, ts.URL, "bob@example.com", "bob-pw-123")
 	charlieTok := loginAs(t, ts.URL, "charlie@example.com", "charlie-pw-123")
 
-	// alice creates a post @bob — mention parsing should resolve Bob.
+	// alice creates a post that mentions bob via the canonical link form —
+	// resolution joins through home_tag.slug.
 	createResp := gqlPost(t, ts.URL, aliceTok, `
         mutation($t:ID!) {
           createPost(input:{
             title:"Quarterly elephant decisions",
-            body:"@Bob can you review this elephant migration plan?",
+            body:"[@bob](pulse-user:bob) can you review this elephant migration plan?",
             tags:[{tagId:$t}]
           }) { id title mentions { displayName } myPermissions { canView canModerate } }
         }`, map[string]any{"t": ids.FormatID(rootID)})

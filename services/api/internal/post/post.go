@@ -41,6 +41,7 @@ type CreateInput struct {
 	Body     string
 	Tags     []TagAttachment
 	Mentions []int64
+	TagRefs  []int64 // tag ids referenced inline in the body
 	Decision *string // 'decision' | 'answer' | nil
 	DenyFlag bool
 }
@@ -95,6 +96,14 @@ func (s *Service) Create(ctx context.Context, in CreateInput) (int64, error) {
 				return fmt.Errorf("insert mention: %w", err)
 			}
 		}
+		for _, t := range in.TagRefs {
+			if _, err := tx.Exec(ctx, `
+                INSERT INTO post_tag_refs (post_id, tag_id) VALUES ($1, $2)
+                ON CONFLICT DO NOTHING
+            `, id, t); err != nil {
+				return fmt.Errorf("insert tag ref: %w", err)
+			}
+		}
 		return nil
 	})
 	return id, err
@@ -117,10 +126,11 @@ func (s *Service) Get(ctx context.Context, id int64) (*Post, error) {
 	return &p, nil
 }
 
-// Edit snapshots the prior title/body to post_edits and updates the row.
-// If neither field changed, returns ErrAlreadyEdited so the caller can
-// avoid a no-op audit row.
-func (s *Service) Edit(ctx context.Context, id, editor int64, title, body string) error {
+// Edit snapshots the prior title/body to post_edits, updates the row,
+// and re-derives the body-driven junctions (post_mentions, post_tag_refs)
+// since the new body may have added or removed mention/tag-ref tokens.
+// If neither title nor body changed, returns ErrAlreadyEdited.
+func (s *Service) Edit(ctx context.Context, id, editor int64, title, body string, mentions, tagRefs []int64) error {
 	return s.runInTx(ctx, func(tx pgx.Tx) error {
 		var prevTitle, prevBody string
 		err := tx.QueryRow(ctx,
@@ -145,6 +155,28 @@ func (s *Service) Edit(ctx context.Context, id, editor int64, title, body string
             UPDATE posts SET title = $1, body = $2, edited_at = now() WHERE id = $3
         `, title, body, id); err != nil {
 			return fmt.Errorf("update post: %w", err)
+		}
+		if _, err := tx.Exec(ctx, `DELETE FROM post_mentions WHERE post_id = $1`, id); err != nil {
+			return fmt.Errorf("clear mentions: %w", err)
+		}
+		for _, p := range mentions {
+			if _, err := tx.Exec(ctx, `
+                INSERT INTO post_mentions (post_id, principal_id) VALUES ($1, $2)
+                ON CONFLICT DO NOTHING
+            `, id, p); err != nil {
+				return fmt.Errorf("insert mention: %w", err)
+			}
+		}
+		if _, err := tx.Exec(ctx, `DELETE FROM post_tag_refs WHERE post_id = $1`, id); err != nil {
+			return fmt.Errorf("clear tag refs: %w", err)
+		}
+		for _, t := range tagRefs {
+			if _, err := tx.Exec(ctx, `
+                INSERT INTO post_tag_refs (post_id, tag_id) VALUES ($1, $2)
+                ON CONFLICT DO NOTHING
+            `, id, t); err != nil {
+				return fmt.Errorf("insert tag ref: %w", err)
+			}
 		}
 		return nil
 	})
@@ -298,6 +330,27 @@ func (s *Service) Mentions(ctx context.Context, id int64) ([]int64, error) {
 			return nil, err
 		}
 		out = append(out, p)
+	}
+	return out, rows.Err()
+}
+
+// TagRefs returns the tag ids referenced inline from this post's body.
+// Distinct from TagAttachments — these tags are link-only and do not
+// affect ACLs.
+func (s *Service) TagRefs(ctx context.Context, id int64) ([]int64, error) {
+	rows, err := s.DB.Query(ctx,
+		`SELECT tag_id FROM post_tag_refs WHERE post_id = $1`, id)
+	if err != nil {
+		return nil, fmt.Errorf("load tag refs: %w", err)
+	}
+	defer rows.Close()
+	var out []int64
+	for rows.Next() {
+		var t int64
+		if err := rows.Scan(&t); err != nil {
+			return nil, err
+		}
+		out = append(out, t)
 	}
 	return out, rows.Err()
 }

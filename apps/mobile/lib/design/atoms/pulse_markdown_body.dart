@@ -1,10 +1,20 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:markdown/markdown.dart' as md;
 
+import '../../features/mention_preview/mention_hoverable.dart';
+import '../../features/mention_preview/mention_preview_provider.dart';
 import '../tokens.dart';
 import '../typography.dart';
 
-class PulseMarkdownBody extends StatelessWidget {
+/// Canonical URL schemes the composer emits for mentions and tag refs.
+/// Kept in sync with `services/api/internal/mentions/mentions.go`.
+const String _userScheme = 'pulse-user:';
+const String _tagScheme = 'pulse-tag:';
+
+class PulseMarkdownBody extends ConsumerWidget {
   const PulseMarkdownBody({
     super.key,
     required this.data,
@@ -15,7 +25,7 @@ class PulseMarkdownBody extends StatelessWidget {
   final bool compact;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
     final theme = Theme.of(context);
     final body =
@@ -30,6 +40,14 @@ class PulseMarkdownBody extends StatelessWidget {
       data: data,
       selectable: true,
       softLineBreak: true,
+      onTapLink: (text, href, title) => _handleTapLink(ref, href),
+      builders: {
+        'a': _PulseLinkBuilder(
+          baseStyle: body,
+          chipColor: t.blueInk,
+          onTap: (href) => _handleTapLink(ref, href),
+        ),
+      },
       styleSheet: MarkdownStyleSheet(
         p: body,
         strong: body.copyWith(fontWeight: FontWeight.w700),
@@ -69,6 +87,79 @@ class PulseMarkdownBody extends StatelessWidget {
           border: Border(top: BorderSide(color: t.hair2)),
         ),
       ),
+    );
+  }
+
+  void _handleTapLink(WidgetRef ref, String? href) {
+    if (href == null || href.isEmpty) return;
+    if (href.startsWith(_userScheme)) {
+      final slug = href.substring(_userScheme.length);
+      if (slug.isNotEmpty) {
+        ref.read(mentionPreviewProvider.notifier).showUser(slug);
+      }
+      return;
+    }
+    if (href.startsWith(_tagScheme)) {
+      final path = href.substring(_tagScheme.length);
+      if (path.isNotEmpty) {
+        ref.read(mentionPreviewProvider.notifier).showTag(path);
+      }
+      return;
+    }
+    // External link handling is intentionally a no-op for v1; renderer
+    // stays a pure design atom without a url_launcher dependency.
+  }
+}
+
+/// Custom `<a>` element builder. For canonical pulse-user / pulse-tag
+/// links we render a styled chip (weight 600, no underline) so readers
+/// can tell at a glance that the token is a structured reference, not a
+/// raw `@foo`/`#foo` string. The tap recognizer dispatches through the
+/// provided [onTap]; flutter_markdown_plus's `onTapLink` does NOT fire
+/// for elements with a custom builder, so this is the only tap path for
+/// mention/tag chips. Everything else falls back to the default
+/// underlined-link rendering produced by [MarkdownStyleSheet.a].
+class _PulseLinkBuilder extends MarkdownElementBuilder {
+  _PulseLinkBuilder({
+    required this.baseStyle,
+    required this.chipColor,
+    required this.onTap,
+  });
+
+  final TextStyle baseStyle;
+  final Color chipColor;
+  final void Function(String href) onTap;
+
+  @override
+  Widget? visitElementAfter(md.Element element, TextStyle? preferredStyle) {
+    final href = element.attributes['href'] ?? '';
+    if (!href.startsWith(_userScheme) && !href.startsWith(_tagScheme)) {
+      return null; // default rendering
+    }
+    final label = element.textContent;
+    final chip = Text.rich(
+      TextSpan(
+        text: label,
+        style: baseStyle.copyWith(
+          color: chipColor,
+          fontWeight: FontWeight.w600,
+        ),
+        recognizer: TapGestureRecognizer()..onTap = () => onTap(href),
+      ),
+    );
+    if (href.startsWith(_userScheme)) {
+      final slug = href.substring(_userScheme.length);
+      return MentionHoverable.user(
+        slug: slug,
+        onTap: () => onTap(href),
+        child: chip,
+      );
+    }
+    final path = href.substring(_tagScheme.length);
+    return MentionHoverable.tag(
+      path: path,
+      onTap: () => onTap(href),
+      child: chip,
     );
   }
 }

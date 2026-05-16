@@ -207,6 +207,7 @@ class _RoomDetailState extends ConsumerState<_RoomDetail> {
       }
       children.add(PulseChatMsg(
         who: node.author.displayName,
+        whoSlug: node.author.homeTag?.slug,
         initials: _initials(node.author.displayName),
         text: node.body,
         when: _shortTime(node.createdAt.value),

@@ -10,13 +10,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
+
+	"github.com/jackc/pgx/v5"
 
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/chat"
 	"github.com/bcnelson/pulse/services/api/internal/comment"
 	"github.com/bcnelson/pulse/services/api/internal/graphql/model"
+	"github.com/bcnelson/pulse/services/api/internal/mentions"
 	"github.com/bcnelson/pulse/services/api/internal/perm"
 	"github.com/bcnelson/pulse/services/api/internal/post"
 	"github.com/bcnelson/pulse/services/api/internal/realtime"
@@ -427,7 +431,11 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input model.CreatePos
 		}
 		tagAttachments = append(tagAttachments, ta)
 	}
-	mentions, err := r.resolveMentionSlugs(ctx, post.ExtractMentionSlugs(input.Body))
+	mentionIDs, err := r.resolveUserMentions(ctx, mentions.ExtractUsers(input.Body))
+	if err != nil {
+		return nil, err
+	}
+	tagRefIDs, err := r.resolveTagRefs(ctx, mentions.ExtractTagPaths(input.Body))
 	if err != nil {
 		return nil, err
 	}
@@ -436,7 +444,8 @@ func (r *mutationResolver) CreatePost(ctx context.Context, input model.CreatePos
 		Title:    input.Title,
 		Body:     input.Body,
 		Tags:     tagAttachments,
-		Mentions: mentions,
+		Mentions: mentionIDs,
+		TagRefs:  tagRefIDs,
 	})
 	if err != nil {
 		return nil, err
@@ -466,7 +475,15 @@ func (r *mutationResolver) EditPost(ctx context.Context, input model.EditPostInp
 	if !can {
 		return nil, errPermissionDenied
 	}
-	if err := r.Posts.Edit(ctx, id, identity.EffectiveID, input.Title, input.Body); err != nil {
+	mentionIDs, err := r.resolveUserMentions(ctx, mentions.ExtractUsers(input.Body))
+	if err != nil {
+		return nil, err
+	}
+	tagRefIDs, err := r.resolveTagRefs(ctx, mentions.ExtractTagPaths(input.Body))
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Posts.Edit(ctx, id, identity.EffectiveID, input.Title, input.Body, mentionIDs, tagRefIDs); err != nil {
 		if errors.Is(err, post.ErrAlreadyEdited) {
 			return r.loadPost(ctx, id)
 		}
@@ -653,13 +670,17 @@ func (r *mutationResolver) CreateComment(ctx context.Context, input model.Create
 		}
 		parentPtr = &pid
 	}
-	mentions, err := r.resolveMentionSlugs(ctx, post.ExtractMentionSlugs(input.Body))
+	mentionIDs, err := r.resolveUserMentions(ctx, mentions.ExtractUsers(input.Body))
+	if err != nil {
+		return nil, err
+	}
+	tagRefIDs, err := r.resolveTagRefs(ctx, mentions.ExtractTagPaths(input.Body))
 	if err != nil {
 		return nil, err
 	}
 	id, err := r.Comments.Create(ctx, comment.CreateInput{
 		PostID: postID, ParentID: parentPtr, AuthorID: identity.EffectiveID,
-		Body: input.Body, Mentions: mentions,
+		Body: input.Body, Mentions: mentionIDs, TagRefs: tagRefIDs,
 	})
 	if err != nil {
 		return nil, err
@@ -696,7 +717,15 @@ func (r *mutationResolver) EditComment(ctx context.Context, commentID string, bo
 			return nil, errPermissionDenied
 		}
 	}
-	if err := r.Comments.Edit(ctx, id, identity.EffectiveID, body); err != nil {
+	mentionIDs, err := r.resolveUserMentions(ctx, mentions.ExtractUsers(body))
+	if err != nil {
+		return nil, err
+	}
+	tagRefIDs, err := r.resolveTagRefs(ctx, mentions.ExtractTagPaths(body))
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Comments.Edit(ctx, id, identity.EffectiveID, body, mentionIDs, tagRefIDs); err != nil {
 		if errors.Is(err, comment.ErrAlreadyEdited) {
 			return r.loadComment(ctx, id)
 		}
@@ -1478,8 +1507,17 @@ func (r *mutationResolver) SendMessage(ctx context.Context, input model.SendMess
 		}
 		replyTo = &rt
 	}
+	mentionIDs, err := r.resolveUserMentions(ctx, mentions.ExtractUsers(input.Body))
+	if err != nil {
+		return nil, err
+	}
+	tagRefIDs, err := r.resolveTagRefs(ctx, mentions.ExtractTagPaths(input.Body))
+	if err != nil {
+		return nil, err
+	}
 	id, err := r.Chat.SendMessage(ctx, chat.SendInput{
 		RoomID: rid, AuthorID: identity.EffectiveID, Body: input.Body, ReplyTo: replyTo,
+		Mentions: mentionIDs, TagRefs: tagRefIDs,
 	})
 	if err != nil {
 		return nil, err
@@ -1506,7 +1544,15 @@ func (r *mutationResolver) EditMessage(ctx context.Context, messageID string, bo
 		// transient than posts. M5 may add admin overrides.
 		return nil, errPermissionDenied
 	}
-	if err := r.Chat.EditMessage(ctx, mid, identity.EffectiveID, body); err != nil {
+	mentionIDs, err := r.resolveUserMentions(ctx, mentions.ExtractUsers(body))
+	if err != nil {
+		return nil, err
+	}
+	tagRefIDs, err := r.resolveTagRefs(ctx, mentions.ExtractTagPaths(body))
+	if err != nil {
+		return nil, err
+	}
+	if err := r.Chat.EditMessage(ctx, mid, identity.EffectiveID, body, mentionIDs, tagRefIDs); err != nil {
 		if errors.Is(err, chat.ErrAlreadyEdited) {
 			return r.loadMessage(ctx, mid)
 		}
@@ -1844,6 +1890,91 @@ func (r *queryResolver) SearchTags(ctx context.Context, query string, first *int
 	return out, nil
 }
 
+// SearchUsers is the resolver for the searchUsers field.
+func (r *queryResolver) SearchUsers(ctx context.Context, query string, first *int) ([]*model.User, error) {
+	if _, err := requireIdentity(ctx); err != nil {
+		return nil, err
+	}
+	q := strings.TrimSpace(query)
+	if q == "" {
+		return nil, nil
+	}
+	limit := 10
+	if first != nil && *first > 0 {
+		limit = *first
+	}
+	if limit > 25 {
+		limit = 25
+	}
+	// Primary signal: prefix match on the user-tag root slug. Secondary:
+	// case-insensitive substring on display_name. The ORDER BY prefers
+	// slug hits so a typeahead converges fast.
+	rows, err := r.DB.Query(ctx, `
+        SELECT p.id
+        FROM principals p
+        JOIN tags t ON t.id = p.home_tag_id
+        WHERE p.status = 'active'
+          AND p.kind = 'user'
+          AND t.parent_id IS NULL
+          AND t.root_kind = 'user'
+          AND (t.slug ILIKE $1 || '%' OR p.display_name ILIKE '%' || $1 || '%')
+        ORDER BY
+          CASE WHEN t.slug ILIKE $1 || '%' THEN 0 ELSE 1 END,
+          t.slug,
+          p.display_name
+        LIMIT $2
+    `, q, limit)
+	if err != nil {
+		return nil, fmt.Errorf("search users: %w", err)
+	}
+	defer rows.Close()
+	out := make([]*model.User, 0, limit)
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		u, err := r.loadUser(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		if u != nil {
+			out = append(out, u)
+		}
+	}
+	return out, rows.Err()
+}
+
+// UserByHandle is the resolver for the userByHandle field.
+func (r *queryResolver) UserByHandle(ctx context.Context, slug string) (*model.User, error) {
+	if _, err := requireIdentity(ctx); err != nil {
+		return nil, err
+	}
+	slug = strings.ToLower(strings.TrimSpace(slug))
+	if slug == "" {
+		return nil, nil
+	}
+	var id int64
+	err := r.DB.QueryRow(ctx, `
+        SELECT p.id
+        FROM principals p
+        JOIN tags t ON t.id = p.home_tag_id
+        WHERE p.status = 'active'
+          AND p.kind = 'user'
+          AND t.parent_id IS NULL
+          AND t.root_kind = 'user'
+          AND t.slug = $1
+        LIMIT 1
+    `, slug).Scan(&id)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("userByHandle: %w", err)
+	}
+	return r.loadUser(ctx, id)
+}
+
 // MessageAdded is the resolver for the messageAdded field.
 func (r *subscriptionResolver) MessageAdded(ctx context.Context, roomID string) (<-chan *model.Message, error) {
 	identity, err := requireIdentity(ctx)
@@ -2149,6 +2280,63 @@ func (r *tagResolver) Tasks(ctx context.Context, obj *model.Tag, first *int, aft
 	return r.loadTasksForTag(ctx, tagID, limit, dbStatus)
 }
 
+// RecentPosts is the resolver for the recentPosts field.
+func (r *userResolver) RecentPosts(ctx context.Context, obj *model.User, first *int) ([]*model.Post, error) {
+	if _, err := requireIdentity(ctx); err != nil {
+		return nil, err
+	}
+	authorID, err := ids.ParseAs(ids.KindUser, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid user id: %w", err)
+	}
+	limit := 5
+	if first != nil && *first > 0 {
+		limit = *first
+	}
+	if limit > 25 {
+		limit = 25
+	}
+	// Over-fetch a window then per-post visibility-check via loadPost; the
+	// viewer can't necessarily see every post the user authored.
+	rows, err := r.DB.Query(ctx, `
+        SELECT id
+        FROM posts
+        WHERE author_id = $1 AND deleted_at IS NULL
+        ORDER BY created_at DESC
+        LIMIT $2
+    `, authorID, limit*3)
+	if err != nil {
+		return nil, fmt.Errorf("recent posts: %w", err)
+	}
+	defer rows.Close()
+	candidates := make([]int64, 0, limit*3)
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		candidates = append(candidates, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	out := make([]*model.Post, 0, limit)
+	for _, id := range candidates {
+		p, err := r.loadPost(ctx, id)
+		if err != nil {
+			return nil, err
+		}
+		if p == nil {
+			continue
+		}
+		out = append(out, p)
+		if len(out) >= limit {
+			break
+		}
+	}
+	return out, nil
+}
+
 // Attachment returns AttachmentResolver implementation.
 func (r *Resolver) Attachment() AttachmentResolver { return &attachmentResolver{r} }
 
@@ -2176,6 +2364,9 @@ func (r *Resolver) Subscription() SubscriptionResolver { return &subscriptionRes
 // Tag returns TagResolver implementation.
 func (r *Resolver) Tag() TagResolver { return &tagResolver{r} }
 
+// User returns UserResolver implementation.
+func (r *Resolver) User() UserResolver { return &userResolver{r} }
+
 type attachmentResolver struct{ *Resolver }
 type chatRoomResolver struct{ *Resolver }
 type commentResolver struct{ *Resolver }
@@ -2185,3 +2376,4 @@ type postResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type subscriptionResolver struct{ *Resolver }
 type tagResolver struct{ *Resolver }
+type userResolver struct{ *Resolver }

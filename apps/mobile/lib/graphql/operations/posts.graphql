@@ -10,6 +10,24 @@ fragment PostSummary on Post {
   author {
     id
     displayName
+    homeTag {
+      slug
+      path
+    }
+  }
+  mentions {
+    id
+    displayName
+    homeTag {
+      slug
+      path
+    }
+  }
+  referencedTags {
+    id
+    slug
+    displayName
+    path
   }
   reactions {
     emoji
@@ -53,6 +71,24 @@ fragment CommentSummary on Comment {
   author {
     id
     displayName
+    homeTag {
+      slug
+      path
+    }
+  }
+  mentions {
+    id
+    displayName
+    homeTag {
+      slug
+      path
+    }
+  }
+  referencedTags {
+    id
+    slug
+    displayName
+    path
   }
   reactions {
     emoji

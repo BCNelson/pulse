@@ -63,3 +63,7 @@ models:
     fields:
       downloadUrl:
         resolver: true
+  User:
+    fields:
+      recentPosts:
+        resolver: true

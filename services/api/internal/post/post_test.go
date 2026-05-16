@@ -75,7 +75,7 @@ func TestEditWritesHistoryRow(t *testing.T) {
 		t.Fatalf("create: %v", err)
 	}
 
-	if err := svc.Edit(context.Background(), id, alice, "v2", "b2"); err != nil {
+	if err := svc.Edit(context.Background(), id, alice, "v2", "b2", nil, nil); err != nil {
 		t.Fatalf("edit: %v", err)
 	}
 
@@ -89,7 +89,7 @@ func TestEditWritesHistoryRow(t *testing.T) {
 	}
 
 	// no-op edit returns ErrAlreadyEdited.
-	if err := svc.Edit(context.Background(), id, alice, "v2", "b2"); err != post.ErrAlreadyEdited {
+	if err := svc.Edit(context.Background(), id, alice, "v2", "b2", nil, nil); err != post.ErrAlreadyEdited {
 		t.Errorf("expected ErrAlreadyEdited, got %v", err)
 	}
 }
@@ -134,37 +134,6 @@ func TestReactTallyAndIdempotency(t *testing.T) {
 	if tally[0].Count != 1 || tally[0].ByViewer {
 		t.Errorf("post-unreact tally: %+v", tally)
 	}
-}
-
-func TestExtractMentionSlugs(t *testing.T) {
-	tests := []struct {
-		body string
-		want []string
-	}{
-		{"hi @alice and @bob", []string{"alice", "bob"}},
-		{"@alice @alice again", []string{"alice"}},
-		{"path @engineering/backend matters", []string{"engineering/backend"}},
-		{"email like a@b.com is not a mention", nil},
-		{"start @alice", []string{"alice"}},
-	}
-	for _, tt := range tests {
-		got := post.ExtractMentionSlugs(tt.body)
-		if !slicesEqual(got, tt.want) {
-			t.Errorf("ExtractMentionSlugs(%q): want %v got %v", tt.body, tt.want, got)
-		}
-	}
-}
-
-func slicesEqual(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
 }
 
 // --- helpers ---

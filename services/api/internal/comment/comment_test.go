@@ -95,7 +95,7 @@ func TestEditWritesHistory(t *testing.T) {
 	id, _ := cmt.Create(context.Background(), comment.CreateInput{
 		PostID: postID, AuthorID: alice, Body: "v1",
 	})
-	if err := cmt.Edit(context.Background(), id, alice, "v2"); err != nil {
+	if err := cmt.Edit(context.Background(), id, alice, "v2", nil, nil); err != nil {
 		t.Fatalf("edit: %v", err)
 	}
 	var n int

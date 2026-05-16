@@ -33,3 +33,14 @@ query SearchTags($query: String!, $first: Int) {
     }
   }
 }
+
+query SearchUsers($query: String!, $first: Int) {
+  searchUsers(query: $query, first: $first) {
+    id
+    displayName
+    homeTag {
+      slug
+      path
+    }
+  }
+}

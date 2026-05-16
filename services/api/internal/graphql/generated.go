@@ -38,6 +38,7 @@ type ResolverRoot interface {
 	Query() QueryResolver
 	Subscription() SubscriptionResolver
 	Tag() TagResolver
+	User() UserResolver
 }
 
 type DirectiveRoot struct {
@@ -93,18 +94,19 @@ type ComplexityRoot struct {
 	}
 
 	Comment struct {
-		Attachments func(childComplexity int) int
-		Author      func(childComplexity int) int
-		Body        func(childComplexity int) int
-		CreatedAt   func(childComplexity int) int
-		DeletedAt   func(childComplexity int) int
-		Depth       func(childComplexity int) int
-		EditedAt    func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Mentions    func(childComplexity int) int
-		ParentID    func(childComplexity int) int
-		PostID      func(childComplexity int) int
-		Reactions   func(childComplexity int) int
+		Attachments    func(childComplexity int) int
+		Author         func(childComplexity int) int
+		Body           func(childComplexity int) int
+		CreatedAt      func(childComplexity int) int
+		DeletedAt      func(childComplexity int) int
+		Depth          func(childComplexity int) int
+		EditedAt       func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Mentions       func(childComplexity int) int
+		ParentID       func(childComplexity int) int
+		PostID         func(childComplexity int) int
+		Reactions      func(childComplexity int) int
+		ReferencedTags func(childComplexity int) int
 	}
 
 	CommentConnection struct {
@@ -139,7 +141,9 @@ type ComplexityRoot struct {
 		EditedAt       func(childComplexity int) int
 		GlobalURI      func(childComplexity int) int
 		ID             func(childComplexity int) int
+		Mentions       func(childComplexity int) int
 		PromotedToPost func(childComplexity int) int
+		ReferencedTags func(childComplexity int) int
 		ReplyTo        func(childComplexity int) int
 	}
 
@@ -253,6 +257,7 @@ type ComplexityRoot struct {
 		Mentions       func(childComplexity int) int
 		MyPermissions  func(childComplexity int) int
 		Reactions      func(childComplexity int) int
+		ReferencedTags func(childComplexity int) int
 		Tags           func(childComplexity int) int
 		Title          func(childComplexity int) int
 	}
@@ -289,10 +294,12 @@ type ComplexityRoot struct {
 		Post                     func(childComplexity int, id string) int
 		Search                   func(childComplexity int, query string, kinds []model.SearchKind, first *int) int
 		SearchTags               func(childComplexity int, query string, first *int) int
+		SearchUsers              func(childComplexity int, query string, first *int) int
 		ServerTime               func(childComplexity int) int
 		Tag                      func(childComplexity int, id string) int
 		TagBySlugPath            func(childComplexity int, path []string) int
 		Task                     func(childComplexity int, id string) int
+		UserByHandle             func(childComplexity int, slug string) int
 		Viewer                   func(childComplexity int) int
 		ViewerImpersonationState func(childComplexity int) int
 	}
@@ -414,6 +421,7 @@ type ComplexityRoot struct {
 		HomeTag     func(childComplexity int) int
 		ID          func(childComplexity int) int
 		Kind        func(childComplexity int) int
+		RecentPosts func(childComplexity int, first *int) int
 		Status      func(childComplexity int) int
 	}
 }
@@ -501,6 +509,8 @@ type QueryResolver interface {
 	Notifications(ctx context.Context, first *int, after *string, filter *model.NotificationFilter) (*model.NotificationConnection, error)
 	Search(ctx context.Context, query string, kinds []model.SearchKind, first *int) (*model.SearchConnection, error)
 	SearchTags(ctx context.Context, query string, first *int) ([]*model.TagSearchHit, error)
+	SearchUsers(ctx context.Context, query string, first *int) ([]*model.User, error)
+	UserByHandle(ctx context.Context, slug string) (*model.User, error)
 }
 type SubscriptionResolver interface {
 	MessageAdded(ctx context.Context, roomID string) (<-chan *model.Message, error)
@@ -511,6 +521,9 @@ type SubscriptionResolver interface {
 type TagResolver interface {
 	Posts(ctx context.Context, obj *model.Tag, first *int, after *string, sort *model.PostSort) (*model.PostConnection, error)
 	Tasks(ctx context.Context, obj *model.Tag, first *int, after *string, status *model.TaskStatus) (*model.TaskConnection, error)
+}
+type UserResolver interface {
+	RecentPosts(ctx context.Context, obj *model.User, first *int) ([]*model.Post, error)
 }
 
 type executableSchema graphql.ExecutableSchemaState[ResolverRoot, DirectiveRoot, ComplexityRoot]
@@ -807,6 +820,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Comment.Reactions(childComplexity), true
+	case "Comment.referencedTags":
+		if e.ComplexityRoot.Comment.ReferencedTags == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Comment.ReferencedTags(childComplexity), true
 
 	case "CommentConnection.edges":
 		if e.ComplexityRoot.CommentConnection.Edges == nil {
@@ -926,12 +945,24 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Message.ID(childComplexity), true
+	case "Message.mentions":
+		if e.ComplexityRoot.Message.Mentions == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Message.Mentions(childComplexity), true
 	case "Message.promotedToPost":
 		if e.ComplexityRoot.Message.PromotedToPost == nil {
 			break
 		}
 
 		return e.ComplexityRoot.Message.PromotedToPost(childComplexity), true
+	case "Message.referencedTags":
+		if e.ComplexityRoot.Message.ReferencedTags == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Message.ReferencedTags(childComplexity), true
 	case "Message.replyTo":
 		if e.ComplexityRoot.Message.ReplyTo == nil {
 			break
@@ -1714,6 +1745,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Post.Reactions(childComplexity), true
+	case "Post.referencedTags":
+		if e.ComplexityRoot.Post.ReferencedTags == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Post.ReferencedTags(childComplexity), true
 	case "Post.tags":
 		if e.ComplexityRoot.Post.Tags == nil {
 			break
@@ -1871,6 +1908,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.SearchTags(childComplexity, args["query"].(string), args["first"].(*int)), true
+	case "Query.searchUsers":
+		if e.ComplexityRoot.Query.SearchUsers == nil {
+			break
+		}
+
+		args, err := ec.field_Query_searchUsers_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.SearchUsers(childComplexity, args["query"].(string), args["first"].(*int)), true
 	case "Query.serverTime":
 		if e.ComplexityRoot.Query.ServerTime == nil {
 			break
@@ -1910,6 +1958,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Query.Task(childComplexity, args["id"].(string)), true
+	case "Query.userByHandle":
+		if e.ComplexityRoot.Query.UserByHandle == nil {
+			break
+		}
+
+		args, err := ec.field_Query_userByHandle_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Query.UserByHandle(childComplexity, args["slug"].(string)), true
 	case "Query.viewer":
 		if e.ComplexityRoot.Query.Viewer == nil {
 			break
@@ -2406,6 +2465,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.User.Kind(childComplexity), true
+	case "User.recentPosts":
+		if e.ComplexityRoot.User.RecentPosts == nil {
+			break
+		}
+
+		args, err := ec.field_User_recentPosts_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.User.RecentPosts(childComplexity, args["first"].(*int)), true
 	case "User.status":
 		if e.ComplexityRoot.User.Status == nil {
 			break
@@ -2651,6 +2721,13 @@ type User implements Principal {
   displayName: String!
   homeTag: Tag
   email: String
+  """
+  Latest posts authored by this user that the viewer can see. Used by
+  the mention-preview panel to show a quick profile snapshot. Visibility
+  is checked per post; soft-deleted posts are skipped. Default first=5,
+  cap 25.
+  """
+  recentPosts(first: Int): [Post!]!
 }
 
 type Bot implements Principal {
@@ -2728,6 +2805,12 @@ type Post {
   author: Principal!
   tags: [PostTag!]!
   mentions: [Principal!]!
+  """
+  Tags referenced inline from this post's body via the canonical
+  [#path](pulse-tag:path) link form. Link-only — distinct from ` + "`" + `tags` + "`" + `,
+  which carries ACL semantics.
+  """
+  referencedTags: [Tag!]!
   comments(first: Int, after: String): CommentConnection!
   reactions: [ReactionSummary!]!
   attachments: [Attachment!]!
@@ -2760,6 +2843,11 @@ type Comment {
   author: Principal!
   body: String!
   mentions: [Principal!]!
+  """
+  Tags referenced inline from this comment's body via the canonical
+  [#path](pulse-tag:path) link form. Link-only; no ACL impact.
+  """
+  referencedTags: [Tag!]!
   reactions: [ReactionSummary!]!
   attachments: [Attachment!]!
   createdAt: Time!
@@ -2912,6 +3000,19 @@ type Query {
 
   search(query: String!, kinds: [SearchKind!], first: Int): SearchConnection!
   searchTags(query: String!, first: Int): [TagSearchHit!]!
+  """
+  Prefix-match active users for the composer's @-mention typeahead. The
+  primary signal is the user-tag root slug; display name is a secondary
+  fuzzy fallback. Returns at most ` + "`" + `first` + "`" + ` (default 10, cap 25) hits.
+  """
+  searchUsers(query: String!, first: Int): [User!]!
+  """
+  Resolve a user by their handle — the slug of their user-tag root.
+  Used by the mention-preview panel to fetch a profile from a ` + "`" + `[@slug]` + "`" + `
+  link target without a fuzzy search. Returns null when no active user
+  owns that slug.
+  """
+  userByHandle(slug: String!): User
 }
 
 type ImpersonationState {
@@ -3041,6 +3142,16 @@ type Message {
   chatRoom: ChatRoom!
   author: Principal!
   body: String!
+  """
+  Principals mentioned in the body via canonical [@slug](pulse-user:slug) links.
+  Drives chat-mention notifications.
+  """
+  mentions: [Principal!]!
+  """
+  Tags referenced inline from this message's body via canonical
+  [#path](pulse-tag:path) links. Link-only; no ACL impact.
+  """
+  referencedTags: [Tag!]!
   replyTo: Message
   attachments: [Attachment!]!
   createdAt: Time!
@@ -3316,6 +3427,8 @@ func (ec *executionContext) childFields_Comment(ctx context.Context, field graph
 		return ec.fieldContext_Comment_body(ctx, field)
 	case "mentions":
 		return ec.fieldContext_Comment_mentions(ctx, field)
+	case "referencedTags":
+		return ec.fieldContext_Comment_referencedTags(ctx, field)
 	case "reactions":
 		return ec.fieldContext_Comment_reactions(ctx, field)
 	case "attachments":
@@ -3386,6 +3499,10 @@ func (ec *executionContext) childFields_Message(ctx context.Context, field graph
 		return ec.fieldContext_Message_author(ctx, field)
 	case "body":
 		return ec.fieldContext_Message_body(ctx, field)
+	case "mentions":
+		return ec.fieldContext_Message_mentions(ctx, field)
+	case "referencedTags":
+		return ec.fieldContext_Message_referencedTags(ctx, field)
 	case "replyTo":
 		return ec.fieldContext_Message_replyTo(ctx, field)
 	case "attachments":
@@ -3500,6 +3617,8 @@ func (ec *executionContext) childFields_Post(ctx context.Context, field graphql.
 		return ec.fieldContext_Post_tags(ctx, field)
 	case "mentions":
 		return ec.fieldContext_Post_mentions(ctx, field)
+	case "referencedTags":
+		return ec.fieldContext_Post_referencedTags(ctx, field)
 	case "comments":
 		return ec.fieldContext_Post_comments(ctx, field)
 	case "reactions":
@@ -3794,6 +3913,8 @@ func (ec *executionContext) childFields_User(ctx context.Context, field graphql.
 		return ec.fieldContext_User_homeTag(ctx, field)
 	case "email":
 		return ec.fieldContext_User_email(ctx, field)
+	case "recentPosts":
+		return ec.fieldContext_User_recentPosts(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type User", field.Name)
 }
@@ -4942,6 +5063,28 @@ func (ec *executionContext) field_Query_searchTags_args(ctx context.Context, raw
 	return args, nil
 }
 
+func (ec *executionContext) field_Query_searchUsers_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "query",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNString2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["query"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "first",
+		func(ctx context.Context, v any) (*int, error) {
+			return ec.unmarshalOInt2ᚖint(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg1
+	return args, nil
+}
+
 func (ec *executionContext) field_Query_search_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -5011,6 +5154,20 @@ func (ec *executionContext) field_Query_task_args(ctx context.Context, rawArgs m
 		return nil, err
 	}
 	args["id"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_userByHandle_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "slug",
+		func(ctx context.Context, v any) (string, error) {
+			return ec.unmarshalNString2string(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["slug"] = arg0
 	return args, nil
 }
 
@@ -5113,6 +5270,20 @@ func (ec *executionContext) field_Tag_tasks_args(ctx context.Context, rawArgs ma
 		return nil, err
 	}
 	args["status"] = arg2
+	return args, nil
+}
+
+func (ec *executionContext) field_User_recentPosts_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "first",
+		func(ctx context.Context, v any) (*int, error) {
+			return ec.unmarshalOInt2ᚖint(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["first"] = arg0
 	return args, nil
 }
 
@@ -6193,6 +6364,38 @@ func (ec *executionContext) fieldContext_Comment_mentions(_ context.Context, fie
 	return fc, nil
 }
 
+func (ec *executionContext) _Comment_referencedTags(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Comment_referencedTags(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ReferencedTags, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.Tag) graphql.Marshaler {
+			return ec.marshalNTag2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐTagᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Comment_referencedTags(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Comment",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Tag(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Comment_reactions(ctx context.Context, field graphql.CollectedField, obj *model.Comment) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -6741,6 +6944,70 @@ func (ec *executionContext) _Message_body(ctx context.Context, field graphql.Col
 }
 func (ec *executionContext) fieldContext_Message_body(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("Message", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _Message_mentions(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Message_mentions(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.Mentions, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []model.Principal) graphql.Marshaler {
+			return ec.marshalNPrincipal2ᚕgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐPrincipalᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Message_mentions(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Message",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("FieldContext.Child cannot be called on type INTERFACE")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Message_referencedTags(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Message_referencedTags(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ReferencedTags, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.Tag) graphql.Marshaler {
+			return ec.marshalNTag2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐTagᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Message_referencedTags(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Message",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Tag(ctx, field)
+		},
+	}
+	return fc, nil
 }
 
 func (ec *executionContext) _Message_replyTo(ctx context.Context, field graphql.CollectedField, obj *model.Message) (ret graphql.Marshaler) {
@@ -9843,6 +10110,38 @@ func (ec *executionContext) fieldContext_Post_mentions(_ context.Context, field 
 	return fc, nil
 }
 
+func (ec *executionContext) _Post_referencedTags(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Post_referencedTags(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.ReferencedTags, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.Tag) graphql.Marshaler {
+			return ec.marshalNTag2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐTagᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Post_referencedTags(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Post",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Tag(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Post_comments(ctx context.Context, field graphql.CollectedField, obj *model.Post) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -10921,6 +11220,94 @@ func (ec *executionContext) fieldContext_Query_searchTags(ctx context.Context, f
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Query_searchTags_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_searchUsers(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_searchUsers(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().SearchUsers(ctx, fc.Args["query"].(string), fc.Args["first"].(*int))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.User) graphql.Marshaler {
+			return ec.marshalNUser2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐUserᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Query_searchUsers(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_User(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_searchUsers_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Query_userByHandle(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Query_userByHandle(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Query().UserByHandle(ctx, fc.Args["slug"].(string))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.User) graphql.Marshaler {
+			return ec.marshalOUser2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐUser(ctx, selections, v)
+		},
+		true,
+		false,
+	)
+}
+func (ec *executionContext) fieldContext_Query_userByHandle(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Query",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_User(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_userByHandle_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -13011,6 +13398,50 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 }
 func (ec *executionContext) fieldContext_User_email(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	return graphql.NewScalarFieldContext("User", field, false, false, errors.New("field of type String does not have child fields"))
+}
+
+func (ec *executionContext) _User_recentPosts(ctx context.Context, field graphql.CollectedField, obj *model.User) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_User_recentPosts(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.User().RecentPosts(ctx, obj, fc.Args["first"].(*int))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v []*model.Post) graphql.Marshaler {
+			return ec.marshalNPost2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐPostᚄ(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_User_recentPosts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_Post(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_User_recentPosts_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
 }
 
 func (ec *executionContext) ___Directive_name(ctx context.Context, field graphql.CollectedField, obj *introspection.Directive) (ret graphql.Marshaler) {
@@ -15289,6 +15720,11 @@ func (ec *executionContext) _Comment(ctx context.Context, sel ast.SelectionSet, 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "referencedTags":
+			out.Values[i] = ec._Comment_referencedTags(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "reactions":
 			out.Values[i] = ec._Comment_reactions(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
@@ -15575,6 +16011,16 @@ func (ec *executionContext) _Message(ctx context.Context, sel ast.SelectionSet, 
 			}
 		case "body":
 			out.Values[i] = ec._Message_body(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "mentions":
+			out.Values[i] = ec._Message_mentions(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
+		case "referencedTags":
+			out.Values[i] = ec._Message_referencedTags(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
@@ -16392,6 +16838,11 @@ func (ec *executionContext) _Post(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&out.Invalids, 1)
 			}
+		case "referencedTags":
+			out.Values[i] = ec._Post_referencedTags(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&out.Invalids, 1)
+			}
 		case "comments":
 			field := field
 
@@ -16986,6 +17437,47 @@ func (ec *executionContext) _Query(ctx context.Context, sel ast.SelectionSet) gr
 				if res == graphql.Null {
 					atomic.AddUint32(&fs.Invalids, 1)
 				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "searchUsers":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_searchUsers(ctx, field)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			rrm := func(ctx context.Context) graphql.Marshaler {
+				return ec.OperationContext.RootResolverMiddleware(ctx,
+					func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return rrm(innerCtx) })
+		case "userByHandle":
+			field := field
+
+			innerFunc := func(ctx context.Context, _ *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Query_userByHandle(ctx, field)
 				return res
 			}
 
@@ -17857,32 +18349,68 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 		case "id":
 			out.Values[i] = ec._User_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "globalUri":
 			out.Values[i] = ec._User_globalUri(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "kind":
 			out.Values[i] = ec._User_kind(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "status":
 			out.Values[i] = ec._User_status(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "displayName":
 			out.Values[i] = ec._User_displayName(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "homeTag":
 			out.Values[i] = ec._User_homeTag(ctx, field, obj)
 		case "email":
 			out.Values[i] = ec._User_email(ctx, field, obj)
+		case "recentPosts":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._User_recentPosts(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -18734,6 +19262,22 @@ func (ec *executionContext) marshalNPost2githubᚗcomᚋbcnelsonᚋpulseᚋservi
 	return ec._Post(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNPost2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐPostᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.Post) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNPost2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐPost(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) marshalNPost2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐPost(ctx context.Context, sel ast.SelectionSet, v *model.Post) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -19283,6 +19827,22 @@ func (ec *executionContext) marshalNTime2ᚖtimeᚐTime(ctx context.Context, sel
 		}
 	}
 	return res
+}
+
+func (ec *executionContext) marshalNUser2ᚕᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐUserᚄ(ctx context.Context, sel ast.SelectionSet, v []*model.User) graphql.Marshaler {
+	ret := graphql.MarshalSliceConcurrently(ctx, len(v), 0, false, func(ctx context.Context, i int) graphql.Marshaler {
+		fc := graphql.GetFieldContext(ctx)
+		fc.Result = &v[i]
+		return ec.marshalNUser2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐUser(ctx, sel, v[i])
+	})
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐUser(ctx context.Context, sel ast.SelectionSet, v *model.User) graphql.Marshaler {

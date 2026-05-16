@@ -12,10 +12,18 @@ import '../../design/tokens.dart';
 import '../../design/typography.dart';
 import '../../graphql/operations/__generated__/posts.data.gql.dart';
 import '../composer/comment_composer.dart';
+import '../mention_preview/mention_hoverable.dart';
 import 'cached_post_detail_provider.dart';
 import 'comment_tree.dart';
 import 'post_read_marker.dart';
 import 'reaction_bar.dart';
+
+/// Wrap an author display widget in [MentionHoverable] when a slug is
+/// available; otherwise return it untouched.
+Widget _maybeHover({required String? slug, required Widget child}) {
+  if (slug == null || slug.isEmpty) return child;
+  return MentionHoverable.user(slug: slug, child: child);
+}
 
 /// Shows a "sending…" pill if the optimistic comment hasn't been
 /// confirmed by the server within [delay]. Mounts when the optimistic
@@ -277,25 +285,31 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
                     Text(post.title,
                         style: Theme.of(context).textTheme.headlineMedium),
                     const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        PulseAvatar(
-                            initials: _initials(post.author.displayName)),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            post.author.displayName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: pulseMono(context, size: 11, color: t.ink),
+                    _maybeHover(
+                      slug: post.author.homeTag?.slug,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PulseAvatar(
+                              initials: _initials(post.author.displayName)),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              post.author.displayName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style:
+                                  pulseMono(context, size: 11, color: t.ink),
+                            ),
                           ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(
-                          '· ${_shortWhen(post.createdAt.value)}',
-                          style: pulseMono(context, size: 11, color: t.ink3),
-                        ),
-                      ],
+                          const SizedBox(width: 6),
+                          Text(
+                            '· ${_shortWhen(post.createdAt.value)}',
+                            style:
+                                pulseMono(context, size: 11, color: t.ink3),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 14),
                     PulseMarkdownBody(data: post.body),
@@ -344,6 +358,7 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
           isOptimistic: e.node.id.startsWith('opt-'),
           body: e.node.body,
           authorDisplayName: e.node.author.displayName,
+          authorSlug: e.node.author.homeTag?.slug,
           createdAtIso: e.node.createdAt.value,
         ),
     ];
@@ -517,9 +532,12 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                PulseAvatar(
-                  initials: _initials(comment.authorDisplayName),
-                  size: PulseAvatarSize.sm,
+                _maybeHover(
+                  slug: comment.authorSlug,
+                  child: PulseAvatar(
+                    initials: _initials(comment.authorDisplayName),
+                    size: PulseAvatarSize.sm,
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
@@ -530,12 +548,15 @@ class _PostDetailState extends ConsumerState<_PostDetail> {
                         crossAxisAlignment: CrossAxisAlignment.baseline,
                         textBaseline: TextBaseline.alphabetic,
                         children: [
-                          Text(
-                            comment.authorDisplayName,
-                            style: pulseMono(context,
-                                size: 11,
-                                color: t.ink,
-                                weight: FontWeight.w600),
+                          _maybeHover(
+                            slug: comment.authorSlug,
+                            child: Text(
+                              comment.authorDisplayName,
+                              style: pulseMono(context,
+                                  size: 11,
+                                  color: t.ink,
+                                  weight: FontWeight.w600),
+                            ),
                           ),
                           const SizedBox(width: 6),
                           Text(

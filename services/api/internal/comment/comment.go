@@ -45,6 +45,7 @@ type CreateInput struct {
 	AuthorID int64
 	Body     string
 	Mentions []int64
+	TagRefs  []int64 // tag ids referenced inline in the body
 }
 
 // Create inserts a comment and writes the materialized ltree path. The
@@ -90,6 +91,14 @@ func (s *Service) Create(ctx context.Context, in CreateInput) (int64, error) {
 				return fmt.Errorf("insert mention: %w", err)
 			}
 		}
+		for _, t := range in.TagRefs {
+			if _, err := tx.Exec(ctx, `
+                INSERT INTO comment_tag_refs (comment_id, tag_id) VALUES ($1, $2)
+                ON CONFLICT DO NOTHING
+            `, id, t); err != nil {
+				return fmt.Errorf("insert tag ref: %w", err)
+			}
+		}
 		return nil
 	})
 	return id, err
@@ -111,8 +120,9 @@ func (s *Service) Get(ctx context.Context, id int64) (*Comment, error) {
 	return &c, nil
 }
 
-// Edit appends a snapshot to comment_edits and updates the comment body.
-func (s *Service) Edit(ctx context.Context, id, editor int64, body string) error {
+// Edit appends a snapshot to comment_edits, updates the comment body, and
+// re-derives the body-driven junctions (comment_mentions, comment_tag_refs).
+func (s *Service) Edit(ctx context.Context, id, editor int64, body string, mentions, tagRefs []int64) error {
 	return s.runInTx(ctx, func(tx pgx.Tx) error {
 		var prev string
 		err := tx.QueryRow(ctx,
@@ -137,6 +147,28 @@ func (s *Service) Edit(ctx context.Context, id, editor int64, body string) error
             UPDATE comments SET body = $1, edited_at = now() WHERE id = $2
         `, body, id); err != nil {
 			return fmt.Errorf("update comment: %w", err)
+		}
+		if _, err := tx.Exec(ctx, `DELETE FROM comment_mentions WHERE comment_id = $1`, id); err != nil {
+			return fmt.Errorf("clear mentions: %w", err)
+		}
+		for _, p := range mentions {
+			if _, err := tx.Exec(ctx, `
+                INSERT INTO comment_mentions (comment_id, principal_id) VALUES ($1, $2)
+                ON CONFLICT DO NOTHING
+            `, id, p); err != nil {
+				return fmt.Errorf("insert mention: %w", err)
+			}
+		}
+		if _, err := tx.Exec(ctx, `DELETE FROM comment_tag_refs WHERE comment_id = $1`, id); err != nil {
+			return fmt.Errorf("clear tag refs: %w", err)
+		}
+		for _, t := range tagRefs {
+			if _, err := tx.Exec(ctx, `
+                INSERT INTO comment_tag_refs (comment_id, tag_id) VALUES ($1, $2)
+                ON CONFLICT DO NOTHING
+            `, id, t); err != nil {
+				return fmt.Errorf("insert tag ref: %w", err)
+			}
 		}
 		return nil
 	})

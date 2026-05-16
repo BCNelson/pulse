@@ -35,8 +35,10 @@ import (
 
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/bootstrap"
+	"github.com/bcnelson/pulse/services/api/internal/chat"
 	"github.com/bcnelson/pulse/services/api/internal/comment"
 	pulsedb "github.com/bcnelson/pulse/services/api/internal/db"
+	"github.com/bcnelson/pulse/services/api/internal/mentions"
 	"github.com/bcnelson/pulse/services/api/internal/post"
 	"github.com/bcnelson/pulse/services/api/internal/tag"
 	"github.com/bcnelson/pulse/services/api/pkg/ids"
@@ -109,19 +111,19 @@ var baseDemoPosts = []demoPost{
 		TagSlug: "engineering",
 		Author:  "alice@pulse.dev",
 		Title:   "Welcome to Pulse Engineering",
-		Body:    "This is a seeded post. Use it to poke at posts, comments, reactions.",
+		Body:    "This is a seeded post under [#org/engineering](pulse-tag:org/engineering). [@bob](pulse-user:bob), [@charlie](pulse-user:charlie) — use it to poke at posts, comments, reactions.",
 		Comments: []demoComment{
-			{Author: "bob@pulse.dev", Body: "Hello from Bob!"},
-			{Author: defaultAdminEmail, Body: "Looks good — let's iterate."},
+			{Author: "bob@pulse.dev", Body: "Hello from Bob! Thanks for the heads up, [@alice](pulse-user:alice)."},
+			{Author: defaultAdminEmail, Body: "Looks good — let's iterate. Should we cross-post to [#org/product](pulse-tag:org/product)?"},
 		},
 	},
 	{
 		TagSlug: "product",
 		Author:  "charlie@pulse.dev",
 		Title:   "Roadmap discussion",
-		Body:    "Drafting Q3 themes here. Replies welcome.",
+		Body:    "Drafting Q3 themes here under [#org/product](pulse-tag:org/product). [@alice](pulse-user:alice), [@bob](pulse-user:bob) — replies welcome.",
 		Comments: []demoComment{
-			{Author: "bob@pulse.dev", Body: "Could we link the spec doc?"},
+			{Author: "bob@pulse.dev", Body: "Could we link the spec doc? Also looping in [@admin](pulse-user:admin)."},
 		},
 	},
 	// A deeply-threaded post for exercising the spine-rendered comment view
@@ -136,11 +138,11 @@ var baseDemoPosts = []demoPost{
 		TagSlug: "engineering",
 		Author:  "alice@pulse.dev",
 		Title:   "Threaded: v1 rollout discussion",
-		Body:    "Use this post to poke at the spine-threaded comment view. Plenty of nesting below.",
+		Body:    "Use this post to poke at the spine-threaded comment view. Plenty of nesting below. [@bob](pulse-user:bob), [@charlie](pulse-user:charlie) — paging you for input.",
 		Comments: []demoComment{
 			// Root A: 12-deep primary thread.
 			{Key: "A", Author: "alice@pulse.dev", Body: "What's the best way to ship the v1 rollout?"},
-			{Key: "A1", ParentKey: "A", Author: "bob@pulse.dev", Body: "I'd start by gating it behind a workspace flag."},
+			{Key: "A1", ParentKey: "A", Author: "bob@pulse.dev", Body: "[@alice](pulse-user:alice) I'd start by gating it behind a workspace flag."},
 			{Key: "A2", ParentKey: "A1", Author: "charlie@pulse.dev", Body: "Agree. What's the default state of the flag?"},
 			{Key: "A3", ParentKey: "A2", Author: "alice@pulse.dev", Body: "Off. We'll flip it per workspace once metrics look healthy."},
 			{Key: "A4", ParentKey: "A3", Author: "bob@pulse.dev", Body: "How are we monitoring those metrics?"},
@@ -149,7 +151,7 @@ var baseDemoPosts = []demoPost{
 			{Key: "A7", ParentKey: "A6", Author: "bob@pulse.dev", Body: "Should we alert if either crosses a threshold?"},
 			{Key: "A8", ParentKey: "A7", Author: "charlie@pulse.dev", Body: "Yes. Page on-call if p99 > 2s for 5 min."},
 			{Key: "A9", ParentKey: "A8", Author: "alice@pulse.dev", Body: "Add a separate alert for sustained 5xx > 1%."},
-			{Key: "A10", ParentKey: "A9", Author: "bob@pulse.dev", Body: "Will do. Both fire to the #oncall room."},
+			{Key: "A10", ParentKey: "A9", Author: "bob@pulse.dev", Body: "Will do. Both fire to the [#org/engineering](pulse-tag:org/engineering) on-call room."},
 			{Key: "A11", ParentKey: "A10", Author: "charlie@pulse.dev", Body: "Great — let's ship it Monday."},
 
 			// Off-spine at A (depth 0): nested two deep.
@@ -290,6 +292,56 @@ func emailForDisplayName(name string) string {
 	return strings.ToLower(strings.ReplaceAll(name, " ", ".")) + demoEmailDomain
 }
 
+// userSlugFromEmail maps a @pulse.dev email to the matching user-tag root
+// slug. Mirrors what `userSlugFromDisplayName` produces from the display
+// name — e.g. "jordan.lee@pulse.dev" → "jordan-lee" — so seeded mention
+// links can address users without going through a separate lookup.
+func userSlugFromEmail(email string) string {
+	local := strings.TrimSuffix(strings.ToLower(email), demoEmailDomain)
+	return strings.ReplaceAll(local, ".", "-")
+}
+
+// userMentionMarkdown builds the canonical [@slug](pulse-user:slug) form
+// for an email. Empty email returns "".
+func userMentionMarkdown(email string) string {
+	slug := userSlugFromEmail(email)
+	if slug == "" {
+		return ""
+	}
+	return fmt.Sprintf("[@%s](pulse-user:%s)", slug, slug)
+}
+
+// demoTagSlugPath returns the full root-to-leaf slug path for a demo tag,
+// joined by "/" and prefixed with the org root slug. Used for inline
+// [#path](pulse-tag:path) references in generated content.
+func demoTagSlugPath(slug string) string {
+	segments := []string{slug}
+	cursor := slug
+	for {
+		var parent string
+		for _, t := range demoTags {
+			if t.Slug == cursor {
+				parent = t.ParentSlug
+				break
+			}
+		}
+		if parent == "" {
+			break
+		}
+		segments = append([]string{parent}, segments...)
+		cursor = parent
+	}
+	return defaultOrgSlug + "/" + strings.Join(segments, "/")
+}
+
+// tagRefMarkdown builds the canonical [#path](pulse-tag:path) form.
+func tagRefMarkdown(path string) string {
+	if path == "" {
+		return ""
+	}
+	return fmt.Sprintf("[#%s](pulse-tag:%s)", path, path)
+}
+
 func buildDemoTags() []demoTag {
 	generated := []struct {
 		Slug string
@@ -398,11 +450,12 @@ func buildDemoPosts() []demoPost {
 		}
 		for postIndex, theme := range themes {
 			sequence := tagIndex*len(themes) + postIndex + 1
+			author := authors[(tagIndex+postIndex)%len(authors)]
 			out = append(out, demoPost{
 				TagSlug:  t.Slug,
-				Author:   authors[(tagIndex+postIndex)%len(authors)],
+				Author:   author,
 				Title:    fmt.Sprintf("%s %s %03d", t.DisplayName, titleCase(theme), sequence),
-				Body:     generatedPostBody(t.DisplayName, theme, sequence),
+				Body:     generatedPostBody(t.DisplayName, t.Slug, theme, sequence, author, authors),
 				Comments: generatedComments(t.Slug, theme, sequence, commentCounts[(tagIndex+postIndex)%len(commentCounts)], authors),
 			})
 		}
@@ -434,13 +487,40 @@ func buildDemoPosts() []demoPost {
 	return out
 }
 
-func generatedPostBody(tagName, theme string, sequence int) string {
-	return fmt.Sprintf(
+func generatedPostBody(tagName, tagSlug, theme string, sequence int, author string, authors []string) string {
+	base := fmt.Sprintf(
 		"Generated demo post %03d for %s. Topic: %s. This gives local feeds, tag pages, search, and pagination enough volume to feel realistic.",
 		sequence,
 		tagName,
 		theme,
 	)
+	tagRef := tagRefMarkdown(demoTagSlugPath(tagSlug))
+	// Pick two co-authors that aren't the post's own author, deterministic
+	// in `sequence` so reruns produce the same demo data.
+	primary := pickOtherAuthor(authors, author, sequence)
+	secondary := pickOtherAuthor(authors, author, sequence+1)
+	primaryMention := userMentionMarkdown(primary)
+	secondaryMention := userMentionMarkdown(secondary)
+	return fmt.Sprintf(
+		"%s %s and %s — flagging this in %s for visibility.",
+		base, primaryMention, secondaryMention, tagRef,
+	)
+}
+
+// pickOtherAuthor returns an author from `authors` that is not `exclude`,
+// chosen deterministically by the salt. Falls back to "" if the slice has
+// no other entries (which only happens in pathological test setups).
+func pickOtherAuthor(authors []string, exclude string, salt int) string {
+	if len(authors) == 0 {
+		return ""
+	}
+	for i := 0; i < len(authors); i++ {
+		candidate := authors[(salt+i)%len(authors)]
+		if candidate != exclude {
+			return candidate
+		}
+	}
+	return authors[0]
 }
 
 func generatedComments(tagSlug, theme string, sequence, count int, authors []string) []demoComment {
@@ -456,19 +536,39 @@ func generatedComments(tagSlug, theme string, sequence, count int, authors []str
 		case i%4 == 2:
 			parentKey = fmt.Sprintf("g-%s-%03d-%02d", tagSlug, sequence, i-1)
 		}
+		author := authors[(sequence+i)%len(authors)]
 		comments = append(comments, demoComment{
 			Key:       key,
 			ParentKey: parentKey,
-			Author:    authors[(sequence+i)%len(authors)],
-			Body:      generatedCommentBody(theme, sequence, i),
+			Author:    author,
+			Body:      generatedCommentBody(tagSlug, theme, sequence, i, author, authors),
 		})
 	}
 	return comments
 }
 
-func generatedCommentBody(theme string, sequence, index int) string {
+func generatedCommentBody(tagSlug, theme string, sequence, index int, author string, authors []string) string {
 	targetWords := normallyDistributedWordCount(sequence, index, 55, 36, 2, 190)
-	return generatedCommentText(theme, sequence, index, targetWords)
+	body := generatedCommentText(theme, sequence, index, targetWords)
+	// Salt the modulus with the tag too, so two posts in different tags
+	// don't end up with identically-positioned mentions.
+	saltSum := 0
+	for _, ch := range tagSlug {
+		saltSum += int(ch)
+	}
+	pattern := (sequence + index + saltSum) % 3
+	switch pattern {
+	case 0:
+		// ~33% — direct @-mention reply to another contributor.
+		other := pickOtherAuthor(authors, author, sequence+index)
+		return userMentionMarkdown(other) + " " + body
+	case 1:
+		// ~33% — tag reference at the end for visibility on tag feeds.
+		return body + " " + tagRefMarkdown(demoTagSlugPath(tagSlug))
+	default:
+		// ~33% — no mention.
+		return body
+	}
 }
 
 func generatedHeavyThreadComments(tagSlug, theme string, sequence, count int, authors []string) []demoComment {
@@ -486,19 +586,30 @@ func generatedHeavyThreadComments(tagSlug, theme string, sequence, count int, au
 		default:
 			parentKey = fmt.Sprintf("heavy-%s-%02d-%03d", tagSlug, sequence, i-1)
 		}
+		author := authors[(sequence+i)%len(authors)]
 		comments = append(comments, demoComment{
 			Key:       key,
 			ParentKey: parentKey,
-			Author:    authors[(sequence+i)%len(authors)],
-			Body:      generatedHeavyThreadCommentBody(theme, count, i),
+			Author:    author,
+			Body:      generatedHeavyThreadCommentBody(tagSlug, theme, count, i, author, authors),
 		})
 	}
 	return comments
 }
 
-func generatedHeavyThreadCommentBody(theme string, count, index int) string {
+func generatedHeavyThreadCommentBody(tagSlug, theme string, count, index int, author string, authors []string) string {
 	targetWords := normallyDistributedWordCount(count, index, 70, 48, 2, 260)
-	return generatedCommentText(theme, count, index, targetWords)
+	body := generatedCommentText(theme, count, index, targetWords)
+	// Heavy threads see a mention every other reply so notification UI
+	// has plenty to surface.
+	if index%2 == 0 {
+		other := pickOtherAuthor(authors, author, count+index)
+		return userMentionMarkdown(other) + " " + body
+	}
+	if index%3 == 0 {
+		return body + " " + tagRefMarkdown(demoTagSlugPath(tagSlug))
+	}
+	return body
 }
 
 func normallyDistributedWordCount(seedA, seedB, mean, stddev, min, max int) int {
@@ -623,6 +734,9 @@ func main() {
 	if err != nil {
 		fail("seed users: %v", err)
 	}
+	if err := ensureUserTagRoots(ctx, pool, adminID, users); err != nil {
+		fail("seed user tag roots: %v", err)
+	}
 	tags, err := ensureDemoTags(ctx, pool, orgTagID, users)
 	if err != nil {
 		fail("seed tags: %v", err)
@@ -630,6 +744,9 @@ func main() {
 	postIDs, err := ensureDemoPosts(ctx, pool, adminID, users, tags)
 	if err != nil {
 		fail("seed posts: %v", err)
+	}
+	if err := ensureDemoChat(ctx, pool, adminID, users, tags); err != nil {
+		fail("seed chat: %v", err)
 	}
 
 	if cfg.s3Configured() {
@@ -736,6 +853,110 @@ func ensureDemoUsers(ctx context.Context, pool *pgxpool.Pool) (map[string]int64,
 	return out, nil
 }
 
+// ensureUserTagRoots gives admin + every demo user a user-tag root with a
+// slug derived from their display name and links it to principals.home_tag_id.
+// Required for `[@slug](pulse-user:slug)` mention resolution and for the
+// /feed/t/<user-slug>/... routes that mention chips link to. Idempotent.
+func ensureUserTagRoots(ctx context.Context, pool *pgxpool.Pool, adminID int64, users map[string]int64) error {
+	// Admin first.
+	var adminName string
+	if err := pool.QueryRow(ctx,
+		`SELECT display_name FROM principals WHERE id = $1`, adminID).Scan(&adminName); err != nil {
+		return fmt.Errorf("load admin display name: %w", err)
+	}
+	if err := ensureUserTagRoot(ctx, pool, adminID, userSlugFromDisplayName(adminName), adminName); err != nil {
+		return fmt.Errorf("admin user-tag root: %w", err)
+	}
+	// Demo users.
+	for _, u := range demoUsers {
+		pid, ok := users[u.Email]
+		if !ok {
+			continue
+		}
+		if err := ensureUserTagRoot(ctx, pool, pid, userSlugFromDisplayName(u.DisplayName), u.DisplayName); err != nil {
+			return fmt.Errorf("user-tag root for %s: %w", u.Email, err)
+		}
+	}
+	return nil
+}
+
+// ensureUserTagRoot inserts a user-tag root for the given principal if one
+// does not already exist and updates principals.home_tag_id. Touches three
+// tables (tags, tag_closure, principals) in one transaction so a partial
+// failure doesn't leave a half-linked user.
+func ensureUserTagRoot(ctx context.Context, pool *pgxpool.Pool, principalID int64, slug, displayName string) error {
+	var existing int64
+	err := pool.QueryRow(ctx, `
+        SELECT id FROM tags
+        WHERE parent_id IS NULL AND root_kind = 'user' AND bound_principal = $1
+    `, principalID).Scan(&existing)
+	if err == nil {
+		// Already provisioned — ensure principal points at it.
+		if _, err := pool.Exec(ctx,
+			`UPDATE principals SET home_tag_id = $1 WHERE id = $2 AND home_tag_id IS DISTINCT FROM $1`,
+			existing, principalID); err != nil {
+			return fmt.Errorf("relink home_tag: %w", err)
+		}
+		return nil
+	}
+	if !errors.Is(err, pgx.ErrNoRows) {
+		return fmt.Errorf("lookup user-tag root: %w", err)
+	}
+
+	tx, err := pool.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return err
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	tagID := ids.New(ids.KindTag)
+	if _, err := tx.Exec(ctx, `
+        INSERT INTO tags (id, parent_id, slug, display_name, root_kind, bound_principal, defaults)
+        VALUES ($1, NULL, $2, $3, 'user', $4, '{}')
+    `, tagID, slug, displayName, principalID); err != nil {
+		return fmt.Errorf("insert user-tag root: %w", err)
+	}
+	if _, err := tx.Exec(ctx,
+		`INSERT INTO tag_closure (ancestor_id, descendant_id, depth) VALUES ($1, $1, 0)`,
+		tagID); err != nil {
+		return fmt.Errorf("insert closure: %w", err)
+	}
+	if _, err := tx.Exec(ctx,
+		`UPDATE principals SET home_tag_id = $1 WHERE id = $2`,
+		tagID, principalID); err != nil {
+		return fmt.Errorf("link home_tag: %w", err)
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return err
+	}
+	fmt.Printf("seed: created user-tag root @%s for principal %s\n", slug, ids.FormatID(principalID))
+	return nil
+}
+
+// userSlugFromDisplayName converts a display name to a tag-slug-compatible
+// form: lowercase, spaces → hyphens, characters outside [a-z0-9-] dropped.
+// Mirrors the regex constraint on `tags.slug`.
+func userSlugFromDisplayName(name string) string {
+	var b strings.Builder
+	b.Grow(len(name))
+	for _, r := range strings.ToLower(name) {
+		switch {
+		case r >= 'a' && r <= 'z', r >= '0' && r <= '9':
+			b.WriteRune(r)
+		case r == ' ' || r == '-' || r == '_' || r == '.':
+			b.WriteByte('-')
+		}
+	}
+	s := b.String()
+	for strings.HasPrefix(s, "-") {
+		s = s[1:]
+	}
+	for strings.HasSuffix(s, "-") {
+		s = s[:len(s)-1]
+	}
+	return s
+}
+
 func createUser(ctx context.Context, pool *pgxpool.Pool, u demoUser, hash string) (int64, error) {
 	id := ids.New(ids.KindUser)
 	tx, err := pool.BeginTx(ctx, pgx.TxOptions{})
@@ -838,6 +1059,14 @@ func ensureDemoPosts(ctx context.Context, pool *pgxpool.Pool, adminID int64, use
             LIMIT 1
         `, tagID, p.Title).Scan(&id)
 		if errors.Is(err, pgx.ErrNoRows) {
+			mentionIDs, err := resolveSeedMentions(ctx, pool, p.Body)
+			if err != nil {
+				return nil, fmt.Errorf("resolve mentions on %q: %w", p.Title, err)
+			}
+			tagRefIDs, err := resolveSeedTagRefs(ctx, pool, p.Body)
+			if err != nil {
+				return nil, fmt.Errorf("resolve tag refs on %q: %w", p.Title, err)
+			}
 			id, err = postSvc.Create(ctx, post.CreateInput{
 				AuthorID: authorID,
 				Title:    p.Title,
@@ -848,6 +1077,8 @@ func ensureDemoPosts(ctx context.Context, pool *pgxpool.Pool, adminID int64, use
 					InteractRole: true,
 					ModerateRole: true,
 				}},
+				Mentions: mentionIDs,
+				TagRefs:  tagRefIDs,
 			})
 			if err != nil {
 				return nil, fmt.Errorf("create post %q: %w", p.Title, err)
@@ -883,12 +1114,22 @@ func ensureDemoPosts(ctx context.Context, pool *pgxpool.Pool, adminID int64, use
 				return nil, fmt.Errorf("lookup comment on %q: %w", p.Title, err)
 			}
 
+			mentionIDs, err := resolveSeedMentions(ctx, pool, c.Body)
+			if err != nil {
+				return nil, fmt.Errorf("resolve mentions on comment of %q: %w", p.Title, err)
+			}
+			tagRefIDs, err := resolveSeedTagRefs(ctx, pool, c.Body)
+			if err != nil {
+				return nil, fmt.Errorf("resolve tag refs on comment of %q: %w", p.Title, err)
+			}
 			authorID := principalFor(c.Author, adminID, users)
 			newID, err := commentSvc.Create(ctx, comment.CreateInput{
 				PostID:   id,
 				ParentID: parentID,
 				AuthorID: authorID,
 				Body:     c.Body,
+				Mentions: mentionIDs,
+				TagRefs:  tagRefIDs,
 			})
 			if err != nil {
 				return nil, fmt.Errorf("create comment on %q: %w", p.Title, err)
@@ -897,6 +1138,249 @@ func ensureDemoPosts(ctx context.Context, pool *pgxpool.Pool, adminID int64, use
 				idByKey[c.Key] = newID
 			}
 		}
+	}
+	return out, nil
+}
+
+// demoChatRoom is the in-memory shape for a seeded chat room. The seed
+// either creates the room (idempotent by participant set + tag) or finds
+// the existing one and ensures every named message is present.
+type demoChatRoom struct {
+	Label        string // human-readable, only for log lines
+	TagSlug      string // empty for a DM
+	Participants []string
+	Messages     []demoMessage
+}
+
+type demoMessage struct {
+	Author string
+	Body   string
+}
+
+// demoChatRooms is the seeded chat content. The Engineering huddle is a
+// team room tagged with `engineering`; the second entry is a 1:1 DM
+// between alice and bob. Bodies use the canonical mention/tag-ref form
+// so the new junctions get populated end-to-end.
+var demoChatRooms = []demoChatRoom{
+	{
+		Label:        "engineering huddle",
+		TagSlug:      "engineering",
+		Participants: []string{"alice@pulse.dev", "bob@pulse.dev", defaultAdminEmail},
+		Messages: []demoMessage{
+			{Author: "alice@pulse.dev", Body: "morning [@bob](pulse-user:bob), did the [#org/engineering](pulse-tag:org/engineering) deploy land?"},
+			{Author: "bob@pulse.dev", Body: "[@alice](pulse-user:alice) yes — pushed at 9:12. holding rollout until [@admin](pulse-user:admin) green-lights the cutover."},
+			{Author: defaultAdminEmail, Body: "thumbs up. [@alice](pulse-user:alice) [@bob](pulse-user:bob) — please file a follow-up in [#org/engineering](pulse-tag:org/engineering) once metrics settle."},
+			{Author: "alice@pulse.dev", Body: "will do. [@charlie](pulse-user:charlie) might want eyes on the [#org/product](pulse-tag:org/product) thread too."},
+			{Author: "bob@pulse.dev", Body: "looping in [@charlie](pulse-user:charlie) now."},
+		},
+	},
+	{
+		Label:        "alice <> bob DM",
+		TagSlug:      "",
+		Participants: []string{"alice@pulse.dev", "bob@pulse.dev"},
+		Messages: []demoMessage{
+			{Author: "alice@pulse.dev", Body: "hey [@bob](pulse-user:bob) — got a sec to look at the retry logic?"},
+			{Author: "bob@pulse.dev", Body: "yep. send the PR, [@alice](pulse-user:alice)."},
+			{Author: "alice@pulse.dev", Body: "linked in the [#org/engineering](pulse-tag:org/engineering) thread. ping if anything looks off."},
+			{Author: "bob@pulse.dev", Body: "reading now."},
+		},
+	},
+}
+
+// ensureDemoChat seeds the chat rooms in `demoChatRooms`. Each room is
+// looked up by tag attachment + participant set; messages are inserted
+// only if a row with the exact same author+body isn't already present,
+// so re-runs are idempotent. Mentions and tag refs flow through the
+// regular chat.SendMessage path so the message_mentions and
+// message_tag_refs junctions populate.
+func ensureDemoChat(ctx context.Context, pool *pgxpool.Pool, adminID int64, users, tags map[string]int64) error {
+	chatSvc := &chat.Service{DB: pool, Posts: &post.Service{DB: pool}}
+	for _, room := range demoChatRooms {
+		var tagID int64
+		if room.TagSlug != "" {
+			id, ok := tags[room.TagSlug]
+			if !ok {
+				return fmt.Errorf("chat room %q references unknown tag %q", room.Label, room.TagSlug)
+			}
+			tagID = id
+		}
+
+		participantIDs := make([]int64, 0, len(room.Participants))
+		for _, email := range room.Participants {
+			participantIDs = append(participantIDs, principalFor(email, adminID, users))
+		}
+
+		roomID, err := findOrCreateChatRoom(ctx, pool, chatSvc, room.Label, tagID, participantIDs)
+		if err != nil {
+			return fmt.Errorf("ensure chat room %q: %w", room.Label, err)
+		}
+
+		for _, m := range room.Messages {
+			var existing int64
+			err := pool.QueryRow(ctx,
+				`SELECT id FROM messages WHERE chat_room_id = $1 AND body = $2 LIMIT 1`,
+				roomID, m.Body).Scan(&existing)
+			if err == nil {
+				continue
+			}
+			if !errors.Is(err, pgx.ErrNoRows) {
+				return fmt.Errorf("lookup chat message in %q: %w", room.Label, err)
+			}
+			mentionIDs, err := resolveSeedMentions(ctx, pool, m.Body)
+			if err != nil {
+				return fmt.Errorf("resolve mentions in %q: %w", room.Label, err)
+			}
+			tagRefIDs, err := resolveSeedTagRefs(ctx, pool, m.Body)
+			if err != nil {
+				return fmt.Errorf("resolve tag refs in %q: %w", room.Label, err)
+			}
+			if _, err := chatSvc.SendMessage(ctx, chat.SendInput{
+				RoomID:   roomID,
+				AuthorID: principalFor(m.Author, adminID, users),
+				Body:     m.Body,
+				Mentions: mentionIDs,
+				TagRefs:  tagRefIDs,
+			}); err != nil {
+				return fmt.Errorf("send chat message in %q: %w", room.Label, err)
+			}
+		}
+		fmt.Printf("seed: chat room %q ready (%d messages, %d participants)\n",
+			room.Label, len(room.Messages), len(participantIDs))
+	}
+	return nil
+}
+
+// findOrCreateChatRoom looks for a room with the requested tag (or no
+// tag, for DMs) whose participant set exactly matches the supplied ids,
+// and creates one if none exists. This lets re-running the seed land on
+// the same room each time.
+func findOrCreateChatRoom(ctx context.Context, pool *pgxpool.Pool, chatSvc *chat.Service, label string, tagID int64, participantIDs []int64) (int64, error) {
+	// Look for any room whose active participants are exactly the
+	// requested set. For team rooms we also require the named tag to be
+	// attached. For DMs we require no tag attachments.
+	var roomID int64
+	var err error
+	if tagID == 0 {
+		err = pool.QueryRow(ctx, `
+            SELECT cr.id FROM chat_rooms cr
+            WHERE NOT EXISTS (SELECT 1 FROM chat_room_tags WHERE chat_room_id = cr.id)
+              AND (
+                SELECT array_agg(principal_id ORDER BY principal_id)
+                FROM chat_room_participants
+                WHERE chat_room_id = cr.id AND left_at IS NULL
+              ) = (SELECT array_agg(x ORDER BY x) FROM unnest($1::bigint[]) AS x)
+            LIMIT 1
+        `, participantIDs).Scan(&roomID)
+	} else {
+		err = pool.QueryRow(ctx, `
+            SELECT cr.id FROM chat_rooms cr
+            JOIN chat_room_tags crt ON crt.chat_room_id = cr.id AND crt.tag_id = $1
+            WHERE (
+                SELECT array_agg(principal_id ORDER BY principal_id)
+                FROM chat_room_participants
+                WHERE chat_room_id = cr.id AND left_at IS NULL
+              ) = (SELECT array_agg(x ORDER BY x) FROM unnest($2::bigint[]) AS x)
+            LIMIT 1
+        `, tagID, participantIDs).Scan(&roomID)
+	}
+	if err == nil {
+		return roomID, nil
+	}
+	if !errors.Is(err, pgx.ErrNoRows) {
+		return 0, fmt.Errorf("lookup chat room: %w", err)
+	}
+
+	// Build the room via the service so is_dm gets recomputed correctly.
+	in := chat.CreateRoomInput{
+		Participants: make([]chat.ParticipantInput, 0, len(participantIDs)),
+	}
+	if tagID != 0 {
+		in.Tags = []int64{tagID}
+	}
+	for _, pid := range participantIDs {
+		in.Participants = append(in.Participants, chat.ParticipantInput{PrincipalID: pid})
+	}
+	id, err := chatSvc.CreateRoom(ctx, in)
+	if err != nil {
+		return 0, fmt.Errorf("create chat room: %w", err)
+	}
+	fmt.Printf("seed: created chat room %q\n", label)
+	return id, nil
+}
+
+// resolveSeedMentions runs the same extraction + lookup the GraphQL
+// resolver does, but inlined here so the seed CLI doesn't need a full
+// Resolver instance. Unknown slugs are silently dropped — matches the
+// production behaviour of leaving the link text in the body.
+func resolveSeedMentions(ctx context.Context, pool *pgxpool.Pool, body string) ([]int64, error) {
+	slugs := mentions.ExtractUsers(body)
+	if len(slugs) == 0 {
+		return nil, nil
+	}
+	rows, err := pool.Query(ctx, `
+        SELECT p.id
+        FROM principals p
+        JOIN tags t ON t.id = p.home_tag_id
+        WHERE p.status = 'active'
+          AND t.parent_id IS NULL
+          AND t.root_kind = 'user'
+          AND t.slug = ANY($1::text[])
+    `, slugs)
+	if err != nil {
+		return nil, fmt.Errorf("query mentions: %w", err)
+	}
+	defer rows.Close()
+	seen := make(map[int64]struct{}, len(slugs))
+	out := make([]int64, 0, len(slugs))
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		if _, dup := seen[id]; dup {
+			continue
+		}
+		seen[id] = struct{}{}
+		out = append(out, id)
+	}
+	return out, rows.Err()
+}
+
+// resolveSeedTagRefs walks each `pulse-tag:` slug path through the tags
+// table, paralleling the GraphQL resolver. Skips unresolved paths.
+func resolveSeedTagRefs(ctx context.Context, pool *pgxpool.Pool, body string) ([]int64, error) {
+	paths := mentions.ExtractTagPaths(body)
+	if len(paths) == 0 {
+		return nil, nil
+	}
+	seen := make(map[int64]struct{}, len(paths))
+	out := make([]int64, 0, len(paths))
+	for _, path := range paths {
+		var id int64
+		err := pool.QueryRow(ctx, `
+            WITH RECURSIVE walk(id, depth) AS (
+              SELECT id, 0
+              FROM tags
+              WHERE parent_id IS NULL AND slug = ($1::text[])[1]
+              UNION ALL
+              SELECT t.id, walk.depth + 1
+              FROM tags t
+              JOIN walk ON t.parent_id = walk.id
+              WHERE t.slug = ($1::text[])[walk.depth + 2]
+            )
+            SELECT id FROM walk WHERE depth = array_length($1::text[], 1) - 1
+        `, path).Scan(&id)
+		if errors.Is(err, pgx.ErrNoRows) {
+			continue
+		}
+		if err != nil {
+			return nil, fmt.Errorf("resolve tag path %v: %w", path, err)
+		}
+		if _, dup := seen[id]; dup {
+			continue
+		}
+		seen[id] = struct{}{}
+		out = append(out, id)
 	}
 	return out, nil
 }
@@ -1010,7 +1494,34 @@ func wipeDemo(ctx context.Context, pool *pgxpool.Pool, adminID int64) error {
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
-	// Demo principals = users in @pulse.dev except admin.
+	// Demo principals = users in @pulse.dev except admin. Wipe their
+	// chat rooms first; chat_rooms cascades into messages, participants,
+	// tags, and the new mention/tag-ref junctions.
+	if _, err := tx.Exec(ctx, `
+        DELETE FROM chat_rooms
+        WHERE id IN (
+            SELECT chat_room_id FROM chat_room_participants
+            WHERE principal_id IN (
+                SELECT id FROM principals
+                WHERE kind = 'user' AND lower(email) LIKE '%' || $1 AND id <> $2
+            )
+        )
+    `, demoEmailDomain, adminID); err != nil {
+		return fmt.Errorf("delete demo chat rooms (by participant): %w", err)
+	}
+	// Also drop the engineering huddle, which has admin as a participant
+	// — without this pass that room would survive a -fresh because its
+	// non-admin members are about to be deleted but the room itself isn't.
+	if _, err := tx.Exec(ctx, `
+        DELETE FROM chat_rooms
+        WHERE id IN (
+            SELECT cr.id FROM chat_rooms cr
+            JOIN chat_room_participants crp ON crp.chat_room_id = cr.id
+            WHERE crp.principal_id = $1
+        )
+    `, adminID); err != nil {
+		return fmt.Errorf("delete demo chat rooms (admin): %w", err)
+	}
 	if _, err := tx.Exec(ctx, `
         DELETE FROM posts
         WHERE author_id IN (
@@ -1051,6 +1562,25 @@ func wipeDemo(ctx context.Context, pool *pgxpool.Pool, adminID int64) error {
           AND slug = ANY($1::text[])
     `, demoSlugs); err != nil {
 		return fmt.Errorf("delete demo tags: %w", err)
+	}
+
+	// Unlink home_tag_id on demo principals so the user-tag root deletes
+	// don't trip the principals.home_tag_id FK, then drop the roots.
+	if _, err := tx.Exec(ctx, `
+        UPDATE principals SET home_tag_id = NULL
+        WHERE kind = 'user' AND lower(email) LIKE '%' || $1 AND id <> $2
+    `, demoEmailDomain, adminID); err != nil {
+		return fmt.Errorf("unlink demo home_tag: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `
+        DELETE FROM tags
+        WHERE parent_id IS NULL AND root_kind = 'user'
+          AND bound_principal IN (
+            SELECT id FROM principals
+            WHERE kind = 'user' AND lower(email) LIKE '%' || $1 AND id <> $2
+          )
+    `, demoEmailDomain, adminID); err != nil {
+		return fmt.Errorf("delete demo user-tag roots: %w", err)
 	}
 
 	if _, err := tx.Exec(ctx, `

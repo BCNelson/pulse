@@ -1,0 +1,47 @@
+fragment MentionPreviewPost on Post {
+  id
+  title
+  createdAt
+  author {
+    id
+    displayName
+  }
+}
+
+query MentionPreviewUser($slug: String!, $first: Int) {
+  userByHandle(slug: $slug) {
+    id
+    displayName
+    homeTag {
+      id
+      slug
+      path
+    }
+    recentPosts(first: $first) {
+      ...MentionPreviewPost
+    }
+  }
+}
+
+query MentionPreviewTag($path: [String!]!, $first: Int) {
+  tagBySlugPath(path: $path) {
+    id
+    slug
+    displayName
+    path
+    rootKind
+    parent {
+      id
+      slug
+      displayName
+      path
+    }
+    posts(first: $first) {
+      edges {
+        node {
+          ...MentionPreviewPost
+        }
+      }
+    }
+  }
+}

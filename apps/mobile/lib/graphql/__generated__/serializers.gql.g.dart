@@ -15,6 +15,14 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GChatRoomDetailData_chatRoom_messages_edges.serializer)
       ..add(GChatRoomDetailData_chatRoom_messages_edges_node.serializer)
       ..add(GChatRoomDetailData_chatRoom_messages_edges_node_author.serializer)
+      ..add(GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag
+          .serializer)
+      ..add(
+          GChatRoomDetailData_chatRoom_messages_edges_node_mentions.serializer)
+      ..add(GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag
+          .serializer)
+      ..add(GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags
+          .serializer)
       ..add(GChatRoomDetailData_chatRoom_messages_edges_node_replyTo.serializer)
       ..add(GChatRoomDetailData_chatRoom_participants.serializer)
       ..add(GChatRoomDetailData_chatRoom_participants_principal.serializer)
@@ -29,7 +37,11 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GChatRoomSummaryVars.serializer)
       ..add(GCommentSummaryData.serializer)
       ..add(GCommentSummaryData_author.serializer)
+      ..add(GCommentSummaryData_author_homeTag.serializer)
+      ..add(GCommentSummaryData_mentions.serializer)
+      ..add(GCommentSummaryData_mentions_homeTag.serializer)
       ..add(GCommentSummaryData_reactions.serializer)
+      ..add(GCommentSummaryData_referencedTags.serializer)
       ..add(GCommentSummaryReq.serializer)
       ..add(GCommentSummaryVars.serializer)
       ..add(GCreateChatRoomData.serializer)
@@ -44,17 +56,25 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GCreateCommentData.serializer)
       ..add(GCreateCommentData_createComment.serializer)
       ..add(GCreateCommentData_createComment_author.serializer)
+      ..add(GCreateCommentData_createComment_author_homeTag.serializer)
+      ..add(GCreateCommentData_createComment_mentions.serializer)
+      ..add(GCreateCommentData_createComment_mentions_homeTag.serializer)
       ..add(GCreateCommentData_createComment_reactions.serializer)
+      ..add(GCreateCommentData_createComment_referencedTags.serializer)
       ..add(GCreateCommentInput.serializer)
       ..add(GCreateCommentReq.serializer)
       ..add(GCreateCommentVars.serializer)
       ..add(GCreatePostData.serializer)
       ..add(GCreatePostData_createPost.serializer)
       ..add(GCreatePostData_createPost_author.serializer)
+      ..add(GCreatePostData_createPost_author_homeTag.serializer)
       ..add(GCreatePostData_createPost_comments.serializer)
       ..add(GCreatePostData_createPost_comments_edges.serializer)
       ..add(GCreatePostData_createPost_comments_edges_node.serializer)
+      ..add(GCreatePostData_createPost_mentions.serializer)
+      ..add(GCreatePostData_createPost_mentions_homeTag.serializer)
       ..add(GCreatePostData_createPost_reactions.serializer)
+      ..add(GCreatePostData_createPost_referencedTags.serializer)
       ..add(GCreatePostInput.serializer)
       ..add(GCreatePostReq.serializer)
       ..add(GCreatePostVars.serializer)
@@ -100,14 +120,53 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GMarkPostReadData_markPostRead.serializer)
       ..add(GMarkPostReadReq.serializer)
       ..add(GMarkPostReadVars.serializer)
+      ..add(GMentionHoverTagData.serializer)
+      ..add(GMentionHoverTagData_tagBySlugPath.serializer)
+      ..add(GMentionHoverTagData_tagBySlugPath_parent.serializer)
+      ..add(GMentionHoverTagReq.serializer)
+      ..add(GMentionHoverTagVars.serializer)
+      ..add(GMentionHoverUserData.serializer)
+      ..add(GMentionHoverUserData_userByHandle.serializer)
+      ..add(GMentionHoverUserData_userByHandle_homeTag.serializer)
+      ..add(GMentionHoverUserReq.serializer)
+      ..add(GMentionHoverUserVars.serializer)
+      ..add(GMentionPreviewPostData.serializer)
+      ..add(GMentionPreviewPostData_author.serializer)
+      ..add(GMentionPreviewPostReq.serializer)
+      ..add(GMentionPreviewPostVars.serializer)
+      ..add(GMentionPreviewTagData.serializer)
+      ..add(GMentionPreviewTagData_tagBySlugPath.serializer)
+      ..add(GMentionPreviewTagData_tagBySlugPath_parent.serializer)
+      ..add(GMentionPreviewTagData_tagBySlugPath_posts.serializer)
+      ..add(GMentionPreviewTagData_tagBySlugPath_posts_edges.serializer)
+      ..add(GMentionPreviewTagData_tagBySlugPath_posts_edges_node.serializer)
+      ..add(GMentionPreviewTagData_tagBySlugPath_posts_edges_node_author
+          .serializer)
+      ..add(GMentionPreviewTagReq.serializer)
+      ..add(GMentionPreviewTagVars.serializer)
+      ..add(GMentionPreviewUserData.serializer)
+      ..add(GMentionPreviewUserData_userByHandle.serializer)
+      ..add(GMentionPreviewUserData_userByHandle_homeTag.serializer)
+      ..add(GMentionPreviewUserData_userByHandle_recentPosts.serializer)
+      ..add(GMentionPreviewUserData_userByHandle_recentPosts_author.serializer)
+      ..add(GMentionPreviewUserReq.serializer)
+      ..add(GMentionPreviewUserVars.serializer)
       ..add(GMessageAddedData.serializer)
       ..add(GMessageAddedData_messageAdded.serializer)
       ..add(GMessageAddedData_messageAdded_author.serializer)
+      ..add(GMessageAddedData_messageAdded_author_homeTag.serializer)
+      ..add(GMessageAddedData_messageAdded_mentions.serializer)
+      ..add(GMessageAddedData_messageAdded_mentions_homeTag.serializer)
+      ..add(GMessageAddedData_messageAdded_referencedTags.serializer)
       ..add(GMessageAddedData_messageAdded_replyTo.serializer)
       ..add(GMessageAddedReq.serializer)
       ..add(GMessageAddedVars.serializer)
       ..add(GMessageSummaryData.serializer)
       ..add(GMessageSummaryData_author.serializer)
+      ..add(GMessageSummaryData_author_homeTag.serializer)
+      ..add(GMessageSummaryData_mentions.serializer)
+      ..add(GMessageSummaryData_mentions_homeTag.serializer)
+      ..add(GMessageSummaryData_referencedTags.serializer)
       ..add(GMessageSummaryData_replyTo.serializer)
       ..add(GMessageSummaryReq.serializer)
       ..add(GMessageSummaryVars.serializer)
@@ -160,22 +219,35 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GPostChangedData.serializer)
       ..add(GPostChangedData_postChanged.serializer)
       ..add(GPostChangedData_postChanged_author.serializer)
+      ..add(GPostChangedData_postChanged_author_homeTag.serializer)
       ..add(GPostChangedData_postChanged_comments.serializer)
       ..add(GPostChangedData_postChanged_comments_edges.serializer)
       ..add(GPostChangedData_postChanged_comments_edges_node.serializer)
+      ..add(GPostChangedData_postChanged_mentions.serializer)
+      ..add(GPostChangedData_postChanged_mentions_homeTag.serializer)
       ..add(GPostChangedData_postChanged_reactions.serializer)
+      ..add(GPostChangedData_postChanged_referencedTags.serializer)
       ..add(GPostChangedReq.serializer)
       ..add(GPostChangedVars.serializer)
       ..add(GPostDetailData.serializer)
       ..add(GPostDetailData_post.serializer)
       ..add(GPostDetailData_post_author.serializer)
+      ..add(GPostDetailData_post_author_homeTag.serializer)
       ..add(GPostDetailData_post_comments.serializer)
       ..add(GPostDetailData_post_comments_edges.serializer)
       ..add(GPostDetailData_post_comments_edges_node.serializer)
       ..add(GPostDetailData_post_comments_edges_node_author.serializer)
+      ..add(GPostDetailData_post_comments_edges_node_author_homeTag.serializer)
+      ..add(GPostDetailData_post_comments_edges_node_mentions.serializer)
+      ..add(
+          GPostDetailData_post_comments_edges_node_mentions_homeTag.serializer)
       ..add(GPostDetailData_post_comments_edges_node_reactions.serializer)
+      ..add(GPostDetailData_post_comments_edges_node_referencedTags.serializer)
+      ..add(GPostDetailData_post_mentions.serializer)
+      ..add(GPostDetailData_post_mentions_homeTag.serializer)
       ..add(GPostDetailData_post_myPermissions.serializer)
       ..add(GPostDetailData_post_reactions.serializer)
+      ..add(GPostDetailData_post_referencedTags.serializer)
       ..add(GPostDetailData_post_tags.serializer)
       ..add(GPostDetailData_post_tags_tag.serializer)
       ..add(GPostDetailReq.serializer)
@@ -183,10 +255,14 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GPostSort.serializer)
       ..add(GPostSummaryData.serializer)
       ..add(GPostSummaryData_author.serializer)
+      ..add(GPostSummaryData_author_homeTag.serializer)
       ..add(GPostSummaryData_comments.serializer)
       ..add(GPostSummaryData_comments_edges.serializer)
       ..add(GPostSummaryData_comments_edges_node.serializer)
+      ..add(GPostSummaryData_mentions.serializer)
+      ..add(GPostSummaryData_mentions_homeTag.serializer)
       ..add(GPostSummaryData_reactions.serializer)
+      ..add(GPostSummaryData_referencedTags.serializer)
       ..add(GPostSummaryReq.serializer)
       ..add(GPostSummaryVars.serializer)
       ..add(GPostTagInput.serializer)
@@ -196,11 +272,15 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GPostsForTagData_tag_posts_edges.serializer)
       ..add(GPostsForTagData_tag_posts_edges_node.serializer)
       ..add(GPostsForTagData_tag_posts_edges_node_author.serializer)
+      ..add(GPostsForTagData_tag_posts_edges_node_author_homeTag.serializer)
       ..add(GPostsForTagData_tag_posts_edges_node_comments.serializer)
       ..add(GPostsForTagData_tag_posts_edges_node_comments_edges.serializer)
       ..add(
           GPostsForTagData_tag_posts_edges_node_comments_edges_node.serializer)
+      ..add(GPostsForTagData_tag_posts_edges_node_mentions.serializer)
+      ..add(GPostsForTagData_tag_posts_edges_node_mentions_homeTag.serializer)
       ..add(GPostsForTagData_tag_posts_edges_node_reactions.serializer)
+      ..add(GPostsForTagData_tag_posts_edges_node_referencedTags.serializer)
       ..add(GPostsForTagReq.serializer)
       ..add(GPostsForTagVars.serializer)
       ..add(GPrincipalKind.serializer)
@@ -227,10 +307,19 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GSearchTagsData_searchTags_tag.serializer)
       ..add(GSearchTagsReq.serializer)
       ..add(GSearchTagsVars.serializer)
+      ..add(GSearchUsersData.serializer)
+      ..add(GSearchUsersData_searchUsers.serializer)
+      ..add(GSearchUsersData_searchUsers_homeTag.serializer)
+      ..add(GSearchUsersReq.serializer)
+      ..add(GSearchUsersVars.serializer)
       ..add(GSearchVars.serializer)
       ..add(GSendMessageData.serializer)
       ..add(GSendMessageData_sendMessage.serializer)
       ..add(GSendMessageData_sendMessage_author.serializer)
+      ..add(GSendMessageData_sendMessage_author_homeTag.serializer)
+      ..add(GSendMessageData_sendMessage_mentions.serializer)
+      ..add(GSendMessageData_sendMessage_mentions_homeTag.serializer)
+      ..add(GSendMessageData_sendMessage_referencedTags.serializer)
       ..add(GSendMessageData_sendMessage_replyTo.serializer)
       ..add(GSendMessageInput.serializer)
       ..add(GSendMessageReq.serializer)
@@ -288,6 +377,20 @@ Serializers _$serializers = (Serializers().toBuilder()
           ]),
           () => ListBuilder<GChatRoomDetailData_chatRoom_messages_edges>())
       ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(
+                GChatRoomDetailData_chatRoom_messages_edges_node_mentions)
+          ]),
+          () => ListBuilder<
+              GChatRoomDetailData_chatRoom_messages_edges_node_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(
+                GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags)
+          ]),
+          () => ListBuilder<
+              GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags>())
+      ..addBuilderFactory(
           const FullType(BuiltList,
               const [const FullType(GChatRoomDetailData_chatRoom_tags)]),
           () => ListBuilder<GChatRoomDetailData_chatRoom_tags>())
@@ -306,6 +409,14 @@ Serializers _$serializers = (Serializers().toBuilder()
           () => ListBuilder<GChatRoomSummaryData_participants>())
       ..addBuilderFactory(
           const FullType(
+              BuiltList, const [const FullType(GCommentSummaryData_mentions)]),
+          () => ListBuilder<GCommentSummaryData_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(GCommentSummaryData_referencedTags)]),
+          () => ListBuilder<GCommentSummaryData_referencedTags>())
+      ..addBuilderFactory(
+          const FullType(
               BuiltList, const [const FullType(GCommentSummaryData_reactions)]),
           () => ListBuilder<GCommentSummaryData_reactions>())
       ..addBuilderFactory(
@@ -319,6 +430,16 @@ Serializers _$serializers = (Serializers().toBuilder()
           () => ListBuilder<GCreateChatRoomData_createChatRoom_participants>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [
+            const FullType(GCreateCommentData_createComment_mentions)
+          ]),
+          () => ListBuilder<GCreateCommentData_createComment_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GCreateCommentData_createComment_referencedTags)
+          ]),
+          () => ListBuilder<GCreateCommentData_createComment_referencedTags>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
             const FullType(GCreateCommentData_createComment_reactions)
           ]),
           () => ListBuilder<GCreateCommentData_createComment_reactions>())
@@ -329,8 +450,44 @@ Serializers _$serializers = (Serializers().toBuilder()
           () => ListBuilder<GCreatePostData_createPost_comments_edges>())
       ..addBuilderFactory(
           const FullType(BuiltList,
+              const [const FullType(GCreatePostData_createPost_mentions)]),
+          () => ListBuilder<GCreatePostData_createPost_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GCreatePostData_createPost_referencedTags)
+          ]),
+          () => ListBuilder<GCreatePostData_createPost_referencedTags>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
               const [const FullType(GCreatePostData_createPost_reactions)]),
           () => ListBuilder<GCreatePostData_createPost_reactions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GMentionPreviewTagData_tagBySlugPath_posts_edges)
+          ]),
+          () => ListBuilder<GMentionPreviewTagData_tagBySlugPath_posts_edges>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GMentionPreviewUserData_userByHandle_recentPosts)
+          ]),
+          () => ListBuilder<GMentionPreviewUserData_userByHandle_recentPosts>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(GMessageAddedData_messageAdded_mentions)]),
+          () => ListBuilder<GMessageAddedData_messageAdded_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GMessageAddedData_messageAdded_referencedTags)
+          ]),
+          () => ListBuilder<GMessageAddedData_messageAdded_referencedTags>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(GMessageSummaryData_mentions)]),
+          () => ListBuilder<GMessageSummaryData_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(GMessageSummaryData_referencedTags)]),
+          () => ListBuilder<GMessageSummaryData_referencedTags>())
       ..addBuilderFactory(
           const FullType(
               BuiltList, const [const FullType(GNotificationReason)]),
@@ -347,6 +504,15 @@ Serializers _$serializers = (Serializers().toBuilder()
           () => ListBuilder<GPostChangedData_postChanged_comments_edges>())
       ..addBuilderFactory(
           const FullType(BuiltList,
+              const [const FullType(GPostChangedData_postChanged_mentions)]),
+          () => ListBuilder<GPostChangedData_postChanged_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GPostChangedData_postChanged_referencedTags)
+          ]),
+          () => ListBuilder<GPostChangedData_postChanged_referencedTags>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
               const [const FullType(GPostChangedData_postChanged_reactions)]),
           () => ListBuilder<GPostChangedData_postChanged_reactions>())
       ..addBuilderFactory(
@@ -355,10 +521,31 @@ Serializers _$serializers = (Serializers().toBuilder()
           () => ListBuilder<GPostDetailData_post_comments_edges>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [
+            const FullType(GPostDetailData_post_comments_edges_node_mentions)
+          ]),
+          () =>
+              ListBuilder<GPostDetailData_post_comments_edges_node_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(
+                GPostDetailData_post_comments_edges_node_referencedTags)
+          ]),
+          () => ListBuilder<
+              GPostDetailData_post_comments_edges_node_referencedTags>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
             const FullType(GPostDetailData_post_comments_edges_node_reactions)
           ]),
           () =>
               ListBuilder<GPostDetailData_post_comments_edges_node_reactions>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(GPostDetailData_post_mentions)]),
+          () => ListBuilder<GPostDetailData_post_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(GPostDetailData_post_referencedTags)]),
+          () => ListBuilder<GPostDetailData_post_referencedTags>())
       ..addBuilderFactory(
           const FullType(BuiltList,
               const [const FullType(GPostDetailData_post_reactions)]),
@@ -371,6 +558,14 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList,
               const [const FullType(GPostSummaryData_comments_edges)]),
           () => ListBuilder<GPostSummaryData_comments_edges>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(GPostSummaryData_mentions)]),
+          () => ListBuilder<GPostSummaryData_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(GPostSummaryData_referencedTags)]),
+          () => ListBuilder<GPostSummaryData_referencedTags>())
       ..addBuilderFactory(
           const FullType(
               BuiltList, const [const FullType(GPostSummaryData_reactions)]),
@@ -390,6 +585,17 @@ Serializers _$serializers = (Serializers().toBuilder()
               GPostsForTagData_tag_posts_edges_node_comments_edges>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [
+            const FullType(GPostsForTagData_tag_posts_edges_node_mentions)
+          ]),
+          () => ListBuilder<GPostsForTagData_tag_posts_edges_node_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GPostsForTagData_tag_posts_edges_node_referencedTags)
+          ]),
+          () => ListBuilder<
+              GPostsForTagData_tag_posts_edges_node_referencedTags>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
             const FullType(GPostsForTagData_tag_posts_edges_node_reactions)
           ]),
           () => ListBuilder<GPostsForTagData_tag_posts_edges_node_reactions>())
@@ -405,6 +611,19 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(
               BuiltList, const [const FullType(GSearchTagsData_searchTags)]),
           () => ListBuilder<GSearchTagsData_searchTags>())
+      ..addBuilderFactory(
+          const FullType(
+              BuiltList, const [const FullType(GSearchUsersData_searchUsers)]),
+          () => ListBuilder<GSearchUsersData_searchUsers>())
+      ..addBuilderFactory(
+          const FullType(BuiltList,
+              const [const FullType(GSendMessageData_sendMessage_mentions)]),
+          () => ListBuilder<GSendMessageData_sendMessage_mentions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GSendMessageData_sendMessage_referencedTags)
+          ]),
+          () => ListBuilder<GSendMessageData_sendMessage_referencedTags>())
       ..addBuilderFactory(
           const FullType(
               BuiltList, const [const FullType(GTagChildrenData_tag_children)]),
@@ -443,6 +662,12 @@ Serializers _$serializers = (Serializers().toBuilder()
             const FullType(GUnreactToPostData_unreactToPost_reactions)
           ]),
           () => ListBuilder<GUnreactToPostData_unreactToPost_reactions>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [const FullType(String)]),
+          () => ListBuilder<String>())
       ..addBuilderFactory(
           const FullType(BuiltList, const [const FullType(String)]),
           () => ListBuilder<String>())

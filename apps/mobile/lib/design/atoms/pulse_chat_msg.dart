@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../features/mention_preview/mention_hoverable.dart';
 import '../tokens.dart';
 import '../typography.dart';
 import 'pulse_markdown_body.dart';
@@ -12,6 +13,7 @@ class PulseChatMsg extends StatelessWidget {
     required this.who,
     required this.initials,
     required this.text,
+    this.whoSlug,
     this.when,
     this.promoted = false,
     this.promotedNote,
@@ -20,9 +22,23 @@ class PulseChatMsg extends StatelessWidget {
   final String who;
   final String initials;
   final String text;
+
+  /// User-tag slug of the author; when set, the avatar + name group
+  /// becomes hoverable (pops a [MentionHoverCard]).
+  final String? whoSlug;
   final String? when;
   final bool promoted;
   final String? promotedNote;
+
+  Widget _wrapAvatar(Widget child) {
+    if (whoSlug == null || whoSlug!.isEmpty) return child;
+    return MentionHoverable.user(slug: whoSlug!, child: child);
+  }
+
+  Widget _wrapName(Widget child) {
+    if (whoSlug == null || whoSlug!.isEmpty) return child;
+    return MentionHoverable.user(slug: whoSlug!, child: child);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +48,7 @@ class PulseChatMsg extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          PulseAvatar(initials: initials),
+          _wrapAvatar(PulseAvatar(initials: initials)),
           const SizedBox(width: 8),
           Expanded(
             child: Column(
@@ -43,14 +59,16 @@ class PulseChatMsg extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    Text(who,
-                        style: TextStyle(
-                          fontFamily: pulseMonoFamily,
-                          fontSize: 10.5,
-                          color: t.ink,
-                          fontWeight: FontWeight.w600,
-                          height: 1.2,
-                        )),
+                    _wrapName(
+                      Text(who,
+                          style: TextStyle(
+                            fontFamily: pulseMonoFamily,
+                            fontSize: 10.5,
+                            color: t.ink,
+                            fontWeight: FontWeight.w600,
+                            height: 1.2,
+                          )),
+                    ),
                     if (when != null) ...[
                       const SizedBox(width: 6),
                       Text(when!,

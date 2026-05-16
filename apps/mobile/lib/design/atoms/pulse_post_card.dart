@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../features/mention_preview/mention_hoverable.dart';
 import '../tokens.dart';
 import '../typography.dart';
 import 'pulse_avatar.dart';
@@ -21,6 +22,7 @@ class PulsePostCard extends StatelessWidget {
     this.statusLabel,
     this.authorInitials = '··',
     this.authorName,
+    this.authorSlug,
     this.whenLabel,
     this.tags = const [],
     this.comments,
@@ -38,6 +40,10 @@ class PulsePostCard extends StatelessWidget {
   final String? body;
   final String authorInitials;
   final String? authorName;
+
+  /// Non-null user-tag slug enables the hover-card popover over the
+  /// avatar + name group. Null disables hover (e.g. anonymous author).
+  final String? authorSlug;
   final String? whenLabel;
   final List<String> tags;
   final int? comments;
@@ -45,6 +51,14 @@ class PulsePostCard extends StatelessWidget {
   final List<String>? participants;
   final bool cursor;
   final VoidCallback? onTap;
+
+  /// Wrap the avatar+name group in [MentionHoverable] when a user-tag
+  /// slug is available; pass through otherwise so anonymous / system
+  /// authors stay free of pointer-event handlers.
+  Widget _wrapAuthor({required String? slug, required Widget child}) {
+    if (slug == null || slug.isEmpty) return child;
+    return MentionHoverable.user(slug: slug, child: child);
+  }
 
   String get _kindLabel {
     switch (kind) {
@@ -157,16 +171,27 @@ class PulsePostCard extends StatelessWidget {
                       Text('· ${statusLabel!.toUpperCase()}',
                           style: pulseMono(context,
                               size: 11, color: t.ink2, letterSpacing: 0.04)),
-                    PulseAvatar(
-                        initials: authorInitials, size: PulseAvatarSize.sm),
-                    if (authorName != null)
-                      Text(authorName!,
-                          style: TextStyle(
-                            fontFamily: pulseMonoFamily,
-                            fontSize: 11,
-                            color: t.ink,
-                            height: 1.2,
-                          )),
+                    _wrapAuthor(
+                      slug: authorSlug,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PulseAvatar(
+                              initials: authorInitials,
+                              size: PulseAvatarSize.sm),
+                          if (authorName != null) ...[
+                            const SizedBox(width: 6),
+                            Text(authorName!,
+                                style: TextStyle(
+                                  fontFamily: pulseMonoFamily,
+                                  fontSize: 11,
+                                  color: t.ink,
+                                  height: 1.2,
+                                )),
+                          ],
+                        ],
+                      ),
+                    ),
                     if (whenLabel != null)
                       Text('· $whenLabel',
                           style: TextStyle(

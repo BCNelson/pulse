@@ -299,6 +299,12 @@ abstract class GChatRoomDetailData_chatRoom_messages_edges_node
   @override
   GChatRoomDetailData_chatRoom_messages_edges_node_author get author;
   @override
+  BuiltList<GChatRoomDetailData_chatRoom_messages_edges_node_mentions>
+      get mentions;
+  @override
+  BuiltList<GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags>
+      get referencedTags;
+  @override
   GChatRoomDetailData_chatRoom_messages_edges_node_replyTo? get replyTo;
   static Serializer<GChatRoomDetailData_chatRoom_messages_edges_node>
       get serializer =>
@@ -341,6 +347,8 @@ abstract class GChatRoomDetailData_chatRoom_messages_edges_node_author
   String get id;
   @override
   String get displayName;
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag? get homeTag;
   static Serializer<GChatRoomDetailData_chatRoom_messages_edges_node_author>
       get serializer =>
           _$gChatRoomDetailDataChatRoomMessagesEdgesNodeAuthorSerializer;
@@ -357,6 +365,193 @@ abstract class GChatRoomDetailData_chatRoom_messages_edges_node_author
         GChatRoomDetailData_chatRoom_messages_edges_node_author.serializer,
         json,
       );
+}
+
+abstract class GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag
+    implements
+        Built<GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag,
+            GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder>,
+        GMessageSummary_author_homeTag {
+  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag._();
+
+  factory GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag(
+          [void Function(
+                  GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder
+                      b)
+              updates]) =
+      _$GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag;
+
+  static void _initializeBuilder(
+          GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTagBuilder
+              b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<
+          GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag>
+      get serializer =>
+          _$gChatRoomDetailDataChatRoomMessagesEdgesNodeAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag
+            .serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag?
+      fromJson(Map<String, dynamic> json) => _i1.serializers.deserializeWith(
+            GChatRoomDetailData_chatRoom_messages_edges_node_author_homeTag
+                .serializer,
+            json,
+          );
+}
+
+abstract class GChatRoomDetailData_chatRoom_messages_edges_node_mentions
+    implements
+        Built<GChatRoomDetailData_chatRoom_messages_edges_node_mentions,
+            GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder>,
+        GMessageSummary_mentions {
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions._();
+
+  factory GChatRoomDetailData_chatRoom_messages_edges_node_mentions(
+      [void Function(
+              GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder
+                  b)
+          updates]) = _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions;
+
+  static void _initializeBuilder(
+          GChatRoomDetailData_chatRoom_messages_edges_node_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag?
+      get homeTag;
+  static Serializer<GChatRoomDetailData_chatRoom_messages_edges_node_mentions>
+      get serializer =>
+          _$gChatRoomDetailDataChatRoomMessagesEdgesNodeMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GChatRoomDetailData_chatRoom_messages_edges_node_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GChatRoomDetailData_chatRoom_messages_edges_node_mentions? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GChatRoomDetailData_chatRoom_messages_edges_node_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag
+    implements
+        Built<GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag,
+            GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder>,
+        GMessageSummary_mentions_homeTag {
+  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag._();
+
+  factory GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag(
+          [void Function(
+                  GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder
+                      b)
+              updates]) =
+      _$GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag;
+
+  static void _initializeBuilder(
+          GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTagBuilder
+              b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<
+          GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag>
+      get serializer =>
+          _$gChatRoomDetailDataChatRoomMessagesEdgesNodeMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag
+            .serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag?
+      fromJson(Map<String, dynamic> json) => _i1.serializers.deserializeWith(
+            GChatRoomDetailData_chatRoom_messages_edges_node_mentions_homeTag
+                .serializer,
+            json,
+          );
+}
+
+abstract class GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags
+    implements
+        Built<GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags,
+            GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder>,
+        GMessageSummary_referencedTags {
+  GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags._();
+
+  factory GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags(
+          [void Function(
+                  GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder
+                      b)
+              updates]) =
+      _$GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags;
+
+  static void _initializeBuilder(
+          GChatRoomDetailData_chatRoom_messages_edges_node_referencedTagsBuilder
+              b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<
+          GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags>
+      get serializer =>
+          _$gChatRoomDetailDataChatRoomMessagesEdgesNodeReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags
+            .serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags?
+      fromJson(Map<String, dynamic> json) => _i1.serializers.deserializeWith(
+            GChatRoomDetailData_chatRoom_messages_edges_node_referencedTags
+                .serializer,
+            json,
+          );
 }
 
 abstract class GChatRoomDetailData_chatRoom_messages_edges_node_replyTo
@@ -456,6 +651,10 @@ abstract class GSendMessageData_sendMessage
   @override
   GSendMessageData_sendMessage_author get author;
   @override
+  BuiltList<GSendMessageData_sendMessage_mentions> get mentions;
+  @override
+  BuiltList<GSendMessageData_sendMessage_referencedTags> get referencedTags;
+  @override
   GSendMessageData_sendMessage_replyTo? get replyTo;
   static Serializer<GSendMessageData_sendMessage> get serializer =>
       _$gSendMessageDataSendMessageSerializer;
@@ -495,6 +694,8 @@ abstract class GSendMessageData_sendMessage_author
   String get id;
   @override
   String get displayName;
+  @override
+  GSendMessageData_sendMessage_author_homeTag? get homeTag;
   static Serializer<GSendMessageData_sendMessage_author> get serializer =>
       _$gSendMessageDataSendMessageAuthorSerializer;
 
@@ -508,6 +709,168 @@ abstract class GSendMessageData_sendMessage_author
           Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GSendMessageData_sendMessage_author.serializer,
+        json,
+      );
+}
+
+abstract class GSendMessageData_sendMessage_author_homeTag
+    implements
+        Built<GSendMessageData_sendMessage_author_homeTag,
+            GSendMessageData_sendMessage_author_homeTagBuilder>,
+        GMessageSummary_author_homeTag {
+  GSendMessageData_sendMessage_author_homeTag._();
+
+  factory GSendMessageData_sendMessage_author_homeTag(
+      [void Function(GSendMessageData_sendMessage_author_homeTagBuilder b)
+          updates]) = _$GSendMessageData_sendMessage_author_homeTag;
+
+  static void _initializeBuilder(
+          GSendMessageData_sendMessage_author_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GSendMessageData_sendMessage_author_homeTag>
+      get serializer => _$gSendMessageDataSendMessageAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GSendMessageData_sendMessage_author_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSendMessageData_sendMessage_author_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GSendMessageData_sendMessage_author_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GSendMessageData_sendMessage_mentions
+    implements
+        Built<GSendMessageData_sendMessage_mentions,
+            GSendMessageData_sendMessage_mentionsBuilder>,
+        GMessageSummary_mentions {
+  GSendMessageData_sendMessage_mentions._();
+
+  factory GSendMessageData_sendMessage_mentions(
+      [void Function(GSendMessageData_sendMessage_mentionsBuilder b)
+          updates]) = _$GSendMessageData_sendMessage_mentions;
+
+  static void _initializeBuilder(
+          GSendMessageData_sendMessage_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GSendMessageData_sendMessage_mentions_homeTag? get homeTag;
+  static Serializer<GSendMessageData_sendMessage_mentions> get serializer =>
+      _$gSendMessageDataSendMessageMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GSendMessageData_sendMessage_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSendMessageData_sendMessage_mentions? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GSendMessageData_sendMessage_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GSendMessageData_sendMessage_mentions_homeTag
+    implements
+        Built<GSendMessageData_sendMessage_mentions_homeTag,
+            GSendMessageData_sendMessage_mentions_homeTagBuilder>,
+        GMessageSummary_mentions_homeTag {
+  GSendMessageData_sendMessage_mentions_homeTag._();
+
+  factory GSendMessageData_sendMessage_mentions_homeTag(
+      [void Function(GSendMessageData_sendMessage_mentions_homeTagBuilder b)
+          updates]) = _$GSendMessageData_sendMessage_mentions_homeTag;
+
+  static void _initializeBuilder(
+          GSendMessageData_sendMessage_mentions_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GSendMessageData_sendMessage_mentions_homeTag>
+      get serializer => _$gSendMessageDataSendMessageMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GSendMessageData_sendMessage_mentions_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSendMessageData_sendMessage_mentions_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GSendMessageData_sendMessage_mentions_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GSendMessageData_sendMessage_referencedTags
+    implements
+        Built<GSendMessageData_sendMessage_referencedTags,
+            GSendMessageData_sendMessage_referencedTagsBuilder>,
+        GMessageSummary_referencedTags {
+  GSendMessageData_sendMessage_referencedTags._();
+
+  factory GSendMessageData_sendMessage_referencedTags(
+      [void Function(GSendMessageData_sendMessage_referencedTagsBuilder b)
+          updates]) = _$GSendMessageData_sendMessage_referencedTags;
+
+  static void _initializeBuilder(
+          GSendMessageData_sendMessage_referencedTagsBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<GSendMessageData_sendMessage_referencedTags>
+      get serializer => _$gSendMessageDataSendMessageReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GSendMessageData_sendMessage_referencedTags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSendMessageData_sendMessage_referencedTags? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GSendMessageData_sendMessage_referencedTags.serializer,
         json,
       );
 }
@@ -804,6 +1167,10 @@ abstract class GMessageAddedData_messageAdded
   @override
   GMessageAddedData_messageAdded_author get author;
   @override
+  BuiltList<GMessageAddedData_messageAdded_mentions> get mentions;
+  @override
+  BuiltList<GMessageAddedData_messageAdded_referencedTags> get referencedTags;
+  @override
   GMessageAddedData_messageAdded_replyTo? get replyTo;
   static Serializer<GMessageAddedData_messageAdded> get serializer =>
       _$gMessageAddedDataMessageAddedSerializer;
@@ -843,6 +1210,8 @@ abstract class GMessageAddedData_messageAdded_author
   String get id;
   @override
   String get displayName;
+  @override
+  GMessageAddedData_messageAdded_author_homeTag? get homeTag;
   static Serializer<GMessageAddedData_messageAdded_author> get serializer =>
       _$gMessageAddedDataMessageAddedAuthorSerializer;
 
@@ -856,6 +1225,169 @@ abstract class GMessageAddedData_messageAdded_author
           Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GMessageAddedData_messageAdded_author.serializer,
+        json,
+      );
+}
+
+abstract class GMessageAddedData_messageAdded_author_homeTag
+    implements
+        Built<GMessageAddedData_messageAdded_author_homeTag,
+            GMessageAddedData_messageAdded_author_homeTagBuilder>,
+        GMessageSummary_author_homeTag {
+  GMessageAddedData_messageAdded_author_homeTag._();
+
+  factory GMessageAddedData_messageAdded_author_homeTag(
+      [void Function(GMessageAddedData_messageAdded_author_homeTagBuilder b)
+          updates]) = _$GMessageAddedData_messageAdded_author_homeTag;
+
+  static void _initializeBuilder(
+          GMessageAddedData_messageAdded_author_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GMessageAddedData_messageAdded_author_homeTag>
+      get serializer => _$gMessageAddedDataMessageAddedAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GMessageAddedData_messageAdded_author_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GMessageAddedData_messageAdded_author_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GMessageAddedData_messageAdded_author_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GMessageAddedData_messageAdded_mentions
+    implements
+        Built<GMessageAddedData_messageAdded_mentions,
+            GMessageAddedData_messageAdded_mentionsBuilder>,
+        GMessageSummary_mentions {
+  GMessageAddedData_messageAdded_mentions._();
+
+  factory GMessageAddedData_messageAdded_mentions(
+      [void Function(GMessageAddedData_messageAdded_mentionsBuilder b)
+          updates]) = _$GMessageAddedData_messageAdded_mentions;
+
+  static void _initializeBuilder(
+          GMessageAddedData_messageAdded_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GMessageAddedData_messageAdded_mentions_homeTag? get homeTag;
+  static Serializer<GMessageAddedData_messageAdded_mentions> get serializer =>
+      _$gMessageAddedDataMessageAddedMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GMessageAddedData_messageAdded_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GMessageAddedData_messageAdded_mentions? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GMessageAddedData_messageAdded_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GMessageAddedData_messageAdded_mentions_homeTag
+    implements
+        Built<GMessageAddedData_messageAdded_mentions_homeTag,
+            GMessageAddedData_messageAdded_mentions_homeTagBuilder>,
+        GMessageSummary_mentions_homeTag {
+  GMessageAddedData_messageAdded_mentions_homeTag._();
+
+  factory GMessageAddedData_messageAdded_mentions_homeTag(
+      [void Function(GMessageAddedData_messageAdded_mentions_homeTagBuilder b)
+          updates]) = _$GMessageAddedData_messageAdded_mentions_homeTag;
+
+  static void _initializeBuilder(
+          GMessageAddedData_messageAdded_mentions_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GMessageAddedData_messageAdded_mentions_homeTag>
+      get serializer =>
+          _$gMessageAddedDataMessageAddedMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GMessageAddedData_messageAdded_mentions_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GMessageAddedData_messageAdded_mentions_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GMessageAddedData_messageAdded_mentions_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GMessageAddedData_messageAdded_referencedTags
+    implements
+        Built<GMessageAddedData_messageAdded_referencedTags,
+            GMessageAddedData_messageAdded_referencedTagsBuilder>,
+        GMessageSummary_referencedTags {
+  GMessageAddedData_messageAdded_referencedTags._();
+
+  factory GMessageAddedData_messageAdded_referencedTags(
+      [void Function(GMessageAddedData_messageAdded_referencedTagsBuilder b)
+          updates]) = _$GMessageAddedData_messageAdded_referencedTags;
+
+  static void _initializeBuilder(
+          GMessageAddedData_messageAdded_referencedTagsBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<GMessageAddedData_messageAdded_referencedTags>
+      get serializer => _$gMessageAddedDataMessageAddedReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GMessageAddedData_messageAdded_referencedTags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GMessageAddedData_messageAdded_referencedTags? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GMessageAddedData_messageAdded_referencedTags.serializer,
         json,
       );
 }
@@ -906,6 +1438,8 @@ abstract class GMessageSummary {
   _i2.GTime get createdAt;
   _i2.GTime? get editedAt;
   GMessageSummary_author get author;
+  BuiltList<GMessageSummary_mentions> get mentions;
+  BuiltList<GMessageSummary_referencedTags> get referencedTags;
   GMessageSummary_replyTo? get replyTo;
   Map<String, dynamic> toJson();
 }
@@ -914,6 +1448,38 @@ abstract class GMessageSummary_author {
   String get G__typename;
   String get id;
   String get displayName;
+  GMessageSummary_author_homeTag? get homeTag;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GMessageSummary_author_homeTag {
+  String get G__typename;
+  String get slug;
+  String get path;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GMessageSummary_mentions {
+  String get G__typename;
+  String get id;
+  String get displayName;
+  GMessageSummary_mentions_homeTag? get homeTag;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GMessageSummary_mentions_homeTag {
+  String get G__typename;
+  String get slug;
+  String get path;
+  Map<String, dynamic> toJson();
+}
+
+abstract class GMessageSummary_referencedTags {
+  String get G__typename;
+  String get id;
+  String get slug;
+  String get displayName;
+  String get path;
   Map<String, dynamic> toJson();
 }
 
@@ -950,6 +1516,10 @@ abstract class GMessageSummaryData
   _i2.GTime? get editedAt;
   @override
   GMessageSummaryData_author get author;
+  @override
+  BuiltList<GMessageSummaryData_mentions> get mentions;
+  @override
+  BuiltList<GMessageSummaryData_referencedTags> get referencedTags;
   @override
   GMessageSummaryData_replyTo? get replyTo;
   static Serializer<GMessageSummaryData> get serializer =>
@@ -988,6 +1558,8 @@ abstract class GMessageSummaryData_author
   String get id;
   @override
   String get displayName;
+  @override
+  GMessageSummaryData_author_homeTag? get homeTag;
   static Serializer<GMessageSummaryData_author> get serializer =>
       _$gMessageSummaryDataAuthorSerializer;
 
@@ -1000,6 +1572,164 @@ abstract class GMessageSummaryData_author
   static GMessageSummaryData_author? fromJson(Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GMessageSummaryData_author.serializer,
+        json,
+      );
+}
+
+abstract class GMessageSummaryData_author_homeTag
+    implements
+        Built<GMessageSummaryData_author_homeTag,
+            GMessageSummaryData_author_homeTagBuilder>,
+        GMessageSummary_author_homeTag {
+  GMessageSummaryData_author_homeTag._();
+
+  factory GMessageSummaryData_author_homeTag(
+      [void Function(GMessageSummaryData_author_homeTagBuilder b)
+          updates]) = _$GMessageSummaryData_author_homeTag;
+
+  static void _initializeBuilder(GMessageSummaryData_author_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GMessageSummaryData_author_homeTag> get serializer =>
+      _$gMessageSummaryDataAuthorHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GMessageSummaryData_author_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GMessageSummaryData_author_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GMessageSummaryData_author_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GMessageSummaryData_mentions
+    implements
+        Built<GMessageSummaryData_mentions,
+            GMessageSummaryData_mentionsBuilder>,
+        GMessageSummary_mentions {
+  GMessageSummaryData_mentions._();
+
+  factory GMessageSummaryData_mentions(
+          [void Function(GMessageSummaryData_mentionsBuilder b) updates]) =
+      _$GMessageSummaryData_mentions;
+
+  static void _initializeBuilder(GMessageSummaryData_mentionsBuilder b) =>
+      b..G__typename = 'Principal';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get displayName;
+  @override
+  GMessageSummaryData_mentions_homeTag? get homeTag;
+  static Serializer<GMessageSummaryData_mentions> get serializer =>
+      _$gMessageSummaryDataMentionsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GMessageSummaryData_mentions.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GMessageSummaryData_mentions? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GMessageSummaryData_mentions.serializer,
+        json,
+      );
+}
+
+abstract class GMessageSummaryData_mentions_homeTag
+    implements
+        Built<GMessageSummaryData_mentions_homeTag,
+            GMessageSummaryData_mentions_homeTagBuilder>,
+        GMessageSummary_mentions_homeTag {
+  GMessageSummaryData_mentions_homeTag._();
+
+  factory GMessageSummaryData_mentions_homeTag(
+      [void Function(GMessageSummaryData_mentions_homeTagBuilder b)
+          updates]) = _$GMessageSummaryData_mentions_homeTag;
+
+  static void _initializeBuilder(
+          GMessageSummaryData_mentions_homeTagBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get slug;
+  @override
+  String get path;
+  static Serializer<GMessageSummaryData_mentions_homeTag> get serializer =>
+      _$gMessageSummaryDataMentionsHomeTagSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GMessageSummaryData_mentions_homeTag.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GMessageSummaryData_mentions_homeTag? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GMessageSummaryData_mentions_homeTag.serializer,
+        json,
+      );
+}
+
+abstract class GMessageSummaryData_referencedTags
+    implements
+        Built<GMessageSummaryData_referencedTags,
+            GMessageSummaryData_referencedTagsBuilder>,
+        GMessageSummary_referencedTags {
+  GMessageSummaryData_referencedTags._();
+
+  factory GMessageSummaryData_referencedTags(
+      [void Function(GMessageSummaryData_referencedTagsBuilder b)
+          updates]) = _$GMessageSummaryData_referencedTags;
+
+  static void _initializeBuilder(GMessageSummaryData_referencedTagsBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  static Serializer<GMessageSummaryData_referencedTags> get serializer =>
+      _$gMessageSummaryDataReferencedTagsSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GMessageSummaryData_referencedTags.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GMessageSummaryData_referencedTags? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GMessageSummaryData_referencedTags.serializer,
         json,
       );
 }

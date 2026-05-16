@@ -78,6 +78,8 @@ type SendInput struct {
 	AuthorID int64
 	Body     string
 	ReplyTo  *int64
+	Mentions []int64 // principal ids extracted from canonical mention links
+	TagRefs  []int64 // tag ids extracted from canonical tag-reference links
 }
 
 // CreateRoom inserts a room with its initial tags and participants. Computes
@@ -268,8 +270,9 @@ func (s *Service) RoomTags(ctx context.Context, roomID int64) ([]int64, error) {
 	return out, rows.Err()
 }
 
-// SendMessage inserts a chat message and emits a chat.room.<id> NOTIFY
-// in the same transaction. Subscribers receive the id and re-fetch.
+// SendMessage inserts a chat message, writes mention/tag-ref junctions,
+// and emits a chat.room.<id> NOTIFY in the same transaction. Subscribers
+// receive the id and re-fetch.
 func (s *Service) SendMessage(ctx context.Context, in SendInput) (int64, error) {
 	var id int64
 	err := s.runInTx(ctx, func(tx pgx.Tx) error {
@@ -279,6 +282,22 @@ func (s *Service) SendMessage(ctx context.Context, in SendInput) (int64, error) 
         `, in.RoomID, in.AuthorID, in.Body, in.ReplyTo)
 		if err := row.Scan(&id); err != nil {
 			return fmt.Errorf("insert message: %w", err)
+		}
+		for _, p := range in.Mentions {
+			if _, err := tx.Exec(ctx, `
+                INSERT INTO message_mentions (message_id, principal_id) VALUES ($1, $2)
+                ON CONFLICT DO NOTHING
+            `, id, p); err != nil {
+				return fmt.Errorf("insert mention: %w", err)
+			}
+		}
+		for _, t := range in.TagRefs {
+			if _, err := tx.Exec(ctx, `
+                INSERT INTO message_tag_refs (message_id, tag_id) VALUES ($1, $2)
+                ON CONFLICT DO NOTHING
+            `, id, t); err != nil {
+				return fmt.Errorf("insert tag ref: %w", err)
+			}
 		}
 		// pg_notify is the realtime hook — payload carries IDs only,
 		// subscribers re-fetch + recheck visibility before emitting.
@@ -310,32 +329,94 @@ func (s *Service) GetMessage(ctx context.Context, id int64) (*Message, error) {
 	return &m, nil
 }
 
-// EditMessage updates the body and stamps edited_at. Note: M3 does NOT
-// snapshot prior body to a message_edits table — chat is more transient
-// than posts, and the architecture defers message-edit history to a
-// later milestone if user research demands it.
-func (s *Service) EditMessage(ctx context.Context, id, editor int64, body string) error {
-	tag, err := s.DB.Exec(ctx, `
-        UPDATE messages SET body = $1, edited_at = now()
-        WHERE id = $2 AND deleted_at IS NULL AND body <> $1
-    `, body, id)
+// EditMessage updates the body, re-derives the mention and tag-ref
+// junctions from the new body, and stamps edited_at — all in a single
+// transaction. Note: M3 still does NOT snapshot prior body to a
+// message_edits table; chat edit history is deferred to a later
+// milestone if user research demands it.
+func (s *Service) EditMessage(ctx context.Context, id, editor int64, body string, mentions, tagRefs []int64) error {
+	return s.runInTx(ctx, func(tx pgx.Tx) error {
+		tag, err := tx.Exec(ctx, `
+            UPDATE messages SET body = $1, edited_at = now()
+            WHERE id = $2 AND deleted_at IS NULL AND body <> $1
+        `, body, id)
+		if err != nil {
+			return fmt.Errorf("edit message: %w", err)
+		}
+		if tag.RowsAffected() == 0 {
+			var exists bool
+			if err := tx.QueryRow(ctx,
+				`SELECT EXISTS(SELECT 1 FROM messages WHERE id = $1 AND deleted_at IS NULL)`, id).
+				Scan(&exists); err != nil {
+				return err
+			}
+			if !exists {
+				return ErrNotFound
+			}
+			return ErrAlreadyEdited
+		}
+		if _, err := tx.Exec(ctx, `DELETE FROM message_mentions WHERE message_id = $1`, id); err != nil {
+			return fmt.Errorf("clear mentions: %w", err)
+		}
+		for _, p := range mentions {
+			if _, err := tx.Exec(ctx, `
+                INSERT INTO message_mentions (message_id, principal_id) VALUES ($1, $2)
+                ON CONFLICT DO NOTHING
+            `, id, p); err != nil {
+				return fmt.Errorf("insert mention: %w", err)
+			}
+		}
+		if _, err := tx.Exec(ctx, `DELETE FROM message_tag_refs WHERE message_id = $1`, id); err != nil {
+			return fmt.Errorf("clear tag refs: %w", err)
+		}
+		for _, t := range tagRefs {
+			if _, err := tx.Exec(ctx, `
+                INSERT INTO message_tag_refs (message_id, tag_id) VALUES ($1, $2)
+                ON CONFLICT DO NOTHING
+            `, id, t); err != nil {
+				return fmt.Errorf("insert tag ref: %w", err)
+			}
+		}
+		return nil
+	})
+}
+
+// MessageMentions returns the principal ids mentioned in a chat message.
+func (s *Service) MessageMentions(ctx context.Context, id int64) ([]int64, error) {
+	rows, err := s.DB.Query(ctx,
+		`SELECT principal_id FROM message_mentions WHERE message_id = $1`, id)
 	if err != nil {
-		return fmt.Errorf("edit message: %w", err)
+		return nil, fmt.Errorf("load message mentions: %w", err)
 	}
-	if tag.RowsAffected() == 0 {
-		// Either not found, deleted, or no-op edit.
-		var exists bool
-		if err := s.DB.QueryRow(ctx,
-			`SELECT EXISTS(SELECT 1 FROM messages WHERE id = $1 AND deleted_at IS NULL)`, id).
-			Scan(&exists); err != nil {
-			return err
+	defer rows.Close()
+	var out []int64
+	for rows.Next() {
+		var p int64
+		if err := rows.Scan(&p); err != nil {
+			return nil, err
 		}
-		if !exists {
-			return ErrNotFound
-		}
-		return ErrAlreadyEdited
+		out = append(out, p)
 	}
-	return nil
+	return out, rows.Err()
+}
+
+// MessageTagRefs returns the tag ids referenced inline in a chat message.
+func (s *Service) MessageTagRefs(ctx context.Context, id int64) ([]int64, error) {
+	rows, err := s.DB.Query(ctx,
+		`SELECT tag_id FROM message_tag_refs WHERE message_id = $1`, id)
+	if err != nil {
+		return nil, fmt.Errorf("load message tag refs: %w", err)
+	}
+	defer rows.Close()
+	var out []int64
+	for rows.Next() {
+		var t int64
+		if err := rows.Scan(&t); err != nil {
+			return nil, err
+		}
+		out = append(out, t)
+	}
+	return out, rows.Err()
 }
 
 // DeleteMessage soft-deletes a message.
