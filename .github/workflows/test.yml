@@ -8,13 +8,12 @@ on:
 permissions:
   contents: read
 
-# Test types map 1:1 to a codecov flag. Each test step writes its own
-# coverprofile; each upload tags the report with the umbrella flag (api
-# or mobile) AND a specific type flag (api-unit, mobile-widget, etc.).
-# Codecov unions reports that share a flag — so the umbrella view is the
-# union of all per-type uploads, and each per-type view shows only what
-# that test category covered. Adding a new test type means a new step
-# pair, not a refactor.
+# Each test category produces its own coverprofile and uploads to
+# codecov tagged with two flags: the platform umbrella (server or
+# mobile) plus the type (unit / integration / e2e). Codecov unions
+# reports that share a flag, so the umbrellas auto-aggregate to the
+# full per-platform view while each <platform>-<type> flag isolates
+# that one category.
 
 jobs:
   go:
@@ -31,7 +30,7 @@ jobs:
         working-directory: services/api
         run: go build ./...
 
-      # Pure-logic tests with no Postgres/RustFS dependency.
+      # Pure-logic packages: no Postgres, no RustFS, no GraphQL transport.
       - name: Test (unit)
         working-directory: services/api
         run: |
@@ -41,19 +40,23 @@ jobs:
             ./internal/federation/... \
             ./pkg/ids/...
 
-      - name: Upload unit coverage
+      - name: Upload server-unit coverage
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: services/api/coverage.unit.out
-          flags: api,api-unit
+          flags: server,server-unit
 
-      # Testcontainer-backed integration tests against real Postgres + RustFS.
-      # The biggest bucket — covers the services layer that lives in SQL.
+      # Testcontainer-backed integration tests: real Postgres + RustFS
+      # via internal/pgtest. Includes the permission service, the
+      # realtime LISTEN/NOTIFY pipeline, and the in-process worker
+      # boot — everything that hits the DB but stops short of the full
+      # HTTP -> resolver roundtrip.
       - name: Test (integration)
         working-directory: services/api
         run: |
           go test -count=1 -race -covermode=atomic -coverprofile=coverage.integration.out \
+            ./cmd/api/... \
             ./internal/attachment/... \
             ./internal/audit/... \
             ./internal/auth/... \
@@ -65,78 +68,37 @@ jobs:
             ./internal/impersonation/... \
             ./internal/job/... \
             ./internal/notification/... \
+            ./internal/perm/... \
             ./internal/post/... \
             ./internal/push/... \
+            ./internal/realtime/... \
             ./internal/redaction/... \
             ./internal/retention/... \
             ./internal/search/... \
             ./internal/tag/... \
             ./internal/task/...
 
-      - name: Upload integration coverage
+      - name: Upload server-integration coverage
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: services/api/coverage.integration.out
-          flags: api,api-integration
+          flags: server,server-integration
 
-      # Full GraphQL surface: HTTP transport → resolver → DB roundtrip.
-      - name: Test (graphql-e2e)
+      # End-to-end GraphQL surface: HTTP transport -> resolver -> DB,
+      # M1 through M4.5 milestones.
+      - name: Test (e2e)
         working-directory: services/api
         run: |
-          go test -count=1 -race -covermode=atomic -coverprofile=coverage.graphql.out \
+          go test -count=1 -race -covermode=atomic -coverprofile=coverage.e2e.out \
             ./internal/graphql/
 
-      - name: Upload graphql-e2e coverage
+      - name: Upload server-e2e coverage
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: services/api/coverage.graphql.out
-          flags: api,api-graphql-e2e
-
-      # The central permission service: closure-table cascades, role
-      # flags, per-domain matrices. The most exhaustively tested area.
-      - name: Test (perm)
-        working-directory: services/api
-        run: |
-          go test -count=1 -race -covermode=atomic -coverprofile=coverage.perm.out \
-            ./internal/perm/...
-
-      - name: Upload perm coverage
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: services/api/coverage.perm.out
-          flags: api,api-perm
-
-      # LISTEN/NOTIFY pipeline. Exercises the Postgres-only realtime
-      # primitive that subscriptions ride on.
-      - name: Test (realtime)
-        working-directory: services/api
-        run: |
-          go test -count=1 -race -covermode=atomic -coverprofile=coverage.realtime.out \
-            ./internal/realtime/...
-
-      - name: Upload realtime coverage
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: services/api/coverage.realtime.out
-          flags: api,api-realtime
-
-      # --mode=worker boot path: registry wiring, poll loop, dispatch.
-      - name: Test (worker)
-        working-directory: services/api
-        run: |
-          go test -count=1 -race -covermode=atomic -coverprofile=coverage.worker.out \
-            ./cmd/api/...
-
-      - name: Upload worker coverage
-        uses: codecov/codecov-action@v5
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: services/api/coverage.worker.out
-          flags: api,api-worker
+          files: services/api/coverage.e2e.out
+          flags: server,server-e2e
 
       - uses: golangci/golangci-lint-action@v9
         with:
@@ -171,21 +133,26 @@ jobs:
         working-directory: apps/mobile
         run: flutter test --coverage --coverage-path=coverage/unit.info test/core/
 
-      - name: Upload unit coverage
+      - name: Upload mobile-unit coverage
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: apps/mobile/coverage/unit.info
           flags: mobile,mobile-unit
 
-      # WidgetTester-driven screen + composer tests.
-      - name: test (widget)
+      # WidgetTester-driven screen + composer tests. Widget tests
+      # integrate multiple components in memory (provider tree,
+      # router, theme) without a real backend, so they live under the
+      # `integration` type rather than `unit`. End-to-end mobile<->API
+      # tests would live in apps/mobile/integration_test/ when added,
+      # uploaded with `mobile,mobile-e2e` (no such tests exist today).
+      - name: test (integration)
         working-directory: apps/mobile
-        run: flutter test --coverage --coverage-path=coverage/widget.info test/features/ test/widget_test.dart
+        run: flutter test --coverage --coverage-path=coverage/integration.info test/features/ test/widget_test.dart
 
-      - name: Upload widget coverage
+      - name: Upload mobile-integration coverage
         uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: apps/mobile/coverage/widget.info
-          flags: mobile,mobile-widget
+          files: apps/mobile/coverage/integration.info
+          flags: mobile,mobile-integration
