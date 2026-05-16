@@ -6,11 +6,13 @@ package comment
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
 
+	"github.com/bcnelson/pulse/services/api/internal/realtime"
 	"github.com/bcnelson/pulse/services/api/pkg/ids"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -99,9 +101,43 @@ func (s *Service) Create(ctx context.Context, in CreateInput) (int64, error) {
 				return fmt.Errorf("insert tag ref: %w", err)
 			}
 		}
-		return nil
+		return notifyPostChangedForComment(ctx, tx, in.PostID)
 	})
 	return id, err
+}
+
+// notifyPostChangedForComment emits posts.tag.<id> NOTIFY on each of the
+// parent post's attached tags. Comment writes change the post's
+// lastActivityAt / commentCount, both of which appear in PostSummary, so
+// feed subscribers need a refetch signal.
+func notifyPostChangedForComment(ctx context.Context, tx pgx.Tx, postID int64) error {
+	rows, err := tx.Query(ctx, `SELECT tag_id FROM post_tags WHERE post_id = $1`, postID)
+	if err != nil {
+		return fmt.Errorf("load post_tags: %w", err)
+	}
+	defer rows.Close()
+	var tagIDs []int64
+	for rows.Next() {
+		var t int64
+		if err := rows.Scan(&t); err != nil {
+			return err
+		}
+		tagIDs = append(tagIDs, t)
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+	if len(tagIDs) == 0 {
+		return nil
+	}
+	payload := json.RawMessage(fmt.Sprintf(`{"post_id":"%s"}`, ids.FormatID(postID)))
+	for _, tid := range tagIDs {
+		sql, args := realtime.NotifySQL("posts.tag."+ids.FormatID(tid), payload)
+		if _, err := tx.Exec(ctx, sql, args...); err != nil {
+			return fmt.Errorf("notify post changed: %w", err)
+		}
+	}
+	return nil
 }
 
 // Get returns a comment by id.
@@ -125,9 +161,10 @@ func (s *Service) Get(ctx context.Context, id int64) (*Comment, error) {
 func (s *Service) Edit(ctx context.Context, id, editor int64, body string, mentions, tagRefs []int64) error {
 	return s.runInTx(ctx, func(tx pgx.Tx) error {
 		var prev string
+		var postID int64
 		err := tx.QueryRow(ctx,
-			`SELECT body FROM comments WHERE id = $1 FOR UPDATE`, id).
-			Scan(&prev)
+			`SELECT body, post_id FROM comments WHERE id = $1 FOR UPDATE`, id).
+			Scan(&prev, &postID)
 		if errors.Is(err, pgx.ErrNoRows) {
 			return ErrNotFound
 		}
@@ -170,22 +207,30 @@ func (s *Service) Edit(ctx context.Context, id, editor int64, body string, menti
 				return fmt.Errorf("insert tag ref: %w", err)
 			}
 		}
-		return nil
+		return notifyPostChangedForComment(ctx, tx, postID)
 	})
 }
 
 // Delete soft-deletes a comment. Children remain — clients render
 // "[deleted]" placeholders to preserve thread structure.
 func (s *Service) Delete(ctx context.Context, id int64) error {
-	tag, err := s.DB.Exec(ctx,
-		`UPDATE comments SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
-	if err != nil {
-		return fmt.Errorf("soft-delete: %w", err)
-	}
-	if tag.RowsAffected() == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return s.runInTx(ctx, func(tx pgx.Tx) error {
+		var postID int64
+		err := tx.QueryRow(ctx,
+			`SELECT post_id FROM comments WHERE id = $1 AND deleted_at IS NULL FOR UPDATE`, id).
+			Scan(&postID)
+		if errors.Is(err, pgx.ErrNoRows) {
+			return ErrNotFound
+		}
+		if err != nil {
+			return fmt.Errorf("lock comment: %w", err)
+		}
+		if _, err := tx.Exec(ctx,
+			`UPDATE comments SET deleted_at = now() WHERE id = $1`, id); err != nil {
+			return fmt.Errorf("soft-delete: %w", err)
+		}
+		return notifyPostChangedForComment(ctx, tx, postID)
+	})
 }
 
 // React adds a (comment, principal, emoji) reaction. Idempotent.

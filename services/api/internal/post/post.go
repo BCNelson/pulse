@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/bcnelson/pulse/services/api/internal/realtime"
+	"github.com/bcnelson/pulse/services/api/pkg/ids"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -104,9 +106,35 @@ func (s *Service) Create(ctx context.Context, in CreateInput) (int64, error) {
 				return fmt.Errorf("insert tag ref: %w", err)
 			}
 		}
+		tagIDs := make([]int64, 0, len(in.Tags))
+		for _, t := range in.Tags {
+			tagIDs = append(tagIDs, t.TagID)
+		}
+		if err := notifyPostChanged(ctx, tx, id, tagIDs); err != nil {
+			return err
+		}
 		return nil
 	})
 	return id, err
+}
+
+// notifyPostChanged emits posts.tag.<id> NOTIFY for each attached tag so
+// subscribers to PostChanged refetch. Payload carries only the post id —
+// subscribers re-check visibility and load the row themselves. Called
+// inside the same transaction as the write so events are atomic with
+// state.
+func notifyPostChanged(ctx context.Context, tx pgx.Tx, postID int64, tagIDs []int64) error {
+	if len(tagIDs) == 0 {
+		return nil
+	}
+	payload := json.RawMessage(fmt.Sprintf(`{"post_id":"%s"}`, ids.FormatID(postID)))
+	for _, tid := range tagIDs {
+		sql, args := realtime.NotifySQL("posts.tag."+ids.FormatID(tid), payload)
+		if _, err := tx.Exec(ctx, sql, args...); err != nil {
+			return fmt.Errorf("notify post changed: %w", err)
+		}
+	}
+	return nil
 }
 
 // Get returns the post by id, or ErrNotFound. Soft-deleted posts are
@@ -178,22 +206,51 @@ func (s *Service) Edit(ctx context.Context, id, editor int64, title, body string
 				return fmt.Errorf("insert tag ref: %w", err)
 			}
 		}
-		return nil
+		tagIDs, err := loadPostTagIDs(ctx, tx, id)
+		if err != nil {
+			return err
+		}
+		return notifyPostChanged(ctx, tx, id, tagIDs)
 	})
+}
+
+// loadPostTagIDs reads the tag-attachment ids for a post inside a tx so
+// notify emission stays atomic with the write that prompted it.
+func loadPostTagIDs(ctx context.Context, tx pgx.Tx, postID int64) ([]int64, error) {
+	rows, err := tx.Query(ctx, `SELECT tag_id FROM post_tags WHERE post_id = $1`, postID)
+	if err != nil {
+		return nil, fmt.Errorf("load post_tags: %w", err)
+	}
+	defer rows.Close()
+	var out []int64
+	for rows.Next() {
+		var t int64
+		if err := rows.Scan(&t); err != nil {
+			return nil, err
+		}
+		out = append(out, t)
+	}
+	return out, rows.Err()
 }
 
 // Delete soft-deletes a post (deleted_at = now()). Comments and reactions
 // remain in place for archival; reads filter on deleted_at IS NULL.
 func (s *Service) Delete(ctx context.Context, id int64) error {
-	tag, err := s.DB.Exec(ctx,
-		`UPDATE posts SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
-	if err != nil {
-		return fmt.Errorf("soft-delete: %w", err)
-	}
-	if tag.RowsAffected() == 0 {
-		return ErrNotFound
-	}
-	return nil
+	return s.runInTx(ctx, func(tx pgx.Tx) error {
+		tag, err := tx.Exec(ctx,
+			`UPDATE posts SET deleted_at = now() WHERE id = $1 AND deleted_at IS NULL`, id)
+		if err != nil {
+			return fmt.Errorf("soft-delete: %w", err)
+		}
+		if tag.RowsAffected() == 0 {
+			return ErrNotFound
+		}
+		tagIDs, err := loadPostTagIDs(ctx, tx, id)
+		if err != nil {
+			return err
+		}
+		return notifyPostChanged(ctx, tx, id, tagIDs)
+	})
 }
 
 func (s *Service) SetDecisionStatus(ctx context.Context, id int64, status *string) error {

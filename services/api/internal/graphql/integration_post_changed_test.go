@@ -114,3 +114,69 @@ func TestPostChangedDescendantFanout(t *testing.T) {
 	case <-time.After(300 * time.Millisecond):
 	}
 }
+
+// TestPostChangedFromProductionCreate exercises the real pg_notify path:
+// post.Service.Create emits posts.tag.<tagID> inside its transaction; the
+// dispatcher's LISTEN connection delivers it to the subscriber. No
+// dispatcher.Publish shortcut.
+func TestPostChangedFromProductionCreate(t *testing.T) {
+	pool, dsn := pgtest.PoolAndDSN(t)
+	authSvc := &auth.Service{DB: pool}
+	postSvc := &post.Service{DB: pool}
+
+	alice := mustSeedUser(t, pool, authSvc, "alice@example.com", "Alice", "alice-pw")
+
+	tags := &tag.Service{DB: pool}
+	rootID, err := tags.Create(context.Background(), tag.CreateInput{
+		Slug: "org", DisplayName: "Org", RootKind: tag.RootKindOrg,
+	})
+	if err != nil {
+		t.Fatalf("create root: %v", err)
+	}
+	mustGrant(t, pool, rootID, alice, "owner", true)
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	dispatcher, err := realtime.New(ctx, dsn, slog.New(slog.NewTextHandler(os.Stderr, nil)))
+	if err != nil {
+		t.Fatalf("realtime: %v", err)
+	}
+
+	resolver := &pulsegraphql.Resolver{
+		DB: pool, Auth: authSvc, Perm: &perm.Service{DB: pool},
+		Tags: tags, Audit: &audit.Service{DB: pool},
+		Posts: postSvc, Comments: &comment.Service{DB: pool},
+		Search: &search.Service{DB: pool}, Realtime: dispatcher,
+	}
+
+	aliceCtx := perm.WithRequestCache(auth.WithIdentity(ctx, auth.Identity{
+		ActingID: alice, EffectiveID: alice,
+	}))
+
+	ch, err := resolver.Subscription().PostChanged(aliceCtx, ids.FormatID(rootID), nil)
+	if err != nil {
+		t.Fatalf("PostChanged: %v", err)
+	}
+	// Let the subscriber goroutine register before the create fires.
+	time.Sleep(50 * time.Millisecond)
+
+	postID, err := postSvc.Create(ctx, post.CreateInput{
+		AuthorID: alice, Title: "hi", Body: "hi",
+		Tags: []post.TagAttachment{{TagID: rootID, ViewRole: true, InteractRole: true, ModerateRole: true}},
+	})
+	if err != nil {
+		t.Fatalf("create post: %v", err)
+	}
+
+	select {
+	case got := <-ch:
+		if got == nil {
+			t.Fatal("got nil post from subscription")
+		}
+		if got.ID != ids.FormatID(postID) {
+			t.Errorf("post id: %q want %q", got.ID, ids.FormatID(postID))
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("subscriber did not receive event from production Create path")
+	}
+}
