@@ -579,6 +579,8 @@ abstract class GPostsForTagData_tag_posts_edges_node_comments_edges_node
   String get G__typename;
   @override
   String get id;
+  @override
+  _i2.GTime get createdAt;
   static Serializer<GPostsForTagData_tag_posts_edges_node_comments_edges_node>
       get serializer =>
           _$gPostsForTagDataTagPostsEdgesNodeCommentsEdgesNodeSerializer;
@@ -1013,6 +1015,8 @@ abstract class GPostDetailData_post_comments_edges_node
   @override
   String get id;
   @override
+  _i2.GTime get createdAt;
+  @override
   String get postId;
   @override
   String? get parentId;
@@ -1020,8 +1024,6 @@ abstract class GPostDetailData_post_comments_edges_node
   int get depth;
   @override
   String get body;
-  @override
-  _i2.GTime get createdAt;
   @override
   _i2.GTime? get editedAt;
   @override
@@ -1824,6 +1826,8 @@ abstract class GCreatePostData_createPost_comments_edges_node
   String get G__typename;
   @override
   String get id;
+  @override
+  _i2.GTime get createdAt;
   static Serializer<GCreatePostData_createPost_comments_edges_node>
       get serializer => _$gCreatePostDataCreatePostCommentsEdgesNodeSerializer;
 
@@ -2851,6 +2855,8 @@ abstract class GPostChangedData_postChanged_comments_edges_node
   String get G__typename;
   @override
   String get id;
+  @override
+  _i2.GTime get createdAt;
   static Serializer<GPostChangedData_postChanged_comments_edges_node>
       get serializer =>
           _$gPostChangedDataPostChangedCommentsEdgesNodeSerializer;
@@ -3011,6 +3017,7 @@ abstract class GPostSummary_comments_edges {
 abstract class GPostSummary_comments_edges_node {
   String get G__typename;
   String get id;
+  _i2.GTime get createdAt;
   Map<String, dynamic> toJson();
 }
 
@@ -3388,6 +3395,8 @@ abstract class GPostSummaryData_comments_edges_node
   String get G__typename;
   @override
   String get id;
+  @override
+  _i2.GTime get createdAt;
   static Serializer<GPostSummaryData_comments_edges_node> get serializer =>
       _$gPostSummaryDataCommentsEdgesNodeSerializer;
 

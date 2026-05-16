@@ -27,6 +27,61 @@ class _SortModeNotifier extends Notifier<_SortMode> {
 final _sortModeProvider =
     NotifierProvider<_SortModeNotifier, _SortMode>(_SortModeNotifier.new);
 
+List<GPostSummaryData> _applySortFilter(
+  List<GPostSummaryData> posts,
+  _SortMode mode,
+) {
+  int byCreatedDesc(GPostSummaryData a, GPostSummaryData b) {
+    final cmp = b.createdAt.value.compareTo(a.createdAt.value);
+    return cmp != 0 ? cmp : b.id.compareTo(a.id);
+  }
+
+  switch (mode) {
+    case _SortMode.forYou:
+    case _SortMode.recent:
+      return [...posts]..sort(byCreatedDesc);
+    case _SortMode.unread:
+      return posts.where(_isUnread).toList()..sort(byCreatedDesc);
+    case _SortMode.active:
+      return [...posts]..sort((a, b) {
+          final cmp = _activeScore(b).compareTo(_activeScore(a));
+          return cmp != 0 ? cmp : b.id.compareTo(a.id);
+        });
+  }
+}
+
+bool _isUnread(GPostSummaryData p) {
+  final lr = p.lastReadAt;
+  if (lr == null) return true;
+  return lr.value.compareTo(p.createdAt.value) < 0;
+}
+
+/// Linear-weighted average of the last 5 comment timestamps (epoch
+/// seconds), most-recent weighted heaviest. Posts with no comments
+/// fall back to the post's own `createdAt`. Comments without a
+/// parseable timestamp are skipped.
+double _activeScore(GPostSummaryData p) {
+  final ts = <int>[];
+  for (final e in p.comments.edges) {
+    final dt = DateTime.tryParse(e.node.createdAt.value);
+    if (dt != null) ts.add(dt.toUtc().millisecondsSinceEpoch ~/ 1000);
+  }
+  if (ts.isEmpty) {
+    final dt = DateTime.tryParse(p.createdAt.value);
+    return (dt?.toUtc().millisecondsSinceEpoch ?? 0) / 1000.0;
+  }
+  ts.sort((a, b) => b.compareTo(a));
+  final take = ts.length < 5 ? ts.length : 5;
+  var num = 0.0;
+  var den = 0.0;
+  for (var i = 0; i < take; i++) {
+    final w = (5 - i).toDouble();
+    num += ts[i] * w;
+    den += w;
+  }
+  return num / den;
+}
+
 class PostListPane extends ConsumerWidget {
   const PostListPane({super.key});
 
@@ -65,6 +120,7 @@ class _PostList extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final t = context.tokens;
     final feedAsync = ref.watch(cachedTagFeedProvider(tagId));
+    final sortMode = ref.watch(_sortModeProvider);
     return Stack(
       children: [
         Builder(builder: (context) {
@@ -72,7 +128,8 @@ class _PostList extends ConsumerWidget {
           final isLoading = feed == null && feedAsync.isLoading;
           final error = feedAsync.hasError ? feedAsync.error : null;
           final tag = feed?.tag;
-          final posts = feed?.posts ?? const <GPostSummaryData>[];
+          final rawPosts = feed?.posts ?? const <GPostSummaryData>[];
+          final posts = _applySortFilter(rawPosts, sortMode);
           return CustomScrollView(
             slivers: [
               SliverToBoxAdapter(

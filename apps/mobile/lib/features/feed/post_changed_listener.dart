@@ -30,8 +30,10 @@ final postChangedListenerProvider =
       );
       if (summary != null) {
         // Fire-and-forget — the drift watch stream is the source of
-        // truth for UI updates.
-        store.upsertSummary(summary);
+        // truth for UI updates. Insert into this tag's feed membership
+        // so a brand-new post drops into whichever sort/filter view
+        // the user is currently looking at.
+        store.upsertSummaryInFeed(tagId, summary);
       }
     });
     ref.onDispose(() {

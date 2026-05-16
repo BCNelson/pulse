@@ -25,10 +25,10 @@ void main() {
 
     tearDown(() => db.close());
 
-    test('replaceFeed + watchFeed round-trips post summaries', () async {
+    test('mergeFeed + watchFeed round-trips post summaries', () async {
       final p1 = _summary(id: 'p1', title: 'first', body: 'one');
       final p2 = _summary(id: 'p2', title: 'second', body: 'two');
-      await store.replaceFeed(
+      await store.mergeFeed(
         tagId: 'tag1',
         slug: 'tag1',
         displayName: 'Tag 1',
@@ -62,7 +62,7 @@ void main() {
 
       // A second feed refetch only carries summaries — detail should
       // not be wiped.
-      await store.replaceFeed(
+      await store.mergeFeed(
         tagId: 'tag1',
         slug: 'tag1',
         displayName: 'Tag 1',
@@ -78,7 +78,7 @@ void main() {
     });
 
     test('prependPostToTags places a new post at position 0', () async {
-      await store.replaceFeed(
+      await store.mergeFeed(
         tagId: 'tag1',
         slug: 'tag1',
         displayName: 'Tag 1',

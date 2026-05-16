@@ -66,7 +66,7 @@ Future<void> _refetch(
     // same key it's watching. The caller may pass either the 12-char
     // typed id or a slug path; the backend resolves both, but the cache
     // doesn't need to know — it just needs read and write to agree.
-    await store.replaceFeed(
+    await store.mergeFeed(
       tagId: tagId,
       slug: tag.slug,
       displayName: tag.displayName,

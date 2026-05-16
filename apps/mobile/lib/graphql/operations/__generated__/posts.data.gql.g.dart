@@ -1304,6 +1304,9 @@ class _$GPostsForTagData_tag_posts_edges_node_comments_edges_nodeSerializer
           specifiedType: const FullType(String)),
       'id',
       serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'createdAt',
+      serializers.serialize(object.createdAt,
+          specifiedType: const FullType(_i2.GTime)),
     ];
 
     return result;
@@ -1329,6 +1332,10 @@ class _$GPostsForTagData_tag_posts_edges_node_comments_edges_nodeSerializer
         case 'id':
           result.id = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
+          break;
+        case 'createdAt':
+          result.createdAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
           break;
       }
     }
@@ -2100,6 +2107,9 @@ class _$GPostDetailData_post_comments_edges_nodeSerializer
           specifiedType: const FullType(String)),
       'id',
       serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'createdAt',
+      serializers.serialize(object.createdAt,
+          specifiedType: const FullType(_i2.GTime)),
       'postId',
       serializers.serialize(object.postId,
           specifiedType: const FullType(String)),
@@ -2107,9 +2117,6 @@ class _$GPostDetailData_post_comments_edges_nodeSerializer
       serializers.serialize(object.depth, specifiedType: const FullType(int)),
       'body',
       serializers.serialize(object.body, specifiedType: const FullType(String)),
-      'createdAt',
-      serializers.serialize(object.createdAt,
-          specifiedType: const FullType(_i2.GTime)),
       'author',
       serializers.serialize(object.author,
           specifiedType:
@@ -2169,6 +2176,10 @@ class _$GPostDetailData_post_comments_edges_nodeSerializer
           result.id = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
+        case 'createdAt':
+          result.createdAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
+          break;
         case 'postId':
           result.postId = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
@@ -2184,10 +2195,6 @@ class _$GPostDetailData_post_comments_edges_nodeSerializer
         case 'body':
           result.body = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
-          break;
-        case 'createdAt':
-          result.createdAt.replace(serializers.deserialize(value,
-              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
           break;
         case 'editedAt':
           result.editedAt.replace(serializers.deserialize(value,
@@ -3575,6 +3582,9 @@ class _$GCreatePostData_createPost_comments_edges_nodeSerializer
           specifiedType: const FullType(String)),
       'id',
       serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'createdAt',
+      serializers.serialize(object.createdAt,
+          specifiedType: const FullType(_i2.GTime)),
     ];
 
     return result;
@@ -3599,6 +3609,10 @@ class _$GCreatePostData_createPost_comments_edges_nodeSerializer
         case 'id':
           result.id = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
+          break;
+        case 'createdAt':
+          result.createdAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
           break;
       }
     }
@@ -5429,6 +5443,9 @@ class _$GPostChangedData_postChanged_comments_edges_nodeSerializer
           specifiedType: const FullType(String)),
       'id',
       serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'createdAt',
+      serializers.serialize(object.createdAt,
+          specifiedType: const FullType(_i2.GTime)),
     ];
 
     return result;
@@ -5453,6 +5470,10 @@ class _$GPostChangedData_postChanged_comments_edges_nodeSerializer
         case 'id':
           result.id = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
+          break;
+        case 'createdAt':
+          result.createdAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
           break;
       }
     }
@@ -6254,6 +6275,9 @@ class _$GPostSummaryData_comments_edges_nodeSerializer
           specifiedType: const FullType(String)),
       'id',
       serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'createdAt',
+      serializers.serialize(object.createdAt,
+          specifiedType: const FullType(_i2.GTime)),
     ];
 
     return result;
@@ -6278,6 +6302,10 @@ class _$GPostSummaryData_comments_edges_nodeSerializer
         case 'id':
           result.id = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
+          break;
+        case 'createdAt':
+          result.createdAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
           break;
       }
     }
@@ -8938,6 +8966,8 @@ class _$GPostsForTagData_tag_posts_edges_node_comments_edges_node
   final String G__typename;
   @override
   final String id;
+  @override
+  final _i2.GTime createdAt;
 
   factory _$GPostsForTagData_tag_posts_edges_node_comments_edges_node(
           [void Function(
@@ -8948,7 +8978,7 @@ class _$GPostsForTagData_tag_posts_edges_node_comments_edges_node
           ._build();
 
   _$GPostsForTagData_tag_posts_edges_node_comments_edges_node._(
-      {required this.G__typename, required this.id})
+      {required this.G__typename, required this.id, required this.createdAt})
       : super._();
   @override
   GPostsForTagData_tag_posts_edges_node_comments_edges_node rebuild(
@@ -8968,7 +8998,8 @@ class _$GPostsForTagData_tag_posts_edges_node_comments_edges_node
     if (identical(other, this)) return true;
     return other is GPostsForTagData_tag_posts_edges_node_comments_edges_node &&
         G__typename == other.G__typename &&
-        id == other.id;
+        id == other.id &&
+        createdAt == other.createdAt;
   }
 
   @override
@@ -8976,6 +9007,7 @@ class _$GPostsForTagData_tag_posts_edges_node_comments_edges_node
     var _$hash = 0;
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -8985,7 +9017,8 @@ class _$GPostsForTagData_tag_posts_edges_node_comments_edges_node
     return (newBuiltValueToStringHelper(
             r'GPostsForTagData_tag_posts_edges_node_comments_edges_node')
           ..add('G__typename', G__typename)
-          ..add('id', id))
+          ..add('id', id)
+          ..add('createdAt', createdAt))
         .toString();
   }
 }
@@ -9004,6 +9037,10 @@ class GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
+  _i2.GTimeBuilder? _createdAt;
+  _i2.GTimeBuilder get createdAt => _$this._createdAt ??= _i2.GTimeBuilder();
+  set createdAt(_i2.GTimeBuilder? createdAt) => _$this._createdAt = createdAt;
+
   GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder() {
     GPostsForTagData_tag_posts_edges_node_comments_edges_node
         ._initializeBuilder(this);
@@ -9014,6 +9051,7 @@ class GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder
     if ($v != null) {
       _G__typename = $v.G__typename;
       _id = $v.id;
+      _createdAt = $v.createdAt.toBuilder();
       _$v = null;
     }
     return this;
@@ -9037,17 +9075,33 @@ class GPostsForTagData_tag_posts_edges_node_comments_edges_nodeBuilder
   GPostsForTagData_tag_posts_edges_node_comments_edges_node build() => _build();
 
   _$GPostsForTagData_tag_posts_edges_node_comments_edges_node _build() {
-    final _$result = _$v ??
-        _$GPostsForTagData_tag_posts_edges_node_comments_edges_node._(
-          G__typename: BuiltValueNullFieldError.checkNotNull(
-              G__typename,
-              r'GPostsForTagData_tag_posts_edges_node_comments_edges_node',
-              'G__typename'),
-          id: BuiltValueNullFieldError.checkNotNull(
-              id,
-              r'GPostsForTagData_tag_posts_edges_node_comments_edges_node',
-              'id'),
-        );
+    _$GPostsForTagData_tag_posts_edges_node_comments_edges_node _$result;
+    try {
+      _$result = _$v ??
+          _$GPostsForTagData_tag_posts_edges_node_comments_edges_node._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename,
+                r'GPostsForTagData_tag_posts_edges_node_comments_edges_node',
+                'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id,
+                r'GPostsForTagData_tag_posts_edges_node_comments_edges_node',
+                'id'),
+            createdAt: createdAt.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'createdAt';
+        createdAt.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostsForTagData_tag_posts_edges_node_comments_edges_node',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }
@@ -10521,6 +10575,8 @@ class _$GPostDetailData_post_comments_edges_node
   @override
   final String id;
   @override
+  final _i2.GTime createdAt;
+  @override
   final String postId;
   @override
   final String? parentId;
@@ -10528,8 +10584,6 @@ class _$GPostDetailData_post_comments_edges_node
   final int depth;
   @override
   final String body;
-  @override
-  final _i2.GTime createdAt;
   @override
   final _i2.GTime? editedAt;
   @override
@@ -10551,11 +10605,11 @@ class _$GPostDetailData_post_comments_edges_node
   _$GPostDetailData_post_comments_edges_node._(
       {required this.G__typename,
       required this.id,
+      required this.createdAt,
       required this.postId,
       this.parentId,
       required this.depth,
       required this.body,
-      required this.createdAt,
       this.editedAt,
       required this.author,
       required this.mentions,
@@ -10578,11 +10632,11 @@ class _$GPostDetailData_post_comments_edges_node
     return other is GPostDetailData_post_comments_edges_node &&
         G__typename == other.G__typename &&
         id == other.id &&
+        createdAt == other.createdAt &&
         postId == other.postId &&
         parentId == other.parentId &&
         depth == other.depth &&
         body == other.body &&
-        createdAt == other.createdAt &&
         editedAt == other.editedAt &&
         author == other.author &&
         mentions == other.mentions &&
@@ -10595,11 +10649,11 @@ class _$GPostDetailData_post_comments_edges_node
     var _$hash = 0;
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, postId.hashCode);
     _$hash = $jc(_$hash, parentId.hashCode);
     _$hash = $jc(_$hash, depth.hashCode);
     _$hash = $jc(_$hash, body.hashCode);
-    _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jc(_$hash, editedAt.hashCode);
     _$hash = $jc(_$hash, author.hashCode);
     _$hash = $jc(_$hash, mentions.hashCode);
@@ -10615,11 +10669,11 @@ class _$GPostDetailData_post_comments_edges_node
             r'GPostDetailData_post_comments_edges_node')
           ..add('G__typename', G__typename)
           ..add('id', id)
+          ..add('createdAt', createdAt)
           ..add('postId', postId)
           ..add('parentId', parentId)
           ..add('depth', depth)
           ..add('body', body)
-          ..add('createdAt', createdAt)
           ..add('editedAt', editedAt)
           ..add('author', author)
           ..add('mentions', mentions)
@@ -10643,6 +10697,10 @@ class GPostDetailData_post_comments_edges_nodeBuilder
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
+  _i2.GTimeBuilder? _createdAt;
+  _i2.GTimeBuilder get createdAt => _$this._createdAt ??= _i2.GTimeBuilder();
+  set createdAt(_i2.GTimeBuilder? createdAt) => _$this._createdAt = createdAt;
+
   String? _postId;
   String? get postId => _$this._postId;
   set postId(String? postId) => _$this._postId = postId;
@@ -10658,10 +10716,6 @@ class GPostDetailData_post_comments_edges_nodeBuilder
   String? _body;
   String? get body => _$this._body;
   set body(String? body) => _$this._body = body;
-
-  _i2.GTimeBuilder? _createdAt;
-  _i2.GTimeBuilder get createdAt => _$this._createdAt ??= _i2.GTimeBuilder();
-  set createdAt(_i2.GTimeBuilder? createdAt) => _$this._createdAt = createdAt;
 
   _i2.GTimeBuilder? _editedAt;
   _i2.GTimeBuilder get editedAt => _$this._editedAt ??= _i2.GTimeBuilder();
@@ -10711,11 +10765,11 @@ class GPostDetailData_post_comments_edges_nodeBuilder
     if ($v != null) {
       _G__typename = $v.G__typename;
       _id = $v.id;
+      _createdAt = $v.createdAt.toBuilder();
       _postId = $v.postId;
       _parentId = $v.parentId;
       _depth = $v.depth;
       _body = $v.body;
-      _createdAt = $v.createdAt.toBuilder();
       _editedAt = $v.editedAt?.toBuilder();
       _author = $v.author.toBuilder();
       _mentions = $v.mentions.toBuilder();
@@ -10749,6 +10803,7 @@ class GPostDetailData_post_comments_edges_nodeBuilder
                 r'GPostDetailData_post_comments_edges_node', 'G__typename'),
             id: BuiltValueNullFieldError.checkNotNull(
                 id, r'GPostDetailData_post_comments_edges_node', 'id'),
+            createdAt: createdAt.build(),
             postId: BuiltValueNullFieldError.checkNotNull(
                 postId, r'GPostDetailData_post_comments_edges_node', 'postId'),
             parentId: parentId,
@@ -10756,7 +10811,6 @@ class GPostDetailData_post_comments_edges_nodeBuilder
                 depth, r'GPostDetailData_post_comments_edges_node', 'depth'),
             body: BuiltValueNullFieldError.checkNotNull(
                 body, r'GPostDetailData_post_comments_edges_node', 'body'),
-            createdAt: createdAt.build(),
             editedAt: _editedAt?.build(),
             author: author.build(),
             mentions: mentions.build(),
@@ -10768,6 +10822,7 @@ class GPostDetailData_post_comments_edges_nodeBuilder
       try {
         _$failedField = 'createdAt';
         createdAt.build();
+
         _$failedField = 'editedAt';
         _editedAt?.build();
         _$failedField = 'author';
@@ -13531,6 +13586,8 @@ class _$GCreatePostData_createPost_comments_edges_node
   final String G__typename;
   @override
   final String id;
+  @override
+  final _i2.GTime createdAt;
 
   factory _$GCreatePostData_createPost_comments_edges_node(
           [void Function(GCreatePostData_createPost_comments_edges_nodeBuilder)?
@@ -13539,7 +13596,7 @@ class _$GCreatePostData_createPost_comments_edges_node
           ._build();
 
   _$GCreatePostData_createPost_comments_edges_node._(
-      {required this.G__typename, required this.id})
+      {required this.G__typename, required this.id, required this.createdAt})
       : super._();
   @override
   GCreatePostData_createPost_comments_edges_node rebuild(
@@ -13556,7 +13613,8 @@ class _$GCreatePostData_createPost_comments_edges_node
     if (identical(other, this)) return true;
     return other is GCreatePostData_createPost_comments_edges_node &&
         G__typename == other.G__typename &&
-        id == other.id;
+        id == other.id &&
+        createdAt == other.createdAt;
   }
 
   @override
@@ -13564,6 +13622,7 @@ class _$GCreatePostData_createPost_comments_edges_node
     var _$hash = 0;
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -13573,7 +13632,8 @@ class _$GCreatePostData_createPost_comments_edges_node
     return (newBuiltValueToStringHelper(
             r'GCreatePostData_createPost_comments_edges_node')
           ..add('G__typename', G__typename)
-          ..add('id', id))
+          ..add('id', id)
+          ..add('createdAt', createdAt))
         .toString();
   }
 }
@@ -13592,6 +13652,10 @@ class GCreatePostData_createPost_comments_edges_nodeBuilder
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
+  _i2.GTimeBuilder? _createdAt;
+  _i2.GTimeBuilder get createdAt => _$this._createdAt ??= _i2.GTimeBuilder();
+  set createdAt(_i2.GTimeBuilder? createdAt) => _$this._createdAt = createdAt;
+
   GCreatePostData_createPost_comments_edges_nodeBuilder() {
     GCreatePostData_createPost_comments_edges_node._initializeBuilder(this);
   }
@@ -13601,6 +13665,7 @@ class GCreatePostData_createPost_comments_edges_nodeBuilder
     if ($v != null) {
       _G__typename = $v.G__typename;
       _id = $v.id;
+      _createdAt = $v.createdAt.toBuilder();
       _$v = null;
     }
     return this;
@@ -13622,13 +13687,31 @@ class GCreatePostData_createPost_comments_edges_nodeBuilder
   GCreatePostData_createPost_comments_edges_node build() => _build();
 
   _$GCreatePostData_createPost_comments_edges_node _build() {
-    final _$result = _$v ??
-        _$GCreatePostData_createPost_comments_edges_node._(
-          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
-              r'GCreatePostData_createPost_comments_edges_node', 'G__typename'),
-          id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GCreatePostData_createPost_comments_edges_node', 'id'),
-        );
+    _$GCreatePostData_createPost_comments_edges_node _$result;
+    try {
+      _$result = _$v ??
+          _$GCreatePostData_createPost_comments_edges_node._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename,
+                r'GCreatePostData_createPost_comments_edges_node',
+                'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GCreatePostData_createPost_comments_edges_node', 'id'),
+            createdAt: createdAt.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'createdAt';
+        createdAt.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GCreatePostData_createPost_comments_edges_node',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }
@@ -17348,6 +17431,8 @@ class _$GPostChangedData_postChanged_comments_edges_node
   final String G__typename;
   @override
   final String id;
+  @override
+  final _i2.GTime createdAt;
 
   factory _$GPostChangedData_postChanged_comments_edges_node(
           [void Function(
@@ -17358,7 +17443,7 @@ class _$GPostChangedData_postChanged_comments_edges_node
           ._build();
 
   _$GPostChangedData_postChanged_comments_edges_node._(
-      {required this.G__typename, required this.id})
+      {required this.G__typename, required this.id, required this.createdAt})
       : super._();
   @override
   GPostChangedData_postChanged_comments_edges_node rebuild(
@@ -17375,7 +17460,8 @@ class _$GPostChangedData_postChanged_comments_edges_node
     if (identical(other, this)) return true;
     return other is GPostChangedData_postChanged_comments_edges_node &&
         G__typename == other.G__typename &&
-        id == other.id;
+        id == other.id &&
+        createdAt == other.createdAt;
   }
 
   @override
@@ -17383,6 +17469,7 @@ class _$GPostChangedData_postChanged_comments_edges_node
     var _$hash = 0;
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -17392,7 +17479,8 @@ class _$GPostChangedData_postChanged_comments_edges_node
     return (newBuiltValueToStringHelper(
             r'GPostChangedData_postChanged_comments_edges_node')
           ..add('G__typename', G__typename)
-          ..add('id', id))
+          ..add('id', id)
+          ..add('createdAt', createdAt))
         .toString();
   }
 }
@@ -17411,6 +17499,10 @@ class GPostChangedData_postChanged_comments_edges_nodeBuilder
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
+  _i2.GTimeBuilder? _createdAt;
+  _i2.GTimeBuilder get createdAt => _$this._createdAt ??= _i2.GTimeBuilder();
+  set createdAt(_i2.GTimeBuilder? createdAt) => _$this._createdAt = createdAt;
+
   GPostChangedData_postChanged_comments_edges_nodeBuilder() {
     GPostChangedData_postChanged_comments_edges_node._initializeBuilder(this);
   }
@@ -17420,6 +17512,7 @@ class GPostChangedData_postChanged_comments_edges_nodeBuilder
     if ($v != null) {
       _G__typename = $v.G__typename;
       _id = $v.id;
+      _createdAt = $v.createdAt.toBuilder();
       _$v = null;
     }
     return this;
@@ -17441,15 +17534,31 @@ class GPostChangedData_postChanged_comments_edges_nodeBuilder
   GPostChangedData_postChanged_comments_edges_node build() => _build();
 
   _$GPostChangedData_postChanged_comments_edges_node _build() {
-    final _$result = _$v ??
-        _$GPostChangedData_postChanged_comments_edges_node._(
-          G__typename: BuiltValueNullFieldError.checkNotNull(
-              G__typename,
-              r'GPostChangedData_postChanged_comments_edges_node',
-              'G__typename'),
-          id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GPostChangedData_postChanged_comments_edges_node', 'id'),
-        );
+    _$GPostChangedData_postChanged_comments_edges_node _$result;
+    try {
+      _$result = _$v ??
+          _$GPostChangedData_postChanged_comments_edges_node._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename,
+                r'GPostChangedData_postChanged_comments_edges_node',
+                'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostChangedData_postChanged_comments_edges_node', 'id'),
+            createdAt: createdAt.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'createdAt';
+        createdAt.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostChangedData_postChanged_comments_edges_node',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }
@@ -18996,6 +19105,8 @@ class _$GPostSummaryData_comments_edges_node
   final String G__typename;
   @override
   final String id;
+  @override
+  final _i2.GTime createdAt;
 
   factory _$GPostSummaryData_comments_edges_node(
           [void Function(GPostSummaryData_comments_edges_nodeBuilder)?
@@ -19003,7 +19114,7 @@ class _$GPostSummaryData_comments_edges_node
       (GPostSummaryData_comments_edges_nodeBuilder()..update(updates))._build();
 
   _$GPostSummaryData_comments_edges_node._(
-      {required this.G__typename, required this.id})
+      {required this.G__typename, required this.id, required this.createdAt})
       : super._();
   @override
   GPostSummaryData_comments_edges_node rebuild(
@@ -19019,7 +19130,8 @@ class _$GPostSummaryData_comments_edges_node
     if (identical(other, this)) return true;
     return other is GPostSummaryData_comments_edges_node &&
         G__typename == other.G__typename &&
-        id == other.id;
+        id == other.id &&
+        createdAt == other.createdAt;
   }
 
   @override
@@ -19027,6 +19139,7 @@ class _$GPostSummaryData_comments_edges_node
     var _$hash = 0;
     _$hash = $jc(_$hash, G__typename.hashCode);
     _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, createdAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -19035,7 +19148,8 @@ class _$GPostSummaryData_comments_edges_node
   String toString() {
     return (newBuiltValueToStringHelper(r'GPostSummaryData_comments_edges_node')
           ..add('G__typename', G__typename)
-          ..add('id', id))
+          ..add('id', id)
+          ..add('createdAt', createdAt))
         .toString();
   }
 }
@@ -19054,6 +19168,10 @@ class GPostSummaryData_comments_edges_nodeBuilder
   String? get id => _$this._id;
   set id(String? id) => _$this._id = id;
 
+  _i2.GTimeBuilder? _createdAt;
+  _i2.GTimeBuilder get createdAt => _$this._createdAt ??= _i2.GTimeBuilder();
+  set createdAt(_i2.GTimeBuilder? createdAt) => _$this._createdAt = createdAt;
+
   GPostSummaryData_comments_edges_nodeBuilder() {
     GPostSummaryData_comments_edges_node._initializeBuilder(this);
   }
@@ -19063,6 +19181,7 @@ class GPostSummaryData_comments_edges_nodeBuilder
     if ($v != null) {
       _G__typename = $v.G__typename;
       _id = $v.id;
+      _createdAt = $v.createdAt.toBuilder();
       _$v = null;
     }
     return this;
@@ -19083,13 +19202,29 @@ class GPostSummaryData_comments_edges_nodeBuilder
   GPostSummaryData_comments_edges_node build() => _build();
 
   _$GPostSummaryData_comments_edges_node _build() {
-    final _$result = _$v ??
-        _$GPostSummaryData_comments_edges_node._(
-          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
-              r'GPostSummaryData_comments_edges_node', 'G__typename'),
-          id: BuiltValueNullFieldError.checkNotNull(
-              id, r'GPostSummaryData_comments_edges_node', 'id'),
-        );
+    _$GPostSummaryData_comments_edges_node _$result;
+    try {
+      _$result = _$v ??
+          _$GPostSummaryData_comments_edges_node._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+                r'GPostSummaryData_comments_edges_node', 'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GPostSummaryData_comments_edges_node', 'id'),
+            createdAt: createdAt.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'createdAt';
+        createdAt.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GPostSummaryData_comments_edges_node',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

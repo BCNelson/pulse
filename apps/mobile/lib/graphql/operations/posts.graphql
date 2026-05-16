@@ -38,6 +38,7 @@ fragment PostSummary on Post {
     edges {
       node {
         id
+        createdAt
       }
     }
   }

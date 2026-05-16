@@ -16,19 +16,18 @@ class PostCacheStore {
 
   final CacheDatabase _db;
 
-  /// Stream the ordered feed for a tag: emits a (tag, posts) tuple
-  /// where `tag` is null when we have no cached header and posts may
-  /// be empty. Each post is reconstructed from its stored summary
-  /// fragment.
+  /// Stream the cached post set for a tag as a (tag, posts) tuple.
+  /// Order is deterministic (post id) but not meaningful — consumers
+  /// apply the active sort/filter mode in Dart.
   Stream<CachedFeed> watchFeed(String tagId) {
     final tagQuery = _db.select(_db.cachedTags)
       ..where((t) => t.id.equals(tagId));
     final feedQuery = _db.customSelect(
-      'SELECT p.summary_json AS sj, f.position AS pos '
+      'SELECT p.summary_json AS sj '
       'FROM cached_tag_feed f '
       'JOIN cached_posts p ON p.id = f.post_id '
       'WHERE f.tag_id = ? '
-      'ORDER BY f.position ASC',
+      'ORDER BY p.id',
       variables: [Variable.withString(tagId)],
       readsFrom: {_db.cachedTagFeed, _db.cachedPosts},
     );
@@ -66,9 +65,13 @@ class PostCacheStore {
     });
   }
 
-  /// Replace the ordered membership for a tag and upsert each post's
-  /// summary in one transaction.
-  Future<void> replaceFeed({
+  /// Merge a batch of posts into a tag's cached feed. Upserts each
+  /// post summary and adds it to the tag's membership without removing
+  /// rows for posts the server didn't return — those linger until the
+  /// budget evictor reaps them. The displayed order is decided in Dart
+  /// by the active sort mode, so `position` is recorded for reference
+  /// only.
+  Future<void> mergeFeed({
     required String tagId,
     required String slug,
     required String displayName,
@@ -86,9 +89,6 @@ class PostCacheStore {
               lastRefreshedAtMs: Value(now),
             ),
           );
-      // Wipe + re-insert membership so server order wins.
-      await (_db.delete(_db.cachedTagFeed)..where((f) => f.tagId.equals(tagId)))
-          .go();
       var pos = 0;
       for (final entry in entries) {
         final node = entry.node;
@@ -163,6 +163,46 @@ class PostCacheStore {
             updatedAtMs: Value(now),
           ),
         );
+  }
+
+  /// Upsert a summary and ensure the post is a member of the given
+  /// tag's feed. Used by the `postChanged` subscription so a brand-new
+  /// post on a tag pops into the feed view without waiting for the
+  /// next refetch. Position is a sentinel — the displayed order is
+  /// recomputed in Dart from the sort mode.
+  Future<void> upsertSummaryInFeed(String tagId, GPostSummaryData summary) async {
+    final now = DateTime.now().millisecondsSinceEpoch;
+    final summaryJson = jsonEncode(summary.toJson());
+    await _db.transaction(() async {
+      final existing = await (_db.select(_db.cachedPosts)
+            ..where((p) => p.id.equals(summary.id)))
+          .getSingleOrNull();
+      final detailJson = existing?.detailJson;
+      final byteSize = summaryJson.length + (detailJson?.length ?? 0);
+      await _db.into(_db.cachedPosts).insertOnConflictUpdate(
+            CachedPostsCompanion(
+              id: Value(summary.id),
+              summaryJson: Value(summaryJson),
+              detailJson: Value(detailJson),
+              byteSize: Value(byteSize),
+              lastViewedAtMs: Value(existing?.lastViewedAtMs ?? now),
+              updatedAtMs: Value(now),
+            ),
+          );
+      final existingMembership = await (_db.select(_db.cachedTagFeed)
+            ..where((f) => f.tagId.equals(tagId) & f.postId.equals(summary.id)))
+          .getSingleOrNull();
+      if (existingMembership == null) {
+        await _db.into(_db.cachedTagFeed).insert(
+              CachedTagFeedCompanion(
+                tagId: Value(tagId),
+                postId: Value(summary.id),
+                position: const Value(-1),
+                cursor: const Value(''),
+              ),
+            );
+      }
+    });
   }
 
   /// Bump lastViewedAt so the evictor treats this post as warm. Cheap
@@ -243,7 +283,9 @@ GPostSummaryData _extractSummary(GPostDetailData_post post) {
       ..comments.edges.replace(
             post.comments.edges.map(
               (e) => GPostSummaryData_comments_edges(
-                (eb) => eb..node.id = e.node.id,
+                (eb) => eb
+                  ..node.id = e.node.id
+                  ..node.createdAt.replace(e.node.createdAt),
               ),
             ),
           ),
