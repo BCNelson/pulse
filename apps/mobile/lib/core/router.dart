@@ -91,6 +91,7 @@ final goRouterProvider = Provider<GoRouter>((ref) {
       }
       return null;
     },
+    errorBuilder: (context, state) => _NotFoundScreen(uri: state.uri),
     routes: [
       GoRoute(
         path: '/_loading',
@@ -141,17 +142,25 @@ final goRouterProvider = Provider<GoRouter>((ref) {
                 path: '/feed',
                 builder: (_, __) => const FeedScreen(),
                 routes: [
+                  // All feed URLs render the same FeedScreen driven by URL
+                  // state. NoTransitionPage suppresses the default push
+                  // animation, which would otherwise fire only on depth
+                  // changes (parent → child) and not on sibling param
+                  // changes — producing an inconsistent feel.
                   GoRoute(
                     path: r't/:tagPath(.+)/p/:postId([0-9A-HJ-NP-TV-Za-hj-np-tv-zIiLlOo]{12})',
-                    builder: (_, __) => const FeedScreen(),
+                    pageBuilder: (_, __) =>
+                        const NoTransitionPage(child: FeedScreen()),
                   ),
                   GoRoute(
                     path: r'p/:postId([0-9A-HJ-NP-TV-Za-hj-np-tv-zIiLlOo]{12})',
-                    builder: (_, __) => const FeedScreen(),
+                    pageBuilder: (_, __) =>
+                        const NoTransitionPage(child: FeedScreen()),
                   ),
                   GoRoute(
                     path: r't/:tagPath(.+)',
-                    builder: (_, __) => const FeedScreen(),
+                    pageBuilder: (_, __) =>
+                        const NoTransitionPage(child: FeedScreen()),
                   ),
                 ],
               ),
@@ -181,8 +190,9 @@ final goRouterProvider = Provider<GoRouter>((ref) {
   // resume where the user left off. Transient routes (splash, gates) are
   // skipped so they're never restored.
   router.routerDelegate.addListener(() {
-    final uri = router.routerDelegate.currentConfiguration.uri;
-    final path = uri.toString();
+    final config = router.routerDelegate.currentConfiguration;
+    if (config.isError) return;
+    final path = config.uri.toString();
     if (path == '/' ||
         path == '/login' ||
         path == '/setup' ||
@@ -293,6 +303,45 @@ class _Splash extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+
+class _NotFoundScreen extends StatelessWidget {
+  const _NotFoundScreen({required this.uri});
+
+  final Uri uri;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Scaffold(
+      appBar: AppBar(title: const Text('Page not found')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'No route matched',
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                uri.toString(),
+                style: theme.textTheme.bodySmall,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              FilledButton(
+                onPressed: () => context.go('/inbox'),
+                child: const Text('Go home'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
