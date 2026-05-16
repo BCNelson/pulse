@@ -44,6 +44,7 @@ Go 1.26 GraphQL API (`gqlgen`, `chi`, `pgx`) + Flutter client (`ferry`, `riverpo
 - **Generated code is committed.** `services/api/internal/graphql/generated.go` (gqlgen) and `apps/mobile/lib/**/__generated__/` (ferry/`build_runner`). Regenerate and commit when changing `.graphql` files. Exception: `packages/pulse_devtools/extension/devtools/build/` is intentionally gitignored — run `mobile-devtools-build` locally.
 - **Git hooks** (gofmt, govet, golangci-lint, nixfmt) are installed by devenv. Don't bypass with `--no-verify`; fix the issue.
 - **Two-client testing.** `mobile` (devA) and `mobile-b` (devB, Linux desktop only) get independent prefs/keychain/sqlite via `PULSE_INSTANCE_ID`. Use them when you need to see real-time or chat round-trips.
+- **Testing uses real dependencies, not mocks.** API tests boot a testcontainer Postgres + RustFS via `internal/pgtest`. Client tests use in-memory `drift` (`NativeDatabase.memory()`) and `ProviderScope` overrides. Do not introduce `mockito`/`gomock`/etc. New packages and new feature screens need at least one test.
 
 ## Tooling
 
