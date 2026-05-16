@@ -49,6 +49,13 @@ const TagSummary = _i1.FragmentDefinitionNode(
       selectionSet: null,
     ),
     _i1.FieldNode(
+      name: _i1.NameNode(value: 'hasChildren'),
+      alias: null,
+      arguments: [],
+      directives: [],
+      selectionSet: null,
+    ),
+    _i1.FieldNode(
       name: _i1.NameNode(value: 'archivedAt'),
       alias: null,
       arguments: [],
@@ -166,7 +173,19 @@ const TagChildren = _i1.OperationDefinitionNode(
                 _i1.FragmentSpreadNode(
                   name: _i1.NameNode(value: 'TagSummary'),
                   directives: [],
-                )
+                ),
+                _i1.FieldNode(
+                  name: _i1.NameNode(value: 'children'),
+                  alias: null,
+                  arguments: [],
+                  directives: [],
+                  selectionSet: _i1.SelectionSetNode(selections: [
+                    _i1.FragmentSpreadNode(
+                      name: _i1.NameNode(value: 'TagSummary'),
+                      directives: [],
+                    )
+                  ]),
+                ),
               ]),
             ),
           ]),

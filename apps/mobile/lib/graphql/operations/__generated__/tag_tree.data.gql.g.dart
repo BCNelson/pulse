@@ -28,6 +28,9 @@ Serializer<GTagChildrenData_tag_children>
 Serializer<GTagChildrenData_tag_children_children>
     _$gTagChildrenDataTagChildrenChildrenSerializer =
     _$GTagChildrenData_tag_children_childrenSerializer();
+Serializer<GTagChildrenData_tag_children_children_children>
+    _$gTagChildrenDataTagChildrenChildrenChildrenSerializer =
+    _$GTagChildrenData_tag_children_children_childrenSerializer();
 Serializer<GTagBySlugPathData> _$gTagBySlugPathDataSerializer =
     _$GTagBySlugPathDataSerializer();
 Serializer<GTagBySlugPathData_tagBySlugPath>
@@ -117,6 +120,9 @@ class _$GTagTreeData_myTagRootsSerializer
       'rootKind',
       serializers.serialize(object.rootKind,
           specifiedType: const FullType(_i2.GTagRootKind)),
+      'hasChildren',
+      serializers.serialize(object.hasChildren,
+          specifiedType: const FullType(bool)),
       'children',
       serializers.serialize(object.children,
           specifiedType: const FullType(BuiltList,
@@ -170,6 +176,10 @@ class _$GTagTreeData_myTagRootsSerializer
                   specifiedType: const FullType(_i2.GTagRootKind))!
               as _i2.GTagRootKind;
           break;
+        case 'hasChildren':
+          result.hasChildren = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
+          break;
         case 'archivedAt':
           result.archivedAt.replace(serializers.deserialize(value,
               specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
@@ -217,6 +227,9 @@ class _$GTagTreeData_myTagRoots_childrenSerializer
       'rootKind',
       serializers.serialize(object.rootKind,
           specifiedType: const FullType(_i2.GTagRootKind)),
+      'hasChildren',
+      serializers.serialize(object.hasChildren,
+          specifiedType: const FullType(bool)),
       'children',
       serializers.serialize(object.children,
           specifiedType: const FullType(BuiltList, const [
@@ -271,6 +284,10 @@ class _$GTagTreeData_myTagRoots_childrenSerializer
                   specifiedType: const FullType(_i2.GTagRootKind))!
               as _i2.GTagRootKind;
           break;
+        case 'hasChildren':
+          result.hasChildren = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
+          break;
         case 'archivedAt':
           result.archivedAt.replace(serializers.deserialize(value,
               specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
@@ -318,6 +335,9 @@ class _$GTagTreeData_myTagRoots_children_childrenSerializer
       'rootKind',
       serializers.serialize(object.rootKind,
           specifiedType: const FullType(_i2.GTagRootKind)),
+      'hasChildren',
+      serializers.serialize(object.hasChildren,
+          specifiedType: const FullType(bool)),
       'children',
       serializers.serialize(object.children,
           specifiedType: const FullType(BuiltList, const [
@@ -372,6 +392,10 @@ class _$GTagTreeData_myTagRoots_children_childrenSerializer
                   specifiedType: const FullType(_i2.GTagRootKind))!
               as _i2.GTagRootKind;
           break;
+        case 'hasChildren':
+          result.hasChildren = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
+          break;
         case 'archivedAt':
           result.archivedAt.replace(serializers.deserialize(value,
               specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
@@ -422,6 +446,9 @@ class _$GTagTreeData_myTagRoots_children_children_childrenSerializer
       'rootKind',
       serializers.serialize(object.rootKind,
           specifiedType: const FullType(_i2.GTagRootKind)),
+      'hasChildren',
+      serializers.serialize(object.hasChildren,
+          specifiedType: const FullType(bool)),
     ];
     Object? value;
     value = object.archivedAt;
@@ -470,6 +497,10 @@ class _$GTagTreeData_myTagRoots_children_children_childrenSerializer
           result.rootKind = serializers.deserialize(value,
                   specifiedType: const FullType(_i2.GTagRootKind))!
               as _i2.GTagRootKind;
+          break;
+        case 'hasChildren':
+          result.hasChildren = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
           break;
         case 'archivedAt':
           result.archivedAt.replace(serializers.deserialize(value,
@@ -628,6 +659,9 @@ class _$GTagChildrenData_tag_childrenSerializer
       'rootKind',
       serializers.serialize(object.rootKind,
           specifiedType: const FullType(_i2.GTagRootKind)),
+      'hasChildren',
+      serializers.serialize(object.hasChildren,
+          specifiedType: const FullType(bool)),
       'children',
       serializers.serialize(object.children,
           specifiedType: const FullType(BuiltList,
@@ -681,6 +715,10 @@ class _$GTagChildrenData_tag_childrenSerializer
                   specifiedType: const FullType(_i2.GTagRootKind))!
               as _i2.GTagRootKind;
           break;
+        case 'hasChildren':
+          result.hasChildren = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
+          break;
         case 'archivedAt':
           result.archivedAt.replace(serializers.deserialize(value,
               specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
@@ -728,6 +766,14 @@ class _$GTagChildrenData_tag_children_childrenSerializer
       'rootKind',
       serializers.serialize(object.rootKind,
           specifiedType: const FullType(_i2.GTagRootKind)),
+      'hasChildren',
+      serializers.serialize(object.hasChildren,
+          specifiedType: const FullType(bool)),
+      'children',
+      serializers.serialize(object.children,
+          specifiedType: const FullType(BuiltList, const [
+            const FullType(GTagChildrenData_tag_children_children_children)
+          ])),
     ];
     Object? value;
     value = object.archivedAt;
@@ -776,6 +822,114 @@ class _$GTagChildrenData_tag_children_childrenSerializer
           result.rootKind = serializers.deserialize(value,
                   specifiedType: const FullType(_i2.GTagRootKind))!
               as _i2.GTagRootKind;
+          break;
+        case 'hasChildren':
+          result.hasChildren = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
+          break;
+        case 'archivedAt':
+          result.archivedAt.replace(serializers.deserialize(value,
+              specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
+          break;
+        case 'children':
+          result.children.replace(serializers.deserialize(value,
+              specifiedType: const FullType(BuiltList, const [
+                const FullType(GTagChildrenData_tag_children_children_children)
+              ]))! as BuiltList<Object?>);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GTagChildrenData_tag_children_children_childrenSerializer
+    implements
+        StructuredSerializer<GTagChildrenData_tag_children_children_children> {
+  @override
+  final Iterable<Type> types = const [
+    GTagChildrenData_tag_children_children_children,
+    _$GTagChildrenData_tag_children_children_children
+  ];
+  @override
+  final String wireName = 'GTagChildrenData_tag_children_children_children';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GTagChildrenData_tag_children_children_children object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'id',
+      serializers.serialize(object.id, specifiedType: const FullType(String)),
+      'slug',
+      serializers.serialize(object.slug, specifiedType: const FullType(String)),
+      'displayName',
+      serializers.serialize(object.displayName,
+          specifiedType: const FullType(String)),
+      'path',
+      serializers.serialize(object.path, specifiedType: const FullType(String)),
+      'rootKind',
+      serializers.serialize(object.rootKind,
+          specifiedType: const FullType(_i2.GTagRootKind)),
+      'hasChildren',
+      serializers.serialize(object.hasChildren,
+          specifiedType: const FullType(bool)),
+    ];
+    Object? value;
+    value = object.archivedAt;
+    if (value != null) {
+      result
+        ..add('archivedAt')
+        ..add(serializers.serialize(value,
+            specifiedType: const FullType(_i2.GTime)));
+    }
+    return result;
+  }
+
+  @override
+  GTagChildrenData_tag_children_children_children deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GTagChildrenData_tag_children_children_childrenBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'id':
+          result.id = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'slug':
+          result.slug = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'displayName':
+          result.displayName = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'path':
+          result.path = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'rootKind':
+          result.rootKind = serializers.deserialize(value,
+                  specifiedType: const FullType(_i2.GTagRootKind))!
+              as _i2.GTagRootKind;
+          break;
+        case 'hasChildren':
+          result.hasChildren = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
           break;
         case 'archivedAt':
           result.archivedAt.replace(serializers.deserialize(value,
@@ -874,6 +1028,9 @@ class _$GTagBySlugPathData_tagBySlugPathSerializer
       'rootKind',
       serializers.serialize(object.rootKind,
           specifiedType: const FullType(_i2.GTagRootKind)),
+      'hasChildren',
+      serializers.serialize(object.hasChildren,
+          specifiedType: const FullType(bool)),
     ];
     Object? value;
     value = object.archivedAt;
@@ -923,6 +1080,10 @@ class _$GTagBySlugPathData_tagBySlugPathSerializer
                   specifiedType: const FullType(_i2.GTagRootKind))!
               as _i2.GTagRootKind;
           break;
+        case 'hasChildren':
+          result.hasChildren = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
+          break;
         case 'archivedAt':
           result.archivedAt.replace(serializers.deserialize(value,
               specifiedType: const FullType(_i2.GTime))! as _i2.GTime);
@@ -960,6 +1121,9 @@ class _$GTagSummaryDataSerializer
       'rootKind',
       serializers.serialize(object.rootKind,
           specifiedType: const FullType(_i2.GTagRootKind)),
+      'hasChildren',
+      serializers.serialize(object.hasChildren,
+          specifiedType: const FullType(bool)),
     ];
     Object? value;
     value = object.archivedAt;
@@ -1008,6 +1172,10 @@ class _$GTagSummaryDataSerializer
           result.rootKind = serializers.deserialize(value,
                   specifiedType: const FullType(_i2.GTagRootKind))!
               as _i2.GTagRootKind;
+          break;
+        case 'hasChildren':
+          result.hasChildren = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
           break;
         case 'archivedAt':
           result.archivedAt.replace(serializers.deserialize(value,
@@ -1144,6 +1312,8 @@ class _$GTagTreeData_myTagRoots extends GTagTreeData_myTagRoots {
   @override
   final _i2.GTagRootKind rootKind;
   @override
+  final bool hasChildren;
+  @override
   final _i2.GTime? archivedAt;
   @override
   final BuiltList<GTagTreeData_myTagRoots_children> children;
@@ -1159,6 +1329,7 @@ class _$GTagTreeData_myTagRoots extends GTagTreeData_myTagRoots {
       required this.displayName,
       required this.path,
       required this.rootKind,
+      required this.hasChildren,
       this.archivedAt,
       required this.children})
       : super._();
@@ -1181,6 +1352,7 @@ class _$GTagTreeData_myTagRoots extends GTagTreeData_myTagRoots {
         displayName == other.displayName &&
         path == other.path &&
         rootKind == other.rootKind &&
+        hasChildren == other.hasChildren &&
         archivedAt == other.archivedAt &&
         children == other.children;
   }
@@ -1194,6 +1366,7 @@ class _$GTagTreeData_myTagRoots extends GTagTreeData_myTagRoots {
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, path.hashCode);
     _$hash = $jc(_$hash, rootKind.hashCode);
+    _$hash = $jc(_$hash, hasChildren.hashCode);
     _$hash = $jc(_$hash, archivedAt.hashCode);
     _$hash = $jc(_$hash, children.hashCode);
     _$hash = $jf(_$hash);
@@ -1209,6 +1382,7 @@ class _$GTagTreeData_myTagRoots extends GTagTreeData_myTagRoots {
           ..add('displayName', displayName)
           ..add('path', path)
           ..add('rootKind', rootKind)
+          ..add('hasChildren', hasChildren)
           ..add('archivedAt', archivedAt)
           ..add('children', children))
         .toString();
@@ -1244,6 +1418,10 @@ class GTagTreeData_myTagRootsBuilder
   _i2.GTagRootKind? get rootKind => _$this._rootKind;
   set rootKind(_i2.GTagRootKind? rootKind) => _$this._rootKind = rootKind;
 
+  bool? _hasChildren;
+  bool? get hasChildren => _$this._hasChildren;
+  set hasChildren(bool? hasChildren) => _$this._hasChildren = hasChildren;
+
   _i2.GTimeBuilder? _archivedAt;
   _i2.GTimeBuilder get archivedAt => _$this._archivedAt ??= _i2.GTimeBuilder();
   set archivedAt(_i2.GTimeBuilder? archivedAt) =>
@@ -1268,6 +1446,7 @@ class GTagTreeData_myTagRootsBuilder
       _displayName = $v.displayName;
       _path = $v.path;
       _rootKind = $v.rootKind;
+      _hasChildren = $v.hasChildren;
       _archivedAt = $v.archivedAt?.toBuilder();
       _children = $v.children.toBuilder();
       _$v = null;
@@ -1305,6 +1484,8 @@ class GTagTreeData_myTagRootsBuilder
                 path, r'GTagTreeData_myTagRoots', 'path'),
             rootKind: BuiltValueNullFieldError.checkNotNull(
                 rootKind, r'GTagTreeData_myTagRoots', 'rootKind'),
+            hasChildren: BuiltValueNullFieldError.checkNotNull(
+                hasChildren, r'GTagTreeData_myTagRoots', 'hasChildren'),
             archivedAt: _archivedAt?.build(),
             children: children.build(),
           );
@@ -1341,6 +1522,8 @@ class _$GTagTreeData_myTagRoots_children
   @override
   final _i2.GTagRootKind rootKind;
   @override
+  final bool hasChildren;
+  @override
   final _i2.GTime? archivedAt;
   @override
   final BuiltList<GTagTreeData_myTagRoots_children_children> children;
@@ -1356,6 +1539,7 @@ class _$GTagTreeData_myTagRoots_children
       required this.displayName,
       required this.path,
       required this.rootKind,
+      required this.hasChildren,
       this.archivedAt,
       required this.children})
       : super._();
@@ -1378,6 +1562,7 @@ class _$GTagTreeData_myTagRoots_children
         displayName == other.displayName &&
         path == other.path &&
         rootKind == other.rootKind &&
+        hasChildren == other.hasChildren &&
         archivedAt == other.archivedAt &&
         children == other.children;
   }
@@ -1391,6 +1576,7 @@ class _$GTagTreeData_myTagRoots_children
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, path.hashCode);
     _$hash = $jc(_$hash, rootKind.hashCode);
+    _$hash = $jc(_$hash, hasChildren.hashCode);
     _$hash = $jc(_$hash, archivedAt.hashCode);
     _$hash = $jc(_$hash, children.hashCode);
     _$hash = $jf(_$hash);
@@ -1406,6 +1592,7 @@ class _$GTagTreeData_myTagRoots_children
           ..add('displayName', displayName)
           ..add('path', path)
           ..add('rootKind', rootKind)
+          ..add('hasChildren', hasChildren)
           ..add('archivedAt', archivedAt)
           ..add('children', children))
         .toString();
@@ -1442,6 +1629,10 @@ class GTagTreeData_myTagRoots_childrenBuilder
   _i2.GTagRootKind? get rootKind => _$this._rootKind;
   set rootKind(_i2.GTagRootKind? rootKind) => _$this._rootKind = rootKind;
 
+  bool? _hasChildren;
+  bool? get hasChildren => _$this._hasChildren;
+  set hasChildren(bool? hasChildren) => _$this._hasChildren = hasChildren;
+
   _i2.GTimeBuilder? _archivedAt;
   _i2.GTimeBuilder get archivedAt => _$this._archivedAt ??= _i2.GTimeBuilder();
   set archivedAt(_i2.GTimeBuilder? archivedAt) =>
@@ -1468,6 +1659,7 @@ class GTagTreeData_myTagRoots_childrenBuilder
       _displayName = $v.displayName;
       _path = $v.path;
       _rootKind = $v.rootKind;
+      _hasChildren = $v.hasChildren;
       _archivedAt = $v.archivedAt?.toBuilder();
       _children = $v.children.toBuilder();
       _$v = null;
@@ -1505,6 +1697,8 @@ class GTagTreeData_myTagRoots_childrenBuilder
                 path, r'GTagTreeData_myTagRoots_children', 'path'),
             rootKind: BuiltValueNullFieldError.checkNotNull(
                 rootKind, r'GTagTreeData_myTagRoots_children', 'rootKind'),
+            hasChildren: BuiltValueNullFieldError.checkNotNull(hasChildren,
+                r'GTagTreeData_myTagRoots_children', 'hasChildren'),
             archivedAt: _archivedAt?.build(),
             children: children.build(),
           );
@@ -1541,6 +1735,8 @@ class _$GTagTreeData_myTagRoots_children_children
   @override
   final _i2.GTagRootKind rootKind;
   @override
+  final bool hasChildren;
+  @override
   final _i2.GTime? archivedAt;
   @override
   final BuiltList<GTagTreeData_myTagRoots_children_children_children> children;
@@ -1558,6 +1754,7 @@ class _$GTagTreeData_myTagRoots_children_children
       required this.displayName,
       required this.path,
       required this.rootKind,
+      required this.hasChildren,
       this.archivedAt,
       required this.children})
       : super._();
@@ -1581,6 +1778,7 @@ class _$GTagTreeData_myTagRoots_children_children
         displayName == other.displayName &&
         path == other.path &&
         rootKind == other.rootKind &&
+        hasChildren == other.hasChildren &&
         archivedAt == other.archivedAt &&
         children == other.children;
   }
@@ -1594,6 +1792,7 @@ class _$GTagTreeData_myTagRoots_children_children
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, path.hashCode);
     _$hash = $jc(_$hash, rootKind.hashCode);
+    _$hash = $jc(_$hash, hasChildren.hashCode);
     _$hash = $jc(_$hash, archivedAt.hashCode);
     _$hash = $jc(_$hash, children.hashCode);
     _$hash = $jf(_$hash);
@@ -1610,6 +1809,7 @@ class _$GTagTreeData_myTagRoots_children_children
           ..add('displayName', displayName)
           ..add('path', path)
           ..add('rootKind', rootKind)
+          ..add('hasChildren', hasChildren)
           ..add('archivedAt', archivedAt)
           ..add('children', children))
         .toString();
@@ -1646,6 +1846,10 @@ class GTagTreeData_myTagRoots_children_childrenBuilder
   _i2.GTagRootKind? get rootKind => _$this._rootKind;
   set rootKind(_i2.GTagRootKind? rootKind) => _$this._rootKind = rootKind;
 
+  bool? _hasChildren;
+  bool? get hasChildren => _$this._hasChildren;
+  set hasChildren(bool? hasChildren) => _$this._hasChildren = hasChildren;
+
   _i2.GTimeBuilder? _archivedAt;
   _i2.GTimeBuilder get archivedAt => _$this._archivedAt ??= _i2.GTimeBuilder();
   set archivedAt(_i2.GTimeBuilder? archivedAt) =>
@@ -1673,6 +1877,7 @@ class GTagTreeData_myTagRoots_children_childrenBuilder
       _displayName = $v.displayName;
       _path = $v.path;
       _rootKind = $v.rootKind;
+      _hasChildren = $v.hasChildren;
       _archivedAt = $v.archivedAt?.toBuilder();
       _children = $v.children.toBuilder();
       _$v = null;
@@ -1712,6 +1917,8 @@ class GTagTreeData_myTagRoots_children_childrenBuilder
                 path, r'GTagTreeData_myTagRoots_children_children', 'path'),
             rootKind: BuiltValueNullFieldError.checkNotNull(rootKind,
                 r'GTagTreeData_myTagRoots_children_children', 'rootKind'),
+            hasChildren: BuiltValueNullFieldError.checkNotNull(hasChildren,
+                r'GTagTreeData_myTagRoots_children_children', 'hasChildren'),
             archivedAt: _archivedAt?.build(),
             children: children.build(),
           );
@@ -1750,6 +1957,8 @@ class _$GTagTreeData_myTagRoots_children_children_children
   @override
   final _i2.GTagRootKind rootKind;
   @override
+  final bool hasChildren;
+  @override
   final _i2.GTime? archivedAt;
 
   factory _$GTagTreeData_myTagRoots_children_children_children(
@@ -1767,6 +1976,7 @@ class _$GTagTreeData_myTagRoots_children_children_children
       required this.displayName,
       required this.path,
       required this.rootKind,
+      required this.hasChildren,
       this.archivedAt})
       : super._();
   @override
@@ -1791,6 +2001,7 @@ class _$GTagTreeData_myTagRoots_children_children_children
         displayName == other.displayName &&
         path == other.path &&
         rootKind == other.rootKind &&
+        hasChildren == other.hasChildren &&
         archivedAt == other.archivedAt;
   }
 
@@ -1803,6 +2014,7 @@ class _$GTagTreeData_myTagRoots_children_children_children
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, path.hashCode);
     _$hash = $jc(_$hash, rootKind.hashCode);
+    _$hash = $jc(_$hash, hasChildren.hashCode);
     _$hash = $jc(_$hash, archivedAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -1818,6 +2030,7 @@ class _$GTagTreeData_myTagRoots_children_children_children
           ..add('displayName', displayName)
           ..add('path', path)
           ..add('rootKind', rootKind)
+          ..add('hasChildren', hasChildren)
           ..add('archivedAt', archivedAt))
         .toString();
   }
@@ -1853,6 +2066,10 @@ class GTagTreeData_myTagRoots_children_children_childrenBuilder
   _i2.GTagRootKind? get rootKind => _$this._rootKind;
   set rootKind(_i2.GTagRootKind? rootKind) => _$this._rootKind = rootKind;
 
+  bool? _hasChildren;
+  bool? get hasChildren => _$this._hasChildren;
+  set hasChildren(bool? hasChildren) => _$this._hasChildren = hasChildren;
+
   _i2.GTimeBuilder? _archivedAt;
   _i2.GTimeBuilder get archivedAt => _$this._archivedAt ??= _i2.GTimeBuilder();
   set archivedAt(_i2.GTimeBuilder? archivedAt) =>
@@ -1871,6 +2088,7 @@ class GTagTreeData_myTagRoots_children_children_childrenBuilder
       _displayName = $v.displayName;
       _path = $v.path;
       _rootKind = $v.rootKind;
+      _hasChildren = $v.hasChildren;
       _archivedAt = $v.archivedAt?.toBuilder();
       _$v = null;
     }
@@ -1915,6 +2133,10 @@ class GTagTreeData_myTagRoots_children_children_childrenBuilder
                 rootKind,
                 r'GTagTreeData_myTagRoots_children_children_children',
                 'rootKind'),
+            hasChildren: BuiltValueNullFieldError.checkNotNull(
+                hasChildren,
+                r'GTagTreeData_myTagRoots_children_children_children',
+                'hasChildren'),
             archivedAt: _archivedAt?.build(),
           );
     } catch (_) {
@@ -2185,6 +2407,8 @@ class _$GTagChildrenData_tag_children extends GTagChildrenData_tag_children {
   @override
   final _i2.GTagRootKind rootKind;
   @override
+  final bool hasChildren;
+  @override
   final _i2.GTime? archivedAt;
   @override
   final BuiltList<GTagChildrenData_tag_children_children> children;
@@ -2200,6 +2424,7 @@ class _$GTagChildrenData_tag_children extends GTagChildrenData_tag_children {
       required this.displayName,
       required this.path,
       required this.rootKind,
+      required this.hasChildren,
       this.archivedAt,
       required this.children})
       : super._();
@@ -2222,6 +2447,7 @@ class _$GTagChildrenData_tag_children extends GTagChildrenData_tag_children {
         displayName == other.displayName &&
         path == other.path &&
         rootKind == other.rootKind &&
+        hasChildren == other.hasChildren &&
         archivedAt == other.archivedAt &&
         children == other.children;
   }
@@ -2235,6 +2461,7 @@ class _$GTagChildrenData_tag_children extends GTagChildrenData_tag_children {
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, path.hashCode);
     _$hash = $jc(_$hash, rootKind.hashCode);
+    _$hash = $jc(_$hash, hasChildren.hashCode);
     _$hash = $jc(_$hash, archivedAt.hashCode);
     _$hash = $jc(_$hash, children.hashCode);
     _$hash = $jf(_$hash);
@@ -2250,6 +2477,7 @@ class _$GTagChildrenData_tag_children extends GTagChildrenData_tag_children {
           ..add('displayName', displayName)
           ..add('path', path)
           ..add('rootKind', rootKind)
+          ..add('hasChildren', hasChildren)
           ..add('archivedAt', archivedAt)
           ..add('children', children))
         .toString();
@@ -2286,6 +2514,10 @@ class GTagChildrenData_tag_childrenBuilder
   _i2.GTagRootKind? get rootKind => _$this._rootKind;
   set rootKind(_i2.GTagRootKind? rootKind) => _$this._rootKind = rootKind;
 
+  bool? _hasChildren;
+  bool? get hasChildren => _$this._hasChildren;
+  set hasChildren(bool? hasChildren) => _$this._hasChildren = hasChildren;
+
   _i2.GTimeBuilder? _archivedAt;
   _i2.GTimeBuilder get archivedAt => _$this._archivedAt ??= _i2.GTimeBuilder();
   set archivedAt(_i2.GTimeBuilder? archivedAt) =>
@@ -2311,6 +2543,7 @@ class GTagChildrenData_tag_childrenBuilder
       _displayName = $v.displayName;
       _path = $v.path;
       _rootKind = $v.rootKind;
+      _hasChildren = $v.hasChildren;
       _archivedAt = $v.archivedAt?.toBuilder();
       _children = $v.children.toBuilder();
       _$v = null;
@@ -2348,6 +2581,8 @@ class GTagChildrenData_tag_childrenBuilder
                 path, r'GTagChildrenData_tag_children', 'path'),
             rootKind: BuiltValueNullFieldError.checkNotNull(
                 rootKind, r'GTagChildrenData_tag_children', 'rootKind'),
+            hasChildren: BuiltValueNullFieldError.checkNotNull(
+                hasChildren, r'GTagChildrenData_tag_children', 'hasChildren'),
             archivedAt: _archivedAt?.build(),
             children: children.build(),
           );
@@ -2384,7 +2619,11 @@ class _$GTagChildrenData_tag_children_children
   @override
   final _i2.GTagRootKind rootKind;
   @override
+  final bool hasChildren;
+  @override
   final _i2.GTime? archivedAt;
+  @override
+  final BuiltList<GTagChildrenData_tag_children_children_children> children;
 
   factory _$GTagChildrenData_tag_children_children(
           [void Function(GTagChildrenData_tag_children_childrenBuilder)?
@@ -2399,7 +2638,9 @@ class _$GTagChildrenData_tag_children_children
       required this.displayName,
       required this.path,
       required this.rootKind,
-      this.archivedAt})
+      required this.hasChildren,
+      this.archivedAt,
+      required this.children})
       : super._();
   @override
   GTagChildrenData_tag_children_children rebuild(
@@ -2421,7 +2662,9 @@ class _$GTagChildrenData_tag_children_children
         displayName == other.displayName &&
         path == other.path &&
         rootKind == other.rootKind &&
-        archivedAt == other.archivedAt;
+        hasChildren == other.hasChildren &&
+        archivedAt == other.archivedAt &&
+        children == other.children;
   }
 
   @override
@@ -2433,7 +2676,9 @@ class _$GTagChildrenData_tag_children_children
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, path.hashCode);
     _$hash = $jc(_$hash, rootKind.hashCode);
+    _$hash = $jc(_$hash, hasChildren.hashCode);
     _$hash = $jc(_$hash, archivedAt.hashCode);
+    _$hash = $jc(_$hash, children.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
   }
@@ -2448,7 +2693,9 @@ class _$GTagChildrenData_tag_children_children
           ..add('displayName', displayName)
           ..add('path', path)
           ..add('rootKind', rootKind)
-          ..add('archivedAt', archivedAt))
+          ..add('hasChildren', hasChildren)
+          ..add('archivedAt', archivedAt)
+          ..add('children', children))
         .toString();
   }
 }
@@ -2483,10 +2730,23 @@ class GTagChildrenData_tag_children_childrenBuilder
   _i2.GTagRootKind? get rootKind => _$this._rootKind;
   set rootKind(_i2.GTagRootKind? rootKind) => _$this._rootKind = rootKind;
 
+  bool? _hasChildren;
+  bool? get hasChildren => _$this._hasChildren;
+  set hasChildren(bool? hasChildren) => _$this._hasChildren = hasChildren;
+
   _i2.GTimeBuilder? _archivedAt;
   _i2.GTimeBuilder get archivedAt => _$this._archivedAt ??= _i2.GTimeBuilder();
   set archivedAt(_i2.GTimeBuilder? archivedAt) =>
       _$this._archivedAt = archivedAt;
+
+  ListBuilder<GTagChildrenData_tag_children_children_children>? _children;
+  ListBuilder<GTagChildrenData_tag_children_children_children> get children =>
+      _$this._children ??=
+          ListBuilder<GTagChildrenData_tag_children_children_children>();
+  set children(
+          ListBuilder<GTagChildrenData_tag_children_children_children>?
+              children) =>
+      _$this._children = children;
 
   GTagChildrenData_tag_children_childrenBuilder() {
     GTagChildrenData_tag_children_children._initializeBuilder(this);
@@ -2501,7 +2761,9 @@ class GTagChildrenData_tag_children_childrenBuilder
       _displayName = $v.displayName;
       _path = $v.path;
       _rootKind = $v.rootKind;
+      _hasChildren = $v.hasChildren;
       _archivedAt = $v.archivedAt?.toBuilder();
+      _children = $v.children.toBuilder();
       _$v = null;
     }
     return this;
@@ -2538,6 +2800,222 @@ class GTagChildrenData_tag_children_childrenBuilder
                 path, r'GTagChildrenData_tag_children_children', 'path'),
             rootKind: BuiltValueNullFieldError.checkNotNull(rootKind,
                 r'GTagChildrenData_tag_children_children', 'rootKind'),
+            hasChildren: BuiltValueNullFieldError.checkNotNull(hasChildren,
+                r'GTagChildrenData_tag_children_children', 'hasChildren'),
+            archivedAt: _archivedAt?.build(),
+            children: children.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'archivedAt';
+        _archivedAt?.build();
+        _$failedField = 'children';
+        children.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GTagChildrenData_tag_children_children',
+            _$failedField,
+            e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GTagChildrenData_tag_children_children_children
+    extends GTagChildrenData_tag_children_children_children {
+  @override
+  final String G__typename;
+  @override
+  final String id;
+  @override
+  final String slug;
+  @override
+  final String displayName;
+  @override
+  final String path;
+  @override
+  final _i2.GTagRootKind rootKind;
+  @override
+  final bool hasChildren;
+  @override
+  final _i2.GTime? archivedAt;
+
+  factory _$GTagChildrenData_tag_children_children_children(
+          [void Function(
+                  GTagChildrenData_tag_children_children_childrenBuilder)?
+              updates]) =>
+      (GTagChildrenData_tag_children_children_childrenBuilder()
+            ..update(updates))
+          ._build();
+
+  _$GTagChildrenData_tag_children_children_children._(
+      {required this.G__typename,
+      required this.id,
+      required this.slug,
+      required this.displayName,
+      required this.path,
+      required this.rootKind,
+      required this.hasChildren,
+      this.archivedAt})
+      : super._();
+  @override
+  GTagChildrenData_tag_children_children_children rebuild(
+          void Function(GTagChildrenData_tag_children_children_childrenBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GTagChildrenData_tag_children_children_childrenBuilder toBuilder() =>
+      GTagChildrenData_tag_children_children_childrenBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GTagChildrenData_tag_children_children_children &&
+        G__typename == other.G__typename &&
+        id == other.id &&
+        slug == other.slug &&
+        displayName == other.displayName &&
+        path == other.path &&
+        rootKind == other.rootKind &&
+        hasChildren == other.hasChildren &&
+        archivedAt == other.archivedAt;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, id.hashCode);
+    _$hash = $jc(_$hash, slug.hashCode);
+    _$hash = $jc(_$hash, displayName.hashCode);
+    _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jc(_$hash, rootKind.hashCode);
+    _$hash = $jc(_$hash, hasChildren.hashCode);
+    _$hash = $jc(_$hash, archivedAt.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GTagChildrenData_tag_children_children_children')
+          ..add('G__typename', G__typename)
+          ..add('id', id)
+          ..add('slug', slug)
+          ..add('displayName', displayName)
+          ..add('path', path)
+          ..add('rootKind', rootKind)
+          ..add('hasChildren', hasChildren)
+          ..add('archivedAt', archivedAt))
+        .toString();
+  }
+}
+
+class GTagChildrenData_tag_children_children_childrenBuilder
+    implements
+        Builder<GTagChildrenData_tag_children_children_children,
+            GTagChildrenData_tag_children_children_childrenBuilder> {
+  _$GTagChildrenData_tag_children_children_children? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  String? _id;
+  String? get id => _$this._id;
+  set id(String? id) => _$this._id = id;
+
+  String? _slug;
+  String? get slug => _$this._slug;
+  set slug(String? slug) => _$this._slug = slug;
+
+  String? _displayName;
+  String? get displayName => _$this._displayName;
+  set displayName(String? displayName) => _$this._displayName = displayName;
+
+  String? _path;
+  String? get path => _$this._path;
+  set path(String? path) => _$this._path = path;
+
+  _i2.GTagRootKind? _rootKind;
+  _i2.GTagRootKind? get rootKind => _$this._rootKind;
+  set rootKind(_i2.GTagRootKind? rootKind) => _$this._rootKind = rootKind;
+
+  bool? _hasChildren;
+  bool? get hasChildren => _$this._hasChildren;
+  set hasChildren(bool? hasChildren) => _$this._hasChildren = hasChildren;
+
+  _i2.GTimeBuilder? _archivedAt;
+  _i2.GTimeBuilder get archivedAt => _$this._archivedAt ??= _i2.GTimeBuilder();
+  set archivedAt(_i2.GTimeBuilder? archivedAt) =>
+      _$this._archivedAt = archivedAt;
+
+  GTagChildrenData_tag_children_children_childrenBuilder() {
+    GTagChildrenData_tag_children_children_children._initializeBuilder(this);
+  }
+
+  GTagChildrenData_tag_children_children_childrenBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _id = $v.id;
+      _slug = $v.slug;
+      _displayName = $v.displayName;
+      _path = $v.path;
+      _rootKind = $v.rootKind;
+      _hasChildren = $v.hasChildren;
+      _archivedAt = $v.archivedAt?.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GTagChildrenData_tag_children_children_children other) {
+    _$v = other as _$GTagChildrenData_tag_children_children_children;
+  }
+
+  @override
+  void update(
+      void Function(GTagChildrenData_tag_children_children_childrenBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GTagChildrenData_tag_children_children_children build() => _build();
+
+  _$GTagChildrenData_tag_children_children_children _build() {
+    _$GTagChildrenData_tag_children_children_children _$result;
+    try {
+      _$result = _$v ??
+          _$GTagChildrenData_tag_children_children_children._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename,
+                r'GTagChildrenData_tag_children_children_children',
+                'G__typename'),
+            id: BuiltValueNullFieldError.checkNotNull(
+                id, r'GTagChildrenData_tag_children_children_children', 'id'),
+            slug: BuiltValueNullFieldError.checkNotNull(slug,
+                r'GTagChildrenData_tag_children_children_children', 'slug'),
+            displayName: BuiltValueNullFieldError.checkNotNull(
+                displayName,
+                r'GTagChildrenData_tag_children_children_children',
+                'displayName'),
+            path: BuiltValueNullFieldError.checkNotNull(path,
+                r'GTagChildrenData_tag_children_children_children', 'path'),
+            rootKind: BuiltValueNullFieldError.checkNotNull(rootKind,
+                r'GTagChildrenData_tag_children_children_children', 'rootKind'),
+            hasChildren: BuiltValueNullFieldError.checkNotNull(
+                hasChildren,
+                r'GTagChildrenData_tag_children_children_children',
+                'hasChildren'),
             archivedAt: _archivedAt?.build(),
           );
     } catch (_) {
@@ -2547,7 +3025,7 @@ class GTagChildrenData_tag_children_childrenBuilder
         _archivedAt?.build();
       } catch (e) {
         throw BuiltValueNestedFieldError(
-            r'GTagChildrenData_tag_children_children',
+            r'GTagChildrenData_tag_children_children_children',
             _$failedField,
             e.toString());
       }
@@ -2686,6 +3164,8 @@ class _$GTagBySlugPathData_tagBySlugPath
   @override
   final _i2.GTagRootKind rootKind;
   @override
+  final bool hasChildren;
+  @override
   final _i2.GTime? archivedAt;
 
   factory _$GTagBySlugPathData_tagBySlugPath(
@@ -2699,6 +3179,7 @@ class _$GTagBySlugPathData_tagBySlugPath
       required this.displayName,
       required this.path,
       required this.rootKind,
+      required this.hasChildren,
       this.archivedAt})
       : super._();
   @override
@@ -2720,6 +3201,7 @@ class _$GTagBySlugPathData_tagBySlugPath
         displayName == other.displayName &&
         path == other.path &&
         rootKind == other.rootKind &&
+        hasChildren == other.hasChildren &&
         archivedAt == other.archivedAt;
   }
 
@@ -2732,6 +3214,7 @@ class _$GTagBySlugPathData_tagBySlugPath
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, path.hashCode);
     _$hash = $jc(_$hash, rootKind.hashCode);
+    _$hash = $jc(_$hash, hasChildren.hashCode);
     _$hash = $jc(_$hash, archivedAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -2746,6 +3229,7 @@ class _$GTagBySlugPathData_tagBySlugPath
           ..add('displayName', displayName)
           ..add('path', path)
           ..add('rootKind', rootKind)
+          ..add('hasChildren', hasChildren)
           ..add('archivedAt', archivedAt))
         .toString();
   }
@@ -2781,6 +3265,10 @@ class GTagBySlugPathData_tagBySlugPathBuilder
   _i2.GTagRootKind? get rootKind => _$this._rootKind;
   set rootKind(_i2.GTagRootKind? rootKind) => _$this._rootKind = rootKind;
 
+  bool? _hasChildren;
+  bool? get hasChildren => _$this._hasChildren;
+  set hasChildren(bool? hasChildren) => _$this._hasChildren = hasChildren;
+
   _i2.GTimeBuilder? _archivedAt;
   _i2.GTimeBuilder get archivedAt => _$this._archivedAt ??= _i2.GTimeBuilder();
   set archivedAt(_i2.GTimeBuilder? archivedAt) =>
@@ -2799,6 +3287,7 @@ class GTagBySlugPathData_tagBySlugPathBuilder
       _displayName = $v.displayName;
       _path = $v.path;
       _rootKind = $v.rootKind;
+      _hasChildren = $v.hasChildren;
       _archivedAt = $v.archivedAt?.toBuilder();
       _$v = null;
     }
@@ -2835,6 +3324,8 @@ class GTagBySlugPathData_tagBySlugPathBuilder
                 path, r'GTagBySlugPathData_tagBySlugPath', 'path'),
             rootKind: BuiltValueNullFieldError.checkNotNull(
                 rootKind, r'GTagBySlugPathData_tagBySlugPath', 'rootKind'),
+            hasChildren: BuiltValueNullFieldError.checkNotNull(hasChildren,
+                r'GTagBySlugPathData_tagBySlugPath', 'hasChildren'),
             archivedAt: _archivedAt?.build(),
           );
     } catch (_) {
@@ -2867,6 +3358,8 @@ class _$GTagSummaryData extends GTagSummaryData {
   @override
   final _i2.GTagRootKind rootKind;
   @override
+  final bool hasChildren;
+  @override
   final _i2.GTime? archivedAt;
 
   factory _$GTagSummaryData([void Function(GTagSummaryDataBuilder)? updates]) =>
@@ -2879,6 +3372,7 @@ class _$GTagSummaryData extends GTagSummaryData {
       required this.displayName,
       required this.path,
       required this.rootKind,
+      required this.hasChildren,
       this.archivedAt})
       : super._();
   @override
@@ -2898,6 +3392,7 @@ class _$GTagSummaryData extends GTagSummaryData {
         displayName == other.displayName &&
         path == other.path &&
         rootKind == other.rootKind &&
+        hasChildren == other.hasChildren &&
         archivedAt == other.archivedAt;
   }
 
@@ -2910,6 +3405,7 @@ class _$GTagSummaryData extends GTagSummaryData {
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, path.hashCode);
     _$hash = $jc(_$hash, rootKind.hashCode);
+    _$hash = $jc(_$hash, hasChildren.hashCode);
     _$hash = $jc(_$hash, archivedAt.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -2924,6 +3420,7 @@ class _$GTagSummaryData extends GTagSummaryData {
           ..add('displayName', displayName)
           ..add('path', path)
           ..add('rootKind', rootKind)
+          ..add('hasChildren', hasChildren)
           ..add('archivedAt', archivedAt))
         .toString();
   }
@@ -2957,6 +3454,10 @@ class GTagSummaryDataBuilder
   _i2.GTagRootKind? get rootKind => _$this._rootKind;
   set rootKind(_i2.GTagRootKind? rootKind) => _$this._rootKind = rootKind;
 
+  bool? _hasChildren;
+  bool? get hasChildren => _$this._hasChildren;
+  set hasChildren(bool? hasChildren) => _$this._hasChildren = hasChildren;
+
   _i2.GTimeBuilder? _archivedAt;
   _i2.GTimeBuilder get archivedAt => _$this._archivedAt ??= _i2.GTimeBuilder();
   set archivedAt(_i2.GTimeBuilder? archivedAt) =>
@@ -2975,6 +3476,7 @@ class GTagSummaryDataBuilder
       _displayName = $v.displayName;
       _path = $v.path;
       _rootKind = $v.rootKind;
+      _hasChildren = $v.hasChildren;
       _archivedAt = $v.archivedAt?.toBuilder();
       _$v = null;
     }
@@ -3011,6 +3513,8 @@ class GTagSummaryDataBuilder
                 path, r'GTagSummaryData', 'path'),
             rootKind: BuiltValueNullFieldError.checkNotNull(
                 rootKind, r'GTagSummaryData', 'rootKind'),
+            hasChildren: BuiltValueNullFieldError.checkNotNull(
+                hasChildren, r'GTagSummaryData', 'hasChildren'),
             archivedAt: _archivedAt?.build(),
           );
     } catch (_) {

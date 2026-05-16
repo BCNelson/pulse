@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/auth_controller.dart';
+import '../../core/router.dart';
 import '../../design/atoms/pulse_status_bar.dart';
 import '../../design/tokens.dart';
 import '../../design/typography.dart';
+import '../feed/tag_panel_visibility.dart';
 import '../impersonation/impersonation_banner.dart';
 import '../mention_preview/mention_preview_overlay.dart';
 import '../palette/command_palette_overlay.dart';
@@ -91,18 +93,29 @@ String _statusLabel(int index) => switch (index) {
       _ => '',
     };
 
-class _WideNavRail extends StatelessWidget {
+class _WideNavRail extends ConsumerWidget {
   const _WideNavRail({required this.navigationShell});
   final StatefulNavigationShell navigationShell;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return NavigationRail(
       selectedIndex: navigationShell.currentIndex,
-      onDestinationSelected: (i) => navigationShell.goBranch(
-        i,
-        initialLocation: i == navigationShell.currentIndex,
-      ),
+      onDestinationSelected: (i) {
+        final reTap = i == navigationShell.currentIndex;
+        // Re-tapping FEED while URL is exactly `/feed` toggles the tag
+        // panel instead of re-navigating. On feed sub-routes the existing
+        // pop-to-root behavior still runs.
+        if (reTap && i == 1) {
+          final atFeedRoot = ref.read(currentTagIdProvider) == null &&
+              ref.read(currentPostIdProvider) == null;
+          if (atFeedRoot) {
+            ref.read(tagPanelVisibleProvider.notifier).toggle();
+            return;
+          }
+        }
+        navigationShell.goBranch(i, initialLocation: reTap);
+      },
       labelType: NavigationRailLabelType.selected,
       minWidth: 52,
       useIndicator: false,

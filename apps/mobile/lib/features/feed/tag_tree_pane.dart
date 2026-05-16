@@ -12,7 +12,15 @@ import '../../design/typography.dart';
 import '../../graphql/__generated__/schema.schema.gql.dart';
 import '../../graphql/operations/__generated__/tag_tree.data.gql.dart';
 import '../../graphql/operations/__generated__/tag_tree.req.gql.dart';
+import 'lazy_tag_children.dart';
 import 'tag_tree_expansion.dart';
+
+/// Number of inline child levels carried by the `TagTree` and `TagChildren`
+/// queries below their root selection. Both fetch the root + 3 nested
+/// `children` fragments, so a freshly-rendered subtree root has 3 levels
+/// of inline descendants. `_RecursiveChild` decrements this counter as it
+/// recurses; on hitting 0 with `hasChildren` true, it triggers a lazy fetch.
+const int _inlineChildLevels = 3;
 
 // Navigates to the feed for the tag whose hierarchical slug path is
 // [tagPath] (already in the wire form "root/child/leaf"). The current
@@ -130,7 +138,8 @@ class _TagNode extends ConsumerWidget {
     final expanded = ref.watch(
       expandedTagPathsProvider.select((s) => s.contains(node.path)),
     );
-    final hasChildren = node.children.isNotEmpty;
+    final hasChildren = node.hasChildren;
+    final inlineLeft = _inlineChildLevels - 1;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -170,38 +179,145 @@ class _TagNode extends ConsumerWidget {
         ),
         if (expanded && hasChildren)
           for (final child in node.children)
-            _RecursiveChild(child: child, depth: depth + 1),
+            _RecursiveChild(
+              child: child,
+              depth: depth + 1,
+              inlineChildLevels: inlineLeft,
+            ),
       ],
     );
   }
 }
 
 /// _RecursiveChild adapts the typed nested fragment to _TagNode. The
-/// codegen emits a unique type per fragment depth, so we build a tiny
-/// adapter to keep recursion uniform.
-class _RecursiveChild extends StatelessWidget {
-  const _RecursiveChild({required this.child, required this.depth});
+/// codegen emits a unique type per fragment depth, so we use `dynamic`
+/// to keep recursion uniform across levels — and across the inline-vs-
+/// lazy boundary, since `TagSummary` shapes match.
+///
+/// `inlineChildLevels` tracks how many levels of children are still
+/// reachable via `child.children` from this node in the current GraphQL
+/// response. When it hits 0 and `child.hasChildren` is true, we switch
+/// to a lazy fetch via [_LazyChildren].
+class _RecursiveChild extends ConsumerWidget {
+  const _RecursiveChild({
+    required this.child,
+    required this.depth,
+    required this.inlineChildLevels,
+  });
 
   final dynamic child;
   final int depth;
+  final int inlineChildLevels;
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, ref, _) {
-        final selected = ref.watch(currentTagIdProvider);
-        final isSelected = selected == child.path;
-        return Padding(
-          padding: const EdgeInsets.only(left: 12),
-          child: PulseTagRow(
-            label: child.displayName as String,
-            indent: depth,
-            prefix: '·',
-            isActive: isSelected,
-            onTap: () => _selectTag(context, child.path as String),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final path = child.path as String;
+    final selected = ref.watch(currentTagIdProvider);
+    final isSelected = selected == path;
+    final expanded = ref.watch(
+      expandedTagPathsProvider.select((s) => s.contains(path)),
+    );
+    final hasChildren = child.hasChildren as bool;
+    final canRenderInline = inlineChildLevels > 0;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            if (hasChildren)
+              SizedBox(
+                width: 12,
+                child: InkWell(
+                  onTap: () => ref
+                      .read(expandedTagPathsProvider.notifier)
+                      .toggle(path),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 3),
+                    child: Icon(
+                      expanded
+                          ? Icons.keyboard_arrow_down
+                          : Icons.chevron_right,
+                      size: 14,
+                      color: context.tokens.ink3,
+                    ),
+                  ),
+                ),
+              )
+            else
+              const SizedBox(width: 12),
+            Expanded(
+              child: PulseTagRow(
+                label: child.displayName as String,
+                indent: depth,
+                prefix: '·',
+                isActive: isSelected,
+                onTap: () => _selectTag(context, path),
+              ),
+            ),
+          ],
+        ),
+        if (expanded && hasChildren)
+          if (canRenderInline)
+            for (final grandchild in child.children as Iterable)
+              _RecursiveChild(
+                child: grandchild,
+                depth: depth + 1,
+                inlineChildLevels: inlineChildLevels - 1,
+              )
+          else
+            _LazyChildren(parentId: child.id as String, depth: depth + 1),
+      ],
+    );
+  }
+}
+
+/// Fetches the next subtree under [parentId] and renders it as
+/// `_RecursiveChild` rows once the data arrives. Spliced in by
+/// `_RecursiveChild` when its inline children are exhausted.
+class _LazyChildren extends ConsumerWidget {
+  const _LazyChildren({required this.parentId, required this.depth});
+
+  final String parentId;
+  final int depth;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.tokens;
+    final async = ref.watch(lazyTagChildrenProvider(parentId));
+    return async.when(
+      loading: () => Padding(
+        padding: EdgeInsets.only(left: 12.0 + depth * 10.0, top: 4, bottom: 4),
+        child: SizedBox(
+          width: 12,
+          height: 12,
+          child: CircularProgressIndicator(strokeWidth: 1.5, color: t.ink3),
+        ),
+      ),
+      error: (err, _) => Padding(
+        padding: EdgeInsets.only(left: 12.0 + depth * 10.0, top: 2, bottom: 2),
+        child: InkWell(
+          onTap: () => ref.invalidate(lazyTagChildrenProvider(parentId)),
+          child: Text(
+            'failed to load — tap to retry',
+            style: TextStyle(
+              fontFamily: pulseMonoFamily,
+              fontSize: 10,
+              color: t.ink3,
+            ),
           ),
-        );
-      },
+        ),
+      ),
+      data: (kids) => Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (final c in kids)
+            _RecursiveChild(
+              child: c,
+              depth: depth,
+              inlineChildLevels: _inlineChildLevels - 1,
+            ),
+        ],
+      ),
     );
   }
 }

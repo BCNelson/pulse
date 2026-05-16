@@ -13,8 +13,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jackc/pgx/v5"
-
 	"github.com/bcnelson/pulse/services/api/internal/audit"
 	"github.com/bcnelson/pulse/services/api/internal/auth"
 	"github.com/bcnelson/pulse/services/api/internal/chat"
@@ -28,6 +26,7 @@ import (
 	"github.com/bcnelson/pulse/services/api/internal/tag"
 	"github.com/bcnelson/pulse/services/api/internal/task"
 	"github.com/bcnelson/pulse/services/api/pkg/ids"
+	pgx "github.com/jackc/pgx/v5"
 )
 
 // DownloadURL is the resolver for the downloadUrl field.
@@ -2201,6 +2200,39 @@ func (r *subscriptionResolver) NotificationReceived(ctx context.Context) (<-chan
 		}
 	}()
 	return out, nil
+}
+
+// Children is the resolver for the children field.
+func (r *tagResolver) Children(ctx context.Context, obj *model.Tag) ([]*model.Tag, error) {
+	identity := auth.FromContext(ctx)
+	if identity.IsAnonymous() {
+		return []*model.Tag{}, nil
+	}
+	tagID, err := r.resolveTagRef(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tag id: %w", err)
+	}
+	return r.loadVisibleChildren(ctx, tagID, identity.EffectiveID)
+}
+
+// HasChildren is the resolver for the hasChildren field.
+func (r *tagResolver) HasChildren(ctx context.Context, obj *model.Tag) (bool, error) {
+	identity := auth.FromContext(ctx)
+	if identity.IsAnonymous() {
+		return false, nil
+	}
+	tagID, err := r.resolveTagRef(ctx, obj.ID)
+	if err != nil {
+		return false, fmt.Errorf("invalid tag id: %w", err)
+	}
+	// Reuses loadVisibleChildren to honor visibility — duplicates work when
+	// the same query also asks for `children`. Acceptable for now; a
+	// request-scoped (parentID, viewer) cache would eliminate it.
+	children, err := r.loadVisibleChildren(ctx, tagID, identity.EffectiveID)
+	if err != nil {
+		return false, err
+	}
+	return len(children) > 0, nil
 }
 
 // Posts is the resolver for the posts field.

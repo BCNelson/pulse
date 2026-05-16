@@ -37,6 +37,10 @@ models:
   # resolvers — skip the model struct's eager-loaded copy.
   Tag:
     fields:
+      children:
+        resolver: true
+      hasChildren:
+        resolver: true
       posts:
         resolver: true
       tasks:

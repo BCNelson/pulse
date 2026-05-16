@@ -13,6 +13,7 @@ class UiStateStorage {
 
   static String lastRouteKey = namespacedKey('pulse.ui.lastRoute');
   static String cacheMaxBytesKey = namespacedKey('pulse.cache.maxBytes');
+  static String feedListWidthKey = namespacedKey('pulse.ui.feedListWidth');
 
   /// Per-post reply target JSON. Keyed by post so reply state attaches
   /// to the post the user was on, not to the global session.
@@ -44,6 +45,16 @@ class UiStateStorage {
       return;
     }
     await _prefs.setString(key, value);
+  }
+
+  double? readDouble(String key) => _prefs.getDouble(key);
+
+  Future<void> writeDouble(String key, double? value) async {
+    if (value == null) {
+      await _prefs.remove(key);
+      return;
+    }
+    await _prefs.setDouble(key, value);
   }
 
   /// Returns the user-selected cache budget in bytes, or the default

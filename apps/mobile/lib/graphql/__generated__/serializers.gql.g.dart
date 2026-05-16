@@ -334,6 +334,7 @@ Serializers _$serializers = (Serializers().toBuilder()
       ..add(GTagChildrenData_tag.serializer)
       ..add(GTagChildrenData_tag_children.serializer)
       ..add(GTagChildrenData_tag_children_children.serializer)
+      ..add(GTagChildrenData_tag_children_children_children.serializer)
       ..add(GTagChildrenReq.serializer)
       ..add(GTagChildrenVars.serializer)
       ..add(GTagRootKind.serializer)
@@ -632,6 +633,11 @@ Serializers _$serializers = (Serializers().toBuilder()
           const FullType(BuiltList,
               const [const FullType(GTagChildrenData_tag_children_children)]),
           () => ListBuilder<GTagChildrenData_tag_children_children>())
+      ..addBuilderFactory(
+          const FullType(BuiltList, const [
+            const FullType(GTagChildrenData_tag_children_children_children)
+          ]),
+          () => ListBuilder<GTagChildrenData_tag_children_children_children>())
       ..addBuilderFactory(
           const FullType(
               BuiltList, const [const FullType(GTagTreeData_myTagRoots)]),

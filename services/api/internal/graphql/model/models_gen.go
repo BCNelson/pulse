@@ -371,6 +371,7 @@ type Tag struct {
 	RootKind       TagRootKind      `json:"rootKind"`
 	Parent         *Tag             `json:"parent,omitempty"`
 	Children       []*Tag           `json:"children"`
+	HasChildren    bool             `json:"hasChildren"`
 	Defaults       string           `json:"defaults"`
 	ArchivedAt     *time.Time       `json:"archivedAt,omitempty"`
 	CreatedAt      time.Time        `json:"createdAt"`

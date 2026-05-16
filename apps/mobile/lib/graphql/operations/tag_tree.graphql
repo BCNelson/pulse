@@ -4,6 +4,7 @@ fragment TagSummary on Tag {
   displayName
   path
   rootKind
+  hasChildren
   archivedAt
 }
 
@@ -29,6 +30,9 @@ query TagChildren($id: ID!) {
       ...TagSummary
       children {
         ...TagSummary
+        children {
+          ...TagSummary
+        }
       }
     }
   }

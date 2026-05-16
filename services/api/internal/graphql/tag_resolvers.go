@@ -66,12 +66,10 @@ func (r *Resolver) loadTag(ctx context.Context, id int64) (*model.Tag, error) {
 		out.Parent = parent
 	}
 
-	// Direct children, filtered to what the viewer can see.
-	children, err := r.loadVisibleChildren(ctx, t.id, identity.EffectiveID)
-	if err != nil {
-		return nil, err
-	}
-	out.Children = children
+	// Direct children are populated lazily by the Tag.children field
+	// resolver — see schema.resolvers.go. Loading here would over-fetch
+	// for queries that don't ask for them and miss deeper levels for
+	// queries that ask for nested children.
 
 	// MyPermissions
 	bundle, extras, err := r.Perm.EffectiveOnTag(ctx, identity.EffectiveID, t.id)

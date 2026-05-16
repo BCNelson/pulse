@@ -167,6 +167,7 @@ type Tag {
   rootKind: TagRootKind!
   parent: Tag
   children: [Tag!]!
+  hasChildren: Boolean!
   defaults: JSON!
   archivedAt: Time
   createdAt: Time!

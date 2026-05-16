@@ -64,6 +64,8 @@ abstract class GTagTreeData_myTagRoots
   @override
   _i2.GTagRootKind get rootKind;
   @override
+  bool get hasChildren;
+  @override
   _i2.GTime? get archivedAt;
   BuiltList<GTagTreeData_myTagRoots_children> get children;
   static Serializer<GTagTreeData_myTagRoots> get serializer =>
@@ -109,6 +111,8 @@ abstract class GTagTreeData_myTagRoots_children
   String get path;
   @override
   _i2.GTagRootKind get rootKind;
+  @override
+  bool get hasChildren;
   @override
   _i2.GTime? get archivedAt;
   BuiltList<GTagTreeData_myTagRoots_children_children> get children;
@@ -158,6 +162,8 @@ abstract class GTagTreeData_myTagRoots_children_children
   @override
   _i2.GTagRootKind get rootKind;
   @override
+  bool get hasChildren;
+  @override
   _i2.GTime? get archivedAt;
   BuiltList<GTagTreeData_myTagRoots_children_children_children> get children;
   static Serializer<GTagTreeData_myTagRoots_children_children> get serializer =>
@@ -206,6 +212,8 @@ abstract class GTagTreeData_myTagRoots_children_children_children
   String get path;
   @override
   _i2.GTagRootKind get rootKind;
+  @override
+  bool get hasChildren;
   @override
   _i2.GTime? get archivedAt;
   static Serializer<GTagTreeData_myTagRoots_children_children_children>
@@ -312,6 +320,8 @@ abstract class GTagChildrenData_tag_children
   @override
   _i2.GTagRootKind get rootKind;
   @override
+  bool get hasChildren;
+  @override
   _i2.GTime? get archivedAt;
   BuiltList<GTagChildrenData_tag_children_children> get children;
   static Serializer<GTagChildrenData_tag_children> get serializer =>
@@ -359,7 +369,10 @@ abstract class GTagChildrenData_tag_children_children
   @override
   _i2.GTagRootKind get rootKind;
   @override
+  bool get hasChildren;
+  @override
   _i2.GTime? get archivedAt;
+  BuiltList<GTagChildrenData_tag_children_children_children> get children;
   static Serializer<GTagChildrenData_tag_children_children> get serializer =>
       _$gTagChildrenDataTagChildrenChildrenSerializer;
 
@@ -373,6 +386,55 @@ abstract class GTagChildrenData_tag_children_children
           Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GTagChildrenData_tag_children_children.serializer,
+        json,
+      );
+}
+
+abstract class GTagChildrenData_tag_children_children_children
+    implements
+        Built<GTagChildrenData_tag_children_children_children,
+            GTagChildrenData_tag_children_children_childrenBuilder>,
+        GTagSummary {
+  GTagChildrenData_tag_children_children_children._();
+
+  factory GTagChildrenData_tag_children_children_children(
+      [void Function(GTagChildrenData_tag_children_children_childrenBuilder b)
+          updates]) = _$GTagChildrenData_tag_children_children_children;
+
+  static void _initializeBuilder(
+          GTagChildrenData_tag_children_children_childrenBuilder b) =>
+      b..G__typename = 'Tag';
+
+  @override
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  @override
+  String get id;
+  @override
+  String get slug;
+  @override
+  String get displayName;
+  @override
+  String get path;
+  @override
+  _i2.GTagRootKind get rootKind;
+  @override
+  bool get hasChildren;
+  @override
+  _i2.GTime? get archivedAt;
+  static Serializer<GTagChildrenData_tag_children_children_children>
+      get serializer => _$gTagChildrenDataTagChildrenChildrenChildrenSerializer;
+
+  @override
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GTagChildrenData_tag_children_children_children.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GTagChildrenData_tag_children_children_children? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GTagChildrenData_tag_children_children_children.serializer,
         json,
       );
 }
@@ -434,6 +496,8 @@ abstract class GTagBySlugPathData_tagBySlugPath
   @override
   _i2.GTagRootKind get rootKind;
   @override
+  bool get hasChildren;
+  @override
   _i2.GTime? get archivedAt;
   static Serializer<GTagBySlugPathData_tagBySlugPath> get serializer =>
       _$gTagBySlugPathDataTagBySlugPathSerializer;
@@ -459,6 +523,7 @@ abstract class GTagSummary {
   String get displayName;
   String get path;
   _i2.GTagRootKind get rootKind;
+  bool get hasChildren;
   _i2.GTime? get archivedAt;
   Map<String, dynamic> toJson();
 }
@@ -486,6 +551,8 @@ abstract class GTagSummaryData
   String get path;
   @override
   _i2.GTagRootKind get rootKind;
+  @override
+  bool get hasChildren;
   @override
   _i2.GTime? get archivedAt;
   static Serializer<GTagSummaryData> get serializer =>

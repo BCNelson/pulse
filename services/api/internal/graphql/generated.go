@@ -335,6 +335,7 @@ type ComplexityRoot struct {
 		Defaults       func(childComplexity int) int
 		DisplayName    func(childComplexity int) int
 		GlobalURI      func(childComplexity int) int
+		HasChildren    func(childComplexity int) int
 		ID             func(childComplexity int) int
 		MyPermissions  func(childComplexity int) int
 		MySubscription func(childComplexity int) int
@@ -519,6 +520,9 @@ type SubscriptionResolver interface {
 	NotificationReceived(ctx context.Context) (<-chan *model.Notification, error)
 }
 type TagResolver interface {
+	Children(ctx context.Context, obj *model.Tag) ([]*model.Tag, error)
+	HasChildren(ctx context.Context, obj *model.Tag) (bool, error)
+
 	Posts(ctx context.Context, obj *model.Tag, first *int, after *string, sort *model.PostSort) (*model.PostConnection, error)
 	Tasks(ctx context.Context, obj *model.Tag, first *int, after *string, status *model.TaskStatus) (*model.TaskConnection, error)
 }
@@ -2109,6 +2113,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Tag.GlobalURI(childComplexity), true
+	case "Tag.hasChildren":
+		if e.ComplexityRoot.Tag.HasChildren == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Tag.HasChildren(childComplexity), true
 	case "Tag.id":
 		if e.ComplexityRoot.Tag.ID == nil {
 			break
@@ -2766,6 +2776,7 @@ type Tag {
   rootKind: TagRootKind!
   parent: Tag
   children: [Tag!]!
+  hasChildren: Boolean!
   defaults: JSON!
   archivedAt: Time
   createdAt: Time!
@@ -3743,6 +3754,8 @@ func (ec *executionContext) childFields_Tag(ctx context.Context, field graphql.C
 		return ec.fieldContext_Tag_parent(ctx, field)
 	case "children":
 		return ec.fieldContext_Tag_children(ctx, field)
+	case "hasChildren":
+		return ec.fieldContext_Tag_hasChildren(ctx, field)
 	case "defaults":
 		return ec.fieldContext_Tag_defaults(ctx, field)
 	case "archivedAt":
@@ -11935,7 +11948,7 @@ func (ec *executionContext) _Tag_children(ctx context.Context, field graphql.Col
 			return ec.fieldContext_Tag_children(ctx, field)
 		},
 		func(ctx context.Context) (any, error) {
-			return obj.Children, nil
+			return ec.Resolvers.Tag().Children(ctx, obj)
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v []*model.Tag) graphql.Marshaler {
@@ -11949,13 +11962,36 @@ func (ec *executionContext) fieldContext_Tag_children(_ context.Context, field g
 	fc = &graphql.FieldContext{
 		Object:     "Tag",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return ec.childFields_Tag(ctx, field)
 		},
 	}
 	return fc, nil
+}
+
+func (ec *executionContext) _Tag_hasChildren(ctx context.Context, field graphql.CollectedField, obj *model.Tag) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Tag_hasChildren(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Tag().HasChildren(ctx, obj)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+			return ec.marshalNBoolean2bool(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Tag_hasChildren(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("Tag", field, true, true, errors.New("field of type Boolean does not have child fields"))
 }
 
 func (ec *executionContext) _Tag_defaults(ctx context.Context, field graphql.CollectedField, obj *model.Tag) (ret graphql.Marshaler) {
@@ -17730,10 +17766,77 @@ func (ec *executionContext) _Tag(ctx context.Context, sel ast.SelectionSet, obj 
 		case "parent":
 			out.Values[i] = ec._Tag_parent(ctx, field, obj)
 		case "children":
-			out.Values[i] = ec._Tag_children(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&out.Invalids, 1)
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Tag_children(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		case "hasChildren":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Tag_hasChildren(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "defaults":
 			out.Values[i] = ec._Tag_defaults(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
