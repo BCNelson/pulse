@@ -22,6 +22,8 @@ Serializer<GUnreactToPostVars> _$gUnreactToPostVarsSerializer =
     _$GUnreactToPostVarsSerializer();
 Serializer<GPostChangedVars> _$gPostChangedVarsSerializer =
     _$GPostChangedVarsSerializer();
+Serializer<GSetTagFeedSettingsVars> _$gSetTagFeedSettingsVarsSerializer =
+    _$GSetTagFeedSettingsVarsSerializer();
 Serializer<GPostSummaryVars> _$gPostSummaryVarsSerializer =
     _$GPostSummaryVarsSerializer();
 Serializer<GCommentSummaryVars> _$gCommentSummaryVarsSerializer =
@@ -393,6 +395,53 @@ class _$GPostChangedVarsSerializer
         case 'tagId':
           result.tagId = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GSetTagFeedSettingsVarsSerializer
+    implements StructuredSerializer<GSetTagFeedSettingsVars> {
+  @override
+  final Iterable<Type> types = const [
+    GSetTagFeedSettingsVars,
+    _$GSetTagFeedSettingsVars
+  ];
+  @override
+  final String wireName = 'GSetTagFeedSettingsVars';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GSetTagFeedSettingsVars object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'input',
+      serializers.serialize(object.input,
+          specifiedType: const FullType(_i2.GSetTagFeedSettingsInput)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GSetTagFeedSettingsVars deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSetTagFeedSettingsVarsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'input':
+          result.input.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(_i2.GSetTagFeedSettingsInput))!
+              as _i2.GSetTagFeedSettingsInput);
           break;
       }
     }
@@ -1185,6 +1234,104 @@ class GPostChangedVarsBuilder
           tagId: BuiltValueNullFieldError.checkNotNull(
               tagId, r'GPostChangedVars', 'tagId'),
         );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSetTagFeedSettingsVars extends GSetTagFeedSettingsVars {
+  @override
+  final _i2.GSetTagFeedSettingsInput input;
+
+  factory _$GSetTagFeedSettingsVars(
+          [void Function(GSetTagFeedSettingsVarsBuilder)? updates]) =>
+      (GSetTagFeedSettingsVarsBuilder()..update(updates))._build();
+
+  _$GSetTagFeedSettingsVars._({required this.input}) : super._();
+  @override
+  GSetTagFeedSettingsVars rebuild(
+          void Function(GSetTagFeedSettingsVarsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSetTagFeedSettingsVarsBuilder toBuilder() =>
+      GSetTagFeedSettingsVarsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSetTagFeedSettingsVars && input == other.input;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, input.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GSetTagFeedSettingsVars')
+          ..add('input', input))
+        .toString();
+  }
+}
+
+class GSetTagFeedSettingsVarsBuilder
+    implements
+        Builder<GSetTagFeedSettingsVars, GSetTagFeedSettingsVarsBuilder> {
+  _$GSetTagFeedSettingsVars? _$v;
+
+  _i2.GSetTagFeedSettingsInputBuilder? _input;
+  _i2.GSetTagFeedSettingsInputBuilder get input =>
+      _$this._input ??= _i2.GSetTagFeedSettingsInputBuilder();
+  set input(_i2.GSetTagFeedSettingsInputBuilder? input) =>
+      _$this._input = input;
+
+  GSetTagFeedSettingsVarsBuilder();
+
+  GSetTagFeedSettingsVarsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _input = $v.input.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSetTagFeedSettingsVars other) {
+    _$v = other as _$GSetTagFeedSettingsVars;
+  }
+
+  @override
+  void update(void Function(GSetTagFeedSettingsVarsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSetTagFeedSettingsVars build() => _build();
+
+  _$GSetTagFeedSettingsVars _build() {
+    _$GSetTagFeedSettingsVars _$result;
+    try {
+      _$result = _$v ??
+          _$GSetTagFeedSettingsVars._(
+            input: input.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'input';
+        input.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GSetTagFeedSettingsVars', _$failedField, e.toString());
+      }
+      rethrow;
+    }
     replace(_$result);
     return _$result;
   }

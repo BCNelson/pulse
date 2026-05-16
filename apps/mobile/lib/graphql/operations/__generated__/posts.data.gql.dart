@@ -55,6 +55,8 @@ abstract class GPostsForTagData_tag
   String get slug;
   String get displayName;
   String get path;
+  bool get hasChildren;
+  GPostsForTagData_tag_myFeedSettings get myFeedSettings;
   GPostsForTagData_tag_posts get posts;
   static Serializer<GPostsForTagData_tag> get serializer =>
       _$gPostsForTagDataTagSerializer;
@@ -67,6 +69,39 @@ abstract class GPostsForTagData_tag
   static GPostsForTagData_tag? fromJson(Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GPostsForTagData_tag.serializer,
+        json,
+      );
+}
+
+abstract class GPostsForTagData_tag_myFeedSettings
+    implements
+        Built<GPostsForTagData_tag_myFeedSettings,
+            GPostsForTagData_tag_myFeedSettingsBuilder> {
+  GPostsForTagData_tag_myFeedSettings._();
+
+  factory GPostsForTagData_tag_myFeedSettings(
+      [void Function(GPostsForTagData_tag_myFeedSettingsBuilder b)
+          updates]) = _$GPostsForTagData_tag_myFeedSettings;
+
+  static void _initializeBuilder(
+          GPostsForTagData_tag_myFeedSettingsBuilder b) =>
+      b..G__typename = 'TagFeedSettings';
+
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  bool get includeDescendants;
+  static Serializer<GPostsForTagData_tag_myFeedSettings> get serializer =>
+      _$gPostsForTagDataTagMyFeedSettingsSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GPostsForTagData_tag_myFeedSettings.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GPostsForTagData_tag_myFeedSettings? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GPostsForTagData_tag_myFeedSettings.serializer,
         json,
       );
 }
@@ -2830,6 +2865,68 @@ abstract class GPostChangedData_postChanged_comments_edges_node
           Map<String, dynamic> json) =>
       _i1.serializers.deserializeWith(
         GPostChangedData_postChanged_comments_edges_node.serializer,
+        json,
+      );
+}
+
+abstract class GSetTagFeedSettingsData
+    implements Built<GSetTagFeedSettingsData, GSetTagFeedSettingsDataBuilder> {
+  GSetTagFeedSettingsData._();
+
+  factory GSetTagFeedSettingsData(
+          [void Function(GSetTagFeedSettingsDataBuilder b) updates]) =
+      _$GSetTagFeedSettingsData;
+
+  static void _initializeBuilder(GSetTagFeedSettingsDataBuilder b) =>
+      b..G__typename = 'Mutation';
+
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  GSetTagFeedSettingsData_setTagFeedSettings get setTagFeedSettings;
+  static Serializer<GSetTagFeedSettingsData> get serializer =>
+      _$gSetTagFeedSettingsDataSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GSetTagFeedSettingsData.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSetTagFeedSettingsData? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GSetTagFeedSettingsData.serializer,
+        json,
+      );
+}
+
+abstract class GSetTagFeedSettingsData_setTagFeedSettings
+    implements
+        Built<GSetTagFeedSettingsData_setTagFeedSettings,
+            GSetTagFeedSettingsData_setTagFeedSettingsBuilder> {
+  GSetTagFeedSettingsData_setTagFeedSettings._();
+
+  factory GSetTagFeedSettingsData_setTagFeedSettings(
+      [void Function(GSetTagFeedSettingsData_setTagFeedSettingsBuilder b)
+          updates]) = _$GSetTagFeedSettingsData_setTagFeedSettings;
+
+  static void _initializeBuilder(
+          GSetTagFeedSettingsData_setTagFeedSettingsBuilder b) =>
+      b..G__typename = 'TagFeedSettings';
+
+  @BuiltValueField(wireName: '__typename')
+  String get G__typename;
+  bool get includeDescendants;
+  static Serializer<GSetTagFeedSettingsData_setTagFeedSettings>
+      get serializer => _$gSetTagFeedSettingsDataSetTagFeedSettingsSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GSetTagFeedSettingsData_setTagFeedSettings.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSetTagFeedSettingsData_setTagFeedSettings? fromJson(
+          Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GSetTagFeedSettingsData_setTagFeedSettings.serializer,
         json,
       );
 }

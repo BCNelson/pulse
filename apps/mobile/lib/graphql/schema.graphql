@@ -158,6 +158,17 @@ type TagSubscription {
   reasonFilter: [String!]!
 }
 
+# Per-viewer feed view preferences for a tag. Persisted via
+# setTagFeedSettings; unset rows fall back to defaults (all FALSE).
+type TagFeedSettings {
+  includeDescendants: Boolean!
+}
+
+input SetTagFeedSettingsInput {
+  tagId: ID!
+  includeDescendants: Boolean!
+}
+
 type Tag {
   id: ID!
   globalUri: String!
@@ -173,7 +184,11 @@ type Tag {
   createdAt: Time!
   myPermissions: TagPermissions!
   mySubscription: TagSubscription
-  posts(first: Int, after: String, sort: PostSort): PostConnection!
+  myFeedSettings: TagFeedSettings!
+  # `includeDescendants` defaults to the viewer's saved myFeedSettings
+  # value when omitted. Pass an explicit boolean to override the saved
+  # pref for this single request (useful for previews / tests).
+  posts(first: Int, after: String, sort: PostSort, includeDescendants: Boolean): PostConnection!
   tasks(first: Int, after: String, status: TaskStatus): TaskConnection!
 }
 
@@ -624,6 +639,7 @@ type Mutation {
   revokeTagGrant(tagId: ID!, principalId: ID!): Tag!
   subscribeTag(input: SubscribeTagInput!): TagSubscription!
   unsubscribeTag(tagId: ID!): Boolean!
+  setTagFeedSettings(input: SetTagFeedSettingsInput!): TagFeedSettings!
 
   createPost(input: CreatePostInput!): Post!
   editPost(input: EditPostInput!): Post!
@@ -715,8 +731,11 @@ type Subscription {
   """
   Fires whenever a post visible to the viewer (under the named tag)
   changes. M3 emits on create only; M4 extends to update / delete.
+  When `includeDescendants` is true, also fires for posts attached to
+  any descendant of the named tag (via tag_closure). Omitting the arg
+  falls back to the viewer's saved myFeedSettings value for the tag.
   """
-  postChanged(tagId: ID!): Post!
+  postChanged(tagId: ID!, includeDescendants: Boolean): Post!
 
   """
   Fires when a tag is moved, renamed, or archived.

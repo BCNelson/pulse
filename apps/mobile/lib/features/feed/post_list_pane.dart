@@ -13,6 +13,7 @@ import '../../graphql/__generated__/schema.schema.gql.dart';
 import '../../graphql/operations/__generated__/posts.data.gql.dart';
 import '../composer/post_composer.dart';
 import 'cached_tag_feed_provider.dart';
+import 'feed_settings_controller.dart';
 import 'post_changed_listener.dart';
 
 enum _SortMode { forYou, recent, unread, active }
@@ -107,6 +108,7 @@ class _PostList extends ConsumerWidget {
                         );
                       }),
                     ),
+                    _IncludeSubTagsToggle(tagId: tagId),
                   ],
                 ),
               ),
@@ -234,6 +236,46 @@ class _PostList extends ConsumerWidget {
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
         child: PostComposer(tagId: tagId),
+      ),
+    );
+  }
+}
+
+/// Compact toggle chip rendered in the feed bar that flips the viewer's
+/// "include sub-tags" pref for the current tag.
+class _IncludeSubTagsToggle extends ConsumerWidget {
+  const _IncludeSubTagsToggle({required this.tagId});
+
+  final String tagId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final t = context.tokens;
+    final settings = ref.watch(feedSettingsProvider(tagId));
+    final on = settings.includeSubTags ?? false;
+    return InkWell(
+      onTap: () => ref
+          .read(feedSettingsProvider(tagId).notifier)
+          .setIncludeSubTags(!on),
+      child: Container(
+        height: 22,
+        padding: const EdgeInsets.symmetric(horizontal: 9),
+        decoration: BoxDecoration(
+          color: on ? t.ink : t.paper,
+          border: Border.all(color: t.hair),
+          borderRadius: BorderRadius.circular(t.radius),
+        ),
+        alignment: Alignment.center,
+        child: Text(
+          'Sub-tags',
+          style: TextStyle(
+            fontFamily: pulseMonoFamily,
+            fontSize: 11,
+            color: on ? t.paper : t.ink2,
+            fontWeight: on ? FontWeight.w600 : FontWeight.w400,
+            height: 1.2,
+          ),
+        ),
       ),
     );
   }

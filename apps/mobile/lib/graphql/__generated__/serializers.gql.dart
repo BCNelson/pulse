@@ -32,6 +32,7 @@ import 'package:pulse/graphql/__generated__/schema.schema.gql.dart'
         GPrincipalStatus,
         GSearchKind,
         GSendMessageInput,
+        GSetTagFeedSettingsInput,
         GSubscribeTagInput,
         GSubscriptionUrgency,
         GTagRootKind,
@@ -304,6 +305,7 @@ import 'package:pulse/graphql/operations/__generated__/posts.data.gql.dart'
         GPostSummaryData_referencedTags,
         GPostsForTagData,
         GPostsForTagData_tag,
+        GPostsForTagData_tag_myFeedSettings,
         GPostsForTagData_tag_posts,
         GPostsForTagData_tag_posts_edges,
         GPostsForTagData_tag_posts_edges_node,
@@ -319,6 +321,8 @@ import 'package:pulse/graphql/operations/__generated__/posts.data.gql.dart'
         GReactToPostData,
         GReactToPostData_reactToPost,
         GReactToPostData_reactToPost_reactions,
+        GSetTagFeedSettingsData,
+        GSetTagFeedSettingsData_setTagFeedSettings,
         GUnreactToPostData,
         GUnreactToPostData_unreactToPost,
         GUnreactToPostData_unreactToPost_reactions;
@@ -333,6 +337,7 @@ import 'package:pulse/graphql/operations/__generated__/posts.req.gql.dart'
         GPostSummaryReq,
         GPostsForTagReq,
         GReactToPostReq,
+        GSetTagFeedSettingsReq,
         GUnreactToPostReq;
 import 'package:pulse/graphql/operations/__generated__/posts.var.gql.dart'
     show
@@ -345,6 +350,7 @@ import 'package:pulse/graphql/operations/__generated__/posts.var.gql.dart'
         GPostSummaryVars,
         GPostsForTagVars,
         GReactToPostVars,
+        GSetTagFeedSettingsVars,
         GUnreactToPostVars;
 import 'package:pulse/graphql/operations/__generated__/search.data.gql.dart'
     show
@@ -644,6 +650,7 @@ final SerializersBuilder _serializersBuilder = _$serializers.toBuilder()
   GPostTagInput,
   GPostsForTagData,
   GPostsForTagData_tag,
+  GPostsForTagData_tag_myFeedSettings,
   GPostsForTagData_tag_posts,
   GPostsForTagData_tag_posts_edges,
   GPostsForTagData_tag_posts_edges_node,
@@ -699,6 +706,11 @@ final SerializersBuilder _serializersBuilder = _$serializers.toBuilder()
   GSendMessageInput,
   GSendMessageReq,
   GSendMessageVars,
+  GSetTagFeedSettingsData,
+  GSetTagFeedSettingsData_setTagFeedSettings,
+  GSetTagFeedSettingsInput,
+  GSetTagFeedSettingsReq,
+  GSetTagFeedSettingsVars,
   GSubscribeTagInput,
   GSubscriptionUrgency,
   GTagBySlugPathData,

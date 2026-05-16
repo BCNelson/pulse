@@ -9,6 +9,7 @@ import '../../core/ferry_client.dart';
 import '../../core/post_cache.dart';
 import '../../graphql/operations/__generated__/posts.data.gql.dart';
 import '../../graphql/operations/__generated__/posts.req.gql.dart';
+import 'feed_settings_controller.dart';
 
 /// Stale-while-revalidate provider for `PostsForTag`. Emits the
 /// drift-cached feed immediately, then kicks off a one-shot network
@@ -41,6 +42,10 @@ Future<void> _refetch(
     if (resp.hasErrors) return;
     final tag = resp.data?.tag;
     if (tag == null) return;
+    ref.read(feedSettingsProvider(tagId).notifier).hydrate(
+          includeSubTags: tag.myFeedSettings.includeDescendants,
+          hasChildren: tag.hasChildren,
+        );
     final entries = <({String cursor, GPostSummaryData node})>[];
     for (final e in tag.posts.edges) {
       // Force a true JSON bytes round-trip rather than a same-Dart-VM

@@ -199,6 +199,7 @@ type ComplexityRoot struct {
 		SendMessage              func(childComplexity int, input model.SendMessageInput) int
 		SetDecisionStatus        func(childComplexity int, postID string, status *model.DecisionStatus) int
 		SetDenyFlag              func(childComplexity int, postID string, deny bool) int
+		SetTagFeedSettings       func(childComplexity int, input model.SetTagFeedSettingsInput) int
 		SetTaskStatus            func(childComplexity int, taskID string, status model.TaskStatus) int
 		SubscribeTag             func(childComplexity int, input model.SubscribeTagInput) int
 		UnassignTask             func(childComplexity int, taskID string, principalID string) int
@@ -324,7 +325,7 @@ type ComplexityRoot struct {
 	Subscription struct {
 		MessageAdded         func(childComplexity int, roomID string) int
 		NotificationReceived func(childComplexity int) int
-		PostChanged          func(childComplexity int, tagID string) int
+		PostChanged          func(childComplexity int, tagID string, includeDescendants *bool) int
 		TagStructureChanged  func(childComplexity int, tagID string) int
 	}
 
@@ -337,14 +338,19 @@ type ComplexityRoot struct {
 		GlobalURI      func(childComplexity int) int
 		HasChildren    func(childComplexity int) int
 		ID             func(childComplexity int) int
+		MyFeedSettings func(childComplexity int) int
 		MyPermissions  func(childComplexity int) int
 		MySubscription func(childComplexity int) int
 		Parent         func(childComplexity int) int
 		Path           func(childComplexity int) int
-		Posts          func(childComplexity int, first *int, after *string, sort *model.PostSort) int
+		Posts          func(childComplexity int, first *int, after *string, sort *model.PostSort, includeDescendants *bool) int
 		RootKind       func(childComplexity int) int
 		Slug           func(childComplexity int) int
 		Tasks          func(childComplexity int, first *int, after *string, status *model.TaskStatus) int
+	}
+
+	TagFeedSettings struct {
+		IncludeDescendants func(childComplexity int) int
 	}
 
 	TagPermissions struct {
@@ -449,6 +455,7 @@ type MutationResolver interface {
 	RevokeTagGrant(ctx context.Context, tagID string, principalID string) (*model.Tag, error)
 	SubscribeTag(ctx context.Context, input model.SubscribeTagInput) (*model.TagSubscription, error)
 	UnsubscribeTag(ctx context.Context, tagID string) (bool, error)
+	SetTagFeedSettings(ctx context.Context, input model.SetTagFeedSettingsInput) (*model.TagFeedSettings, error)
 	CreatePost(ctx context.Context, input model.CreatePostInput) (*model.Post, error)
 	EditPost(ctx context.Context, input model.EditPostInput) (*model.Post, error)
 	DeletePost(ctx context.Context, postID string) (bool, error)
@@ -515,7 +522,7 @@ type QueryResolver interface {
 }
 type SubscriptionResolver interface {
 	MessageAdded(ctx context.Context, roomID string) (<-chan *model.Message, error)
-	PostChanged(ctx context.Context, tagID string) (<-chan *model.Post, error)
+	PostChanged(ctx context.Context, tagID string, includeDescendants *bool) (<-chan *model.Post, error)
 	TagStructureChanged(ctx context.Context, tagID string) (<-chan *model.TagStructureEvent, error)
 	NotificationReceived(ctx context.Context) (<-chan *model.Notification, error)
 }
@@ -523,7 +530,8 @@ type TagResolver interface {
 	Children(ctx context.Context, obj *model.Tag) ([]*model.Tag, error)
 	HasChildren(ctx context.Context, obj *model.Tag) (bool, error)
 
-	Posts(ctx context.Context, obj *model.Tag, first *int, after *string, sort *model.PostSort) (*model.PostConnection, error)
+	MyFeedSettings(ctx context.Context, obj *model.Tag) (*model.TagFeedSettings, error)
+	Posts(ctx context.Context, obj *model.Tag, first *int, after *string, sort *model.PostSort, includeDescendants *bool) (*model.PostConnection, error)
 	Tasks(ctx context.Context, obj *model.Tag, first *int, after *string, status *model.TaskStatus) (*model.TaskConnection, error)
 }
 type UserResolver interface {
@@ -1436,6 +1444,17 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Mutation.SetDenyFlag(childComplexity, args["postId"].(string), args["deny"].(bool)), true
+	case "Mutation.setTagFeedSettings":
+		if e.ComplexityRoot.Mutation.SetTagFeedSettings == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_setTagFeedSettings_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.ComplexityRoot.Mutation.SetTagFeedSettings(childComplexity, args["input"].(model.SetTagFeedSettingsInput)), true
 	case "Mutation.setTaskStatus":
 		if e.ComplexityRoot.Mutation.SetTaskStatus == nil {
 			break
@@ -2064,7 +2083,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Subscription.PostChanged(childComplexity, args["tagId"].(string)), true
+		return e.ComplexityRoot.Subscription.PostChanged(childComplexity, args["tagId"].(string), args["includeDescendants"].(*bool)), true
 	case "Subscription.tagStructureChanged":
 		if e.ComplexityRoot.Subscription.TagStructureChanged == nil {
 			break
@@ -2125,6 +2144,12 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Tag.ID(childComplexity), true
+	case "Tag.myFeedSettings":
+		if e.ComplexityRoot.Tag.MyFeedSettings == nil {
+			break
+		}
+
+		return e.ComplexityRoot.Tag.MyFeedSettings(childComplexity), true
 	case "Tag.myPermissions":
 		if e.ComplexityRoot.Tag.MyPermissions == nil {
 			break
@@ -2159,7 +2184,7 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 			return 0, false
 		}
 
-		return e.ComplexityRoot.Tag.Posts(childComplexity, args["first"].(*int), args["after"].(*string), args["sort"].(*model.PostSort)), true
+		return e.ComplexityRoot.Tag.Posts(childComplexity, args["first"].(*int), args["after"].(*string), args["sort"].(*model.PostSort), args["includeDescendants"].(*bool)), true
 	case "Tag.rootKind":
 		if e.ComplexityRoot.Tag.RootKind == nil {
 			break
@@ -2183,6 +2208,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.ComplexityRoot.Tag.Tasks(childComplexity, args["first"].(*int), args["after"].(*string), args["status"].(*model.TaskStatus)), true
+
+	case "TagFeedSettings.includeDescendants":
+		if e.ComplexityRoot.TagFeedSettings.IncludeDescendants == nil {
+			break
+		}
+
+		return e.ComplexityRoot.TagFeedSettings.IncludeDescendants(childComplexity), true
 
 	case "TagPermissions.bundle":
 		if e.ComplexityRoot.TagPermissions.Bundle == nil {
@@ -2513,6 +2545,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputNotificationFilter,
 		ec.unmarshalInputPostTagInput,
 		ec.unmarshalInputSendMessageInput,
+		ec.unmarshalInputSetTagFeedSettingsInput,
 		ec.unmarshalInputSubscribeTagInput,
 		ec.unmarshalInputTaskTagInput,
 	)
@@ -2767,6 +2800,17 @@ type TagSubscription {
   reasonFilter: [String!]!
 }
 
+# Per-viewer feed view preferences for a tag. Persisted via
+# setTagFeedSettings; unset rows fall back to defaults (all FALSE).
+type TagFeedSettings {
+  includeDescendants: Boolean!
+}
+
+input SetTagFeedSettingsInput {
+  tagId: ID!
+  includeDescendants: Boolean!
+}
+
 type Tag {
   id: ID!
   globalUri: String!
@@ -2782,7 +2826,8 @@ type Tag {
   createdAt: Time!
   myPermissions: TagPermissions!
   mySubscription: TagSubscription
-  posts(first: Int, after: String, sort: PostSort): PostConnection!
+  myFeedSettings: TagFeedSettings!
+  posts(first: Int, after: String, sort: PostSort, includeDescendants: Boolean): PostConnection!
   tasks(first: Int, after: String, status: TaskStatus): TaskConnection!
 }
 
@@ -3233,6 +3278,7 @@ type Mutation {
   revokeTagGrant(tagId: ID!, principalId: ID!): Tag!
   subscribeTag(input: SubscribeTagInput!): TagSubscription!
   unsubscribeTag(tagId: ID!): Boolean!
+  setTagFeedSettings(input: SetTagFeedSettingsInput!): TagFeedSettings!
 
   createPost(input: CreatePostInput!): Post!
   editPost(input: EditPostInput!): Post!
@@ -3324,8 +3370,10 @@ type Subscription {
   """
   Fires whenever a post visible to the viewer (under the named tag)
   changes. M3 emits on create only; M4 extends to update / delete.
+  When ` + "`" + `includeDescendants` + "`" + ` is true, also fires for posts attached to
+  any descendant of the named tag (via tag_closure).
   """
-  postChanged(tagId: ID!): Post!
+  postChanged(tagId: ID!, includeDescendants: Boolean): Post!
 
   """
   Fires when a tag is moved, renamed, or archived.
@@ -3766,12 +3814,22 @@ func (ec *executionContext) childFields_Tag(ctx context.Context, field graphql.C
 		return ec.fieldContext_Tag_myPermissions(ctx, field)
 	case "mySubscription":
 		return ec.fieldContext_Tag_mySubscription(ctx, field)
+	case "myFeedSettings":
+		return ec.fieldContext_Tag_myFeedSettings(ctx, field)
 	case "posts":
 		return ec.fieldContext_Tag_posts(ctx, field)
 	case "tasks":
 		return ec.fieldContext_Tag_tasks(ctx, field)
 	}
 	return nil, fmt.Errorf("no field named %q was found under type Tag", field.Name)
+}
+
+func (ec *executionContext) childFields_TagFeedSettings(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+	switch field.Name {
+	case "includeDescendants":
+		return ec.fieldContext_TagFeedSettings_includeDescendants(ctx, field)
+	}
+	return nil, fmt.Errorf("no field named %q was found under type TagFeedSettings", field.Name)
 }
 
 func (ec *executionContext) childFields_TagPermissions(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
@@ -4802,6 +4860,20 @@ func (ec *executionContext) field_Mutation_setDenyFlag_args(ctx context.Context,
 	return args, nil
 }
 
+func (ec *executionContext) field_Mutation_setTagFeedSettings_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
+	var err error
+	args := map[string]any{}
+	arg0, err := graphql.ProcessArgField(ctx, rawArgs, "input",
+		func(ctx context.Context, v any) (model.SetTagFeedSettingsInput, error) {
+			return ec.unmarshalNSetTagFeedSettingsInput2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐSetTagFeedSettingsInput(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["input"] = arg0
+	return args, nil
+}
+
 func (ec *executionContext) field_Mutation_setTaskStatus_args(ctx context.Context, rawArgs map[string]any) (map[string]any, error) {
 	var err error
 	args := map[string]any{}
@@ -5209,6 +5281,14 @@ func (ec *executionContext) field_Subscription_postChanged_args(ctx context.Cont
 		return nil, err
 	}
 	args["tagId"] = arg0
+	arg1, err := graphql.ProcessArgField(ctx, rawArgs, "includeDescendants",
+		func(ctx context.Context, v any) (*bool, error) {
+			return ec.unmarshalOBoolean2ᚖbool(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["includeDescendants"] = arg1
 	return args, nil
 }
 
@@ -5253,6 +5333,14 @@ func (ec *executionContext) field_Tag_posts_args(ctx context.Context, rawArgs ma
 		return nil, err
 	}
 	args["sort"] = arg2
+	arg3, err := graphql.ProcessArgField(ctx, rawArgs, "includeDescendants",
+		func(ctx context.Context, v any) (*bool, error) {
+			return ec.unmarshalOBoolean2ᚖbool(ctx, v)
+		})
+	if err != nil {
+		return nil, err
+	}
+	args["includeDescendants"] = arg3
 	return args, nil
 }
 
@@ -7676,6 +7764,50 @@ func (ec *executionContext) fieldContext_Mutation_unsubscribeTag(ctx context.Con
 	}()
 	ctx = graphql.WithFieldContext(ctx, fc)
 	if fc.Args, err = ec.field_Mutation_unsubscribeTag_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return fc, err
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Mutation_setTagFeedSettings(ctx context.Context, field graphql.CollectedField) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Mutation_setTagFeedSettings(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			fc := graphql.GetFieldContext(ctx)
+			return ec.Resolvers.Mutation().SetTagFeedSettings(ctx, fc.Args["input"].(model.SetTagFeedSettingsInput))
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.TagFeedSettings) graphql.Marshaler {
+			return ec.marshalNTagFeedSettings2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐTagFeedSettings(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Mutation_setTagFeedSettings(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Mutation",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_TagFeedSettings(ctx, field)
+		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Mutation_setTagFeedSettings_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
 		ec.Error(ctx, err)
 		return fc, err
 	}
@@ -11659,7 +11791,7 @@ func (ec *executionContext) _Subscription_postChanged(ctx context.Context, field
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Subscription().PostChanged(ctx, fc.Args["tagId"].(string))
+			return ec.Resolvers.Subscription().PostChanged(ctx, fc.Args["tagId"].(string), fc.Args["includeDescendants"].(*bool))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v *model.Post) graphql.Marshaler {
@@ -12127,6 +12259,38 @@ func (ec *executionContext) fieldContext_Tag_mySubscription(_ context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Tag_myFeedSettings(ctx context.Context, field graphql.CollectedField, obj *model.Tag) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_Tag_myFeedSettings(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return ec.Resolvers.Tag().MyFeedSettings(ctx, obj)
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v *model.TagFeedSettings) graphql.Marshaler {
+			return ec.marshalNTagFeedSettings2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐTagFeedSettings(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_Tag_myFeedSettings(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Tag",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: true,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.childFields_TagFeedSettings(ctx, field)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Tag_posts(ctx context.Context, field graphql.CollectedField, obj *model.Tag) (ret graphql.Marshaler) {
 	return graphql.ResolveField(
 		ctx,
@@ -12137,7 +12301,7 @@ func (ec *executionContext) _Tag_posts(ctx context.Context, field graphql.Collec
 		},
 		func(ctx context.Context) (any, error) {
 			fc := graphql.GetFieldContext(ctx)
-			return ec.Resolvers.Tag().Posts(ctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*string), fc.Args["sort"].(*model.PostSort))
+			return ec.Resolvers.Tag().Posts(ctx, obj, fc.Args["first"].(*int), fc.Args["after"].(*string), fc.Args["sort"].(*model.PostSort), fc.Args["includeDescendants"].(*bool))
 		},
 		nil,
 		func(ctx context.Context, selections ast.SelectionSet, v *model.PostConnection) graphql.Marshaler {
@@ -12213,6 +12377,29 @@ func (ec *executionContext) fieldContext_Tag_tasks(ctx context.Context, field gr
 		return fc, err
 	}
 	return fc, nil
+}
+
+func (ec *executionContext) _TagFeedSettings_includeDescendants(ctx context.Context, field graphql.CollectedField, obj *model.TagFeedSettings) (ret graphql.Marshaler) {
+	return graphql.ResolveField(
+		ctx,
+		ec.OperationContext,
+		field,
+		func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return ec.fieldContext_TagFeedSettings_includeDescendants(ctx, field)
+		},
+		func(ctx context.Context) (any, error) {
+			return obj.IncludeDescendants, nil
+		},
+		nil,
+		func(ctx context.Context, selections ast.SelectionSet, v bool) graphql.Marshaler {
+			return ec.marshalNBoolean2bool(ctx, selections, v)
+		},
+		true,
+		true,
+	)
+}
+func (ec *executionContext) fieldContext_TagFeedSettings_includeDescendants(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	return graphql.NewScalarFieldContext("TagFeedSettings", field, false, false, errors.New("field of type Boolean does not have child fields"))
 }
 
 func (ec *executionContext) _TagPermissions_bundle(ctx context.Context, field graphql.CollectedField, obj *model.TagPermissions) (ret graphql.Marshaler) {
@@ -15123,6 +15310,43 @@ func (ec *executionContext) unmarshalInputSendMessageInput(ctx context.Context, 
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputSetTagFeedSettingsInput(ctx context.Context, obj any) (model.SetTagFeedSettingsInput, error) {
+	var it model.SetTagFeedSettingsInput
+	if obj == nil {
+		return it, nil
+	}
+
+	asMap := map[string]any{}
+	for k, v := range obj.(map[string]any) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"tagId", "includeDescendants"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "tagId":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tagId"))
+			data, err := ec.unmarshalNID2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.TagID = data
+		case "includeDescendants":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("includeDescendants"))
+			data, err := ec.unmarshalNBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.IncludeDescendants = data
+		}
+	}
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputSubscribeTagInput(ctx context.Context, obj any) (model.SubscribeTagInput, error) {
 	var it model.SubscribeTagInput
 	if obj == nil {
@@ -16298,6 +16522,13 @@ func (ec *executionContext) _Mutation(ctx context.Context, sel ast.SelectionSet)
 		case "unsubscribeTag":
 			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._Mutation_unsubscribeTag(ctx, field)
+			})
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
+		case "setTagFeedSettings":
+			out.Values[i] = ec.OperationContext.RootResolverMiddleware(innerCtx, func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._Mutation_setTagFeedSettings(ctx, field)
 			})
 			if out.Values[i] == graphql.Null {
 				out.Invalids++
@@ -17856,6 +18087,42 @@ func (ec *executionContext) _Tag(ctx context.Context, sel ast.SelectionSet, obj 
 			}
 		case "mySubscription":
 			out.Values[i] = ec._Tag_mySubscription(ctx, field, obj)
+		case "myFeedSettings":
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Tag_myFeedSettings(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
+			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "posts":
 			field := field
 
@@ -17928,6 +18195,45 @@ func (ec *executionContext) _Tag(ctx context.Context, sel ast.SelectionSet, obj 
 			}
 
 			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch(ctx)
+	if out.Invalids > 0 {
+		return graphql.Null
+	}
+
+	atomic.AddInt32(&ec.Deferred, int32(min(len(deferred), math.MaxInt32)))
+
+	for label, dfs := range deferred {
+		ec.ProcessDeferredGroup(graphql.DeferredGroup{
+			Label:    label,
+			Path:     graphql.GetPath(ctx),
+			FieldSet: dfs,
+			Context:  ctx,
+		})
+	}
+
+	return out
+}
+
+var tagFeedSettingsImplementors = []string{"TagFeedSettings"}
+
+func (ec *executionContext) _TagFeedSettings(ctx context.Context, sel ast.SelectionSet, obj *model.TagFeedSettings) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, tagFeedSettingsImplementors)
+
+	out := graphql.NewFieldSet(fields)
+	deferred := make(map[string]*graphql.FieldSet)
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("TagFeedSettings")
+		case "includeDescendants":
+			out.Values[i] = ec._TagFeedSettings_includeDescendants(ctx, field, obj)
+			if out.Values[i] == graphql.Null {
+				out.Invalids++
+			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -19624,6 +19930,11 @@ func (ec *executionContext) unmarshalNSendMessageInput2githubᚗcomᚋbcnelson�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) unmarshalNSetTagFeedSettingsInput2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐSetTagFeedSettingsInput(ctx context.Context, v any) (model.SetTagFeedSettingsInput, error) {
+	res, err := ec.unmarshalInputSetTagFeedSettingsInput(ctx, v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNString2string(ctx context.Context, v any) (string, error) {
 	res, err := graphql.UnmarshalString(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -19713,6 +20024,20 @@ func (ec *executionContext) marshalNTag2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋser
 		return graphql.Null
 	}
 	return ec._Tag(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNTagFeedSettings2githubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐTagFeedSettings(ctx context.Context, sel ast.SelectionSet, v model.TagFeedSettings) graphql.Marshaler {
+	return ec._TagFeedSettings(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNTagFeedSettings2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐTagFeedSettings(ctx context.Context, sel ast.SelectionSet, v *model.TagFeedSettings) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			graphql.AddErrorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._TagFeedSettings(ctx, sel, v)
 }
 
 func (ec *executionContext) marshalNTagPermissions2ᚖgithubᚗcomᚋbcnelsonᚋpulseᚋservicesᚋapiᚋinternalᚋgraphqlᚋmodelᚐTagPermissions(ctx context.Context, sel ast.SelectionSet, v *model.TagPermissions) graphql.Marshaler {

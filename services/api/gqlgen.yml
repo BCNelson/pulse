@@ -45,6 +45,8 @@ models:
         resolver: true
       tasks:
         resolver: true
+      myFeedSettings:
+        resolver: true
   Post:
     fields:
       comments:

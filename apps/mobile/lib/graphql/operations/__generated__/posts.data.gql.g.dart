@@ -10,6 +10,9 @@ Serializer<GPostsForTagData> _$gPostsForTagDataSerializer =
     _$GPostsForTagDataSerializer();
 Serializer<GPostsForTagData_tag> _$gPostsForTagDataTagSerializer =
     _$GPostsForTagData_tagSerializer();
+Serializer<GPostsForTagData_tag_myFeedSettings>
+    _$gPostsForTagDataTagMyFeedSettingsSerializer =
+    _$GPostsForTagData_tag_myFeedSettingsSerializer();
 Serializer<GPostsForTagData_tag_posts> _$gPostsForTagDataTagPostsSerializer =
     _$GPostsForTagData_tag_postsSerializer();
 Serializer<GPostsForTagData_tag_posts_edges>
@@ -208,6 +211,11 @@ Serializer<GPostChangedData_postChanged_comments_edges>
 Serializer<GPostChangedData_postChanged_comments_edges_node>
     _$gPostChangedDataPostChangedCommentsEdgesNodeSerializer =
     _$GPostChangedData_postChanged_comments_edges_nodeSerializer();
+Serializer<GSetTagFeedSettingsData> _$gSetTagFeedSettingsDataSerializer =
+    _$GSetTagFeedSettingsDataSerializer();
+Serializer<GSetTagFeedSettingsData_setTagFeedSettings>
+    _$gSetTagFeedSettingsDataSetTagFeedSettingsSerializer =
+    _$GSetTagFeedSettingsData_setTagFeedSettingsSerializer();
 Serializer<GPostSummaryData> _$gPostSummaryDataSerializer =
     _$GPostSummaryDataSerializer();
 Serializer<GPostSummaryData_author> _$gPostSummaryDataAuthorSerializer =
@@ -334,6 +342,12 @@ class _$GPostsForTagData_tagSerializer
           specifiedType: const FullType(String)),
       'path',
       serializers.serialize(object.path, specifiedType: const FullType(String)),
+      'hasChildren',
+      serializers.serialize(object.hasChildren,
+          specifiedType: const FullType(bool)),
+      'myFeedSettings',
+      serializers.serialize(object.myFeedSettings,
+          specifiedType: const FullType(GPostsForTagData_tag_myFeedSettings)),
       'posts',
       serializers.serialize(object.posts,
           specifiedType: const FullType(GPostsForTagData_tag_posts)),
@@ -374,10 +388,73 @@ class _$GPostsForTagData_tagSerializer
           result.path = serializers.deserialize(value,
               specifiedType: const FullType(String))! as String;
           break;
+        case 'hasChildren':
+          result.hasChildren = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
+          break;
+        case 'myFeedSettings':
+          result.myFeedSettings.replace(serializers.deserialize(value,
+                  specifiedType:
+                      const FullType(GPostsForTagData_tag_myFeedSettings))!
+              as GPostsForTagData_tag_myFeedSettings);
+          break;
         case 'posts':
           result.posts.replace(serializers.deserialize(value,
                   specifiedType: const FullType(GPostsForTagData_tag_posts))!
               as GPostsForTagData_tag_posts);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GPostsForTagData_tag_myFeedSettingsSerializer
+    implements StructuredSerializer<GPostsForTagData_tag_myFeedSettings> {
+  @override
+  final Iterable<Type> types = const [
+    GPostsForTagData_tag_myFeedSettings,
+    _$GPostsForTagData_tag_myFeedSettings
+  ];
+  @override
+  final String wireName = 'GPostsForTagData_tag_myFeedSettings';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GPostsForTagData_tag_myFeedSettings object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'includeDescendants',
+      serializers.serialize(object.includeDescendants,
+          specifiedType: const FullType(bool)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GPostsForTagData_tag_myFeedSettings deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GPostsForTagData_tag_myFeedSettingsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'includeDescendants':
+          result.includeDescendants = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
           break;
       }
     }
@@ -5384,6 +5461,116 @@ class _$GPostChangedData_postChanged_comments_edges_nodeSerializer
   }
 }
 
+class _$GSetTagFeedSettingsDataSerializer
+    implements StructuredSerializer<GSetTagFeedSettingsData> {
+  @override
+  final Iterable<Type> types = const [
+    GSetTagFeedSettingsData,
+    _$GSetTagFeedSettingsData
+  ];
+  @override
+  final String wireName = 'GSetTagFeedSettingsData';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GSetTagFeedSettingsData object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'setTagFeedSettings',
+      serializers.serialize(object.setTagFeedSettings,
+          specifiedType:
+              const FullType(GSetTagFeedSettingsData_setTagFeedSettings)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GSetTagFeedSettingsData deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSetTagFeedSettingsDataBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'setTagFeedSettings':
+          result.setTagFeedSettings.replace(serializers.deserialize(value,
+                  specifiedType: const FullType(
+                      GSetTagFeedSettingsData_setTagFeedSettings))!
+              as GSetTagFeedSettingsData_setTagFeedSettings);
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
+class _$GSetTagFeedSettingsData_setTagFeedSettingsSerializer
+    implements
+        StructuredSerializer<GSetTagFeedSettingsData_setTagFeedSettings> {
+  @override
+  final Iterable<Type> types = const [
+    GSetTagFeedSettingsData_setTagFeedSettings,
+    _$GSetTagFeedSettingsData_setTagFeedSettings
+  ];
+  @override
+  final String wireName = 'GSetTagFeedSettingsData_setTagFeedSettings';
+
+  @override
+  Iterable<Object?> serialize(Serializers serializers,
+      GSetTagFeedSettingsData_setTagFeedSettings object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      '__typename',
+      serializers.serialize(object.G__typename,
+          specifiedType: const FullType(String)),
+      'includeDescendants',
+      serializers.serialize(object.includeDescendants,
+          specifiedType: const FullType(bool)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GSetTagFeedSettingsData_setTagFeedSettings deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSetTagFeedSettingsData_setTagFeedSettingsBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case '__typename':
+          result.G__typename = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'includeDescendants':
+          result.includeDescendants = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
+          break;
+      }
+    }
+
+    return result.build();
+  }
+}
+
 class _$GPostSummaryDataSerializer
     implements StructuredSerializer<GPostSummaryData> {
   @override
@@ -6757,6 +6944,10 @@ class _$GPostsForTagData_tag extends GPostsForTagData_tag {
   @override
   final String path;
   @override
+  final bool hasChildren;
+  @override
+  final GPostsForTagData_tag_myFeedSettings myFeedSettings;
+  @override
   final GPostsForTagData_tag_posts posts;
 
   factory _$GPostsForTagData_tag(
@@ -6769,6 +6960,8 @@ class _$GPostsForTagData_tag extends GPostsForTagData_tag {
       required this.slug,
       required this.displayName,
       required this.path,
+      required this.hasChildren,
+      required this.myFeedSettings,
       required this.posts})
       : super._();
   @override
@@ -6789,6 +6982,8 @@ class _$GPostsForTagData_tag extends GPostsForTagData_tag {
         slug == other.slug &&
         displayName == other.displayName &&
         path == other.path &&
+        hasChildren == other.hasChildren &&
+        myFeedSettings == other.myFeedSettings &&
         posts == other.posts;
   }
 
@@ -6800,6 +6995,8 @@ class _$GPostsForTagData_tag extends GPostsForTagData_tag {
     _$hash = $jc(_$hash, slug.hashCode);
     _$hash = $jc(_$hash, displayName.hashCode);
     _$hash = $jc(_$hash, path.hashCode);
+    _$hash = $jc(_$hash, hasChildren.hashCode);
+    _$hash = $jc(_$hash, myFeedSettings.hashCode);
     _$hash = $jc(_$hash, posts.hashCode);
     _$hash = $jf(_$hash);
     return _$hash;
@@ -6813,6 +7010,8 @@ class _$GPostsForTagData_tag extends GPostsForTagData_tag {
           ..add('slug', slug)
           ..add('displayName', displayName)
           ..add('path', path)
+          ..add('hasChildren', hasChildren)
+          ..add('myFeedSettings', myFeedSettings)
           ..add('posts', posts))
         .toString();
   }
@@ -6842,6 +7041,17 @@ class GPostsForTagData_tagBuilder
   String? get path => _$this._path;
   set path(String? path) => _$this._path = path;
 
+  bool? _hasChildren;
+  bool? get hasChildren => _$this._hasChildren;
+  set hasChildren(bool? hasChildren) => _$this._hasChildren = hasChildren;
+
+  GPostsForTagData_tag_myFeedSettingsBuilder? _myFeedSettings;
+  GPostsForTagData_tag_myFeedSettingsBuilder get myFeedSettings =>
+      _$this._myFeedSettings ??= GPostsForTagData_tag_myFeedSettingsBuilder();
+  set myFeedSettings(
+          GPostsForTagData_tag_myFeedSettingsBuilder? myFeedSettings) =>
+      _$this._myFeedSettings = myFeedSettings;
+
   GPostsForTagData_tag_postsBuilder? _posts;
   GPostsForTagData_tag_postsBuilder get posts =>
       _$this._posts ??= GPostsForTagData_tag_postsBuilder();
@@ -6859,6 +7069,8 @@ class GPostsForTagData_tagBuilder
       _slug = $v.slug;
       _displayName = $v.displayName;
       _path = $v.path;
+      _hasChildren = $v.hasChildren;
+      _myFeedSettings = $v.myFeedSettings.toBuilder();
       _posts = $v.posts.toBuilder();
       _$v = null;
     }
@@ -6893,11 +7105,16 @@ class GPostsForTagData_tagBuilder
                 displayName, r'GPostsForTagData_tag', 'displayName'),
             path: BuiltValueNullFieldError.checkNotNull(
                 path, r'GPostsForTagData_tag', 'path'),
+            hasChildren: BuiltValueNullFieldError.checkNotNull(
+                hasChildren, r'GPostsForTagData_tag', 'hasChildren'),
+            myFeedSettings: myFeedSettings.build(),
             posts: posts.build(),
           );
     } catch (_) {
       late String _$failedField;
       try {
+        _$failedField = 'myFeedSettings';
+        myFeedSettings.build();
         _$failedField = 'posts';
         posts.build();
       } catch (e) {
@@ -6906,6 +7123,114 @@ class GPostsForTagData_tagBuilder
       }
       rethrow;
     }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GPostsForTagData_tag_myFeedSettings
+    extends GPostsForTagData_tag_myFeedSettings {
+  @override
+  final String G__typename;
+  @override
+  final bool includeDescendants;
+
+  factory _$GPostsForTagData_tag_myFeedSettings(
+          [void Function(GPostsForTagData_tag_myFeedSettingsBuilder)?
+              updates]) =>
+      (GPostsForTagData_tag_myFeedSettingsBuilder()..update(updates))._build();
+
+  _$GPostsForTagData_tag_myFeedSettings._(
+      {required this.G__typename, required this.includeDescendants})
+      : super._();
+  @override
+  GPostsForTagData_tag_myFeedSettings rebuild(
+          void Function(GPostsForTagData_tag_myFeedSettingsBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GPostsForTagData_tag_myFeedSettingsBuilder toBuilder() =>
+      GPostsForTagData_tag_myFeedSettingsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GPostsForTagData_tag_myFeedSettings &&
+        G__typename == other.G__typename &&
+        includeDescendants == other.includeDescendants;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, includeDescendants.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GPostsForTagData_tag_myFeedSettings')
+          ..add('G__typename', G__typename)
+          ..add('includeDescendants', includeDescendants))
+        .toString();
+  }
+}
+
+class GPostsForTagData_tag_myFeedSettingsBuilder
+    implements
+        Builder<GPostsForTagData_tag_myFeedSettings,
+            GPostsForTagData_tag_myFeedSettingsBuilder> {
+  _$GPostsForTagData_tag_myFeedSettings? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  bool? _includeDescendants;
+  bool? get includeDescendants => _$this._includeDescendants;
+  set includeDescendants(bool? includeDescendants) =>
+      _$this._includeDescendants = includeDescendants;
+
+  GPostsForTagData_tag_myFeedSettingsBuilder() {
+    GPostsForTagData_tag_myFeedSettings._initializeBuilder(this);
+  }
+
+  GPostsForTagData_tag_myFeedSettingsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _includeDescendants = $v.includeDescendants;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GPostsForTagData_tag_myFeedSettings other) {
+    _$v = other as _$GPostsForTagData_tag_myFeedSettings;
+  }
+
+  @override
+  void update(
+      void Function(GPostsForTagData_tag_myFeedSettingsBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GPostsForTagData_tag_myFeedSettings build() => _build();
+
+  _$GPostsForTagData_tag_myFeedSettings _build() {
+    final _$result = _$v ??
+        _$GPostsForTagData_tag_myFeedSettings._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GPostsForTagData_tag_myFeedSettings', 'G__typename'),
+          includeDescendants: BuiltValueNullFieldError.checkNotNull(
+              includeDescendants,
+              r'GPostsForTagData_tag_myFeedSettings',
+              'includeDescendants'),
+        );
     replace(_$result);
     return _$result;
   }
@@ -17124,6 +17449,236 @@ class GPostChangedData_postChanged_comments_edges_nodeBuilder
               'G__typename'),
           id: BuiltValueNullFieldError.checkNotNull(
               id, r'GPostChangedData_postChanged_comments_edges_node', 'id'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSetTagFeedSettingsData extends GSetTagFeedSettingsData {
+  @override
+  final String G__typename;
+  @override
+  final GSetTagFeedSettingsData_setTagFeedSettings setTagFeedSettings;
+
+  factory _$GSetTagFeedSettingsData(
+          [void Function(GSetTagFeedSettingsDataBuilder)? updates]) =>
+      (GSetTagFeedSettingsDataBuilder()..update(updates))._build();
+
+  _$GSetTagFeedSettingsData._(
+      {required this.G__typename, required this.setTagFeedSettings})
+      : super._();
+  @override
+  GSetTagFeedSettingsData rebuild(
+          void Function(GSetTagFeedSettingsDataBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSetTagFeedSettingsDataBuilder toBuilder() =>
+      GSetTagFeedSettingsDataBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSetTagFeedSettingsData &&
+        G__typename == other.G__typename &&
+        setTagFeedSettings == other.setTagFeedSettings;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, setTagFeedSettings.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GSetTagFeedSettingsData')
+          ..add('G__typename', G__typename)
+          ..add('setTagFeedSettings', setTagFeedSettings))
+        .toString();
+  }
+}
+
+class GSetTagFeedSettingsDataBuilder
+    implements
+        Builder<GSetTagFeedSettingsData, GSetTagFeedSettingsDataBuilder> {
+  _$GSetTagFeedSettingsData? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  GSetTagFeedSettingsData_setTagFeedSettingsBuilder? _setTagFeedSettings;
+  GSetTagFeedSettingsData_setTagFeedSettingsBuilder get setTagFeedSettings =>
+      _$this._setTagFeedSettings ??=
+          GSetTagFeedSettingsData_setTagFeedSettingsBuilder();
+  set setTagFeedSettings(
+          GSetTagFeedSettingsData_setTagFeedSettingsBuilder?
+              setTagFeedSettings) =>
+      _$this._setTagFeedSettings = setTagFeedSettings;
+
+  GSetTagFeedSettingsDataBuilder() {
+    GSetTagFeedSettingsData._initializeBuilder(this);
+  }
+
+  GSetTagFeedSettingsDataBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _setTagFeedSettings = $v.setTagFeedSettings.toBuilder();
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSetTagFeedSettingsData other) {
+    _$v = other as _$GSetTagFeedSettingsData;
+  }
+
+  @override
+  void update(void Function(GSetTagFeedSettingsDataBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSetTagFeedSettingsData build() => _build();
+
+  _$GSetTagFeedSettingsData _build() {
+    _$GSetTagFeedSettingsData _$result;
+    try {
+      _$result = _$v ??
+          _$GSetTagFeedSettingsData._(
+            G__typename: BuiltValueNullFieldError.checkNotNull(
+                G__typename, r'GSetTagFeedSettingsData', 'G__typename'),
+            setTagFeedSettings: setTagFeedSettings.build(),
+          );
+    } catch (_) {
+      late String _$failedField;
+      try {
+        _$failedField = 'setTagFeedSettings';
+        setTagFeedSettings.build();
+      } catch (e) {
+        throw BuiltValueNestedFieldError(
+            r'GSetTagFeedSettingsData', _$failedField, e.toString());
+      }
+      rethrow;
+    }
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSetTagFeedSettingsData_setTagFeedSettings
+    extends GSetTagFeedSettingsData_setTagFeedSettings {
+  @override
+  final String G__typename;
+  @override
+  final bool includeDescendants;
+
+  factory _$GSetTagFeedSettingsData_setTagFeedSettings(
+          [void Function(GSetTagFeedSettingsData_setTagFeedSettingsBuilder)?
+              updates]) =>
+      (GSetTagFeedSettingsData_setTagFeedSettingsBuilder()..update(updates))
+          ._build();
+
+  _$GSetTagFeedSettingsData_setTagFeedSettings._(
+      {required this.G__typename, required this.includeDescendants})
+      : super._();
+  @override
+  GSetTagFeedSettingsData_setTagFeedSettings rebuild(
+          void Function(GSetTagFeedSettingsData_setTagFeedSettingsBuilder)
+              updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSetTagFeedSettingsData_setTagFeedSettingsBuilder toBuilder() =>
+      GSetTagFeedSettingsData_setTagFeedSettingsBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSetTagFeedSettingsData_setTagFeedSettings &&
+        G__typename == other.G__typename &&
+        includeDescendants == other.includeDescendants;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, G__typename.hashCode);
+    _$hash = $jc(_$hash, includeDescendants.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(
+            r'GSetTagFeedSettingsData_setTagFeedSettings')
+          ..add('G__typename', G__typename)
+          ..add('includeDescendants', includeDescendants))
+        .toString();
+  }
+}
+
+class GSetTagFeedSettingsData_setTagFeedSettingsBuilder
+    implements
+        Builder<GSetTagFeedSettingsData_setTagFeedSettings,
+            GSetTagFeedSettingsData_setTagFeedSettingsBuilder> {
+  _$GSetTagFeedSettingsData_setTagFeedSettings? _$v;
+
+  String? _G__typename;
+  String? get G__typename => _$this._G__typename;
+  set G__typename(String? G__typename) => _$this._G__typename = G__typename;
+
+  bool? _includeDescendants;
+  bool? get includeDescendants => _$this._includeDescendants;
+  set includeDescendants(bool? includeDescendants) =>
+      _$this._includeDescendants = includeDescendants;
+
+  GSetTagFeedSettingsData_setTagFeedSettingsBuilder() {
+    GSetTagFeedSettingsData_setTagFeedSettings._initializeBuilder(this);
+  }
+
+  GSetTagFeedSettingsData_setTagFeedSettingsBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _G__typename = $v.G__typename;
+      _includeDescendants = $v.includeDescendants;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSetTagFeedSettingsData_setTagFeedSettings other) {
+    _$v = other as _$GSetTagFeedSettingsData_setTagFeedSettings;
+  }
+
+  @override
+  void update(
+      void Function(GSetTagFeedSettingsData_setTagFeedSettingsBuilder)?
+          updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSetTagFeedSettingsData_setTagFeedSettings build() => _build();
+
+  _$GSetTagFeedSettingsData_setTagFeedSettings _build() {
+    final _$result = _$v ??
+        _$GSetTagFeedSettingsData_setTagFeedSettings._(
+          G__typename: BuiltValueNullFieldError.checkNotNull(G__typename,
+              r'GSetTagFeedSettingsData_setTagFeedSettings', 'G__typename'),
+          includeDescendants: BuiltValueNullFieldError.checkNotNull(
+              includeDescendants,
+              r'GSetTagFeedSettingsData_setTagFeedSettings',
+              'includeDescendants'),
         );
     replace(_$result);
     return _$result;

@@ -136,6 +136,82 @@ func TestReactTallyAndIdempotency(t *testing.T) {
 	}
 }
 
+func TestListByTagIncludeDescendants(t *testing.T) {
+	pool := pgtest.Pool(t)
+	svc := &post.Service{DB: pool}
+	tags := &tag.Service{DB: pool}
+
+	alice := mustCreatePrincipal(t, pool, "Alice")
+	root := mustCreateRoot(t, tags, "org")
+	childA, err := tags.Create(context.Background(), tag.CreateInput{
+		ParentID: &root, Slug: "a", DisplayName: "A", RootKind: tag.RootKindOrg,
+	})
+	if err != nil {
+		t.Fatalf("create childA: %v", err)
+	}
+	childB, err := tags.Create(context.Background(), tag.CreateInput{
+		ParentID: &root, Slug: "b", DisplayName: "B", RootKind: tag.RootKindOrg,
+	})
+	if err != nil {
+		t.Fatalf("create childB: %v", err)
+	}
+
+	pRoot, err := svc.Create(context.Background(), post.CreateInput{
+		AuthorID: alice, Title: "root", Body: "r",
+		Tags: []post.TagAttachment{{TagID: root, ViewRole: true, InteractRole: true, ModerateRole: true}},
+	})
+	if err != nil {
+		t.Fatalf("create root post: %v", err)
+	}
+	pA, err := svc.Create(context.Background(), post.CreateInput{
+		AuthorID: alice, Title: "a", Body: "a",
+		Tags: []post.TagAttachment{{TagID: childA, ViewRole: true, InteractRole: true, ModerateRole: true}},
+	})
+	if err != nil {
+		t.Fatalf("create child A post: %v", err)
+	}
+	pB, err := svc.Create(context.Background(), post.CreateInput{
+		AuthorID: alice, Title: "b", Body: "b",
+		Tags: []post.TagAttachment{{TagID: childB, ViewRole: true, InteractRole: true, ModerateRole: true}},
+	})
+	if err != nil {
+		t.Fatalf("create child B post: %v", err)
+	}
+
+	// Default: root tag returns only the root-attached post.
+	posts, err := svc.ListByTag(context.Background(), root, false, 50)
+	if err != nil {
+		t.Fatalf("list shallow: %v", err)
+	}
+	if len(posts) != 1 || posts[0].ID != pRoot {
+		t.Errorf("shallow list mismatch: got %+v want only [%d]", postIDs(posts), pRoot)
+	}
+
+	// With includeDescendants: covers the closure subtree.
+	posts, err = svc.ListByTag(context.Background(), root, true, 50)
+	if err != nil {
+		t.Fatalf("list deep: %v", err)
+	}
+	got := postIDs(posts)
+	want := map[int64]bool{pRoot: true, pA: true, pB: true}
+	if len(got) != 3 {
+		t.Fatalf("deep list size: got %v want 3", got)
+	}
+	for _, id := range got {
+		if !want[id] {
+			t.Errorf("unexpected post id %d in deep list", id)
+		}
+	}
+}
+
+func postIDs(posts []*post.Post) []int64 {
+	out := make([]int64, 0, len(posts))
+	for _, p := range posts {
+		out = append(out, p.ID)
+	}
+	return out
+}
+
 // --- helpers ---
 
 func mustCreatePrincipal(t *testing.T, pool *pgxpool.Pool, name string) int64 {

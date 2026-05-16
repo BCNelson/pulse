@@ -11,6 +11,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/bcnelson/pulse/services/api/internal/audit"
@@ -397,6 +398,48 @@ func (r *mutationResolver) UnsubscribeTag(ctx context.Context, tagID string) (bo
 		return false, err
 	}
 	return true, nil
+}
+
+// SetTagFeedSettings is the resolver for the setTagFeedSettings field.
+func (r *mutationResolver) SetTagFeedSettings(ctx context.Context, input model.SetTagFeedSettingsInput) (*model.TagFeedSettings, error) {
+	identity, err := requireIdentity(ctx)
+	if err != nil {
+		return nil, err
+	}
+	tagID, err := r.resolveTagRef(ctx, input.TagID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tagId: %w", err)
+	}
+	if tagID == 0 {
+		return nil, fmt.Errorf("tag not found")
+	}
+	can, err := r.Perm.Can(ctx, identity.EffectiveID, perm.ActionView, tagID)
+	if err != nil {
+		return nil, err
+	}
+	if !can {
+		return nil, errPermissionDenied
+	}
+	// Sparse: collapse to defaults by deleting the row outright. Keeps
+	// "is descendants on?" a single EXISTS-style read.
+	if !input.IncludeDescendants {
+		if _, err := r.DB.Exec(ctx,
+			`DELETE FROM tag_view_prefs WHERE principal_id = $1 AND tag_id = $2`,
+			identity.EffectiveID, tagID); err != nil {
+			return nil, err
+		}
+		return &model.TagFeedSettings{IncludeDescendants: false}, nil
+	}
+	if _, err := r.DB.Exec(ctx, `
+        INSERT INTO tag_view_prefs (principal_id, tag_id, include_descendants, updated_at)
+        VALUES ($1, $2, $3, now())
+        ON CONFLICT (principal_id, tag_id) DO UPDATE
+            SET include_descendants = EXCLUDED.include_descendants,
+                updated_at = now()
+    `, identity.EffectiveID, tagID, input.IncludeDescendants); err != nil {
+		return nil, err
+	}
+	return &model.TagFeedSettings{IncludeDescendants: input.IncludeDescendants}, nil
 }
 
 // CreatePost is the resolver for the createPost field.
@@ -2036,7 +2079,7 @@ func (r *subscriptionResolver) MessageAdded(ctx context.Context, roomID string) 
 }
 
 // PostChanged is the resolver for the postChanged field.
-func (r *subscriptionResolver) PostChanged(ctx context.Context, tagID string) (<-chan *model.Post, error) {
+func (r *subscriptionResolver) PostChanged(ctx context.Context, tagID string, includeDescendants *bool) (<-chan *model.Post, error) {
 	identity, err := requireIdentity(ctx)
 	if err != nil {
 		return nil, err
@@ -2052,45 +2095,103 @@ func (r *subscriptionResolver) PostChanged(ctx context.Context, tagID string) (<
 	if !can {
 		return nil, errPermissionDenied
 	}
+
+	// Resolve the set of tag topics to subscribe to. With includeDescendants
+	// we cover the full closure subtree (self included at depth 0). The
+	// realtime dispatcher routes by exact topic, so we fan out subscriber-
+	// side rather than asking publishers to fan out per write.
+	//
+	// Explicit arg overrides the viewer's saved pref; nil means "use
+	// whatever they saved" (default false).
+	incDesc := false
+	if includeDescendants != nil {
+		incDesc = *includeDescendants
+	} else {
+		settings, err := r.loadFeedSettings(ctx, identity.EffectiveID, tid)
+		if err != nil {
+			return nil, err
+		}
+		incDesc = settings.IncludeDescendants
+	}
+	topicTagIDs := []int64{tid}
+	if incDesc {
+		topicTagIDs, err = r.descendantTagIDs(ctx, tid)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	out := make(chan *model.Post, 4)
-	sub := r.Realtime.Subscribe("posts.tag." + ids.FormatID(tid))
-	go func() {
-		defer close(out)
-		defer sub.Close()
-		for {
-			select {
-			case <-ctx.Done():
-				return
-			case ev, ok := <-sub.Ch:
-				if !ok {
-					return
-				}
-				var p struct {
-					PostID string `json:"post_id"`
-				}
-				if err := json.Unmarshal(ev.Payload, &p); err != nil || p.PostID == "" {
-					continue
-				}
-				pid, err := ids.ParseAs(ids.KindPost, p.PostID)
-				if err != nil {
-					continue
-				}
-				stillCan, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionView, pid)
-				if err != nil || !stillCan {
-					continue
-				}
-				post, err := r.loadPost(ctx, pid)
-				if err != nil || post == nil {
-					continue
-				}
+	var wg sync.WaitGroup
+	for _, dtid := range topicTagIDs {
+		sub := r.Realtime.Subscribe("posts.tag." + ids.FormatID(dtid))
+		wg.Add(1)
+		go func(sub *realtime.Subscription) {
+			defer wg.Done()
+			defer sub.Close()
+			for {
 				select {
-				case out <- post:
 				case <-ctx.Done():
 					return
+				case ev, ok := <-sub.Ch:
+					if !ok {
+						return
+					}
+					var p struct {
+						PostID string `json:"post_id"`
+					}
+					if err := json.Unmarshal(ev.Payload, &p); err != nil || p.PostID == "" {
+						continue
+					}
+					pid, err := ids.ParseAs(ids.KindPost, p.PostID)
+					if err != nil {
+						continue
+					}
+					stillCan, err := r.Perm.CanOnPost(ctx, identity.EffectiveID, perm.ActionView, pid)
+					if err != nil || !stillCan {
+						continue
+					}
+					post, err := r.loadPost(ctx, pid)
+					if err != nil || post == nil {
+						continue
+					}
+					select {
+					case out <- post:
+					case <-ctx.Done():
+						return
+					}
 				}
 			}
-		}
+		}(sub)
+	}
+	go func() {
+		wg.Wait()
+		close(out)
 	}()
+	return out, nil
+}
+
+// descendantTagIDs returns the closure subtree under ancestor (self at
+// depth 0 included). Used to fan PostChanged subscriptions across an
+// entire subtree when the caller asks for descendants.
+func (r *Resolver) descendantTagIDs(ctx context.Context, ancestor int64) ([]int64, error) {
+	rows, err := r.DB.Query(ctx,
+		`SELECT descendant_id FROM tag_closure WHERE ancestor_id = $1`, ancestor)
+	if err != nil {
+		return nil, fmt.Errorf("descendants: %w", err)
+	}
+	defer rows.Close()
+	var out []int64
+	for rows.Next() {
+		var id int64
+		if err := rows.Scan(&id); err != nil {
+			return nil, err
+		}
+		out = append(out, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 	return out, nil
 }
 
@@ -2235,8 +2336,21 @@ func (r *tagResolver) HasChildren(ctx context.Context, obj *model.Tag) (bool, er
 	return len(children) > 0, nil
 }
 
+// MyFeedSettings is the resolver for the myFeedSettings field.
+func (r *tagResolver) MyFeedSettings(ctx context.Context, obj *model.Tag) (*model.TagFeedSettings, error) {
+	identity := auth.FromContext(ctx)
+	if identity.IsAnonymous() {
+		return &model.TagFeedSettings{IncludeDescendants: false}, nil
+	}
+	tagID, err := r.resolveTagRef(ctx, obj.ID)
+	if err != nil {
+		return nil, fmt.Errorf("invalid tag id: %w", err)
+	}
+	return r.loadFeedSettings(ctx, identity.EffectiveID, tagID)
+}
+
 // Posts is the resolver for the posts field.
-func (r *tagResolver) Posts(ctx context.Context, obj *model.Tag, first *int, after *string, sort *model.PostSort) (*model.PostConnection, error) {
+func (r *tagResolver) Posts(ctx context.Context, obj *model.Tag, first *int, after *string, sort *model.PostSort, includeDescendants *bool) (*model.PostConnection, error) {
 	identity := auth.FromContext(ctx)
 	if identity.IsAnonymous() {
 		return emptyPostConnection(), nil
@@ -2253,7 +2367,19 @@ func (r *tagResolver) Posts(ctx context.Context, obj *model.Tag, first *int, aft
 	// created_at is the only ordering. Pagination cursors lift in M5.
 	_ = after
 	_ = sort
-	postRows, err := r.Resolver.Posts.ListByTag(ctx, tagID, limit)
+	// Explicit arg overrides the viewer's saved pref; nil means "use
+	// whatever they saved" (default false).
+	incDesc := false
+	if includeDescendants != nil {
+		incDesc = *includeDescendants
+	} else {
+		settings, err := r.loadFeedSettings(ctx, identity.EffectiveID, tagID)
+		if err != nil {
+			return nil, err
+		}
+		incDesc = settings.IncludeDescendants
+	}
+	postRows, err := r.Resolver.Posts.ListByTag(ctx, tagID, incDesc, limit)
 	if err != nil {
 		return nil, err
 	}

@@ -356,20 +356,39 @@ func (s *Service) TagRefs(ctx context.Context, id int64) ([]int64, error) {
 }
 
 // ListByTag returns posts attached to tagID, paginated by created_at DESC.
-// The caller passes the visibility predicate as already-checked: this
-// function does *not* perform a perm check.
-func (s *Service) ListByTag(ctx context.Context, tagID int64, limit int) ([]*Post, error) {
+// When includeDescendants is true, the result also covers every tag in
+// tagID's tag_closure subtree (deduped per-post). The caller passes the
+// visibility predicate as already-checked: this function does *not*
+// perform a perm check.
+func (s *Service) ListByTag(ctx context.Context, tagID int64, includeDescendants bool, limit int) ([]*Post, error) {
 	if limit <= 0 || limit > 100 {
 		limit = 50
 	}
-	rows, err := s.DB.Query(ctx, `
-        SELECT p.id, p.title, p.body, p.author_id, p.decision_status, p.deny_flag, p.created_at, p.edited_at, p.deleted_at
-        FROM posts p
-        JOIN post_tags pt ON pt.post_id = p.id
-        WHERE pt.tag_id = $1 AND p.deleted_at IS NULL
-        ORDER BY p.created_at DESC
-        LIMIT $2
-    `, tagID, limit)
+	var (
+		rows pgx.Rows
+		err  error
+	)
+	if includeDescendants {
+		rows, err = s.DB.Query(ctx, `
+            SELECT p.id, p.title, p.body, p.author_id, p.decision_status, p.deny_flag, p.created_at, p.edited_at, p.deleted_at
+            FROM posts p
+            JOIN post_tags pt ON pt.post_id = p.id
+            JOIN tag_closure c ON c.descendant_id = pt.tag_id
+            WHERE c.ancestor_id = $1 AND p.deleted_at IS NULL
+            GROUP BY p.id
+            ORDER BY p.created_at DESC
+            LIMIT $2
+        `, tagID, limit)
+	} else {
+		rows, err = s.DB.Query(ctx, `
+            SELECT p.id, p.title, p.body, p.author_id, p.decision_status, p.deny_flag, p.created_at, p.edited_at, p.deleted_at
+            FROM posts p
+            JOIN post_tags pt ON pt.post_id = p.id
+            WHERE pt.tag_id = $1 AND p.deleted_at IS NULL
+            ORDER BY p.created_at DESC
+            LIMIT $2
+        `, tagID, limit)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("list by tag: %w", err)
 	}

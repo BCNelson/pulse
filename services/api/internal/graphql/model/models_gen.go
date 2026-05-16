@@ -352,6 +352,11 @@ type SendMessageInput struct {
 	ReplyTo *string `json:"replyTo,omitempty"`
 }
 
+type SetTagFeedSettingsInput struct {
+	TagID              string `json:"tagId"`
+	IncludeDescendants bool   `json:"includeDescendants"`
+}
+
 type SubscribeTagInput struct {
 	TagID        string               `json:"tagId"`
 	Cascade      *bool                `json:"cascade,omitempty"`
@@ -377,8 +382,13 @@ type Tag struct {
 	CreatedAt      time.Time        `json:"createdAt"`
 	MyPermissions  *TagPermissions  `json:"myPermissions"`
 	MySubscription *TagSubscription `json:"mySubscription,omitempty"`
+	MyFeedSettings *TagFeedSettings `json:"myFeedSettings"`
 	Posts          *PostConnection  `json:"posts"`
 	Tasks          *TaskConnection  `json:"tasks"`
+}
+
+type TagFeedSettings struct {
+	IncludeDescendants bool `json:"includeDescendants"`
 }
 
 type TagPermissions struct {

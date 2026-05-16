@@ -49,6 +49,10 @@ query PostsForTag($tagId: ID!, $first: Int) {
     slug
     displayName
     path
+    hasChildren
+    myFeedSettings {
+      includeDescendants
+    }
     posts(first: $first) {
       edges {
         cursor
@@ -166,5 +170,11 @@ mutation UnreactToPost($postId: ID!, $emoji: String!) {
 subscription PostChanged($tagId: ID!) {
   postChanged(tagId: $tagId) {
     ...PostSummary
+  }
+}
+
+mutation SetTagFeedSettings($input: SetTagFeedSettingsInput!) {
+  setTagFeedSettings(input: $input) {
+    includeDescendants
   }
 }

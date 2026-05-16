@@ -267,6 +267,32 @@ class GPostSort extends EnumClass {
   static GPostSort valueOf(String name) => _$gPostSortValueOf(name);
 }
 
+abstract class GSetTagFeedSettingsInput
+    implements
+        Built<GSetTagFeedSettingsInput, GSetTagFeedSettingsInputBuilder> {
+  GSetTagFeedSettingsInput._();
+
+  factory GSetTagFeedSettingsInput(
+          [void Function(GSetTagFeedSettingsInputBuilder b) updates]) =
+      _$GSetTagFeedSettingsInput;
+
+  String get tagId;
+  bool get includeDescendants;
+  static Serializer<GSetTagFeedSettingsInput> get serializer =>
+      _$gSetTagFeedSettingsInputSerializer;
+
+  Map<String, dynamic> toJson() => (_i2.serializers.serializeWith(
+        GSetTagFeedSettingsInput.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSetTagFeedSettingsInput? fromJson(Map<String, dynamic> json) =>
+      _i2.serializers.deserializeWith(
+        GSetTagFeedSettingsInput.serializer,
+        json,
+      );
+}
+
 abstract class GNotificationFilter
     implements Built<GNotificationFilter, GNotificationFilterBuilder> {
   GNotificationFilter._();

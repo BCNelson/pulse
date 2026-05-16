@@ -292,6 +292,25 @@ func joinPath(parts []string) string {
 	return out
 }
 
+// loadFeedSettings returns the viewer's saved feed view prefs for tagID.
+// Missing rows mean defaults (all FALSE) — the row only exists once a
+// pref has been flipped away from default.
+func (r *Resolver) loadFeedSettings(ctx context.Context, principal, tagID int64) (*model.TagFeedSettings, error) {
+	out := &model.TagFeedSettings{}
+	err := r.DB.QueryRow(ctx, `
+        SELECT include_descendants
+        FROM tag_view_prefs
+        WHERE principal_id = $1 AND tag_id = $2
+    `, principal, tagID).Scan(&out.IncludeDescendants)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return out, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("load feed settings: %w", err)
+	}
+	return out, nil
+}
+
 func (r *Resolver) loadSubscription(ctx context.Context, principal, tagID int64) (*model.TagSubscription, error) {
 	var cascade bool
 	var urgency string

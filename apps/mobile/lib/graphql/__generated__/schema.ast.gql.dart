@@ -631,6 +631,46 @@ const TagSubscription = _i1.ObjectTypeDefinitionNode(
     ),
   ],
 );
+const TagFeedSettings = _i1.ObjectTypeDefinitionNode(
+  name: _i1.NameNode(value: 'TagFeedSettings'),
+  directives: [],
+  interfaces: [],
+  fields: [
+    _i1.FieldDefinitionNode(
+      name: _i1.NameNode(value: 'includeDescendants'),
+      directives: [],
+      args: [],
+      type: _i1.NamedTypeNode(
+        name: _i1.NameNode(value: 'Boolean'),
+        isNonNull: true,
+      ),
+    )
+  ],
+);
+const SetTagFeedSettingsInput = _i1.InputObjectTypeDefinitionNode(
+  name: _i1.NameNode(value: 'SetTagFeedSettingsInput'),
+  directives: [],
+  fields: [
+    _i1.InputValueDefinitionNode(
+      name: _i1.NameNode(value: 'tagId'),
+      directives: [],
+      type: _i1.NamedTypeNode(
+        name: _i1.NameNode(value: 'ID'),
+        isNonNull: true,
+      ),
+      defaultValue: null,
+    ),
+    _i1.InputValueDefinitionNode(
+      name: _i1.NameNode(value: 'includeDescendants'),
+      directives: [],
+      type: _i1.NamedTypeNode(
+        name: _i1.NameNode(value: 'Boolean'),
+        isNonNull: true,
+      ),
+      defaultValue: null,
+    ),
+  ],
+);
 const Tag = _i1.ObjectTypeDefinitionNode(
   name: _i1.NameNode(value: 'Tag'),
   directives: [],
@@ -766,6 +806,15 @@ const Tag = _i1.ObjectTypeDefinitionNode(
       ),
     ),
     _i1.FieldDefinitionNode(
+      name: _i1.NameNode(value: 'myFeedSettings'),
+      directives: [],
+      args: [],
+      type: _i1.NamedTypeNode(
+        name: _i1.NameNode(value: 'TagFeedSettings'),
+        isNonNull: true,
+      ),
+    ),
+    _i1.FieldDefinitionNode(
       name: _i1.NameNode(value: 'posts'),
       directives: [],
       args: [
@@ -792,6 +841,15 @@ const Tag = _i1.ObjectTypeDefinitionNode(
           directives: [],
           type: _i1.NamedTypeNode(
             name: _i1.NameNode(value: 'PostSort'),
+            isNonNull: false,
+          ),
+          defaultValue: null,
+        ),
+        _i1.InputValueDefinitionNode(
+          name: _i1.NameNode(value: 'includeDescendants'),
+          directives: [],
+          type: _i1.NamedTypeNode(
+            name: _i1.NameNode(value: 'Boolean'),
             isNonNull: false,
           ),
           defaultValue: null,
@@ -3634,6 +3692,25 @@ const Mutation = _i1.ObjectTypeDefinitionNode(
       ),
     ),
     _i1.FieldDefinitionNode(
+      name: _i1.NameNode(value: 'setTagFeedSettings'),
+      directives: [],
+      args: [
+        _i1.InputValueDefinitionNode(
+          name: _i1.NameNode(value: 'input'),
+          directives: [],
+          type: _i1.NamedTypeNode(
+            name: _i1.NameNode(value: 'SetTagFeedSettingsInput'),
+            isNonNull: true,
+          ),
+          defaultValue: null,
+        )
+      ],
+      type: _i1.NamedTypeNode(
+        name: _i1.NameNode(value: 'TagFeedSettings'),
+        isNonNull: true,
+      ),
+    ),
+    _i1.FieldDefinitionNode(
       name: _i1.NameNode(value: 'createPost'),
       directives: [],
       args: [
@@ -4673,7 +4750,16 @@ const Subscription = _i1.ObjectTypeDefinitionNode(
             isNonNull: true,
           ),
           defaultValue: null,
-        )
+        ),
+        _i1.InputValueDefinitionNode(
+          name: _i1.NameNode(value: 'includeDescendants'),
+          directives: [],
+          type: _i1.NamedTypeNode(
+            name: _i1.NameNode(value: 'Boolean'),
+            isNonNull: false,
+          ),
+          defaultValue: null,
+        ),
       ],
       type: _i1.NamedTypeNode(
         name: _i1.NameNode(value: 'Post'),
@@ -4732,6 +4818,8 @@ const document = _i1.DocumentNode(definitions: [
   Bot,
   TagPermissions,
   TagSubscription,
+  TagFeedSettings,
+  SetTagFeedSettingsInput,
   Tag,
   PostTag,
   PostPermissions,

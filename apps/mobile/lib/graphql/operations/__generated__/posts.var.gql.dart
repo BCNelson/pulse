@@ -200,6 +200,30 @@ abstract class GPostChangedVars
       );
 }
 
+abstract class GSetTagFeedSettingsVars
+    implements Built<GSetTagFeedSettingsVars, GSetTagFeedSettingsVarsBuilder> {
+  GSetTagFeedSettingsVars._();
+
+  factory GSetTagFeedSettingsVars(
+          [void Function(GSetTagFeedSettingsVarsBuilder b) updates]) =
+      _$GSetTagFeedSettingsVars;
+
+  _i2.GSetTagFeedSettingsInput get input;
+  static Serializer<GSetTagFeedSettingsVars> get serializer =>
+      _$gSetTagFeedSettingsVarsSerializer;
+
+  Map<String, dynamic> toJson() => (_i1.serializers.serializeWith(
+        GSetTagFeedSettingsVars.serializer,
+        this,
+      ) as Map<String, dynamic>);
+
+  static GSetTagFeedSettingsVars? fromJson(Map<String, dynamic> json) =>
+      _i1.serializers.deserializeWith(
+        GSetTagFeedSettingsVars.serializer,
+        json,
+      );
+}
+
 abstract class GPostSummaryVars
     implements Built<GPostSummaryVars, GPostSummaryVarsBuilder> {
   GPostSummaryVars._();

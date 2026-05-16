@@ -372,6 +372,8 @@ Serializer<GDevicePlatform> _$gDevicePlatformSerializer =
 Serializer<GAttachmentOwnerKind> _$gAttachmentOwnerKindSerializer =
     _$GAttachmentOwnerKindSerializer();
 Serializer<GPostSort> _$gPostSortSerializer = _$GPostSortSerializer();
+Serializer<GSetTagFeedSettingsInput> _$gSetTagFeedSettingsInputSerializer =
+    _$GSetTagFeedSettingsInputSerializer();
 Serializer<GNotificationFilter> _$gNotificationFilterSerializer =
     _$GNotificationFilterSerializer();
 Serializer<GIssueAttachmentUploadInput>
@@ -630,6 +632,59 @@ class _$GPostSortSerializer implements PrimitiveSerializer<GPostSort> {
   GPostSort deserialize(Serializers serializers, Object serialized,
           {FullType specifiedType = FullType.unspecified}) =>
       GPostSort.valueOf(serialized as String);
+}
+
+class _$GSetTagFeedSettingsInputSerializer
+    implements StructuredSerializer<GSetTagFeedSettingsInput> {
+  @override
+  final Iterable<Type> types = const [
+    GSetTagFeedSettingsInput,
+    _$GSetTagFeedSettingsInput
+  ];
+  @override
+  final String wireName = 'GSetTagFeedSettingsInput';
+
+  @override
+  Iterable<Object?> serialize(
+      Serializers serializers, GSetTagFeedSettingsInput object,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = <Object?>[
+      'tagId',
+      serializers.serialize(object.tagId,
+          specifiedType: const FullType(String)),
+      'includeDescendants',
+      serializers.serialize(object.includeDescendants,
+          specifiedType: const FullType(bool)),
+    ];
+
+    return result;
+  }
+
+  @override
+  GSetTagFeedSettingsInput deserialize(
+      Serializers serializers, Iterable<Object?> serialized,
+      {FullType specifiedType = FullType.unspecified}) {
+    final result = GSetTagFeedSettingsInputBuilder();
+
+    final iterator = serialized.iterator;
+    while (iterator.moveNext()) {
+      final key = iterator.current! as String;
+      iterator.moveNext();
+      final Object? value = iterator.current;
+      switch (key) {
+        case 'tagId':
+          result.tagId = serializers.deserialize(value,
+              specifiedType: const FullType(String))! as String;
+          break;
+        case 'includeDescendants':
+          result.includeDescendants = serializers.deserialize(value,
+              specifiedType: const FullType(bool))! as bool;
+          break;
+      }
+    }
+
+    return result.build();
+  }
 }
 
 class _$GNotificationFilterSerializer
@@ -1775,6 +1830,108 @@ class GJSONBuilder implements Builder<GJSON, GJSONBuilder> {
         _$GJSON._(
           value:
               BuiltValueNullFieldError.checkNotNull(value, r'GJSON', 'value'),
+        );
+    replace(_$result);
+    return _$result;
+  }
+}
+
+class _$GSetTagFeedSettingsInput extends GSetTagFeedSettingsInput {
+  @override
+  final String tagId;
+  @override
+  final bool includeDescendants;
+
+  factory _$GSetTagFeedSettingsInput(
+          [void Function(GSetTagFeedSettingsInputBuilder)? updates]) =>
+      (GSetTagFeedSettingsInputBuilder()..update(updates))._build();
+
+  _$GSetTagFeedSettingsInput._(
+      {required this.tagId, required this.includeDescendants})
+      : super._();
+  @override
+  GSetTagFeedSettingsInput rebuild(
+          void Function(GSetTagFeedSettingsInputBuilder) updates) =>
+      (toBuilder()..update(updates)).build();
+
+  @override
+  GSetTagFeedSettingsInputBuilder toBuilder() =>
+      GSetTagFeedSettingsInputBuilder()..replace(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(other, this)) return true;
+    return other is GSetTagFeedSettingsInput &&
+        tagId == other.tagId &&
+        includeDescendants == other.includeDescendants;
+  }
+
+  @override
+  int get hashCode {
+    var _$hash = 0;
+    _$hash = $jc(_$hash, tagId.hashCode);
+    _$hash = $jc(_$hash, includeDescendants.hashCode);
+    _$hash = $jf(_$hash);
+    return _$hash;
+  }
+
+  @override
+  String toString() {
+    return (newBuiltValueToStringHelper(r'GSetTagFeedSettingsInput')
+          ..add('tagId', tagId)
+          ..add('includeDescendants', includeDescendants))
+        .toString();
+  }
+}
+
+class GSetTagFeedSettingsInputBuilder
+    implements
+        Builder<GSetTagFeedSettingsInput, GSetTagFeedSettingsInputBuilder> {
+  _$GSetTagFeedSettingsInput? _$v;
+
+  String? _tagId;
+  String? get tagId => _$this._tagId;
+  set tagId(String? tagId) => _$this._tagId = tagId;
+
+  bool? _includeDescendants;
+  bool? get includeDescendants => _$this._includeDescendants;
+  set includeDescendants(bool? includeDescendants) =>
+      _$this._includeDescendants = includeDescendants;
+
+  GSetTagFeedSettingsInputBuilder();
+
+  GSetTagFeedSettingsInputBuilder get _$this {
+    final $v = _$v;
+    if ($v != null) {
+      _tagId = $v.tagId;
+      _includeDescendants = $v.includeDescendants;
+      _$v = null;
+    }
+    return this;
+  }
+
+  @override
+  void replace(GSetTagFeedSettingsInput other) {
+    _$v = other as _$GSetTagFeedSettingsInput;
+  }
+
+  @override
+  void update(void Function(GSetTagFeedSettingsInputBuilder)? updates) {
+    if (updates != null) updates(this);
+  }
+
+  @override
+  GSetTagFeedSettingsInput build() => _build();
+
+  _$GSetTagFeedSettingsInput _build() {
+    final _$result = _$v ??
+        _$GSetTagFeedSettingsInput._(
+          tagId: BuiltValueNullFieldError.checkNotNull(
+              tagId, r'GSetTagFeedSettingsInput', 'tagId'),
+          includeDescendants: BuiltValueNullFieldError.checkNotNull(
+              includeDescendants,
+              r'GSetTagFeedSettingsInput',
+              'includeDescendants'),
         );
     replace(_$result);
     return _$result;
